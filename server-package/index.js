@@ -43,6 +43,18 @@ CMD.on("credits", (player, params) => {
 });
 
 /* SA:MP Functions */
+function PreparatePlayerLogin(player) {
+    con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
+        if(err) return player.Kick();
+        if(result == 0) { /* Register */
+            player.ShowPlayerDialog(Dialog.REGISTER, samp.DIALOG_STYLE.PASSWORD, "Inregistreaza-ti numele!", `{FFFF00}Salut, {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Numele tau nu este inregistrat. Te rugam sa-l inregistrezi pentru a-ti salva statisticile!\n{FFFF00}Introdu o parola grea pe care doar tu sa o stii pentru a te autentifica! ({FF0000}intre 3-25 de caractere{FFFF00}):`, "Register", "Nume Nou");
+        }
+        else { /* Login */
+            player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, "Autentificare", `{FFFF00}Bine ai revenit {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Trebuie sa te autentifici cu parola acestui cont inainte de a continua!\n{FFFF00}Daca acesta nu este numele contului tau, apasa pe butonul {FF0000}Nume Nou{FFFF00}!`, "Autentificare", "Nume Nou");
+        }
+    });
+}
+
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -104,12 +116,12 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             if(response) {
                 if(inputtext.length < 3 || inputtext.length > 20) return Call_NewName(player);
                 player.SetPlayerName(inputtext);
-                samp.OnPlayerConnect(player);
+                PreparatePlayerLogin(player);
             }
             else {
                 let tag = getRandomInt(1, 99999);
                 player.SetPlayerName(`[${tag}]TempName`);
-                samp.OnPlayerConnect(player);
+                PreparatePlayerLogin(player);
             }
             break;
         }
@@ -146,15 +158,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.SELECT_LANGUAGE: {
             Player.Info[player.playerid].Language = response;
-            con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
-                if(err) return player.Kick();
-                if(result == 0) { /* Register */
-                    player.ShowPlayerDialog(Dialog.REGISTER, samp.DIALOG_STYLE.PASSWORD, "Inregistreaza-ti numele!", `{FFFF00}Salut, {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Numele tau nu este inregistrat. Te rugam sa-l inregistrezi pentru a-ti salva statisticile!\n{FFFF00}Introdu o parola grea pe care doar tu sa o stii pentru a te autentifica! ({FF0000}intre 3-25 de caractere{FFFF00}):`, "Register", "Nume Nou");
-                }
-                else { /* Login */
-                    player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, "Autentificare", `{FFFF00}Bine ai revenit {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Trebuie sa te autentifici cu parola acestui cont inainte de a continua!\n{FFFF00}Daca acesta nu este numele contului tau, apasa pe butonul {FF0000}Nume Nou{FFFF00}!`, "Autentificare", "Nume Nou");
-                }
-            });
+            PreparatePlayerLogin(player);
             break;
         }
     }
