@@ -9,6 +9,7 @@ const colors = require("colors");
 
 /* Custom Modules */
 const events = require("./modules/events");
+const Player = require("./modules/player");
 
 /* Data's */
 const data = {
