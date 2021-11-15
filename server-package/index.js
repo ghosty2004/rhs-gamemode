@@ -20,7 +20,8 @@ require("./maps");
 /* Data's */
 const data = {
     mysql: require("./data/mysql"),
-    settings: require("./data/settings")
+    settings: require("./data/settings"),
+    colors: require("./data/colors")
 }
 
 /* Create MYSQL Connection */
@@ -178,12 +179,11 @@ samp.OnPlayerCommandText((player, cmdtext) => {
         cmdtext = replaceAll(cmdtext, "/", ""); 
         let params = cmdtext.split(/[ ]+/);
         let temp_string = params[0];
-
         if(CMD.eventNames().some(s => s == temp_string)) {
             params.shift();
             CMD.emit(`${temp_string}`, player, params);
         }
-        else player.SendClientMessage(0xFF0000AA, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`);
+        else player.SendClientMessage(data.colors.RED, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`);
     }
     return true;
 });
