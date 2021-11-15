@@ -10,6 +10,7 @@ const colors = require("colors");
 /* Custom Modules */
 const events = require("./modules/events");
 const Player = require("./modules/player");
+const Dialog = require("./modules/dialog");
 
 /* Data's */
 const data = {
@@ -49,4 +50,8 @@ samp.OnPlayerSpawn((player) => {
 
 samp.OnPlayerUpdate((player) => {
     return true;
+});
+
+samp.OnDialogResponse((player) => {
+
 });
