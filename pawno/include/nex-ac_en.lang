@@ -1,0 +1,37 @@
+//For Nex-AC v1.0 (0.3.7-R1)
+ 
+#if defined _nex_ac_lang_included
+        #endinput
+#endif
+#define _nex_ac_lang_included
+ 
+new
+        SUSPICION_1[] =                 "[ESSBuster] Suspicious player, ID %d. Reason code: %03d%s",
+        SUSPICION_2[] =                 "[ESSBuster] Suspicious player, IP %s. Reason code: %03d%s",
+        VERSION_WARNING[] =             "[ESSBuster] The anticheat version is not compatible with the current SA-MP Server",
+        CFG_OPENING_ERROR[] =   		"[ESSBuster] Error creating or opening %s!",
+ 
+#if defined DEBUG
+        DEBUG_CODE_1[] =                "[ESSBuster debug] ID %d exceeded %d flood attempts. Public ID: %d",
+        DEBUG_CODE_2[] =                "[ESSBuster debug] Invalid version by ID %d. Version: %s",
+        DEBUG_CODE_3[] =                "[ESSBuster debug] ID %d exceeded %d connections from 1 IP-address",
+        DEBUG_CODE_4[] =                "[ESSBuster debug] Bad RCON login by IP %s using password %s",
+        DEBUG_CODE_5[] =                "[ESSBuster debug] ID %d used NOP %s",
+#endif
+ 
+		KICK_MSG[] =					"{FF0000}ESSBuster: Kicking player '%s'. Reason: Using Cheats (#%03d)!",
+        MAX_CONNECTS_MSG[] =    		"{FF0000}ESSBuster: You have exceeded the maximum number of connections from 1 IP-address!",
+        UNKNOWN_CLIENT_MSG[] =  		"{FF0000}ESSInfo: This version of the client is not compatible with the server version!",
+ 
+        LOADED_MSG_1[] =                " Anticheat ESSBuster loaded!",
+        LOADED_MSG_2[] =                " Anticheat version: %s",
+        LOADED_MSG_3[] =                " Author: ESSBuster",
+ 
+        STATS_STRING_1[] =              " Statistics anticheat ESSBuster",
+        STATS_STRING_2[] =              " Detected and prevented:",
+        STATS_STRING_3[] =              "  %d cheating attempts",
+        STATS_STRING_4[] =              "  %d hacking attempts",
+        STATS_STRING_5[] =              "  %d crashing attempts",
+        STATS_STRING_6[] =              "  %d flooding attempts",
+        STATS_STRING_7[] =              "  %d attacks",
+        STATS_STRING_8[] =              " Total detected and punished %d cheaters";
