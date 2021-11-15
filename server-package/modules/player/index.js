@@ -6,7 +6,8 @@ module.exports = {
             Language: 0,
             Fail_Logins: 0,
             Mail: "",
-            Admin: 0
+            Admin: 0,
+            VIP: 0
         }
     }
 };

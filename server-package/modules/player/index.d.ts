@@ -6,6 +6,7 @@ export declare const Info: {
     Fail_Logins: number,
     Mail: string,
     Admin: number,
+    VIP: number,
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;
