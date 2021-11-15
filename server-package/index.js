@@ -47,6 +47,10 @@ CMD.on("credits", (player, params) => {
 });
 
 /* SA:MP Functions */
+function replaceAll(string, search, replace) {
+    return string.split(search).join(replace);
+}
+
 function PreparatePlayerLogin(player) {
     con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
         if(err) return player.Kick();
@@ -170,8 +174,8 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
 
 samp.OnPlayerCommandText((player, cmdtext) => {
     if(Player.Info[player.playerid].LoggedIn) {
-        cmdtext = cmdtext.toLowerCase(); /* Convert the char to lower case */
-        cmdtext = replaceAll(cmdtext, "/", ""); /* Replace slash to empty char */
+        cmdtext = cmdtext.toLowerCase(); 
+        cmdtext = replaceAll(cmdtext, "/", ""); 
         let params = cmdtext.split(/[ ]+/);
         let temp_string = params[0];
 
@@ -179,6 +183,7 @@ samp.OnPlayerCommandText((player, cmdtext) => {
             params.shift();
             CMD.emit(`${temp_string}`, player, params);
         }
-        else player.SendClientMessage(0xFF0000, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`);
+        else player.SendClientMessage(0xFF0000AA, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`);
     }
+    return true;
 });
