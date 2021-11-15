@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/Ghosty2004/rhs-gamemode/issues"
   },
-  "homepage": "https://github.com/Ghosty2004/rhs-gamemode#readme"
+  "homepage": "https://github.com/Ghosty2004/rhs-gamemode#readme",
+  "dependencies": {
+    "colors": "^1.4.0",
+    "mysql": "^2.18.1"
+  }
 }
