@@ -43,6 +43,16 @@ CMD.on("credits", (player, params) => {
 });
 
 /* SA:MP Functions */
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); 
+}
+
+function Call_NewName(player) {
+    player.ShowPlayerDialog(Dialog.NEW_NAME, samp.DIALOG_STYLE.INPUT, "Change Name", "{BBFF00}Please enter below new nickname wich you want to have\n{FFFF00}This name need to between {FF0000}3-20{FFFF00} characters long!:", "Change", "Random Name");
+}
+
 function LoadPlayerStats(player) {
     con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
         if(!err && result) {  
@@ -90,19 +100,33 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.NEW_NAME: {
+            if(response) {
+                if(inputtext.length < 3 || inputtext.length > 20) return Call_NewName(player);
+                player.SetPlayerName(inputtext);
+                samp.OnPlayerConnect(player);
+            }
+            else {
+                let tag = getRandomInt(1, 99999);
+                player.SetPlayerName(`[${tag}]TempName`);
+                samp.OnPlayerConnect(player);
+            }
+            break;
+        }
         case Dialog.LOGIN: {
             if(response) {
                 con.query("SELECT * FROM users WHERE name = ? AND password = ?", [player.GetPlayerName(24), md5(inputtext)], function(err, result) {
                     if(!err) {
                         if(result == 0) {
-
+                            Player.Info[player.playerid].Fail_Logins++;
+                            if(Player.Info[player.playerid].Fail_Logins == 3) player.Kick();
                         }
                         else LoadPlayerStats(player);
                     }
                     else player.Kick();
                 });
             }
-            else player.Kick();
+            else Call_NewName(player);
             break;
         }
         case Dialog.AFTER_REGISTER: {
@@ -117,7 +141,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                     else player.Kick();
                 });
             }
-            else player.Kick();
+            else Call_NewName(player);
             break;
         }
         case Dialog.SELECT_LANGUAGE: {
@@ -125,10 +149,10 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
                 if(err) return player.Kick();
                 if(result == 0) { /* Register */
-                    player.ShowPlayerDialog(Dialog.REGISTER, samp.DIALOG_STYLE.PASSWORD, "Inregistreaza-ti numele!", `{FFFF00}Salut, {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Numele tau nu este inregistrat. Te rugam sa-l inregistrezi pentru a-ti salva statisticile!\n{FFFF00}Introdu o parola grea pe care doar tu sa o stii pentru a te autentifica! ({FF0000}intre 3-25 de caractere{FFFF00}):`, "Register", "Kick");
+                    player.ShowPlayerDialog(Dialog.REGISTER, samp.DIALOG_STYLE.PASSWORD, "Inregistreaza-ti numele!", `{FFFF00}Salut, {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Numele tau nu este inregistrat. Te rugam sa-l inregistrezi pentru a-ti salva statisticile!\n{FFFF00}Introdu o parola grea pe care doar tu sa o stii pentru a te autentifica! ({FF0000}intre 3-25 de caractere{FFFF00}):`, "Register", "Nume Nou");
                 }
                 else { /* Login */
-                    player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, "Autentificare", `{FFFF00}Bine ai revenit {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Trebuie sa te autentifici cu parola acestui cont inainte de a continua!\n{FFFF00}Daca acesta nu este numele contului tau, apasa pe butonul {FF0000}Nume Nou{FFFF00}!`, "Autentificare", "Kick");
+                    player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, "Autentificare", `{FFFF00}Bine ai revenit {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Trebuie sa te autentifici cu parola acestui cont inainte de a continua!\n{FFFF00}Daca acesta nu este numele contului tau, apasa pe butonul {FF0000}Nume Nou{FFFF00}!`, "Autentificare", "Nume Nou");
                 }
             });
             break;
