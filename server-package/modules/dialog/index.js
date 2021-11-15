@@ -4,5 +4,8 @@ module.exports = {
     REGISTER: 3,
     AFTER_REGISTER: 4,
     LOGIN: 5,
-    NEW_NAME: 6
+    NEW_NAME: 6,
+    CMDS_1,
+    CMDS_2,
+    CMDS_3
 }
