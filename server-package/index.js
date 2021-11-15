@@ -3,6 +3,7 @@
 /* =============================== */
 
 /* Modules */
+const samp = require("samp-node-lib");
 const mysql = require("mysql");
 const colors = require("colors");
 
