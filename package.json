@@ -19,6 +19,7 @@
   "dependencies": {
     "colors": "^1.4.0",
     "events": "^3.3.0",
+    "md5": "^2.3.0",
     "mysql": "^2.18.1",
     "samp-node-lib": "^1.0.5"
   }

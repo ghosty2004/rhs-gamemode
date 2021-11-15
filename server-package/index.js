@@ -6,6 +6,7 @@
 const samp = require("samp-node-lib");
 const mysql = require("mysql");
 const colors = require("colors");
+const md5 = require("md5");
 
 /* Custom Modules */
 const events = require("./modules/events");
@@ -41,6 +42,34 @@ CMD.on("credits", (player, params) => {
     
 });
 
+/* SA:MP Functions */
+function LoadPlayerStats(player) {
+    con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
+        if(!err && result) {  
+            Player.Info[player.playerid].LoggedIn = true;
+            Player.Info[player.playerid].Admin = result[0].admin;
+
+            let info = "";
+            info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
+            info += "{BBFF00}Ai fost autentificat cu succes!\n";
+            info += "\n";
+            info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? "{00FF00}Yes" : "{FF0000}No"}\n`;
+            info += "{BBFF00}VIP: {FF0000}No\n";
+            info += "{BBFF00}Nota Statistici: {FF0000}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob\n";
+            info += "\n";
+            info += "{BBFF00}Pentru mai multe statistici, foloseste {FF0000}/stats{BBFF00}.\n";
+            info += "\n";
+            info += "{FF0000}Mesaj {FF9900}URGENT {FF0000}pentru siguranta contului tau:\n";
+            info += "{FFFFFF}In contul tau nu exista o parola secundara!\n";
+            info += "{FFFFFF}Pentru a evita pierderea contului tau,\n";
+            info += "{FFFFFF}Adauga o parola secundara folosind comanda {FF0000}/Spassword{FFFFFF}!";
+
+            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
+        }
+        else player.Kick();
+    });
+}
+
 /* SA:MP Events */
 samp.OnPlayerConnect((player) => {
     Player.ResetVariables(player);
@@ -61,14 +90,29 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.LOGIN: {
+            if(response) {
+                con.query("SELECT * FROM users WHERE name = ? AND password = ?", [player.GetPlayerName(24), md5(inputtext)], function(err, result) {
+                    if(!err) {
+                        if(result == 0) {
+
+                        }
+                        else LoadPlayerStats(player);
+                    }
+                    else player.Kick();
+                });
+            }
+            else player.Kick();
+            break;
+        }
         case Dialog.AFTER_REGISTER: {
             break;
         }
         case Dialog.REGISTER: {
             if(response) {
-                con.query("INSERT INTO users (name, password) VALUES(?, ?)", [player.GetPlayerName(24), inputtext], function(err, result) {
+                con.query("INSERT INTO users (name, password) VALUES(?, ?)", [player.GetPlayerName(24), md5(inputtext)], function(err, result) {
                     if(!err) {
-                        player.ShowPlayerDialog(Dialog.AFTER_REGISTER, samp.DIALOG_STYLE.MSGBOX, "Inregistrare {BBFF00}Reusita!", `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n{BBFF00}Te-ai inregistrat cu succes pe server-ul ${data.settings.SERVER_NAME}{BBFF00}!\n{BBFF00}Tine minte! De cate ori vei reveni, va trebuii sa te autentifici cu parola: {FF0000}${inputtext}{BBFF00}!\n\n{FFFF00}Pentru mai multe informatii, click pe buton-ul {FF0000}Ajutor{FFFF00}.\n{FFFF00}De asemenea, nu uita sa ne vizitezi si website-ul si forum-ul nostru la adresa {FF0000}${data.settings.SERVER_WEB}{FFFF00}!`)
+                        player.ShowPlayerDialog(Dialog.AFTER_REGISTER, samp.DIALOG_STYLE.MSGBOX, "Inregistrare {BBFF00}Reusita!", `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n{BBFF00}Te-ai inregistrat cu succes pe server-ul ${data.settings.SERVER_NAME}{BBFF00}!\n{BBFF00}Tine minte! De cate ori vei reveni, va trebuii sa te autentifici cu parola: {FF0000}${inputtext}{BBFF00}!\n\n{FFFF00}Pentru mai multe informatii, click pe buton-ul {FF0000}Ajutor{FFFF00}.\n{FFFF00}De asemenea, nu uita sa ne vizitezi si website-ul si forum-ul nostru la adresa {FF0000}${data.settings.SERVER_WEB}{FFFF00}!`, "Inchide", "Ajutor!");
                     }
                     else player.Kick();
                 });
@@ -84,7 +128,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                     player.ShowPlayerDialog(Dialog.REGISTER, samp.DIALOG_STYLE.PASSWORD, "Inregistreaza-ti numele!", `{FFFF00}Salut, {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Numele tau nu este inregistrat. Te rugam sa-l inregistrezi pentru a-ti salva statisticile!\n{FFFF00}Introdu o parola grea pe care doar tu sa o stii pentru a te autentifica! ({FF0000}intre 3-25 de caractere{FFFF00}):`, "Register", "Kick");
                 }
                 else { /* Login */
-
+                    player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, "Autentificare", `{FFFF00}Bine ai revenit {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Trebuie sa te autentifici cu parola acestui cont inainte de a continua!\n{FFFF00}Daca acesta nu este numele contului tau, apasa pe butonul {FF0000}Nume Nou{FFFF00}!`, "Autentificare", "Kick");
                 }
             });
             break;

@@ -4,7 +4,8 @@ module.exports = {
         this.Info[player.playerid] = {
             LoggedIn: false,
             Language: 0,
-            Mail: ""
+            Mail: "",
+            Admin: 0
         }
     }
 };
