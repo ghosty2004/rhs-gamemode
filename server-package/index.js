@@ -35,13 +35,18 @@ con.connect((err) => {
 /* Command Handler */
 const CMD = new events.Command();
 
+/* SA:MP Commands */
+CMD.on("credits", (player, params) => {
+    
+});
+
 /* SA:MP Events */
 samp.OnPlayerConnect((player) => {
-
+    Player.ResetVariables(player);
 });
 
 samp.OnPlayerDisconnect((player, reason) => {
-
+    Player.ResetVariables(player);
 });
 
 samp.OnPlayerSpawn((player) => {
@@ -54,4 +59,17 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player) => {
 
+});
+
+samp.OnPlayerCommandText((player, cmdtext) => {
+    cmdtext = cmdtext.toLowerCase(); /* Convert the char to lower case */
+    cmdtext = replaceAll(cmdtext, "/", ""); /* Replace slash to empty char */
+    let params = cmdtext.split(/[ ]+/);
+    let temp_string = params[0];
+
+    if(CMD.eventNames().some(s => s == temp_string)) {
+        params.shift();
+        CMD.emit(`${temp_string}`, player, params);
+    }
+    else player.SendClientMessage(0xFF0000, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`);
 });
