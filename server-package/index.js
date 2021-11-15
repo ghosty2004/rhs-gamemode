@@ -7,6 +7,9 @@ const samp = require("samp-node-lib");
 const mysql = require("mysql");
 const colors = require("colors");
 
+/* Custom Modules */
+const events = require("./modules/events");
+
 /* Data's */
 const data = {
     mysql: require("./data/mysql.js")
@@ -25,4 +28,16 @@ con.connect((err) => {
         console.log("MYSQL:".yellow + ` Connection have been refused.`.red);
         process.exit();
     }
+});
+
+/* Command Handler */
+const CMD = new events.Command();
+
+/* SA:MP Events */
+samp.OnPlayerConnect((player) => {
+
+});
+
+samp.OnPlayerDisconnect((player, reason) => {
+
 });
