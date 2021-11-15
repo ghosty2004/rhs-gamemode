@@ -44,7 +44,7 @@ CMD.on("credits", (player, params) => {
 /* SA:MP Events */
 samp.OnPlayerConnect((player) => {
     Player.ResetVariables(player);
-    player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`)
+    player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English");
 });
 
 samp.OnPlayerDisconnect((player, reason) => {
@@ -59,19 +59,50 @@ samp.OnPlayerUpdate((player) => {
     return true;
 });
 
-samp.OnDialogResponse((player) => {
+samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
+    switch(dialogid) {
+        case Dialog.AFTER_REGISTER: {
+            break;
+        }
+        case Dialog.REGISTER: {
+            if(response) {
+                con.query("INSERT INTO users (name, password) VALUES(?, ?)", [player.GetPlayerName(24), inputtext], function(err, result) {
+                    if(!err) {
+                        player.ShowPlayerDialog(Dialog.AFTER_REGISTER, samp.DIALOG_STYLE.MSGBOX, "Inregistrare {BBFF00}Reusita!", `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n{BBFF00}Te-ai inregistrat cu succes pe server-ul ${data.settings.SERVER_NAME}{BBFF00}!\n{BBFF00}Tine minte! De cate ori vei reveni, va trebuii sa te autentifici cu parola: {FF0000}${inputtext}{BBFF00}!\n\n{FFFF00}Pentru mai multe informatii, click pe buton-ul {FF0000}Ajutor{FFFF00}.\n{FFFF00}De asemenea, nu uita sa ne vizitezi si website-ul si forum-ul nostru la adresa {FF0000}${data.settings.SERVER_WEB}{FFFF00}!`)
+                    }
+                    else player.Kick();
+                });
+            }
+            else player.Kick();
+            break;
+        }
+        case Dialog.SELECT_LANGUAGE: {
+            Player.Info[player.playerid].Language = response;
+            con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
+                if(err) return player.Kick();
+                if(result == 0) { /* Register */
+                    player.ShowPlayerDialog(Dialog.REGISTER, samp.DIALOG_STYLE.PASSWORD, "Inregistreaza-ti numele!", `{FFFF00}Salut, {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Numele tau nu este inregistrat. Te rugam sa-l inregistrezi pentru a-ti salva statisticile!\n{FFFF00}Introdu o parola grea pe care doar tu sa o stii pentru a te autentifica! ({FF0000}intre 3-25 de caractere{FFFF00}):`, "Register", "Kick");
+                }
+                else { /* Login */
 
+                }
+            });
+            break;
+        }
+    }
 });
 
 samp.OnPlayerCommandText((player, cmdtext) => {
-    cmdtext = cmdtext.toLowerCase(); /* Convert the char to lower case */
-    cmdtext = replaceAll(cmdtext, "/", ""); /* Replace slash to empty char */
-    let params = cmdtext.split(/[ ]+/);
-    let temp_string = params[0];
+    if(Player.Info[player.playerid].LoggedIn) {
+        cmdtext = cmdtext.toLowerCase(); /* Convert the char to lower case */
+        cmdtext = replaceAll(cmdtext, "/", ""); /* Replace slash to empty char */
+        let params = cmdtext.split(/[ ]+/);
+        let temp_string = params[0];
 
-    if(CMD.eventNames().some(s => s == temp_string)) {
-        params.shift();
-        CMD.emit(`${temp_string}`, player, params);
+        if(CMD.eventNames().some(s => s == temp_string)) {
+            params.shift();
+            CMD.emit(`${temp_string}`, player, params);
+        }
+        else player.SendClientMessage(0xFF0000, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`);
     }
-    else player.SendClientMessage(0xFF0000, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`);
 });
