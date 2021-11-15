@@ -14,7 +14,8 @@ const Dialog = require("./modules/dialog");
 
 /* Data's */
 const data = {
-    mysql: require("./data/mysql.js")
+    mysql: require("./data/mysql"),
+    settings: require("./data/settings")
 }
 
 /* Create MYSQL Connection */
@@ -43,6 +44,7 @@ CMD.on("credits", (player, params) => {
 /* SA:MP Events */
 samp.OnPlayerConnect((player) => {
     Player.ResetVariables(player);
+    player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`)
 });
 
 samp.OnPlayerDisconnect((player, reason) => {
