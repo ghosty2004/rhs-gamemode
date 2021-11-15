@@ -44,7 +44,34 @@ const CMD = new events.Command();
 
 /* SA:MP Commands */
 CMD.on("credits", (player, params) => {
-    
+    let info = "";
+    info += `{00BBF6}${Player.Info[player.playerid].Language == 1 ? "Mai jos ai o lista cu cei ce au contribuit la crearea acestui server:" : "Before is a list with server's creators:"}\n`;
+    info += "\n";
+    info += "{FF0000}Scripter:\n";
+    info += "{15FF00}Voller.\n";
+    info += "\n";
+    info += `{0072FF}${Player.Info[player.playerid].Language == 1 ? "Proprietari:" : "Owners:"}\n`;
+    info += "{15FF00}Voller.\n";
+    info += "\n";
+    info += `{FF0000}${Player.Info[player.playerid].Language == 1 ? "Creatorii Hartilor:" : "Maps Creators:"}\n`;
+    info += "{15FF00}[9mm]_LimiTLesS_\n";
+    info += "{15FF00}+ Alti\n";
+    info += "\n";
+    info += `{0072FF}Site & Forum ({FFFF00}${data.settings.SERVER_WEB}{0072FF}):\n`;
+    info += "{15FF00}L0g1k.\n";
+    info += "{15FF00}iuda.\n";
+    info += "{15FF00}Invision Power Board Team\n";
+    info += "\n";
+    info += `{FF0000}${Player.Info[player.playerid].Language == 1 ? "Multumiri Speciale:" : "Special Thanks:"}\n`;
+    info += "{15FF00}TheRullZ_\n";
+    info += "{15FF00}L0g1k\n";
+    info += "{15FF00}[9mm]_LimiTLesS_";
+    info += "\n";
+    info += `{0072FF}${Player.Info[player.playerid].Language == 1 ? "Cel mai bun jucator:" : "Best Player:"}\n`;
+    info += `{15FF00}${player.GetPlayerName(24)}\n`;
+    info += "\n";
+    info += `{00BBF6}${Player.Info[player.playerid].Language == 1 ? `Multumim, {FF0000}${player.GetPlayerName(24)}{00BBF6}, pentru ca joci pe server-ul nostru!` : `Thank you, {FF0000}${player.GetPlayerName(24)}{00BBF6}, for playing on our server!`}`;
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `${Player.Info[player.playerid].Language == 1 ? "Creatori" : "Credits"}`, info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", "");
 });
 
 /* SA:MP Functions */
