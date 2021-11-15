@@ -41,3 +41,11 @@ samp.OnPlayerConnect((player) => {
 samp.OnPlayerDisconnect((player, reason) => {
 
 });
+
+samp.OnPlayerSpawn((player) => {
+
+});
+
+samp.OnPlayerUpdate((player) => {
+    return true;
+});
