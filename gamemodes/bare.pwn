@@ -15,6 +15,22 @@ public getLocationData(RequestID[], Float:x, Float:y, Float:z) {
     return true;
 }
 
+// => Objects
+forward _CreateDynamicObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, worldid, interiorid, playerid, Float:streamdistance, Float:drawdistance, areaid, priority);
+public _CreateDynamicObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, worldid, interiorid, playerid, Float:streamdistance, Float:drawdistance, areaid, priority) { return CreateDynamicObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, worldid, interiorid, playerid, Float:streamdistance, Float:drawdistance, areaid, priority); }
+
+forward _DestroyDynamicObject(objectid);
+public _DestroyDynamicObject(objectid) { return DestroyDynamicObject(objectid); }
+
+forward _IsValidDynamicObject(objectid);
+public _IsValidDynamicObject(objectid) { return IsValidDynamicObject(objectid); }
+
+forward _SetDynamicObjectMaterial(objectid, materialindex, modelid, txdname[], texturename[], materialcolor);
+public _SetDynamicObjectMaterial(objectid, materialindex, modelid, txdname[], texturename[], materialcolor) { return SetDynamicObjectMaterial(objectid, materialindex, modelid, txdname, texturename, materialcolor); }
+
+forward _SetDynamicObjectMaterialText(objectid, materialindex, text[], materialsize, fontface[], fontsize, bold, fontcolor, backcolor, textalignment);
+public _SetDynamicObjectMaterialText(objectid, materialindex, text[], materialsize, fontface[], fontsize, bold, fontcolor, backcolor, textalignment) { return SetDynamicObjectMaterialText(objectid, materialindex, text, materialsize, fontface, fontsize, bold, fontcolor, backcolor, textalignment); }
+
 // => Pickups
 forward _CreateDynamicPickup(modelid, type, Float:x, Float:y, Float:z, worldid, interiorid, playerid, streamdistance, areaid, priority);
 public _CreateDynamicPickup(modelid, type, Float:x, Float:y, Float:z, worldid, interiorid, playerid, streamdistance, areaid, priority) { return CreateDynamicPickup(modelid, type, x, y, z, worldid, interiorid, playerid, streamdistance, areaid, priority); }

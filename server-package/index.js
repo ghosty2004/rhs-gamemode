@@ -12,6 +12,10 @@ const md5 = require("md5");
 const events = require("./modules/events");
 const Player = require("./modules/player");
 const Dialog = require("./modules/dialog");
+const Streamer = require("./modules/streamer");
+
+/* Server Maps */
+require("./maps");
 
 /* Data's */
 const data = {

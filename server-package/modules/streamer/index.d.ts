@@ -1,3 +1,8 @@
+export declare function CreateDynamicObject(modelid: number, x: number, y: number, z: number, rx: number, ry: number, rz: number, worldid: number, interiorid: number, playerid: number, streamdistance: number, drawdistance: number, areaid: number, priority: number): number;
+export declare function DestroyDynamicObject(objectid: number): void;
+export declare function IsValidDynamicObject(objectid: number): boolean;
+export declare function SetDynamicObjectMaterial(objectid: number, materialindex: number, modelid: number, txdname: string, texturename: string, materialcolor: number): void;
+export declare function SetDynamicObjectMaterialText(objectid: number, materialindex: number, text: string, materialsize: number, fontface: string, fontsize: number, bold: number, fontcolor: number, backcolor: number, textalignment: number): void;
 export declare function CreateDynamicPickup(modelid: number, type: number, x: number, y: number, z: number, worldid: number, interiorid: number, playerid: number, streamdistance: number, areaid: number, priority: number): number;
 export declare function DestroyDynamicPickup(pickupid: number): void;
 export declare function IsValidDynamicPickup(pickupid: number): boolean;
