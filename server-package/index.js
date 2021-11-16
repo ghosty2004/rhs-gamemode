@@ -18,11 +18,14 @@ const Streamer = require("./modules/streamer");
 /* Server Maps */
 require("./maps");
 
+/* Server TextDraws */
+const TextDraws = require("./textdraws");
+
 /* Data's */
 const data = {
     mysql: require("./data/mysql"),
     settings: require("./data/settings"),
-    colors: require("./data/colors")
+    colors: require("./data/colors"),
 }
 
 /* Create MYSQL Connection */
@@ -444,6 +447,8 @@ samp.OnGameModeInit(() => {
     console.log("Romania HarD Stunt GameMode successfully loaded.");
     console.log("Gamemode creator: Ghosty2004");
     console.log("Have Fun with this shit :)");
+
+    TextDraws.Load();
 });
 
 samp.OnGameModeExit(() => {
@@ -451,6 +456,7 @@ samp.OnGameModeExit(() => {
 });
 
 samp.OnPlayerConnect((player) => {
+    for(let i = 0; i < 3; i++) samp.TextDrawShowForPlayer(playerid, TextDraws.connect[i]);
     Player.ResetVariables(player);
     player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English");
 });
