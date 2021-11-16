@@ -449,20 +449,23 @@ samp.OnGameModeInit(() => {
     console.log("Have Fun with this shit :)");
 
     TextDraws.Load();
+    return true;
 });
 
 samp.OnGameModeExit(() => {
-
+    return true;
 });
 
 samp.OnPlayerConnect((player) => {
     for(let i = 0; i < 3; i++) samp.TextDrawShowForPlayer(playerid, TextDraws.connect[i]);
     Player.ResetVariables(player);
     player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English");
+    return true;
 });
 
 samp.OnPlayerDisconnect((player, reason) => {
     Player.ResetVariables(player);
+    return true;
 });
 
 samp.OnPlayerSpawn((player) => {
@@ -470,6 +473,7 @@ samp.OnPlayerSpawn((player) => {
     if(Player.Info[player.playerid].Mail == "none") {
         player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
     }
+    return true;
 });
 
 samp.OnPlayerUpdate((player) => {
@@ -563,6 +567,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             break;
         }
     }
+    return true;
 });
 
 samp.OnPlayerCommandText((player, cmdtext) => {
