@@ -12,5 +12,6 @@ module.exports = {
     ADD_MAIL: 11,
     RULES: 12,
     IMPORTANT_1: 13,
-    IMPORTANT_2: 14
+    IMPORTANT_2: 14,
+    BUYVIP: 15
 }

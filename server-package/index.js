@@ -49,6 +49,15 @@ con.connect((err) => {
 const CMD = new events.Command();
 
 /* Player's Commands */
+CMD.on("buyvip", (player) => {
+    let info = "Item\tPret\tValabilitate\n";
+    info += "{FF0000}Rosu\t{00BBF6}Gratis!\t{00FF00}Permanent!\n";
+    info += "{FFFF00}Galben\t{BBFF00}20.000 Coins + 20 Ore\t{00FF00}Permanent!\n";
+    info += "{0077FF}Albastru\t{BBFF00}80.000 Coins + 80 Ore\t{00FF00}Permanent!\n";
+    info += "{FFFFFF}Alb\t{BBFF00}150.000 Coins + 150 Ore\t{00BBF6}30 Zile!";
+    player.ShowPlayerDialog(Dialog.BUYVIP, samp.DIALOG_STYLE.TABLIST_HEADERS, Lang(player, "Cumpara VIP - Scrie {FF0000}/vcmds {D1D1D1}pentru comenzi.", "Buy VIP - Type {FF0000}/vcmds {D1D1D1}for commands."), info, Lang(player, "Cumpara", "Buy"), Lang("Inchide", "Close"));
+});
+
 CMD.on("ranks", (player) => {
     let info = "";
     info += "{FFFFFF}Rank\t{FF0000}Kills\t\t{FF0000}Drift points\t{FF0000}Race points\t{FF0000}Stunt points\n";
