@@ -326,6 +326,17 @@ function LoadPlayerStats(player) {
 }
 
 /* SA:MP Events */
+samp.OnGameModeInit(() => {
+    console.log("\n");
+    console.log("Romania HarD Stunt GameMode successfully loaded.");
+    console.log("Gamemode creator: Ghosty2004");
+    console.log("Have Fun with this shit :)");
+});
+
+samp.OnGameModeExit(() => {
+
+});
+
 samp.OnPlayerConnect((player) => {
     Player.ResetVariables(player);
     player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English");
