@@ -1,7 +1,7 @@
-const { RemoveBuildingForPlayer, OnPlayerConnect, OnFilterScriptInit } = require("samp-node-lib");
+const { RemoveBuildingForPlayer, OnPlayerConnect, OnGameModeInit } = require("samp-node-lib");
 const { CreateDynamicObject, SetDynamicObjectMaterial, SetDynamicObjectMaterialText } = require("../../modules/streamer");
 
-OnFilterScriptInit(() => {
+OnGameModeInit(() => {
     let fso_map;
     CreateDynamicObject(3053, 1433.160278, -1484.817017, 114.459999, 0.000000, 0.000000, 0.000000, -1, -1);
     CreateDynamicObject(3440, 1434.576660, -1484.175781, 114.125542, 90.000000, 0.000000, 180.000000, -1, -1);

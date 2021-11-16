@@ -14,7 +14,7 @@ module.exports = {
         callPublic("_SetDynamicObjectMaterial", "iiissi", objectid, materialindex, modelid, txdname, texturename, materialcolor);
     },
     SetDynamicObjectMaterialText: function(objectid, materialindex, text, materialsize = OBJECT_MATERIAL_SIZE._256x128, fontface = "Arial", fontsize = 24, bold = 1, fontcolor = 0xFFFFFFFF, backcolor = 0, textalignment = 0) {
-        callPublic("_SetDynamicObjectMaterialText", "iisisiiiii");
+        callPublic("_SetDynamicObjectMaterialText", "iisisiiiii", objectid, materialindex, text, materialsize, fontface, fontsize, bold, fontcolor, backcolor, textalignment);
     },
     CreateDynamicPickup: function(modelid, type, x, y, z, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 200.0, areaid = -1, priority = 0) {
         let value = callPublic("_CreateDynamicPickup", "iifffiiifii", modelid, type, x, y, z, worldid, interiorid, playerid, streamdistance, areaid, priority);

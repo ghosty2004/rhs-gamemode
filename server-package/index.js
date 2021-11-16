@@ -149,10 +149,12 @@ CMD.on("report", (player, params) => {
 CMD.on("gotop", (player, params) => {
     if(Player.Info[player.playerid].Admin >= 1) {
         if(!isNaN(params[0]) && !isNaN(params[1]) && !isNaN(params[2])) {
-            params[0] = parseInt(params[0]);
-            params[1] = parseInt(params[1]);
-            params[2] = parseInt(params[2]);
-            player.SetPlayerPos(param[0], params[1], params[2]);
+            const position = {
+                x: parseInt(params[0]),
+                y: parseInt(params[1]),
+                z: parseInt(params[2])
+            }
+            player.SetPlayerPos(position.x, position.y, position.z);
         }
         else SendUsage(player, "/gotop [X] [Y] [Z]");
     }
@@ -413,8 +415,8 @@ samp.OnPlayerCommandText((player, cmdtext) => {
         cmdtext = replaceAll(cmdtext, "/", ""); 
         let params = cmdtext.split(/[ ]+/);
         let temp_string = params[0];
+        params.shift();
         if(CMD.eventNames().some(s => s == temp_string)) {
-            params.shift();
             CMD.emit(`${temp_string}`, player, params);
         }
         else player.SendClientMessage(data.colors.RED, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`);
