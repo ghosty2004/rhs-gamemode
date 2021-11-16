@@ -48,6 +48,16 @@ const CMD = new events.Command();
 /* ============== */
 
 /* Player's Commands */
+CMD.on("ro", (player) => {
+    player.SendClientMessage(data.colors.YELLOW, "Ti-ai schimbat limba in {FF0000}Romana{FFFF00}!");
+    Player.Info[player.playerid].Language = 1;
+});
+
+CMD.on("eng", (player) => {
+    player.SendClientMessage(data.colors.YELLOW, "You changed your language in {FF0000}English{FFFF00}!");
+    Player.Info[player.playerid].Language = 2;
+});
+
 CMD.on("stats", (player, params) => {
     let info = "";
     info += "{FF4800}General statistics\n";
