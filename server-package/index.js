@@ -40,12 +40,10 @@ con.connect((err) => {
     }
 });
 
-/* Command Handler */
-const CMD = new events.Command();
-
 /* ============== */
 /* SA:MP Commands */
 /* ============== */
+const CMD = new events.Command();
 
 /* Player's Commands */
 CMD.on("ro", (player) => {
@@ -58,12 +56,12 @@ CMD.on("eng", (player) => {
     Player.Info[player.playerid].Language = 2;
 });
 
-CMD.on("stats", (player, params) => {
+CMD.on("stats", (player) => {
     let info = "";
     info += "{FF4800}General statistics\n";
     info += `{BBFF00}Money: {49FFFF}$${player.GetPlayerMoney()}\n`;
     info += `{BBFF00}Coins: {49FFFF}0\n`;
-    info += `{BBFF00}Respect: {49FFFF}+0 {BBFF00}/ {49FFFF}-0`;
+    info += `{BBFF00}Respect: {49FFFF}+0 {BBFF00}/ {49FFFF}-0\n`;
     info += `{BBFF00}Online time: {49FFFF}0 {BBFF00}hrs, {49FFFF}0 {BBFF00}mins, {49FFFF}0 {BBFF00}secs\n`;
     info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? "{00FF00}Yes" : "{FF0000}No"}\n`;
     info += `{BBFF00}VIP: {FF0000}No\n`;
@@ -85,7 +83,7 @@ CMD.on("stats", (player, params) => {
     info += `{BBFF00}Personal Vehicle: {FF0000}No\n`;
     info += "\n";
     info += `{FF4800}Statistics note: {49FFFF}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob`
-    player.ShowPlayerDialog(Dialog.STATS, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${player.GetPlayerName(24)}{BBFF00}'s stats!`, info, "Ok");
+    player.ShowPlayerDialog(Dialog.STATS, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${player.GetPlayerName(24)}{BBFF00}'s stats!`, info, "Ok", "Description");
 });
 
 CMD.on("help", (player) => {
@@ -575,3 +573,7 @@ samp.OnPlayerCommandText((player, cmdtext) => {
     }
     return true;
 });
+
+setTimeout(() => {
+    console.log(`Loaded ${CMD.eventNames.length} commands.`);
+}, 2000);   
