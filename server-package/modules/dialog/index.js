@@ -9,5 +9,8 @@ module.exports = {
     CMDS_2: 8,
     CMDS_3: 9,
     STATS: 10,
-    ADD_MAIL: 11
+    ADD_MAIL: 11,
+    RULES: 12,
+    IMPORTANT_1: 13,
+    IMPORTANT_2: 14
 }

@@ -122,6 +122,8 @@ CMD.on("rules", (player) => {
     player.ShowPlayerDialog(Dialog.RULES, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- ${Lang(player, "Reguli", "Rules")}!`, info, Lang(player, "Inchide", "Close"), "Important");
 });
 
+CMD.on("important", (player) => { ShowImportant(player, 1); });
+
 CMD.on("cmds", (player) => {
     ShowCMDS(player, 1);
 });
@@ -202,6 +204,84 @@ function SendUsage(player, text) {
 
 function SendError(player, ro_error, en_error) {
     player.SendClientMessage(0xFF0000AA, "ERROR:" + Player.Info[player.playerid].Language == 1 ? ro_error : en_error);
+}
+
+function ShowImportant(player, page) {
+    let info = "";
+    switch(page) {
+        case 1: {
+            switch(Player.Info[player.playerid].Language) {
+                case 1: {
+                    info += "{FF0000}1 - {00BBF6}Pe langa regulile de mai sus,iti este interzis sa ceri status unui Admin/RCON\n";
+                    info += "{00BBF6}asta incluzand chiar Admin sau Vip,nu este cinstit ca tu sa primesti Admin sau Vip gratuit\n";
+                    info += "{00BBF6}in timp ce alti jucatori stau pe server si asteapta sa faca cele necesare pentru a isi cumpara status\n";
+                    info += "{00BBF6}unii jucatori platesc chiar si bani reali.\n";
+                    info += "\n";
+                    info += "{FF0000}2 - {00BBF6}Nu ai voie sa abuzezi de buguri,bugurile fiind mici probleme aparute in diverse sisteme deoarece\n";
+                    info += "{00BBF6}ca si un medicament,acesta poate avea reactii adverse/buguri\n";
+                    info += "{00BBF6}nefiind testat/e in conditii reale pe server cu jucatorii.\n";
+                    info += "\n";
+                    info += "{FF0000}3 - {00BBF6}Nu ai voie sa folosesti moduri/hackuri ce iti ofera anumite avantaje in fata celorlalti,\n";
+                    info += "{00BBF6}jucatorii cinstiti se straduiesc din greu pentru a face coins bani si alte lucruri necesare pentru status\n";
+                    info += "{00BBF6}in timp ce tu zbori,sari foarte departe fata de un jucator normal sau escaladezi\n";
+                    info += "{00BBF6}cladiri uriase in cateva secunde fiind clar in avantaj fata de ceilalti.";
+                    break;
+                }
+                case 2: {
+                    info += "{FF0000}1 - {00BBF6}Beside the rules above,you are forbidden to ask/beg for status a Admin/RCON,that includes even Admin or Vip\n";
+                    info += "{00BBF6}is not fair that you receive free things while other player stay on the server and work hard for their status\n";
+                    info += "{00BBF6}some players even donate real money.\n";
+                    info += "\n";
+                    info += "{FF0000}2 - {00BBF6}You are not allowed to abuse of bugs,bugs are small problems that appear in some systems because like drugs/medicine\n";
+                    info += "{00BBF6}they have adverse effects/bugs because they need to be tested in real conditions with humans/players.\n";
+                    info += "\n";
+                    info += "{FF0000}3 - {00BBF6}You are not allowed to use hacks/mods that gives you advantages in front of other players\n";
+                    info += "{00BBF6}honest players are working hard to make coins and money and rest of the things needed for status while you\n";
+                    info += "{00BBF6}fly,jump very far or climb tall buildings in seconds...and so on\n";
+                    info += "{00BBF6}that means you have advantages in frontn of the other players.";
+                    break;
+                }
+            }
+            player.ShowPlayerDialog(Dialog.IMPORTANT_1, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- Important!`, info, Lang(player, "Pagina 2", "Page 2"), Lang(player, "Reguli", "Rules"));
+            break;
+        }
+        case 2: {
+            switch(Player.Info[player.playerid].Language) {
+                case 1: {
+                    info += "{FF0000}4 - {00BBF6}Nu ai voie sa faci reclama altor servere si comunitati,nu ai voie sa faci reclama la servere de jocuri\n";
+                    info += "{00BBF6}unde jucatorii pot fi indrumati spre alte servere,de asemenea nu ai voie sa faci reclama la canale de yotube\n";
+                    info += "{00BBF6}unde jucatorii pot fi indrumati spre alte servere,echipa serverului a muncit din greu pentru a avea jucatorii prezenti.\n";
+                    info += "\n";
+                    info += "{FF0000}5 - {00BBF6}Serverul,pe langa faptul ca este server de stunt,poti face si deathmatch,insa,\n";
+                    info += "{00BBF6}acest lucru nu iti da dreptul sa omori jucatorii in zonele protejate precum spawnurile gen\n";
+                    info += "{00BBF6}/aa /sfair /lsair /lvair /jizzy /plaja /beach si asa mai departe\n";
+                    info += "{00BBF6}de asemenea,in zonele unde iti sunt scoase armele dar totusi poti folosii comenzi si iti poti cumpara armele inapoi\n";
+                    info += "{00BBF6}nu o face,armele iti sunt scoase in acele locuri tocmai pentru a oferii jucatorilor locuri linistite\n";
+                    info += "{00BBF6}pe unde se pot plimba,juca,filma si etc...\n";
+                    info += "{00BBF6}daca ai chef sa omori pe cineva o poti face doar in locurile special amenajate de la /dm.\n";
+                    info += "\n";
+                    info += "{FF0000}6 - {00BBF6}Pe criteriul {FF0000}''Respecta si vei fi respectat'', {00BBF6}te rugam sa respecti jucatorii si echipa de administratie a serverului\n";
+                    info += "{00BBF6}altfel vom fi fortati sa luam masuri ce nu cred ca iti vor place.";
+                    break;
+                }
+                case 2: {
+                    info += "{FF0000}4 - {00BBF6}You are not allowed to advertise servers,communities,web sites,other games servers,youtube channels that might\n";
+                    info += "{00BBF6}lead players to other servers,our team worked and works hard to bring and keep players on server.\n";
+                    info += "\n";
+                    info += "{FF0000}5 - {00BBF6}You are not allowed to kill players in protected zones/spawn zones like\n";
+                    info += "{00BBF6}/aa /lsair /sfair /lvair /jizzy /beach and so on,also,in the places where your weapons are being removed\n";
+                    info += "{00BBF6}but you still can use commandsto get your weapons back,dont do it,those places are made to take your weapons\n";
+                    info += "{00BBF6}so others and even you can play in peace...if you want to kill players,you can use /dm and choose from there.\n";
+                    info += "\n";
+                    info += "{FF0000}6 - {00BBF6}Respect others and others will respect you ! Please respect other players and server Administration Team !\n";
+                    info += "{00BBF6}otherwise we will be forced to take measures that we dont think you will like.";
+                    break;
+                }
+            }
+            player.ShowPlayerDialog(Dialog.IMPORTANT_2, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- Important!`, info, "Accept", Lang(player, "Pagina 1", "Page 1"));
+            break;
+        }
+    }
 }
 
 function ShowCMDS(player, page) {
@@ -394,6 +474,19 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.IMPORTANT_1: {
+            if(response) ShowImportant(player, 2);
+            else CMD.emit("rules");
+            break;
+        }
+        case Dialog.IMPORTANT_2: {
+            if(!response) ShowImportant(player, 1);
+            break;
+        }
+        case Dialog.RULES: {
+            if(!response) ShowImportant(player, 1);
+            break;
+        }
         case Dialog.ADD_MAIL: {
             if(response) {
                 if(validateEmail(inputtext)) {
