@@ -51,12 +51,12 @@ const CMD = new events.Command();
 /* Player's Commands */
 CMD.on("ranks", (player) => {
     let info = "";
-    info += "{FFFFFF}Rank\t{FF0000}Kills\t{FF0000}Drift points\t{FF0000}Race points\t{FF0000}Stunt points\n";
-    info += "{FF6600}Beginner\t{FFFFFF}1+\t{FFFFFF}1+\t{FFFFFF}1+\t{FFFFFF}1+\n";
-    info += "{FF9900}Advanced\t{FFFFFF}500+\t{FFFFFF}1500+\t{FFFFFF}100+\t{FFFFFF}100+\n";
-    info += "{FFFF00}Specialist\t{FFFFFF}3000+\t{FFFFFF}10000+\t{FFFFFF}1000+\t{FFFFFF}1000+\n";
-    info += "{00FF00}Master\t{FFFFFF}10000+\t{FFFFFF}100000+\t{FFFFFF}4000+\t{FFFFFF}2000+\n";
-    info += "{0072FF}King\t{FFFFFF}20000+\t{FFFFFF}300000+\t{FFFFFF}8000+\t{FFFFFF}5000+";
+    info += "{FFFFFF}Rank\t{FF0000}Kills\t\t{FF0000}Drift points\t{FF0000}Race points\t{FF0000}Stunt points\n";
+    info += "{FF6600}Beginner\t{FFFFFF}1+\t\t{FFFFFF}1+\t{FFFFFF}1+\t{FFFFFF}1+\n";
+    info += "{FF9900}Advanced\t{FFFFFF}500+\t\t{FFFFFF}1500+\t{FFFFFF}100+\t{FFFFFF}100+\n";
+    info += "{FFFF00}Specialist\t{FFFFFF}3000+\t\t{FFFFFF}10000+\t{FFFFFF}1000+\t{FFFFFF}1000+\n";
+    info += "{00FF00}Master\t{FFFFFF}10000+\t\t{FFFFFF}100000+\t{FFFFFF}4000+\t{FFFFFF}2000+\n";
+    info += "{0072FF}King\t{FFFFFF}20000+\t\t{FFFFFF}300000+\t{FFFFFF}8000+\t{FFFFFF}5000+";
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Stats Ranks", info, "Close", "");
 });
 
