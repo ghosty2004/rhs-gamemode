@@ -43,6 +43,36 @@ con.connect((err) => {
 const CMD = new events.Command();
 
 /* SA:MP Commands */
+CMD.on("stats", (player, params) => {
+    let info = "";
+    info += "{FF4800}General statistics\n";
+    info += `{BBFF00}Money: {49FFFF}$${player.GetPlayerMoney()}\n`;
+    info += `{BBFF00}Coins: {49FFFF}0\n`;
+    info += `{BBFF00}Respect: {49FFFF}+0 {BBFF00}/ {49FFFF}-0`;
+    info += `{BBFF00}Online time: {49FFFF}0 {BBFF00}hrs, {49FFFF}0 {BBFF00}mins, {49FFFF}0 {BBFF00}secs\n`;
+    info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? "{00FF00}Yes" : "{FF0000}No"}\n`;
+    info += `{BBFF00}VIP: {FF0000}No\n`;
+    info += "\n";
+    info += "{FF4800}Killer statistics\n";
+    info += `{BBFF00}Kills: {49FFFF}0 {BBFF00}| Headshots: {49FFFF}0\n`;
+    info += `{BBFF00}Killing Spree: {49FFFF}0 {BBFF00}| Best Killing Spree: {49FFFF}0\n`;
+    info += `{BBFF00}Deaths: {49FFFF}0\n`;
+    info += `{BBFF00}Killer Rank: {FF0000}Noob\n`;
+    info += "\n";
+    info += `{FF4800}Driving skills\n`;
+    info += `{BBFF00}Drift Points: {49FFFF}0 {BBFF00}({FF0000}Noob{BBFF00})\n`;
+    info += `{BBFF00}Stunt Points: {49FFFF}0 {BBFF00}({FF0000}Noob{BBFF00})\n`;
+    info += `{BBFF00}Race Points: {49FFFF}0 {BBFF00}({FF0000}Noob{BBFF00})\n`;
+    info += "\n";
+    info += "{FF4800}Properties\n";
+    info += `{BBFF00}Business: {FF0000}No\n`;
+    info += `{BBFF00}House: {FF0000}No\n`;
+    info += `{BBFF00}Personal Vehicle: {FF0000}No\n`;
+    info += "\n";
+    info += `{FF4800}Statistics note: {49FFFF}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob`
+    player.ShowPlayerDialog(Dialog.STATS, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${player.GetPlayerName(24)}{BBFF00}'s stats!`, info, "Ok");
+});
+
 CMD.on("help", (player) => {
     let info = "";
     info += `${data.settings.SERVER_NAME} {00FF00}${Player.Info[player.playerid].Language == 1 ? "este unul din cele mai noi servere de GTA San Andreas MultiPlayer din Romania!" : "is one of the newest GTA San Andreas MultiPlayer servers from Romania!"}\n`;

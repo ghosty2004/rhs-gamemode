@@ -7,5 +7,6 @@ module.exports = {
     NEW_NAME: 6,
     CMDS_1: 7,
     CMDS_2: 8,
-    CMDS_3: 9
+    CMDS_3: 9,
+    STATS: 10
 }
