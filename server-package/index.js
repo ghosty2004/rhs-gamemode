@@ -164,6 +164,14 @@ CMD.on("gotop", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function validateEmail(email) {
+    return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email);
+}
+
+function Lang(player, ro_string, en_string) {
+    return Player.Info[player.playerid].Language == 1 ? ro_string : en_string;
+}
+
 function SendUsage(player, text) {
     player.SendClientMessage(0xFF0000AA, `USAGE: {49FFFF}${text}`);
 }
@@ -302,7 +310,10 @@ function LoadPlayerStats(player) {
     con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
         if(!err && result) {  
             Player.Info[player.playerid].LoggedIn = true;
+
+            Player.Info[player.playerid].Mail = result[0].mail;
             Player.Info[player.playerid].Admin = result[0].admin;
+            Player.Info[player.playerid].VIP = result[0].VIP;
 
             let info = "";
             info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
@@ -347,7 +358,10 @@ samp.OnPlayerDisconnect((player, reason) => {
 });
 
 samp.OnPlayerSpawn((player) => {
-    
+    if(!Player.Info[player.playerid].LoggedIn) return player.Kick();
+    if(Player.Info[player.playerid].Mail == "none") {
+        player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
+    }
 });
 
 samp.OnPlayerUpdate((player) => {
@@ -356,6 +370,16 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.ADD_MAIL: {
+            if(response) {
+                if(validateEmail(inputtext)) {
+                    player.SendClientMessage(player, data.colors.YELLOW, Lang(player, `Ti-ai adaugat cu succes E-Mail-ul {FF0000}${inputtext} {FFFF00}in Cont!`, `You have successfully added the {FF0000}${inputtext} {FFFF00}E-Mail in your Account!`));
+                }
+                else player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
+            }
+            else player.SendClientMessage(data.colors.YELLOW, Lang(player, "Ai refuzat sa iti adaugi un {FF0000}E-Mail {FFFF00}in cont! Cont-ul tau este vulnerabil!", "You refused to add an {FF0000}E-Mail {FFFF00}in your Account! Your Account is vulnerable!"));
+            break;
+        }
         case Dialog.CMDS_1: {
             if(!response) ShowCMDS(player, 2);
             break;
