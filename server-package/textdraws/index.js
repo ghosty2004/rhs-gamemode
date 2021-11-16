@@ -3,50 +3,195 @@
 /* ================ */
 
 const { 
-    TextDrawCreate, TextDrawColor, TextDrawBoxColor, 
-    TextDrawBackgroundColor, TextDrawAlignment, TextDrawFont,
-    TextDrawLetterSize, TextDrawTextSize, TextDrawSetOutline,
-    TextDrawSetShadow, TextDrawSetProportional, TextDrawUseBox, OnGameModeInit
+    TextDrawCreate, TextDrawLetterSize, TextDrawTextSize, TextDrawAlignment, TextDrawColor,
+    TextDrawUseBox, TextDrawBoxColor, TextDrawSetShadow, TextDrawSetOutline,
+    TextDrawBackgroundColor, TextDrawFont, TextDrawSetProportional, TextDrawSetSelectable
 } = require("samp-node-lib");
 
 module.exports = {
     connect: {},
     Load: function() {
-        /* this.connect TextDraw */
-        this.connect[0] = TextDrawCreate(8, 346, "Romania");
-        TextDrawColor(this.connect[0], -1);
-        TextDrawBoxColor(this.connect[0], -2139062144);
-        TextDrawBackgroundColor(this.connect[0], -2139062144);
-        TextDrawAlignment(this.connect[0], 2);
-        TextDrawFont(this.connect[0], 3);
-        TextDrawLetterSize(this.connect[0], 0, 2);
-        TextDrawTextSize(this.connect[0], 1280, 1280);
-        TextDrawSetOutline(this.connect[0], 1);
+        /* Connect TextDraw */
+        this.connect[0] = TextDrawCreate(8.000000, 346.000000, "Romania");
+        TextDrawLetterSize(this.connect[0], 0.449999, 2.199994);
+        TextDrawTextSize(this.connect[0], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[0], 0);
+        TextDrawColor(this.connect[0], 0x0000FFFF);
+        TextDrawUseBox(this.connect[0], 0);
+        TextDrawBoxColor(this.connect[0], 0x80808080);
         TextDrawSetShadow(this.connect[0], 2);
-        TextDrawSetProportional(this.connect[0], 0);
+        TextDrawSetOutline(this.connect[0], 1);
+        TextDrawBackgroundColor(this.connect[0], 0x000000FF);
+        TextDrawFont(this.connect[0], 3);
+        TextDrawSetProportional(this.connect[0], 1);
+        TextDrawSetSelectable(this.connect[0], 0);
 
-        this.connect[1] = TextDrawCreate(75, 347, "hard");
-        TextDrawColor(this.connect[1], -1);
-        TextDrawBoxColor(this.connect[1], -2139062144);
-        TextDrawBackgroundColor(this.connect[1], -2139062144);
-        TextDrawAlignment(this.connect[1], 2);
-        TextDrawFont(this.connect[1], 3);
-        TextDrawLetterSize(this.connect[1], 0, 2);
-        TextDrawTextSize(this.connect[1], 1280, 1280);
-        TextDrawSetOutline(this.connect[1], 1);
+        this.connect[1] = TextDrawCreate(75.000000, 347.000000, "hard");
+        TextDrawLetterSize(this.connect[1], 0.469996, 2.099994);
+        TextDrawTextSize(this.connect[1], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[1], 0);
+        TextDrawColor(this.connect[1], 0xFFFF00FF);
+        TextDrawUseBox(this.connect[1], 0);
+        TextDrawBoxColor(this.connect[1], 0x80808080);
         TextDrawSetShadow(this.connect[1], 2);
-        TextDrawSetProportional(this.connect[1], 0);
+        TextDrawSetOutline(this.connect[1], 1);
+        TextDrawBackgroundColor(this.connect[1], 0x000000FF);
+        TextDrawFont(this.connect[1], 3);
+        TextDrawSetProportional(this.connect[1], 1);
+        TextDrawSetSelectable(this.connect[1], 0);
 
-        this.connect[2] = TextDrawCreate(117, 347, "Stunt");
-        TextDrawColor(this.connect[2], -1);
-        TextDrawBoxColor(this.connect[2], -2139062144);
-        TextDrawBackgroundColor(this.connect[2], -2139062144);
-        TextDrawAlignment(this.connect[2], 2);
-        TextDrawFont(this.connect[2], 3);
-        TextDrawLetterSize(this.connect[2], 0, 2);
-        TextDrawTextSize(this.connect[2], 1280, 1280);
-        TextDrawSetOutline(this.connect[2], 1);
+        this.connect[2] = TextDrawCreate(117.000000, 347.000000, "Stunt");
+        TextDrawLetterSize(this.connect[2], 0.459996, 2.099992);
+        TextDrawTextSize(this.connect[2], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[2], 0);
+        TextDrawColor(this.connect[2], 0xFF0000FF);
+        TextDrawUseBox(this.connect[2], 0);
+        TextDrawBoxColor(this.connect[2], 0x80808080);
         TextDrawSetShadow(this.connect[2], 2);
-        TextDrawSetProportional(this.connect[2], 0);
+        TextDrawSetOutline(this.connect[2], 1);
+        TextDrawBackgroundColor(this.connect[2], 0x000000FF);
+        TextDrawFont(this.connect[2], 3);
+        TextDrawSetProportional(this.connect[2], 1);
+        TextDrawSetSelectable(this.connect[2], 0);
+
+        this.connect[3] = TextDrawCreate(41.000000, 315.000000, "WELCOME");
+        TextDrawLetterSize(this.connect[3], 0.559997, 1.999997);
+        TextDrawTextSize(this.connect[3], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[3], 0);
+        TextDrawColor(this.connect[3], 0xFFFF00FF);
+        TextDrawUseBox(this.connect[3], 0);
+        TextDrawBoxColor(this.connect[3], 0x80808080);
+        TextDrawSetShadow(this.connect[3], 2);
+        TextDrawSetOutline(this.connect[3], 1);
+        TextDrawBackgroundColor(this.connect[3], 0x000000FF);
+        TextDrawFont(this.connect[3], 1);
+        TextDrawSetProportional(this.connect[3], 1);
+        TextDrawSetSelectable(this.connect[3], 0);
+
+        this.connect[4] = TextDrawCreate(10.000000, 390.000000, "Please read                  !");
+        TextDrawLetterSize(this.connect[4], 0.299997, 1.699998);
+        TextDrawTextSize(this.connect[4], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[4], 0);
+        TextDrawColor(this.connect[4], 0x000000FF);
+        TextDrawUseBox(this.connect[4], 0);
+        TextDrawBoxColor(this.connect[4], 0x80808080);
+        TextDrawSetShadow(this.connect[4], 2);
+        TextDrawSetOutline(this.connect[4], 1);
+        TextDrawBackgroundColor(this.connect[4], 0xFFFFFFFF);
+        TextDrawFont(this.connect[4], 1);
+        TextDrawSetProportional(this.connect[4], 1);
+        TextDrawSetSelectable(this.connect[4], 0);
+
+        this.connect[5] = TextDrawCreate(74.000000, 391.000000, "/rules, /important");
+        TextDrawLetterSize(this.connect[5], 0.250000, 1.600000);
+        TextDrawTextSize(this.connect[5], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[5], 0);
+        TextDrawColor(this.connect[5], 0xFF0000FF);
+        TextDrawUseBox(this.connect[5], 0);
+        TextDrawBoxColor(this.connect[5], 0x80808080);
+        TextDrawSetShadow(this.connect[5], 2);
+        TextDrawSetOutline(this.connect[5], 1);
+        TextDrawBackgroundColor(this.connect[5], 0xFFFFFFFF);
+        TextDrawFont(this.connect[5], 1);
+        TextDrawSetProportional(this.connect[5], 1);
+        TextDrawSetSelectable(this.connect[5], 0);
+
+        this.connect[6] = TextDrawCreate(12.000000, 329.000000, "]");
+        TextDrawLetterSize(this.connect[6], 0.659999, 1.899999);
+        TextDrawTextSize(this.connect[6], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[6], 0);
+        TextDrawColor(this.connect[6], 0x00FFFFFF);
+        TextDrawUseBox(this.connect[6], 0);
+        TextDrawBoxColor(this.connect[6], 0x80808080);
+        TextDrawSetShadow(this.connect[6], 2);
+        TextDrawSetOutline(this.connect[6], 1);
+        TextDrawBackgroundColor(this.connect[6], 0x000000FF);
+        TextDrawFont(this.connect[6], 0);
+        TextDrawSetProportional(this.connect[6], 1);
+        TextDrawSetSelectable(this.connect[6], 0);
+
+        this.connect[7] = TextDrawCreate(139.000000, 330.000000, "]");
+        TextDrawLetterSize(this.connect[7], 0.659999, 1.899999);
+        TextDrawTextSize(this.connect[7], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[7], 0);
+        TextDrawColor(this.connect[7], 0x00FFFFFF);
+        TextDrawUseBox(this.connect[7], 0);
+        TextDrawBoxColor(this.connect[7], 0x80808080);
+        TextDrawSetShadow(this.connect[7], 2);
+        TextDrawSetOutline(this.connect[7], 1);
+        TextDrawBackgroundColor(this.connect[7], 0x000000FF);
+        TextDrawFont(this.connect[7], 0);
+        TextDrawSetProportional(this.connect[7], 1);
+        TextDrawSetSelectable(this.connect[7], 0);
+
+        this.connect[8] = TextDrawCreate(9.000000, 406.000000, "/cmds, /teles, /buyvip, /news");
+        TextDrawLetterSize(this.connect[8], 0.299998, 1.700000);
+        TextDrawTextSize(this.connect[8], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[8], 0);
+        TextDrawColor(this.connect[8], 0x221F99FF);
+        TextDrawUseBox(this.connect[8], 0);
+        TextDrawBoxColor(this.connect[8], 0x80808080);
+        TextDrawSetShadow(this.connect[8], 2);
+        TextDrawSetOutline(this.connect[8], 1);
+        TextDrawBackgroundColor(this.connect[8], 0x00FFFFFF);
+        TextDrawFont(this.connect[8], 1);
+        TextDrawSetProportional(this.connect[8], 1);
+        TextDrawSetSelectable(this.connect[8], 0);
+
+        this.connect[9] = TextDrawCreate(34.000000, 422.000000, "www.rhs-samp.com");
+        TextDrawLetterSize(this.connect[9], 0.299998, 1.899997);
+        TextDrawTextSize(this.connect[9], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[9], 0);
+        TextDrawColor(this.connect[9], 0xFF0000FF);
+        TextDrawUseBox(this.connect[9], 0);
+        TextDrawBoxColor(this.connect[9], 0x80808080);
+        TextDrawSetShadow(this.connect[9], 2);
+        TextDrawSetOutline(this.connect[9], 1);
+        TextDrawBackgroundColor(this.connect[9], 0xFFFFFFFF);
+        TextDrawFont(this.connect[9], 1);
+        TextDrawSetProportional(this.connect[9], 1);
+        TextDrawSetSelectable(this.connect[9], 0);
+
+        this.connect[10] = TextDrawCreate(195.000000, 359.000000, ".");
+        TextDrawLetterSize(this.connect[10], 15.990015, 1.600000);
+        TextDrawTextSize(this.connect[10], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[10], 3);
+        TextDrawColor(this.connect[10], 0xFFFFFFFF);
+        TextDrawUseBox(this.connect[10], 0);
+        TextDrawBoxColor(this.connect[10], 0x80808080);
+        TextDrawSetShadow(this.connect[10], 1);
+        TextDrawSetOutline(this.connect[10], 0);
+        TextDrawBackgroundColor(this.connect[10], 0x000000FF);
+        TextDrawFont(this.connect[10], 1);
+        TextDrawSetProportional(this.connect[10], 1);
+        TextDrawSetSelectable(this.connect[10], 0);
+
+        this.connect[11] = TextDrawCreate(79.000000, 332.000000, "TO");
+        TextDrawLetterSize(this.connect[11], 0.509998, 1.699995);
+        TextDrawTextSize(this.connect[11], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[11], 0);
+        TextDrawColor(this.connect[11], 0xFFFF00FF);
+        TextDrawUseBox(this.connect[11], 0);
+        TextDrawBoxColor(this.connect[11], 0x80808080);
+        TextDrawSetShadow(this.connect[11], 2);
+        TextDrawSetOutline(this.connect[11], 1);
+        TextDrawBackgroundColor(this.connect[11], 0x000000FF);
+        TextDrawFont(this.connect[11], 1);
+        TextDrawSetProportional(this.connect[11], 1);
+        TextDrawSetSelectable(this.connect[11], 0);
+
+        this.connect[12] = TextDrawCreate(9.000000, 373.000000, "Stunt/Race/DM/Gangs/Clans/Fun");
+        TextDrawLetterSize(this.connect[12], 0.279998, 1.700000);
+        TextDrawTextSize(this.connect[12], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.connect[12], 0);
+        TextDrawColor(this.connect[12], 0x221F99FF);
+        TextDrawUseBox(this.connect[12], 0);
+        TextDrawBoxColor(this.connect[12], 0x80808080);
+        TextDrawSetShadow(this.connect[12], 2);
+        TextDrawSetOutline(this.connect[12], 1);
+        TextDrawBackgroundColor(this.connect[12], 0x00FFFFFF);
+        TextDrawFont(this.connect[12], 1);
+        TextDrawSetProportional(this.connect[12], 1);
+        TextDrawSetSelectable(this.connect[12], 0);
     }
 }

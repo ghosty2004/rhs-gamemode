@@ -191,6 +191,22 @@ CMD.on("gotop", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function ShowSpawnTextDraw(player) {
+
+}
+
+function HideSpawnTextDraw(player) {
+    
+}
+
+function ShowConnectTextDraw(player) {
+    for(let i = 0; i <= 12; i++) player.TextDrawShowForPlayer(TextDraws.connect[i]);
+}
+
+function HideConnectTextDraw(player) {
+    for(let i = 0; i <= 12; i++) player.TextDrawHideForPlayer(TextDraws.connect[i]);
+}
+
 function validateEmail(email) {
     return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email);
 }
@@ -457,7 +473,7 @@ samp.OnGameModeExit(() => {
 });
 
 samp.OnPlayerConnect((player) => {
-    for(let i = 0; i < 3; i++) samp.TextDrawShowForPlayer(playerid, TextDraws.connect[i]);
+    ShowConnectTextDraw(player);
     Player.ResetVariables(player);
     player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English");
     return true;
@@ -465,11 +481,15 @@ samp.OnPlayerConnect((player) => {
 
 samp.OnPlayerDisconnect((player, reason) => {
     Player.ResetVariables(player);
+    HideConnectTextDraw(player);
+    HideSpawnTextDraw(player);
     return true;
 });
 
 samp.OnPlayerSpawn((player) => {
     if(!Player.Info[player.playerid].LoggedIn) return player.Kick();
+    HideConnectTextDraw(player);
+    ShowSpawnTextDraw(player);
     if(Player.Info[player.playerid].Mail == "none") {
         player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
     }
@@ -583,8 +603,4 @@ samp.OnPlayerCommandText((player, cmdtext) => {
         else player.SendClientMessage(data.colors.RED, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`);
     }
     return true;
-});
-
-setTimeout(() => {
-    console.log(`Loaded ${CMD.eventNames.length} commands.`);
-}, 2000);   
+});  
