@@ -192,11 +192,11 @@ CMD.on("gotop", (player, params) => {
 /* SA:MP Functions */
 /* =============== */
 function ShowSpawnTextDraw(player) {
-
+    for(let i = 0; i <= 3; i++) player.TextDrawShowForPlayer(TextDraws.spawn[i]);
 }
 
 function HideSpawnTextDraw(player) {
-    
+    for(let i = 0; i <= 3; i++) player.TextDrawHideForPlayer(TextDraws.spawn[i]);
 }
 
 function ShowConnectTextDraw(player) {

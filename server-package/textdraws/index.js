@@ -9,8 +9,66 @@ const {
 } = require("samp-node-lib");
 
 module.exports = {
+    spawn: {},
     connect: {},
     Load: function() {
+        /* Spanw TextDraw */
+        this.spawn[0] = TextDrawCreate(8.000000, 422.000000, "Romania");
+        TextDrawLetterSize(this.spawn[0], 0.379996, 1.499992);
+        TextDrawTextSize(this.spawn[0], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.spawn[0], 0);
+        TextDrawColor(this.spawn[0], 0x3333FFFF);
+        TextDrawUseBox(this.spawn[0], 0);
+        TextDrawBoxColor(this.spawn[0], 0x80808080);
+        TextDrawSetShadow(this.spawn[0], 2);
+        TextDrawSetOutline(this.spawn[0], 1);
+        TextDrawBackgroundColor(this.spawn[0], 0x000000FF);
+        TextDrawFont(this.spawn[0], 3);
+        TextDrawSetProportional(this.spawn[0], 1);
+        TextDrawSetSelectable(this.spawn[0], 0);
+
+        this.spawn[1] = TextDrawCreate(64.000000, 424.000000, "HarD");
+        TextDrawLetterSize(this.spawn[1], 0.449995, 1.299993);
+        TextDrawTextSize(this.spawn[1], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.spawn[1], 0);
+        TextDrawColor(this.spawn[1], 0xFFFF00FF);
+        TextDrawUseBox(this.spawn[1], 0);
+        TextDrawBoxColor(this.spawn[1], 0x80808080);
+        TextDrawSetShadow(this.spawn[1], 2);
+        TextDrawSetOutline(this.spawn[1], 1);
+        TextDrawBackgroundColor(this.spawn[1], 0x000000FF);
+        TextDrawFont(this.spawn[1], 3);
+        TextDrawSetProportional(this.spawn[1], 1);
+        TextDrawSetSelectable(this.spawn[1], 0);
+
+        this.spawn[2] = TextDrawCreate(103.000000, 423.000000, "Stunt");
+        TextDrawLetterSize(this.spawn[2], 0.379999, 1.399997);
+        TextDrawTextSize(this.spawn[2], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.spawn[2], 0);
+        TextDrawColor(this.spawn[2], 0xFF0000FF);
+        TextDrawUseBox(this.spawn[2], 0);
+        TextDrawBoxColor(this.spawn[2], 0x80808080);
+        TextDrawSetShadow(this.spawn[2], 2);
+        TextDrawSetOutline(this.spawn[2], 1);
+        TextDrawBackgroundColor(this.spawn[2], 0x000000FF);
+        TextDrawFont(this.spawn[2], 3);
+        TextDrawSetProportional(this.spawn[2], 1);
+        TextDrawSetSelectable(this.spawn[2], 0);
+
+        this.spawn[3] = TextDrawCreate(7.000000, 436.000000, "~w~~h~/~y~~h~tutorial ~w~~h~/~y~~h~important ~w~~h~/~y~~h~rules ~w~~h~/~y~~h~cmds ~w~~h~/~y~~h~teles");
+        TextDrawLetterSize(this.spawn[3], 0.209994, 1.099995);
+        TextDrawTextSize(this.spawn[3], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.spawn[3], 0);
+        TextDrawColor(this.spawn[3], 0xFFFF00FF);
+        TextDrawUseBox(this.spawn[3], 0);
+        TextDrawBoxColor(this.spawn[3], 0x80808080);
+        TextDrawSetShadow(this.spawn[3], 1);
+        TextDrawSetOutline(this.spawn[3], 0);
+        TextDrawBackgroundColor(this.spawn[3], 0x000000FF);
+        TextDrawFont(this.spawn[3], 1);
+        TextDrawSetProportional(this.spawn[3], 1);
+        TextDrawSetSelectable(this.spawn[3], 0);
+
         /* Connect TextDraw */
         this.connect[0] = TextDrawCreate(8.000000, 346.000000, "Romania");
         TextDrawLetterSize(this.connect[0], 0.449999, 2.199994);
