@@ -9,9 +9,10 @@ const colors = require("colors");
 const md5 = require("md5");
 
 /* Custom Modules */
+const Dialog = require("./modules/dialog");
+const Errors = require("./modules/errors");
 const events = require("./modules/events");
 const Player = require("./modules/player");
-const Dialog = require("./modules/dialog");
 const Streamer = require("./modules/streamer");
 
 /* Server Maps */
@@ -42,7 +43,11 @@ con.connect((err) => {
 /* Command Handler */
 const CMD = new events.Command();
 
+/* ============== */
 /* SA:MP Commands */
+/* ============== */
+
+/* Player's Commands */
 CMD.on("stats", (player, params) => {
     let info = "";
     info += "{FF4800}General statistics\n";
@@ -140,7 +145,31 @@ CMD.on("report", (player, params) => {
 
 });
 
+/* Admins Commands */
+CMD.on("gotop", (player, params) => {
+    if(Player.Info[player.playerid].Admin >= 1) {
+        if(!isNaN(params[0]) && !isNaN(params[1]) && !isNaN(params[2])) {
+            params[0] = parseInt(params[0]);
+            params[1] = parseInt(params[1]);
+            params[2] = parseInt(params[2]);
+            player.SetPlayerPos(param[0], params[1], params[2]);
+        }
+        else SendUsage(player, "/gotop [X] [Y] [Z]");
+    }
+    else SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+/* =============== */
 /* SA:MP Functions */
+/* =============== */
+function SendUsage(player, text) {
+    player.SendClientMessage(0xFF0000AA, `USAGE: {49FFFF}${text}`);
+}
+
+function SendError(player, ro_error, en_error) {
+    player.SendClientMessage(0xFF0000AA, "ERROR:" + Player.Info[player.playerid].Language == 1 ? ro_error : en_error);
+}
+
 function ShowCMDS(player, page) {
     let info = "";
     switch(page) {
