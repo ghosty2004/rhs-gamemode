@@ -660,6 +660,15 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         player.ShowPlayerDialog(Dialog.TELES_CHALLANGES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Challenges", info, "Teleport", "Back");
                         break;
                     }
+                    case 9: { /* Parkours */
+                        let info = "Command\tDescription\n";
+                        info += "{49FFFF}/proparkour	{BBFF00}Pro Parkour\n";
+                        info += "{49FFFF}/gparkour	{BBFF00}Grove Parkour\n";
+                        info += "{49FFFF}/sfparkour	{BBFF00}San Fierro Parkour\n";
+                        info += "{49FFFF}/cpk	{BBFF00}City Parkour";
+                        player.ShowPlayerDialog(Dialog.TELES_PARKOURS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Parkours Teleports", info, "Teleport", "Back");
+                        break;
+                    }
                 }
             }
             break;
@@ -707,6 +716,13 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             break;
         }
         case Dialog.TELES_CHALLANGES: {
+            if(response) {
+
+            }
+            else CMD.emit("teles");
+            break;
+        }
+        case Dialog.TELES_PARKOURS: {
             if(response) {
 
             }
