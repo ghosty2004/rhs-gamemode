@@ -745,6 +745,40 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         player.ShowPlayerDialog(Dialog.TELES_OTHERS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Other Teleports", info, "Teleport", "Back");
                         break;
                     }
+                    case 13: { /* Simple Stunts */
+                        let info = "";
+                        info += "{0072FF}Simple Stunt 1\n";
+                        info += "{0072FF}Simple Stunt 2\n";
+                        info += "{0072FF}Simple Stunt 3\n";
+                        info += "{0072FF}Simple Stunt 4\n";
+                        info += "{0072FF}Simple Stunt 5\n";
+                        info += "{0072FF}Simple Stunt 6\n";
+                        info += "{0072FF}Simple Stunt 7\n";
+                        info += "{0072FF}Simple Stunt 8\n";
+                        info += "{0072FF}Simple Stunt 9\n";
+                        info += "{FFFF00}Simple Stunt 10\n";
+                        info += "{FFFF00}Simple Stunt 11\n";
+                        info += "{FFFF00}Simple Stunt 12\n";
+                        info += "{FFFF00}Simple Stunt 13\n";
+                        info += "{FFFF00}Simple Stunt 14\n";
+                        info += "{FFFF00}Simple Stunt 15\n";
+                        info += "{FFFF00}Simple Stunt 16\n";
+                        info += "{FFFF00}Simple Stunt 17\n";
+                        info += "{FFFF00}Simple Stunt 18\n";
+                        info += "{FFFF00}Simple Stunt 19\n";
+                        info += "{FFFF00}Simple Stunt 20\n";
+                        info += "{FFFF00}Simple Stunt 21\n";
+                        info += "{FF0000}Simple Stunt 22\n";
+                        info += "{FF0000}Simple Stunt 23\n";
+                        info += "{FF0000}Simple Stunt 24\n";
+                        info += "{FF0000}Simple Stunt 25\n";
+                        info += "{FF0000}Simple Stunt 26\n";
+                        info += "{FF0000}Simple Stunt 27\n";
+                        info += "{FF0000}Simple Stunt 28\n";
+                        info += "{FF0000}Simple Stunt 29";
+                        player.ShowPlayerDialog(Dialog.TELES_SIMPLE_STUNTS, samp.DIALOG_STYLE.LIST, "Simple Stunts", info, "Teleport", "Back");
+                        break;
+                    }
                 }
             }
             break;
@@ -820,6 +854,13 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             break;
         }
         case Dialog.TELES_OTHERS: {
+            if(response) {
+
+            }
+            else CMD.emit("teles");
+            break;
+        }
+        case Dialog.TELES_SIMPLE_STUNTS: {
             if(response) {
 
             }
