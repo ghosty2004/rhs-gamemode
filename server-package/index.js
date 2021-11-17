@@ -207,6 +207,99 @@ CMD.on("report", (player, params) => {
 
 });
 
+/* VIPS Commands */
+CMD.on("vcmds", (player, params) => {
+    let info = "";
+
+    let RED = "";
+    RED += "{FF0000}/aStats, /Time, /Weather, /vAD\n";
+    RED += "{FF0000}/Goto, /SpawnMe, /vClub, /vDisarm, /Fire\n";
+    RED += "{FF0000}/Get, /CarColor, /GetID, /LockCar, /vCC\n";
+    RED += "{FF0000}/CmyChat, /DoS, /MyColor, /vBike, /vAccount";
+
+    let YELLOW = "";
+    YELLOW += "{FFFF00}/S2, /L2, /S3, /L3, /Admins, /cHint, /ReNew\n";
+    YELLOW += "{FFFF00}/Ignore, /MaxAmmo, /wSet, /Wgm, /VipChat\n";
+    YELLOW += "{FFFF00}/Weaps, /GodMode, /(In)Visible, /vCar";
+
+    let BLUE = "";
+    BLUE += "{0072FF}/GodCar, /VipIsland, /ArmHel, /WriteColor\n";
+    BLUE += "{0072FF}/Spec(Off), /vHeli, /vTank, /vHydra, /vMinigun, /Eject";
+
+    let WHITE = "";
+    WHITE += "{FFFFFF}/Highlight, /vHunter, /vRustler, /vSatchel, /vTag(Off)\n";
+    WHITE += "{FFFFFF}/vWeapons, /CarText, /Tags, /SongForAll";
+
+    switch(Player.Info[player.playerid].Language) {
+        case 1: {
+            info += "{FF0000}Rosu:\n";
+            info += `${RED}\n`;
+            info += "{00FF00}+ Apare in dreptul numelui tag-ul {FF0000}(VIP){00FF00}!\n";
+            info += "\n";
+            info += "{FFFF00}Galben:\n";
+            info += `${YELLOW}\n`;
+            info += "{00FF00}+ Apare in dreptul numelui tag-ul {FFFF00}(VIP){00FF00}!\n";
+            info += "{00FF00}+ {00BBF6}Anti-Spam {00FF00}la chat scazut la 2 secunde.\n";
+            info += "{00FF00}+ {00BBF6}Anti-Spam {00FF00}la comenzi scazut la 2 secunde.\n";
+            info += "{00FF00}+ Limita de la {00BBF6}Speed Boost {00FF00}redusa la 10 secunde, puterea ridicata!\n";
+            info += "{00FF00}+ {00BBF6}Imunitate {00FF00}la Anti-DriveBy.\n";
+            info += "\n";
+            info += "{0072FF}Albastru:\n";
+            info += `${BLUE}\n`;
+            info += "{00FF00}+ Apare in dreptul numelui tag-ul {0072FF}(VIP){00FF00}!\n";
+            info += "{00FF00}+ Acces la {00BBF6}VUP Level 4{00FF00}!\n";
+            info += "{00FF00}+ {00BBF6}Anti-Spam {00FF00}la chat scazut la o secunda.\n";
+            info += "{00FF00}+ {00BBF6}Anti-Spam {00FF00}la comenzi scazut la o secunda.\n";
+            info += "{00FF00}+ Limita de la {00BBF6}Speed Boost {00FF00}redusa la 5 secunde, puterea ridicata!\n";
+            info += "\n";
+            info += "{FFFFFF}Alb:\n";
+            info += `${WHITE}\n`;
+            info += "{00FF00}+ Apare in dreptul numelui tag-ul {FF0000}({FFFFFF}VIP{FF0000}){00FF00}!\n";
+            info += "{00FF00}+ Acces la {00BBF6}Teleport pe mapa prin marker{00FF00}!\n";
+            info += "{00FF00}+ {00BBF6}Anti-Spam {00FF00}la chat revocat.\n";
+            info += "{00FF00}+ {00BBF6}Anti-Spam {00FF00}la comenzi revocat.\n";
+            info += "{00FF00}+ Limita de la {00BBF6}Speed Boost {00FF00}redusa la 3 secunde, puterea ridicata la maxim!\n";
+            info += "\n";
+            info += "{FFFF00}Foloseste {FF0000}#Text {FFFF00}pentru a scrie in {FF0000}VIP Chat{FFFF00}!";
+            break;
+        }
+        case 2: {
+            info += "{FF0000}Red:\n";
+            info += `${RED}\n`;
+            info += "{00FF00}+ The {FF0000}(VIP){00FF00} tag shown ahead the name!\n";
+            info += "\n";
+            info += "{FFFF00}Yellow:\n";
+            info += `${YELLOW}\n`;
+            info += "{00FF00}+ The {FFFF00}(VIP){00FF00} tag shown ahead the name!\n";
+            info += "{00FF00}+ Chat {00BBF6}Anti-Spam {00FF00}reduced to 2 seconds.\n";
+            info += "{00FF00}+ Commands {00BBF6}Anti-Spam {00FF00}reduced to 2 seconds.\n";
+            info += "{00FF00}+ {00BBF6}Speed Boost {00FF00}limit reduced to 10 seconds, power increased!\n";
+            info += "{00FF00}+ {00BBF6}Immunity {00FF00}to Anti-DriveBy.\n";
+            info += "\n";
+            info += "{0072FF}Blue:\n";
+            info += `${BLUE}\n`
+            info += "{00FF00}+ The {0072FF}(VIP){00FF00} tag shown ahead the name!\n";
+            info += "{00FF00}+ Access to {00BBF6}VUP Level 4{00FF00}!\n";
+            info += "{00FF00}+ Chat {00BBF6}Anti-Spam {00FF00}reduced to 1 second.\n";
+            info += "{00FF00}+ Commands {00BBF6}Anti-Spam {00FF00}reduced to 1 second.\n";
+            info += "{00FF00}+ {00BBF6}Speed Boost {00FF00}limit reduced to 5 seconds, power increased!\n";
+            info += "\n";
+            info += "{FFFFFF}White:\n";
+            info += `${WHITE}\n`;
+            info += "{00FF00}+ The {FF0000}({FFFFFF}VIP{FF0000}){00FF00} tag shown ahead the name!\n";
+            info += "{00FF00}+ Access to {00BBF6}Teleport to marker on the map{00FF00}!\n";
+            info += "{00FF00}+ Chat {00BBF6}Anti-Spam {00FF00}removed.\n";
+            info += "{00FF00}+ Commands {00BBF6}Anti-Spam {00FF00}removed.\n";
+            info += "{00FF00}+ {00BBF6}Speed Boost {00FF00}limit reduced to 3 seconds, power increased to maximum!\n";
+            info += "\n";
+            info += "{FFFF00}Type {FF0000}#Text {FFFF00}to use the {FF0000}VIP Chat{FFFF00}!";
+            break;
+        }
+    }
+
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Lang(player, "{FFCC00}Comenzi VIP - {FF0000}/BuyVIP, /Vips.", "{FFCC00}VIP Commands - {FF0000}/BuyVIP, /Vips."), info, Lang(player, "Inchide", "Close"), "");
+});
+
 /* Admins Commands */
 CMD.on("gotop", (player, params) => {
     if(Player.Info[player.playerid].Admin >= 1) {
@@ -896,6 +989,10 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.BUYVIP: {
             switch(listitem) {
                 case 0: {
+                    let info = "";
+                    info += "{00FF00}Ai cumparat cu succes {FF0000}VIP Red{00FF00} Gratis!\n";
+                    info += "{00FF00}Scrie {00BBF6}/vCmds {00FF00}pentru a vedea {FF0000}Comenzile de VIP{00FF00}!";
+                    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Lang(player, "VIP {FF0000}Cumparat{AFAFAF}!", ""), info, "Ok", "VCmds");
                     break;
                 }
                 case 1: {
