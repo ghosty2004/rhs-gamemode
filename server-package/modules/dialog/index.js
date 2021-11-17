@@ -13,5 +13,7 @@ module.exports = {
     RULES: 12,
     IMPORTANT_1: 13,
     IMPORTANT_2: 14,
-    BUYVIP: 15
+    BUYVIP: 15,
+    STATS_DESCRIPTION: 16,
+    STATS_DESCRIPTION_INPUT: 17
 }

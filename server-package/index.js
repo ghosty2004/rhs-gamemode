@@ -82,12 +82,12 @@ CMD.on("eng", (player) => {
 CMD.on("stats", (player) => {
     let info = "";
     info += "{FF4800}General statistics\n";
-    info += `{BBFF00}Money: {49FFFF}$${player.GetPlayerMoney()}\n`;
-    info += `{BBFF00}Coins: {49FFFF}0\n`;
-    info += `{BBFF00}Respect: {49FFFF}+0 {BBFF00}/ {49FFFF}-0\n`;
+    info += `{BBFF00}Money: {49FFFF}$${Player.Info[player.playerid].Money}\n`;
+    info += `{BBFF00}Coins: {49FFFF}${Player.Info[player.playerid].Money}\n`;
+    info += `{BBFF00}Respect: {49FFFF}+${Player.Info[player.playerid].Respect.Positive} {BBFF00}/ {49FFFF}-${Player.Info[player.playerid].Respect.Negative}\n`;
     info += `{BBFF00}Online time: {49FFFF}0 {BBFF00}hrs, {49FFFF}0 {BBFF00}mins, {49FFFF}0 {BBFF00}secs\n`;
-    info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? "{00FF00}Yes" : "{FF0000}No"}\n`;
-    info += `{BBFF00}VIP: {FF0000}No\n`;
+    info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? `{49FFFF}Yes{BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
+    info += `{BBFF00}VIP: ${Player.Info[player.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
     info += "\n";
     info += "{FF4800}Killer statistics\n";
     info += `{BBFF00}Kills: {49FFFF}0 {BBFF00}| Headshots: {49FFFF}0\n`;
@@ -211,6 +211,27 @@ CMD.on("gotop", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function getAdminRank(rank) {
+    let string = "";
+    switch(rank) {
+        case 1: break;
+        case 2: break;
+        case 3: string = "{0072FF}Master"; break;
+    }
+    return string;
+}
+
+function getVIPRank(rank) {
+    let string = "";
+    switch(rank) {
+        case 1: string = "{FF0000}Red"; break;
+        case 2: string = "{FFFF00}Yellow"; break;
+        case 3: string = "{0077FF}Blue"; break;
+        case 4: string = "{FFFFFF}White"; break;
+    }
+    return string;
+}
+
 function ShowSpawnTextDraw(player) {
     for(let i = 0; i <= 3; i++) player.TextDrawShowForPlayer(TextDraws.spawn[i]);
 }
@@ -522,6 +543,49 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.STATS: {
+            if(!response) {
+                let info = "";
+                info += `{0072FF}${Lang(player, "Descriere Linia 1", "Description Line 1")}\n`;
+                info += `{FFFF00}${Lang(player, "Descriere Linia 2", "Description Line 2")}\n`;
+                info += `{FF0000}${Lang(player, "Descriere Linia 3", "Description Line 3")}`;
+                player.ShowPlayerDialog(Dialog.STATS_DESCRIPTION, samp.DIALOG_STYLE.LIST, Lang(player, "Descriere", "Description"), info, Lang(player, "Selecteaza", "Select"), Lang(player, "Inapoi", "Back"));
+            }
+            break;
+        }
+        case Dialog.STATS_DESCRIPTION: {
+            if(response) {
+                Player.Info[player.playerid].Editing_Stats_Description_Line = listitem + 1;
+                player.ShowPlayerDialog(Dialog.STATS_DESCRIPTION_INPUT, samp.DIALOG_STYLE.INPUT, Lang(player, "Descriere", "Description"), "", Lang(player, "Ok", "Update"), Lang(player, "Renunta", "Cancel"));
+            }
+            else CMD.emit("stats");
+            break;
+        }
+        case Dialog.STATS_DESCRIPTION_INPUT: {
+            if(response) {
+                Player.Info[player.playerid].Description[Player.Info[player.playerid].Editing_Stats_Description_Line] = inputtext;
+                player.SendClientMessage(data.colors.YELLOW, Lang(player, "Ti-ai modificat Descrierea! Scrie {FF0000}/Stats {FFFF00}pentru a o vedea!", "You have updated your Description! Type {FF0000}/Stats {FFFF00}to see it!"));
+            }
+            Player.Info[player.playerid].Editing_Stats_Description_Line = 0;
+            break;
+        }
+        case Dialog.BUYVIP: {
+            switch(listitem) {
+                case 0: {
+                    break;
+                }
+                case 1: {
+                    break;
+                }
+                case 2: {
+                    break;
+                }
+                case 3: {
+                    break;
+                }
+            }
+            break;
+        }
         case Dialog.IMPORTANT_1: {
             if(response) ShowImportant(player, 2);
             else CMD.emit("rules");
