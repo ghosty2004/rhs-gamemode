@@ -124,6 +124,7 @@ CMD.on("help", (player) => {
     info += `{00BBF6}/Report [ID][Motiv] {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "O comanda ce iti permite sa raportezi un jucator care nu respecta regulamentul!" : "A command wich help you report a player that is not respecting the /Rules!"}\n`;
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `${Player.Info[player.playerid].Language == 1 ? "Ajutor" : "Help"}`, info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", "");
 });
+CMD.on("ajutor", (player) => { CMD.emit("help", player); });
 
 CMD.on("rules", (player) => {
     let info = "";
@@ -141,6 +142,51 @@ CMD.on("rules", (player) => {
     info += "\n";
     info += `{FFEB7B}${Lang(player, "Iti multumim pentru ca ti-ai dedicat un minut din viata citind aceste reguli! Iti dorim distractie placuta!", "Thank you for dedicating a minute of your life to read these rules! Have fun!")}`;
     player.ShowPlayerDialog(Dialog.RULES, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- ${Lang(player, "Reguli", "Rules")}!`, info, Lang(player, "Inchide", "Close"), "Important");
+});
+
+CMD.on("tutorial", (player) => {
+    let info = "";
+    switch(Player.Info[player.playerid].Language) {
+        case 1: {
+            info += "{FFFFFF}Bine ai venit!\n";
+            info += "{0072FF}Scopul tau pe server este sa atingi Stats Note 10/10.\n";
+            info += "{0072FF}Pentru a-ti atinge scopul este nevoie ca tu sa ai urmatoarele lucruri:\n";
+            info += "\n";
+            info += "{BBFF00}1000 Stunt Points {00BBF6}- /ss pentru a face Stunt Points.\n";
+            info += "{BBFF00}1000 Drift Points {00BBF6}- /Drifts pentru a face Drift Points.\n";
+            info += "{BBFF00}1000 Race Points {00BBF6}- /Races pentru a face Race Points.\n";
+            info += "{BBFF00}1000 Kills {00BBF6}- /DM pentru a face killuri.\n";
+            info += "{BBFF00}100 Best Killing Spree {00BBF6}- /DM pentru a face Killing Spree.\n";
+            info += "{BBFF00}100 Ore jucate pe server {00BBF6}- /Stats pentru a vedea cate ore ai.\n";
+            info += "{BBFF00}50 Respect Points {00BBF6}- Roaga jucatorii sa-ti ofere puncte de respect.\n";
+            info += "{BBFF00}O proprietate personala {00BBF6}- /Howto pentru a afla cum iti cumperi una.\n";
+            info += "{BBFF00}O casa {00BBF6}- /Howto pentru a afla cum iti cumperi una.\n";
+            info += "{BBFF00}25.000 de coins {00BBF6}- /Jobs sau /Minigames pentru a face coins.\n";
+            info += "\n";
+            info += "{0072FF}Pentru mai multe informatii scrie /Howto sau /Help.";
+            break;
+        }
+        case 2: {
+            info += "{FFFFFF}Welcome!\n";
+            info += "{0072FF}Your purpose on our server is to make 10/10 Stats Note.\n";
+            info += "{0072FF}To achieve that you must have the following items:\n";
+            info += "\n";
+            info += "{BBFF00}1000 Stunt Points {00BBF6}- /ss for Stunt Points\n";
+            info += "{BBFF00}1000 Drift Points {00BBF6}- /Drifts for Drift Points.\n";
+            info += "{BBFF00}1000 Race Points {00BBF6}- /Races for Race Points.\n";
+            info += "{BBFF00}1000 Kills {00BBF6}- /DM to make kills.\n";
+            info += "{BBFF00}100 Best Killing Spree {00BBF6}- /DM for Killing Spree.\n";
+            info += "{BBFF00}100 hours played {00BBF6}- /Stats to see your hours.\n";
+            info += "{BBFF00}50 Respect Points {00BBF6}- Politely ask players to /respect you.\n";
+            info += "{BBFF00}A good business {00BBF6}- /Howto to find out how to buy one.\n";
+            info += "{BBFF00}A decent house {00BBF6}- /Howto to find out how to buy one.\n";
+            info += "{BBFF00}25.000 de coins {00BBF6}- /Jobs or /Minigames to make them.\n";
+            info += "\n";
+            info += "{0072FF}For more info please type /Howto or /Help.";
+            break;
+        }
+    }
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Tutorial - Cum poti face 10/10 stats!", "Tutorial - How to make 10/10 stats!"), info, "Ok", "");
 });
 
 CMD.on("important", (player) => { ShowImportant(player, 1); });
