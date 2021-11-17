@@ -18,5 +18,6 @@ module.exports = {
     STATS_DESCRIPTION_INPUT: 17,
     TELES: 17,
     TELES_STUNTS: 18,
-    TELES_JUMPS: 19
+    TELES_JUMPS: 19,
+    TELES_DM: 20,
 }
