@@ -589,6 +589,9 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         player.ShowPlayerDialog(Dialog.TELES_STUNTS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Jumps Zones", info, "Teleport", "Back");
                         break;
                     }
+                    case 2: {
+                        break;
+                    }
                 }
             }
             break;
