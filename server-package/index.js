@@ -635,6 +635,21 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         player.ShowPlayerDialog(Dialog.TELES_JOBS, samp.DIALOG_STYLE.LIST, "Jobs", info, "Teleport", "Back");
                         break;
                     }
+                    case 7: { /* Minigames */
+                        let info = "Command\tDescription\n";
+                        info += "{49FFFF}/Gifts\t{BBFF00}The Gifts(Reward VIP Blue)\n";
+                        info += "{49FFFF}/LastMan\t{BBFF00}The Last Man Standing Alive!\n";
+                        info += "{49FFFF}/Hns\t{BBFF00}Hide'n Seek\n";
+                        info += "{49FFFF}/GParkour\t{BBFF00}Grove Parkour\n";
+                        info += "{49FFFF}/SfParkour\t{BBFF00}San Fierro Parkour\n";
+                        info += "{49FFFF}/Targets\t{BBFF00}Targets Training\n";
+                        info += "{49FFFF}/SkyClimb\t{BBFF00}The Sky Climb\n";
+                        info += "{49FFFF}/Derby\t{BBFF00}The Derby\n";
+                        info += "{49FFFF}/Football\t{BBFF00}Play Football\n";
+                        info += "{49FFFF}/Zm\t{BBFF00}Zombies vs Humans";
+                        player.ShowPlayerDialog(Dialog.TELES_MINIGAMES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Minigames", info, "Teleport", "Back");
+                        break;
+                    }
                 }
             }
             break;
@@ -668,6 +683,13 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             break;
         }
         case Dialog.TELES_JOBS: {
+            if(response) {
+
+            }
+            else CMD.emit("teles");
+            break;
+        }
+        case Dialog.TELES_MINIGAMES: {
             if(response) {
 
             }
