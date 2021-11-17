@@ -679,6 +679,30 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         player.ShowPlayerDialog(Dialog.TELES_PARTYS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Partys", info, "Teleport", "Back");
                         break;
                     }
+                    case 11: { /* Special Places */
+                        let info = "Command\tDescription\n";
+                        info += "{49FFFF}/Bamboo\t{BBFF00}Bamboo Club\n";
+                        info += "{49FFFF}/Drag\t{BBFF00}Drag Race\n";
+                        info += "{49FFFF}/Airship\t{BBFF00}Airship\n";
+                        info += "{49FFFF}/Jungle\t{BBFF00}Jungle\n";
+                        info += "{49FFFF}/Paradise\t{BBFF00}Paradise\n";
+                        info += "{49FFFF}/Bahamas\t{BBFF00}Bahamas\n";
+                        info += "{49FFFF}/VipIsland\t{BBFF00}VIP Island\n";
+                        info += "{49FFFF}/Drag2\t{BBFF00}Drag Race 2\n";
+                        info += "{49FFFF}/Pirateland\t{BBFF00}Pirateland\n";
+                        info += "{49FFFF}/Planes\t{BBFF00}Planes Airport\n";
+                        info += "{49FFFF}/Atlantis\t{BBFF00}Atlantis\n";
+                        info += "{49FFFF}/Rec\t{BBFF00}Recruitment Zone\n";
+                        info += "{49FFFF}/Th\t{BBFF00}Tree House\n";
+                        info += "{49FFFF}/Spiral\t{BBFF00}Spiral\n";
+                        info += "{49FFFF}/Smash\t{BBFF00}Smash\n";
+                        info += "{49FFFF}/Showroom\t{BBFF00}Show Room\n";
+                        info += "{49FFFF}/Market\t{BBFF00}Market\n";
+                        info += "{49FFFF}/Justglass\t{BBFF00}Just Glass\n";
+                        info += "{49FFFF}/Drag3\t{BBFF00}Drag Race 3";
+                        player.ShowPlayerDialog(Dialog.TELES_SPECIAL_PLACES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Special Places", info, "Teleport", "Back");
+                        break;
+                    }
                 }
             }
             break;
@@ -740,6 +764,13 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             break;
         }
         case Dialog.TELES_PARTYS: {
+            if(response) {
+
+            }
+            else CMD.emit("teles");
+            break;
+        }
+        case Dialog.TELES_SPECIAL_PLACES: {
             if(response) {
 
             }
