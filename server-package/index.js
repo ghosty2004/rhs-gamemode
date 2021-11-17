@@ -662,11 +662,21 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                     }
                     case 9: { /* Parkours */
                         let info = "Command\tDescription\n";
-                        info += "{49FFFF}/proparkour	{BBFF00}Pro Parkour\n";
-                        info += "{49FFFF}/gparkour	{BBFF00}Grove Parkour\n";
-                        info += "{49FFFF}/sfparkour	{BBFF00}San Fierro Parkour\n";
-                        info += "{49FFFF}/cpk	{BBFF00}City Parkour";
+                        info += "{49FFFF}/proparkour\t{BBFF00}Pro Parkour\n";
+                        info += "{49FFFF}/gparkour\t{BBFF00}Grove Parkour\n";
+                        info += "{49FFFF}/sfparkour\t{BBFF00}San Fierro Parkour\n";
+                        info += "{49FFFF}/cpk\t{BBFF00}City Parkour";
                         player.ShowPlayerDialog(Dialog.TELES_PARKOURS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Parkours Teleports", info, "Teleport", "Back");
+                        break;
+                    }
+                    case 10: { /* Partys */
+                        let info = "Command\tDescription\n";
+                        info += "{49FFFF}/Party\t{BBFF00}Party\n";
+                        info += "{49FFFF}/Bamboo\t{BBFF00}Bamboo Club\n";
+                        info += "{49FFFF}/Bar\t{BBFF00}Party Bar\n";
+                        info += "{49FFFF}/Minecraft\t{BBFF00}Party Minecraft\n";
+                        info += "{49FFFF}/Island\t{BBFF00}Island";
+                        player.ShowPlayerDialog(Dialog.TELES_PARTYS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Partys", info, "Teleport", "Back");
                         break;
                     }
                 }
@@ -723,6 +733,13 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             break;
         }
         case Dialog.TELES_PARKOURS: {
+            if(response) {
+
+            }
+            else CMD.emit("teles");
+            break;
+        }
+        case Dialog.TELES_PARTYS: {
             if(response) {
 
             }
