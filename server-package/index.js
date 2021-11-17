@@ -90,19 +90,19 @@ CMD.on("stats", (player) => {
     info += `{BBFF00}VIP: ${Player.Info[player.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
     info += "\n";
     info += "{FF4800}Killer statistics\n";
-    info += `{BBFF00}Kills: {49FFFF}0 {BBFF00}| Headshots: {49FFFF}0\n`;
-    info += `{BBFF00}Killing Spree: {49FFFF}0 {BBFF00}| Best Killing Spree: {49FFFF}0\n`;
-    info += `{BBFF00}Deaths: {49FFFF}0\n`;
-    info += `{BBFF00}Killer Rank: {FF0000}Noob\n`;
+    info += `{BBFF00}Kills: {49FFFF}${Player.Info[player.playerid].Kills_Data.Kills} {BBFF00}| Headshots: {49FFFF}${Player.Info[player.playerid].Kills_Data.HeadShots}\n`;
+    info += `{BBFF00}Killing Spree: {49FFFF}${Player.Info[player.playerid].Kills_Data.KillingSpree} {BBFF00}| Best Killing Spree: {49FFFF}${Player.Info[player.playerid].Kills_Data.BestKillingSpree}\n`;
+    info += `{BBFF00}Deaths: {49FFFF}${Player.Info[player.playerid].Kills_Data.Deaths}\n`;
+    info += `{BBFF00}Killer Rank: ${getRanksRankName("kills", Player.Info[player.playerid].Kills_Data.Kills)}\n`;
     info += "\n";
     info += `{FF4800}Driving skills\n`;
-    info += `{BBFF00}Drift Points: {49FFFF}0 {BBFF00}({FF0000}Noob{BBFF00})\n`;
-    info += `{BBFF00}Stunt Points: {49FFFF}0 {BBFF00}({FF0000}Noob{BBFF00})\n`;
-    info += `{BBFF00}Race Points: {49FFFF}0 {BBFF00}({FF0000}Noob{BBFF00})\n`;
+    info += `{BBFF00}Drift Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.DriftPoints} {BBFF00}(${getRanksRankName("drift", Player.Info[player.playerid].Driving_Data.DriftPoints)}{BBFF00})\n`;
+    info += `{BBFF00}Stunt Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.StuntPoints} {BBFF00}(${getRanksRankName("stunt", Player.Info[player.playerid].Driving_Data.StuntPoints)}{BBFF00})\n`;
+    info += `{BBFF00}Race Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.RacePoints} {BBFF00}(${getRanksRankName("race", Player.Info[player.playerid].Driving_Data.RacePoints)}{BBFF00})\n`;
     info += "\n";
     info += "{FF4800}Properties\n";
-    info += `{BBFF00}Business: {FF0000}No\n`;
-    info += `{BBFF00}House: {FF0000}No\n`;
+    info += `{BBFF00}Business: ${Player.Info[player.playerid].Properties.Business ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
+    info += `{BBFF00}House: ${Player.Info[player.playerid].Properties.House ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
     info += `{BBFF00}Personal Vehicle: {FF0000}No\n`;
     info += "\n";
     info += `{FF4800}Statistics note: {49FFFF}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob`
@@ -319,6 +319,49 @@ CMD.on("gotop", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function getRanksRankName(rank_name, rank) {
+    let string = "";
+    switch(rank_name) {
+        case "kills": {
+            if(rank >= 20000) string = "{0072FF}King";
+            else if(rank >= 10000) string = "{00FF00}Master";
+            else if(rank >= 3000) string = "{FFFF00}Specialist";
+            else if(rank >= 500) string = "{FF9900}Advanced";
+            else if(rank >= 1) string = "{FF6600}Beginner";
+            else string = "{FF0000}Noob";
+            break;
+        }
+        case "drift": {
+            if(rank >= 300000) string = "{0072FF}King";
+            else if(rank >= 100000) string = "{00FF00}Master";
+            else if(rank >= 10000) string = "{FFFF00}Specialist";
+            else if(rank >= 1500) string = "{FF9900}Advanced";
+            else if(rank >= 1) string = "{FF6600}Beginner";
+            else string = "{FF0000}Noob";
+            break;
+        }
+        case "race": {
+            if(rank >= 8000) string = "{0072FF}King";
+            else if(rank >= 4000) string = "{00FF00}Master";
+            else if(rank >= 1000) string = "{FFFF00}Specialist";
+            else if(rank >= 100) string = "{FF9900}Advanced";
+            else if(rank >= 1) string = "{FF6600}Beginner";
+            else string = "{FF0000}Noob";
+            break;
+        }
+        case "stunt": {
+            if(rank >= 5000) string = "{0072FF}King";
+            else if(rank >= 2000) string = "{00FF00}Master";
+            else if(rank >= 1000) string = "{FFFF00}Specialist";
+            else if(rank >= 100) string = "{FF9900}Advanced";
+            else if(rank >= 1) string = "{FF6600}Beginner";
+            else string = "{FF0000}Noob";
+            break;
+        }
+    }
+    return string;
+}
+
 function getAdminRank(rank) {
     let string = "";
     switch(rank) {
@@ -515,7 +558,7 @@ function ShowCMDS(player, page) {
             info += `{FF0000}/hidetag {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Ascunde-ti tie sau celorlalti jucatori tag-ul!" : "Hide your/others' tag."}\n`;
             info += `{FF0000}/vCmds {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Vezi o lista cu comenzile de VIP." : "View a list with all VIP Commands."}\n`;
             info += `{FF0000}/vup {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Activeaza/Dezactiveaza functia de VUP a vehiculului." : "Activate/Deactivate Vehicle's VUP Function."}\n`;
-            player.ShowPlayerDialog(Dialog.CMDS_2, samp.DIALOG_STYLE.MSGBOX, Player.Info[player.playerid].Language == 1 ? "Comenzi - Pagina {FF0000}2" : "Commands - Page {FF0000}1", info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", Player.Info[player.playerid].Language == 1 ? "Pagina 2" : "Page 2");
+            player.ShowPlayerDialog(Dialog.CMDS_2, samp.DIALOG_STYLE.MSGBOX, Player.Info[player.playerid].Language == 1 ? "Comenzi - Pagina {FF0000}2" : "Commands - Page {FF0000}2", info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", Player.Info[player.playerid].Language == 1 ? "Pagina 2" : "Page 2");
             break;
         }
         case 3: {
@@ -544,7 +587,7 @@ function ShowCMDS(player, page) {
             info += `{FF0000}/wtime {05C81F}- ${Player.Info[player.playerid].Language == 1 ? "Pentru a vedea cat este ceasul!" : "To see what the clock is!"}\n`;
             info += `{FF0000}/blacklisted {05C81F}- ${Player.Info[player.playerid].Language == 1 ? "Pentru a vedea cine se afla pe lista neagra!" : "To see who is blacklisted!"}\n`;
             info += `{FF0000}/email {05C81F}- ${Player.Info[player.playerid].Language == 1 ? "Pentru a schimba sau adauga un e-mail in contul tau!" : "To change or add a e-mail to your account!"}\n`;
-            player.ShowPlayerDialog(Dialog.CMDS_3, samp.DIALOG_STYLE.MSGBOX, Player.Info[player.playerid].Language == 1 ? "Comenzi - Pagina {FF0000}3" : "Commands - Page {FF0000}1", info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", Player.Info[player.playerid].Language == 1 ? "Pagina 1" : "Page 1");
+            player.ShowPlayerDialog(Dialog.CMDS_3, samp.DIALOG_STYLE.MSGBOX, Player.Info[player.playerid].Language == 1 ? "Comenzi - Pagina {FF0000}3" : "Commands - Page {FF0000}3", info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", Player.Info[player.playerid].Language == 1 ? "Pagina 1" : "Page 1");
             break;
         }
     }
