@@ -20,4 +20,6 @@ module.exports = {
     TELES_STUNTS: 18,
     TELES_JUMPS: 19,
     TELES_DM: 20,
+    TELES_INTERIORS: 21,
+    TELES_DRIFTS: 22
 }

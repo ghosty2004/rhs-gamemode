@@ -589,7 +589,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         player.ShowPlayerDialog(Dialog.TELES_JUMPS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Jumps Zones", info, "Teleport", "Back");
                         break;
                     }
-                    case 2: {
+                    case 2: { /* Death Matchs */
                         let info = "Command\tDescription\tPlaying\n";
                         info += `{49FFFF}/Minigun\t{BBFF00}Minigun DeathMatch\t{00BBF6}0 Players\n`;
                         info += `{49FFFF}/De\t{BBFF00}Desert Eagle DeathMatch\t{00BBF6}0 Players\n`;
@@ -603,6 +603,21 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         info += `{49FFFF}/Helldm\t{BBFF00}Hell DeathMatch\t{00BBF6}0 Players\n`;
                         info += `{49FFFF}/GunWar\t{BBFF00}Gun War DeathMatch\t{00BBF6}0 Players`;
                         player.ShowPlayerDialog(Dialog.TELES_DM, samp.DIALOG_STYLE.TABLIST_HEADERS, "Death match zone", info, "Teleport", "Back");
+                        break;
+                    }
+                    case 3: { /* Interiors */
+                        break;
+                    }
+                    case 4: { /* Drifts */
+                        let info = "";
+                        info += "{0072FF}/Drift 1\n";
+                        info += "{0072FF}/Drift 2\n";
+                        info += "{FF0000}/Drift 3\n";
+                        info += "{FF0000}/Drift 4\n";
+                        info += "{FF0000}/Drift 5\n";
+                        info += "{FFFF00}/Drift 6\n";
+                        info += "{FFFF00}/LvAir\n";
+                        player.ShowPlayerDialog(Dialog.TELES_DRIFTS, samp.DIALOG_STYLE.LIST, "Drifts", info, "Teleport", "Back");
                         break;
                     }
                 }
