@@ -703,6 +703,48 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         player.ShowPlayerDialog(Dialog.TELES_SPECIAL_PLACES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Special Places", info, "Teleport", "Back");
                         break;
                     }
+                    case 12: { /* Others */
+                        let info = "Command\tDescription\n";
+                        info += "{49FFFF}/Ls\t{BBFF00}Los Santos\n";
+                        info += "{49FFFF}/Sf\t{BBFF00}San Fierro\n";
+                        info += "{49FFFF}/Lv\t{BBFF00}Las Venturas\n";
+                        info += "{49FFFF}/Lvps\t{BBFF00}Las Venturas Pay and Spray\n";
+                        info += "{49FFFF}/Lv4d\t{BBFF00}Four Dragos Casino\n";
+                        info += "{49FFFF}/Lvstrip\t{BBFF00}Las Venturas Strip\n";
+                        info += "{49FFFF}/Lvpd\t{BBFF00}Las Venturas Police Dep\n";
+                        info += "{49FFFF}/Lvtrans\t{BBFF00}Las Venturas Transfender\n";
+                        info += "{49FFFF}/Sfps\t{BBFF00}San Fierro Pay and Spray\n";
+                        info += "{49FFFF}/Sftrain\t{BBFF00}San Fierro Train\n";
+                        info += "{49FFFF}/Lspool\t{BBFF00}Los Santos Pool\n";
+                        info += "{49FFFF}/Maddog\t{BBFF00}Madd Dog's House\n";
+                        info += "{49FFFF}/Vinewood\t{BBFF00}Vinewood\n";
+                        info += "{49FFFF}/Beach\t{BBFF00}Santa Maria Beach\n";
+                        info += "{49FFFF}/Grove\t{BBFF00}Grove Street\n";
+                        info += "{49FFFF}/Pimps\t{BBFF00}Pimps\n";
+                        info += "{49FFFF}/Chilliad\t{BBFF00}Mount Chilliad\n";
+                        info += "{49FFFF}/Lvpd\t{BBFF00}Las Venturas PD\n";
+                        info += "{49FFFF}/Lspd\t{BBFF00}Los Santos PD\n";
+                        info += "{49FFFF}/Sfpd\t{BBFF00}San Fierro PD\n";
+                        info += "{49FFFF}/Dam\t{BBFF00}Dam\n";
+                        info += "{49FFFF}/Hut\t{BBFF00}Forest Hut\n";
+                        info += "{49FFFF}/Desertramp\t{BBFF00}Desert Ramp\n";
+                        info += "{49FFFF}/Disco\t{BBFF00}Alhambra Club\n";
+                        info += "{49FFFF}/Lssp\t{BBFF00}Los Santos Spawn Place\n";
+                        info += "{49FFFF}/Lst\t{BBFF00}Los Santos Trains\n";
+                        info += "{49FFFF}/Lvt\t{BBFF00}Las Venturas Trains\n";
+                        info += "{49FFFF}/Sft\t{BBFF00}San Fierro Trains\n";
+                        info += "{49FFFF}/Sffire\t{BBFF00}SF Fire Departament\n";
+                        info += "{49FFFF}/Lsammu\t{BBFF00}Los Santos Ammunation\n";
+                        info += "{49FFFF}/Lvammu\t{BBFF00}Las Venturas Ammunation\n";
+                        info += "{49FFFF}/Sfammu\t{BBFF00}San Fierro Ammunation\n";
+                        info += "{49FFFF}/Sfh\t{BBFF00}San Fierro Hospital\n";
+                        info += "{49FFFF}/Quarry\t{BBFF00}Quarry\n";
+                        info += "{49FFFF}/a51\t{BBFF00}A51\n";
+                        info += "{49FFFF}/lvchina\t{BBFF00}Las Venturas China\n";
+                        info += "{49FFFF}/lvsp\t{BBFF00}Las Venturas Spawn Place";
+                        player.ShowPlayerDialog(Dialog.TELES_OTHERS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Other Teleports", info, "Teleport", "Back");
+                        break;
+                    }
                 }
             }
             break;
@@ -771,6 +813,13 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             break;
         }
         case Dialog.TELES_SPECIAL_PLACES: {
+            if(response) {
+
+            }
+            else CMD.emit("teles");
+            break;
+        }
+        case Dialog.TELES_OTHERS: {
             if(response) {
 
             }
