@@ -880,84 +880,84 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             if(response) {
 
             }
-            else CMD.emit("teles");
+            else CMD.emit("teles", player);
             break;
         }
         case Dialog.TELES_JUMPS: {
             if(response) {
 
             }
-            else CMD.emit("teles");
+            else CMD.emit("teles", player);
             break;
         }
         case Dialog.TELES_DM: {
             if(response) {
 
             }
-            else CMD.emit("teles");
+            else CMD.emit("teles", player);
             break;
         }
         case Dialog.TELES_DRIFTS: {
             if(response) {
 
             }
-            else CMD.emit("teles");
+            else CMD.emit("teles", player);
             break;
         }
         case Dialog.TELES_JOBS: {
             if(response) {
 
             }
-            else CMD.emit("teles");
+            else CMD.emit("teles", player);
             break;
         }
         case Dialog.TELES_MINIGAMES: {
             if(response) {
 
             }
-            else CMD.emit("teles");
+            else CMD.emit("teles", player);
             break;
         }
         case Dialog.TELES_CHALLANGES: {
             if(response) {
 
             }
-            else CMD.emit("teles");
+            else CMD.emit("teles", player);
             break;
         }
         case Dialog.TELES_PARKOURS: {
             if(response) {
 
             }
-            else CMD.emit("teles");
+            else CMD.emit("teles", player);
             break;
         }
         case Dialog.TELES_PARTYS: {
             if(response) {
 
             }
-            else CMD.emit("teles");
+            else CMD.emit("teles", player);
             break;
         }
         case Dialog.TELES_SPECIAL_PLACES: {
             if(response) {
 
             }
-            else CMD.emit("teles");
+            else CMD.emit("teles", player);
             break;
         }
         case Dialog.TELES_OTHERS: {
             if(response) {
 
             }
-            else CMD.emit("teles");
+            else CMD.emit("teles", player);
             break;
         }
         case Dialog.TELES_SIMPLE_STUNTS: {
             if(response) {
 
             }
-            else CMD.emit("teles");
+            else CMD.emit("teles", player);
             break;
         }
         case Dialog.STATS: {
@@ -975,7 +975,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                 Player.Info[player.playerid].Editing_Stats_Description_Line = listitem + 1;
                 player.ShowPlayerDialog(Dialog.STATS_DESCRIPTION_INPUT, samp.DIALOG_STYLE.INPUT, Lang(player, "Descriere", "Description"), "", Lang(player, "Ok", "Update"), Lang(player, "Renunta", "Cancel"));
             }
-            else CMD.emit("stats");
+            else CMD.emit("stats", player);
             break;
         }
         case Dialog.STATS_DESCRIPTION_INPUT: {
@@ -1009,7 +1009,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.IMPORTANT_1: {
             if(response) ShowImportant(player, 2);
-            else CMD.emit("rules");
+            else CMD.emit("rules", player);
             break;
         }
         case Dialog.IMPORTANT_2: {
