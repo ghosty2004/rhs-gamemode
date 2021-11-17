@@ -24,5 +24,6 @@ module.exports = {
     TELES_DRIFTS: 22,
     TELES_RACES: 23,
     TELES_JOBS: 24,
-    TELES_MINIGAMES: 25
+    TELES_MINIGAMES: 25,
+    TELES_CHALLANGES: 26
 }

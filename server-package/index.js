@@ -650,6 +650,16 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         player.ShowPlayerDialog(Dialog.TELES_MINIGAMES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Minigames", info, "Teleport", "Back");
                         break;
                     }
+                    case 8: { /* Challenges */
+                        let info = "Command\tDescription\n";
+                        info += "{49FFFF}/Derby\t{BBFF00}Derby\n";
+                        info += "{49FFFF}/Bmx\t{BBFF00}Bmx\n";
+                        info += "{49FFFF}/Quad\t{BBFF00}Quad\n";
+                        info += "{49FFFF}/Karting\t{BBFF00}Karting\n";
+                        info += "{49FFFF}/Monster\t{BBFF00}Monster Crash";
+                        player.ShowPlayerDialog(Dialog.TELES_CHALLANGES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Challenges", info, "Teleport", "Back");
+                        break;
+                    }
                 }
             }
             break;
@@ -690,6 +700,13 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             break;
         }
         case Dialog.TELES_MINIGAMES: {
+            if(response) {
+
+            }
+            else CMD.emit("teles");
+            break;
+        }
+        case Dialog.TELES_CHALLANGES: {
             if(response) {
 
             }
