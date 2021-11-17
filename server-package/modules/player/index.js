@@ -15,6 +15,7 @@ module.exports = {
             ConnectTime: Date.now(),
             Admin: 0,
             VIP: 0,
+            VIP_Expire: 0,
             Kills_Data: {
                 Kills: 0,
                 HeadShots: 0,

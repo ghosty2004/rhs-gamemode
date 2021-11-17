@@ -181,7 +181,22 @@ CMD.on("credits", (player) => {
 });
 
 CMD.on("teles", (player) => {
-
+    let info = "Command\tDescription\n";
+    info += "{49FFFF}/Stunts\t{BBFF00}Stunt Zones\n";
+    info += "{49FFFF}/Jumps\t{BBFF00}Jumps Zones\n";
+    info += "{49FFFF}/Dm\t{BBFF00}Death Match\n";
+    info += "{49FFFF}/Int\t{BBFF00}Interiors\n";
+    info += "{49FFFF}/Drifts\t{BBFF00}Drifts\n";
+    info += "{49FFFF}/Races\t{BBFF00}Races\n";
+    info += "{49FFFF}/Jobs\t{BBFF00}Jobs\n";
+    info += "{49FFFF}/Minigames\t{BBFF00}MiniGames\n";
+    info += "{49FFFF}/Challenges\t{BBFF00}Car Challenges\n";
+    info += "{49FFFF}/Parkours\t{BBFF00}Parkours\n";
+    info += "{49FFFF}/Partys\t{BBFF00}Party Places\n";
+    info += "{49FFFF}/Splaces\t{BBFF00}Special Places\n";
+    info += "{49FFFF}/Others\t{BBFF00}Other Places\n";
+    info += "{49FFFF}/Sstunts\t{BBFF00}Simple Stunts";
+    player.ShowPlayerDialog(Dialog.TELES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Teleports category", info, "Select", "Close");
 });
 
 CMD.on("admins", (player) => {
