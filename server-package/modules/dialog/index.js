@@ -16,5 +16,7 @@ module.exports = {
     BUYVIP: 15,
     STATS_DESCRIPTION: 16,
     STATS_DESCRIPTION_INPUT: 17,
-    TELES: 17
+    TELES: 17,
+    TELES_STUNTS: 18,
+    TELES_JUMPS: 19
 }

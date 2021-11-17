@@ -558,6 +558,48 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.TELES: {
+            if(response) {
+                switch(listitem) {
+                    case 0: { /* Stunts */
+                        let info = "Command\tDescription\n";
+                        info += "{49FFFF}/Aa\t{BBFF00}Old Airport\n";
+                        info += "{49FFFF}/LsAir\t{BBFF00}Los Santos Airport\n";
+                        info += "{49FFFF}/SfAir\t{BBFF00}San Fierro Airport\n";
+                        info += "{49FFFF}/Jizzy\t{BBFF00}Jizzy Stunt\n";
+                        info += "{49FFFF}/Chrome\t{BBFF00}Stunt Chrome\n";
+                        info += "{49FFFF}/Rc\t{BBFF00}Roller Coaster\n";
+                        info += "{49FFFF}/Bmx\t{BBFF00}Stunt BMX\n";
+                        info += "{49FFFF}/Mc\t{BBFF00}Monster Crash\n";
+                        info += "{49FFFF}/Sstunts\t{BBFF00}Simple Stunts";
+                        player.ShowPlayerDialog(Dialog.TELES_STUNTS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Stunts", info, "Teleport", "Back");
+                        break;
+                    }
+                    case 1: {
+                        let info = "Command\tDescription\n";
+                        info += "{49FFFF}/Basejump\t{BBFF00}Base Jump\n";
+                        info += "{49FFFF}/Gdj\t{BBFF00}Glass and Dance Jump\n";
+                        info += "{49FFFF}/Wj\t{BBFF00}Water Jump\n";
+                        info += "{49FFFF}/Jj\t{BBFF00}Jizzy Jump\n";
+                        info += "{49FFFF}/Tr\t{BBFF00}Trampoline Jump\n";
+                        info += "{49FFFF}/AaTube\t{BBFF00}Old Airport Tube\n";
+                        info += "{49FFFF}/Tj\t{BBFF00}Tube Jump\n";
+                        info += "{49FFFF}/Bcar\t{BBFF00}Basket Car\n";
+                        info += "{49FFFF}/Bj\t{BBFF00}Building Jump";
+                        player.ShowPlayerDialog(Dialog.TELES_STUNTS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Jumps Zones", info, "Teleport", "Back");
+                        break;
+                    }
+                }
+            }
+            break;
+        }
+        case Dialog.TELES_STUNTS: {
+            if(response) {
+
+            }
+            else CMD.emit("teles");
+            break;
+        }
         case Dialog.STATS: {
             if(!response) {
                 let info = "";
