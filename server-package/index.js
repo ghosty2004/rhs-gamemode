@@ -319,6 +319,10 @@ CMD.on("gotop", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function Updater() {
+
+}
+
 function getRanksRankName(rank_name, rank) {
     let string = "";
     switch(rank_name) {
@@ -384,19 +388,20 @@ function getVIPRank(rank) {
 }
 
 function ShowSpawnTextDraw(player) {
-    for(let i = 0; i <= 3; i++) player.TextDrawShowForPlayer(TextDraws.spawn[i]);
+    for(let i = 0; i <= 3; i++) player.TextDrawShowForPlayer(TextDraws.server.spawn[i]);
+    player.PlayerTextDrawShow(TextDraws.player.date);
 }
 
 function HideSpawnTextDraw(player) {
-    for(let i = 0; i <= 3; i++) player.TextDrawHideForPlayer(TextDraws.spawn[i]);
+    for(let i = 0; i <= 3; i++) player.TextDrawHideForPlayer(TextDraws.server.spawn[i]);
 }
 
 function ShowConnectTextDraw(player) {
-    for(let i = 0; i <= 12; i++) player.TextDrawShowForPlayer(TextDraws.connect[i]);
+    for(let i = 0; i <= 12; i++) player.TextDrawShowForPlayer(TextDraws.server.connect[i]);
 }
 
 function HideConnectTextDraw(player) {
-    for(let i = 0; i <= 12; i++) player.TextDrawHideForPlayer(TextDraws.connect[i]);
+    for(let i = 0; i <= 12; i++) player.TextDrawHideForPlayer(TextDraws.server.connect[i]);
 }
 
 function validateEmail(email) {
@@ -656,7 +661,9 @@ samp.OnGameModeInit(() => {
     console.log("Gamemode creator: Ghosty2004");
     console.log("Have Fun with this shit :)");
 
-    TextDraws.Load();
+    TextDraws.server.Load(); /* Load Server TextDraws */
+    
+    Updater();
     return true;
 });
 
@@ -665,9 +672,12 @@ samp.OnGameModeExit(() => {
 });
 
 samp.OnPlayerConnect((player) => {
-    ShowConnectTextDraw(player);
+    ShowConnectTextDraw(player); 
     Player.ResetVariables(player);
     player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English");
+    
+    TextDraws.player.Load(player); /* Load Player TextDraws */
+
     return true;
 });
 
@@ -1136,6 +1146,10 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
     }
     return true;
+});
+
+samp.OnPlayerText((player, text) => {
+    return false;
 });
 
 samp.OnPlayerCommandText((player, cmdtext) => {
