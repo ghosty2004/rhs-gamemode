@@ -616,8 +616,23 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         info += "{FF0000}/Drift 4\n";
                         info += "{FF0000}/Drift 5\n";
                         info += "{FFFF00}/Drift 6\n";
-                        info += "{FFFF00}/LvAir\n";
+                        info += "{FFFF00}/LvAir";
                         player.ShowPlayerDialog(Dialog.TELES_DRIFTS, samp.DIALOG_STYLE.LIST, "Drifts", info, "Teleport", "Back");
+                        break;
+                    }
+                    case 5: { /* Races */
+                        break;
+                    }
+                    case 6: { /* Jobs */
+                        let info = "";
+                        info += "{BBFF00}Truck Driver\n";
+                        info += "{BBFF00}Air Pilot\n";
+                        info += "{BBFF00}Pizza Boy\n";
+                        info += "{BBFF00}Ambulance Driver\n";
+                        info += "{BBFF00}Policeman\n";
+                        info += "{BBFF00}Fisherman\n";
+                        info += "{BBFF00}Hunterman";
+                        player.ShowPlayerDialog(Dialog.TELES_JOBS, samp.DIALOG_STYLE.LIST, "Jobs", info, "Teleport", "Back");
                         break;
                     }
                 }
@@ -639,6 +654,20 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             break;
         }
         case Dialog.TELES_DM: {
+            if(response) {
+
+            }
+            else CMD.emit("teles");
+            break;
+        }
+        case Dialog.TELES_DRIFTS: {
+            if(response) {
+
+            }
+            else CMD.emit("teles");
+            break;
+        }
+        case Dialog.TELES_JOBS: {
             if(response) {
 
             }
