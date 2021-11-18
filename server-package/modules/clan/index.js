@@ -23,7 +23,11 @@ module.exports = {
         }
         else return false;
     },
-    Exists: function(name) {
+    Exists: function(id) {
+        if(this.Info[id]) return true;
+        else return false;
+    },
+    ExistsName: function(name) {
         if(Object.entries(this.Info).some(s => s.some(s => s.name == name))) return true;
         else return false;
     }

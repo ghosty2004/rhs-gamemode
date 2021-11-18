@@ -355,6 +355,7 @@ CMD.on("lclan", (player) => {
     if(Player.Info[player.playerid].Clan) {
         if(Clan.Info[Player.Info[player.playerid].Clan].owner == Player.Info[player.playerid].AccID) {
             con.query("DELETE FROM clans WHERE id = ?", [Player.Info[player.playerid].Clan]);
+            con.query("UPDATE users SET clan = 0 WHERE clan = ?", [Player.Info[player.playerid].Clan]);
             Clan.Delete(Player.Info[player.playerid].Clan);
             samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan).forEach((i) => {
                 Player.Info[i.playerid].Clan = 0;
@@ -394,6 +395,10 @@ CMD.on("gotop", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function UpdatePlayerDB(player, column, value) {
+    con.query(`UPDATE users SET ${column} = ? WHERE id = ?`, [value, Player.Info[player.playerid].AccID]);
+}
+
 function SetupPlayerForSpawn(player, type=0) { 
     /* Type 0 = Check if the player is in a clan or gang */
     /* Type else = Set auto random spawn position */
@@ -423,7 +428,7 @@ function LoadClans() {
         for(let i = 0; i < result.length; i++) {
             let position = JSON.parse(result[i].position);
             let weapon = JSON.parse(result[i].weapon);
-            Clan.Create(result[i].ID, result[i].name, result[i].owner, {x: position.x, y: position.y, z: position.z}, {"1": weapon[0], "2": weapon[1], "3": weapon[2], "4": weapon[3], "5": weapon[4], "6": weapon[5]}, parseInt(result[i].color, 10), {member: result[i].member_skin, leader: result[i].leader_skin}, result[i].kills, result[i].deaths);
+            Clan.Create(result[i].ID, result[i].name, result[i].owner, {x: position.x, y: position.y, z: position.z}, {"1": weapon[0], "2": weapon[1], "3": weapon[2], "4": weapon[3], "5": weapon[4], "6": weapon[5]}, parseInt(result[i].color), {member: result[i].member_skin, leader: result[i].leader_skin}, result[i].kills, result[i].deaths);
         }
         console.log(`Loaded ${result.length} clans.`);
     });
@@ -822,7 +827,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
         case Dialog.CREATE_CLAN: {
             if(response) {
-                if(!Clan.Exists(inputtext)) {
+                if(!Clan.ExistsName(inputtext)) {
                     if(inputtext.length < 3 || inputtext.length > 20) return player.ShowPlayerDialog(Dialog.CREATE_CLAN, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", "{FF0000}ERROR:\n\n{00FF00}The clan name must be lower that {FF0000}20 {00FF00}characters and biggest that {FF0000}3{00FF00}!\n{00FF00}Please re-type it:", "Continue", "Close");
                     Player.Info[player.playerid].Creating_Clan.name = inputtext;
                     player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN_MEMBERS, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", "{0072FF}Now choose a Skin for members!\nEnter below the Skin ID for members:", "Continue", "Close");
@@ -973,12 +978,14 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             info += "If you need help with your clan, type {00FF00}/chelp{0072FF} and {00FF00}/ctop{0072FF} for clan top!";
             player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "{00FF00}Clan Created!", info, "Close", "");
 
-            /* Create row in SQL */
+                        /* Create row in SQL */
             con.query("INSERT INTO clans (name, owner, position, weapon, color, member_skin, leader_skin) VALUES(?, ?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, JSON.stringify({x: player.position.x, y: player.position.y, z: player.position.z, angle: player.position.angle}), JSON.stringify(Object.values(Player.Info[player.playerid].Creating_Clan.weapon)), `${Player.Info[player.playerid].Creating_Clan.color}`, Player.Info[player.playerid].Creating_Clan.skin.member, Player.Info[player.playerid].Creating_Clan.skin.leader], function(err, result) {
                 if(!err) {
                     Clan.Create(result.insertId, Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, {x: player.position.x, y: player.position.y, z: player.position.z, angle: player.position.angle}, {"1": Player.Info[player.playerid].Creating_Clan.weapon[1], "2": Player.Info[player.playerid].Creating_Clan.weapon[2], "3": Player.Info[player.playerid].Creating_Clan.weapon[3], "4": Player.Info[player.playerid].Creating_Clan.weapon[4], "5": Player.Info[player.playerid].Creating_Clan.weapon[5], "6": Player.Info[player.playerid].Creating_Clan.weapon[6]}, Player.Info[player.playerid].Creating_Clan.color, {member: Player.Info[player.playerid].Creating_Clan.skin.member, leader: Player.Info[player.playerid].Creating_Clan.skin.leader}, 0, 0);
                     Player.Info[player.playerid].Clan = result.insertId;
                     Player.Info[player.playerid].Clan_Rank = 3;
+                    UpdatePlayerDB(player, "clan", Player.Info[player.playerid].Clan);
+                    UpdatePlayerDB(player, "clan_rank", Player.Info[player.playerid].Clan_Rank);
                     player.SetPlayerColor(Player.Info[player.playerid].Creating_Clan.color);
                     player.SetPlayerSkin(Player.Info[player.playerid].Creating_Clan.skin.leader);
                 }
