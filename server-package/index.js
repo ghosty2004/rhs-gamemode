@@ -375,6 +375,25 @@ CMD.on("gotop", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function SetupPlayerForSpawn(player, type=0) { 
+    /* Type 0 = Check if the player is in a clan or gang */
+    /* Type else = Set auto random spawn position */
+    if(type == 0) {
+        if(Player.Info[player.playerid].Clan) { /* Clan Spawn */
+            player.SetPlayerPos(Clan.Info[Player.Info[player.playerid].Clan].position.x, Clan.Info[Player.Info[player.playerid].Clan].position.y, Clan.Info[Player.Info[player.playerid].Clan].position.z);
+            player.SetPlayerFacingAngle(Clan.Info[Player.Info[player.playerid].Clan].position.angle);
+            player.SetPlayerColor()
+        }
+        else if(Player.Info[player.playerid].Gang) { /* Gang Spawn */
+
+        }
+        else SetupPlayerForSpawn(player, 1);
+    }
+    else { /* Random Spawn */
+        player.SetPlayerPos(0, 0, 0);
+    }
+}
+
 function LoadFromDB() {
     LoadClans();
 }
@@ -384,7 +403,7 @@ function LoadClans() {
         for(let i = 0; i < result.length; i++) {
             let position = JSON.parse(result[i].position);
             let weapon = JSON.parse(result[i].weapon);
-            Clan.Create(result[i].id, result[i].name, result[i].owner, {x: position.x, y: position.y, z: position.z}, {"1": weapon[0], "2": weapon[1], "3": weapon[2], "4": weapon[3], "5": weapon[4], "6": weapon[5]}, result[i].kills, result[i].deaths);
+            Clan.Create(result[i].ID, result[i].name, result[i].owner, {x: position.x, y: position.y, z: position.z}, {"1": weapon[0], "2": weapon[1], "3": weapon[2], "4": weapon[3], "5": weapon[4], "6": weapon[5]}, result[i].kills, result[i].deaths);
         }
         console.log(`Loaded ${result.length} clans.`);
     });
@@ -700,9 +719,13 @@ function LoadPlayerStats(player) {
         if(!err && result) {  
             Player.Info[player.playerid].LoggedIn = true;
 
+            Player.Info[player.playerid].AccID = result[0].ID;
             Player.Info[player.playerid].Mail = result[0].mail;
             Player.Info[player.playerid].Admin = result[0].admin;
             Player.Info[player.playerid].VIP = result[0].VIP;
+            Player.Info[player.playerid].VIP_Expire = result[0].VIP_Expire;
+            Player.Info[player.playerid].Clan = result[0].clan;
+            Player.Info[player.playerid].Gang = result[0].gang;
 
             let info = "";
             info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
@@ -766,6 +789,7 @@ samp.OnPlayerSpawn((player) => {
     if(Player.Info[player.playerid].Mail == "none") {
         player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
     }
+    SetupPlayerForSpawn(player);
     return true;
 });
 
@@ -788,16 +812,18 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.CREATE_CLAN_SKIN_MEMBERS: {
             if(response) {
-                if(inputtext.length < 0 || inputtext.length > 299 || isNaN(inputtext)) return player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan - {FF0000}ERROR!", "{0072FF}Invalid Skin ID (0-299)!\nEnter below the Skin ID for members:", "Continue", "Close");
-                Player.Info[player.playerid].Creating_Clan.skin.member = parseInt(inputtext);
+                inputtext = parseInt(inputtext);
+                if(inputtext < 0 || inputtext > 299) return player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN_MEMBERS, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan - {FF0000}ERROR!", "{0072FF}Invalid Skin ID (0-299)!\nEnter below the Skin ID for members:", "Continue", "Close");
+                Player.Info[player.playerid].Creating_Clan.skin.member = inputtext;
                 player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN_LEADERS, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", "{0072FF}Now choose a Skin for leaders!\nEnter below the Skin ID for leaders:", "Continue", "Close");
             }
             break;
         }
         case Dialog.CREATE_CLAN_SKIN_LEADERS: {
             if(response) {
-                if(inputtext.length < 0 || inputtext.length > 299 || isNaN(inputtext)) return player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN_LEADERS, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan - {FF0000}ERROR!", "{0072FF}Invalid Skin ID (0-299)!\nEnter below the Skin ID for leaders:", "Continue", "Close");
-                Player.Info[player.playerid].Creating_Clan.skin.leader = parseInt(inputtext);
+                inputtext = parseInt(inputtext);
+                if(inputtext < 0 || inputtext > 299) return player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN_LEADERS, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan - {FF0000}ERROR!", "{0072FF}Invalid Skin ID (0-299)!\nEnter below the Skin ID for leaders:", "Continue", "Close");
+                Player.Info[player.playerid].Creating_Clan.skin.leader = inputtext;
                 let info = "";
                 info += "{FF0000}RED\n";
                 info += "{F4A460}Brown\n";
@@ -920,10 +946,19 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                 Player.Info[player.playerid].Creating_Clan.weapon[6] = start + listitem; 
             }
 
+            /* Send Informations in Dialog */
             let info = "";
-            info += `{0072FF}Congratulations {00FF00}${player.GetPlayerName(24)}{0072FF} for creating {00FF00}CLAN_NAME{0072FF} clan!\n`;
+            info += `{0072FF}Congratulations {00FF00}${player.GetPlayerName(24)}{0072FF} for creating {00FF00}${Player.Info[player.playerid].Creating_Clan.name}{0072FF} clan!\n`;
             info += "If you need help with your clan, type {00FF00}/chelp{0072FF} and {00FF00}/ctop{0072FF} for clan top!";
-            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.LIST, "{00FF00}Clan Created!", info, "Close", "");
+            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "{00FF00}Clan Created!", info, "Close", "");
+
+            /* Create row in SQL */
+            con.query("INSERT INTO clans (name, owner, position, weapon) VALUES(?, ?, ?, ?)", [Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, JSON.stringify({x: player.position.x, y: player.position.y, z: player.position.z, angle: player.position.angle}), JSON.stringify(Object.values(Player.Info[player.playerid].Creating_Clan.weapon))], function(err, result) {
+                if(!err) {
+                    Clan.Create(result.insertId, Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, {x: player.position.x, y: player.position.y, z: player.position.z, angle: player.position.angle}, {"1": Player.Info[player.playerid].Creating_Clan.weapon[1], "2": Player.Info[player.playerid].Creating_Clan.weapon[2], "3": Player.Info[player.playerid].Creating_Clan.weapon[3], "4": Player.Info[player.playerid].Creating_Clan.weapon[4], "5": Player.Info[player.playerid].Creating_Clan.weapon[5], "6": Player.Info[player.playerid].Creating_Clan.weapon[6]})
+                }
+                else console.log(err);
+            });
             
             /* Reset Player CreateClan Variables to 0 */
             Player.Info[player.playerid].Creating_Clan.name = "";

@@ -4,6 +4,7 @@ export declare const Info: {
     LoggedIn: boolean,
     Language: number,
     Fail_Logins: number,
+    AccID: number,
     Mail: string,
     Money: number,
     Coins: number,
@@ -14,6 +15,9 @@ export declare const Info: {
     ConnectTime: number,
     Admin: number,
     VIP: number,
+    VIP_Expire: number,
+    Clan: 0,
+    Gang: 0,
     Kills_Data: {
         Kills: number,
         HeadShots: number,

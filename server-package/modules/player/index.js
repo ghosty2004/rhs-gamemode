@@ -5,6 +5,7 @@ module.exports = {
             LoggedIn: false,
             Language: 0,
             Fail_Logins: 0,
+            AccID: 0,
             Mail: "none",
             Money: 0,
             Coins: 0,
@@ -16,6 +17,8 @@ module.exports = {
             Admin: 0,
             VIP: 0,
             VIP_Expire: 0,
+            Clan: 0,
+            Gang: 0,
             Kills_Data: {
                 Kills: 0,
                 HeadShots: 0,
