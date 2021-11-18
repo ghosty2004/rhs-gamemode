@@ -9,6 +9,7 @@ const colors = require("colors");
 const md5 = require("md5");
 
 /* Custom Modules */
+const Clan = require("./modules/clan");
 const Dialog = require("./modules/dialog");
 const Errors = require("./modules/errors");
 const events = require("./modules/events");
@@ -344,6 +345,12 @@ CMD.on("vcmds", (player, params) => {
     }
 
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Lang(player, "{FFCC00}Comenzi VIP - {FF0000}/BuyVIP, /Vips.", "{FFCC00}VIP Commands - {FF0000}/BuyVIP, /Vips."), info, Lang(player, "Inchide", "Close"), "");
+});
+
+/* Clans Commands */
+CMD.on("createclan", (player) => {
+    player.GameTextForPlayer("~n~~n~~n~~n~~n~~n~~n~~n~~r~~h~Create ~w~~h~your own ~g~~h~clan!", 4000, 4);
+    player.ShowPlayerDialog(Dialog.CREATE_CLAN, samp.DIALOG_STYLE.INPUT, "{BBFF00}Create Clan", "{0072FF}You are now creating a clan!\nEnter below the name of your clan to continue...", "Continue", "Close");
 });
 
 /* Admins Commands */
@@ -750,6 +757,11 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.CREATE_CLAN: {
+            if(response) {
+
+            }
+        }
         case Dialog.TELES: {
             if(response) {
                 switch(listitem) {
