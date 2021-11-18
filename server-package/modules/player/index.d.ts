@@ -36,7 +36,23 @@ export declare const Info: {
         "2": string,
         "3": string
     },
-    Editing_Stats_Description_Line: number
+    Editing_Stats_Description_Line: number,
+    Creating_Clan: {
+        name: string,
+        skin: {
+            member: number,
+            leader: number
+        },
+        color: number,
+        weapon: {
+            "1": number,
+            "2": number,
+            "3": number,
+            "4": number,
+            "5": number,
+            "6": number
+        }
+    }
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;

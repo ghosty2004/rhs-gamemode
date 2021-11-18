@@ -38,7 +38,23 @@ module.exports = {
                 "2": "",
                 "3": ""
             },
-            Editing_Stats_Description_Line: 0
+            Editing_Stats_Description_Line: 0,
+            Creating_Clan: {
+                name: "",
+                skin: {
+                    member: 0,
+                    leader: 0
+                },
+                color: 0xFFFFFFAA,
+                weapon: {
+                    "1": 0,
+                    "2": 0,
+                    "3": 0,
+                    "4": 0,
+                    "5": 0,
+                    "6": 0
+                }
+            }
         }
     }
 };
