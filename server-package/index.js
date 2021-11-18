@@ -354,10 +354,17 @@ CMD.on("vcmds", (player, params) => {
 CMD.on("lclan", (player) => {
     if(Player.Info[player.playerid].Clan) {
         if(Clan.Info[Player.Info[player.playerid].Clan].owner == Player.Info[player.playerid].AccID) {
-            
-        }
-        Player.Info[player.playerid].Clan = 0;
-        samp.OnPlayerSpawn(player);
+            con.query("DELETE FROM clans WHERE id = ?", [Player.Info[player.playerid].Clan]);
+            Clan.Delete(Player.Info[player.playerid].Clan);
+            samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan).forEach((i) => {
+                Player.Info[i.playerid].Clan = 0;
+                SetupPlayerForSpawn(i);
+            });
+        } 
+        else {
+            Player.Info[i.playerid].Clan = 0;
+            SetupPlayerForSpawn(player);
+        }  
     }
     else SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
 });
