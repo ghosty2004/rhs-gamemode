@@ -37,7 +37,10 @@ const con = mysql.createConnection({
     database: data.mysql.database
 });
 con.connect((err) => {
-    if(!err) console.log("MYSQL:".yellow + ` Connection successfully established.`.green);
+    if(!err) {
+        console.log("MYSQL:".yellow + ` Connection successfully established.`.green);
+        LoadFromDB();
+    }
     else {
         console.log("MYSQL:".yellow + ` Connection have been refused.`.red);
         process.exit();
@@ -372,6 +375,10 @@ CMD.on("gotop", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function LoadFromDB() {
+    
+}
+
 function Updater() {
 
 }
