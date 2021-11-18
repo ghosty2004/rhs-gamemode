@@ -376,7 +376,17 @@ CMD.on("gotop", (player, params) => {
 /* SA:MP Functions */
 /* =============== */
 function LoadFromDB() {
-    
+    LoadClans();
+}
+
+function LoadClans() {
+    con.query("SELECT * FROM clans", function(err, result) {
+        for(let i = 0; i < result.length; i++) {
+            let position = JSON.parse(result[i].position);
+            let weapon = JSON.parse(result[i].weapon);
+            Clan.Create(result[i].id, result[i].name, result[i].owner, {x: position.x, y: position.y, z: position.z}, {"1": weapon[0], "2": weapon[1], "3": weapon[2], "4": weapon[3], "5": weapon[4], "6": weapon[5]}, result[i].kills, result[i].deaths);
+        }
+    });
 }
 
 function Updater() {
