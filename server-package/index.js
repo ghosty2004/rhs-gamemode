@@ -759,8 +759,117 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
         case Dialog.CREATE_CLAN: {
             if(response) {
-
+                if(!Clan.Exists(inputtext)) {
+                    if(inputtext.length < 3 || inputtext.length > 20) return player.ShowPlayerDialog(Dialog.CREATE_CLAN, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", "{FF0000}ERROR:\n\n{00FF00}The clan name must be lower that {FF0000}20 {00FF00}characters and biggest that {FF0000}3{00FF00}!\n{00FF00}Please re-type it:", "Continue", "Close");
+                    player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN_MEMBERS, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", "{0072FF}Now choose a Skin for members!\nEnter below the Skin ID for members:", "Continue", "Close");
+                }
+                else player.ShowPlayerDialog(Dialog.CREATE_CLAN, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", `{0072FF}A clan named {00FF00}'${inputtext}'{0072FF} already exists!\nPlease try again with another name...`, "Continue", "Close");
             }
+            break;
+        }
+        case Dialog.CREATE_CLAN_SKIN_MEMBERS: {
+            if(response) {
+                if(inputtext.length < 0 || inputtext.length > 299) return player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan - {FF0000}ERROR!", "{0072FF}Invalid Skin ID (0-299)!\nEnter below the Skin ID for members:", "Continue", "Close");
+                player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN_LEADERS, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", "{0072FF}Now choose a Skin for leaders!\nEnter below the Skin ID for leaders:", "Continue", "Close");
+            }
+            break;
+        }
+        case Dialog.CREATE_CLAN_SKIN_LEADERS: {
+            if(response) {
+                if(inputtext.length < 0 || inputtext.length > 299) return player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN_LEADERS, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan - {FF0000}ERROR!", "{0072FF}Invalid Skin ID (0-299)!\nEnter below the Skin ID for leaders:", "Continue", "Close");
+                let info = "";
+                info += "{FF0000}RED\n";
+                info += "{F4A460}Brown\n";
+                info += "{FF9900}Orange\n";
+                info += "{FFFF00}Yellow\n";
+                info += "{BBFF00}Lime\n";
+                info += "{55FF00}Light green\n";
+                info += "{00FFAA}Aqua\n";
+                info += "{00DDFF}Light blue\n";
+                info += "{0044FF}Blue\n";
+                info += "{8000FF}Purple\n";
+                info += "{CC00FF}Indigo\n";
+                info += "{FF00EE}Pink\n";
+                info += "{FFFFFF}White\n";
+                info += "{FFEB7B}Crem";
+                player.ShowPlayerDialog(Dialog.CREATE_CLAN_COLOR, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Close");
+            }
+            break;
+        }
+        case Dialog.CREATE_CLAN_COLOR: {
+            if(response) {
+                let info = "";
+                info += "{0072FF}Brass Knuckles\n";
+                info += "{0072FF}Golf Club\n";
+                info += "{0072FF}Nightstick\n";
+                info += "{0072FF}Knife\n";
+                info += "{0072FF}Baseball Bat\n";
+                info += "{0072FF}Shovel\n";
+                info += "{0072FF}Pool Cue\n";
+                info += "{0072FF}Katana\n";
+                info += "{0072FF}Chainsaw";
+                player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_1, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
+            }
+            break;
+        }
+        case Dialog.CREATE_CLAN_WEAPON_1: {
+            if(response) {}
+            else {}
+
+            let info = "";
+            info += "{0072FF}Pistol\n";
+            info += "{0072FF}Silenced Pistol\n";
+            info += "{0072FF}Desert Eagle";
+            player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_2, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
+            break;
+        }
+        case Dialog.CREATE_CLAN_WEAPON_2: {
+            if(response) {}
+            else {}
+
+            let info = "";
+            info += "{0072FF}ShotGun\n";
+            info += "{0072FF}Sawn-Off-Shotgune\n";
+            info += "{0072FF}SPAZ-12";
+            player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_3, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
+        }
+        case Dialog.CREATE_CLAN_WEAPON_3: {
+            if(response) {}
+            else {}
+
+            let info = "";
+            info += "{0072FF}Micro UZI\n";
+            info += "{0072FF}MP5\n";
+            info += "{0072FF}TEC-9";
+            player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_4, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
+            break;
+        }
+        case Dialog.CREATE_CLAN_WEAPON_4: {
+            if(response) {}
+            else {}
+
+            let info = "";
+            info += "{0072FF}AK-47\n";
+            info += "{0072FF}M4-A1";
+            player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_5, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
+            break;
+        }
+        case Dialog.CREATE_CLAN_WEAPON_5: {
+            if(response) {}
+            else {}
+
+            let info = "";
+            info += "{0072FF}Country Rifle\n";
+            info += "{0072FF}Sniper Rifle";
+            player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_6, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
+            break;
+        }
+        case Dialog.CREATE_CLAN_WEAPON_6: {
+            let info = "";
+            info += `{0072FF}Congratulations {00FF00}${player.GetPlayerName(24)}{0072FF} for creating {00FF00}CLAN_NAME{0072FF} clan!\n`;
+            info += "If you need help with your clan, type {00FF00}/chelp{0072FF} and {00FF00}/ctop{0072FF} for clan top!";
+            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.LIST, "{00FF00}Clan Created!", info, "Close", "");
+            break;
         }
         case Dialog.TELES: {
             if(response) {
