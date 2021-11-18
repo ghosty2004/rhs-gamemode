@@ -16,8 +16,9 @@ export declare const Info: {
     Admin: number,
     VIP: number,
     VIP_Expire: number,
-    Clan: 0,
-    Gang: 0,
+    Clan: number,
+    Clan_Rank: number,
+    Gang: number,
     Kills_Data: {
         Kills: number,
         HeadShots: number,

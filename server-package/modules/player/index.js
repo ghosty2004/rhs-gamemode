@@ -18,6 +18,7 @@ module.exports = {
             VIP: 0,
             VIP_Expire: 0,
             Clan: 0,
+            Clan_Rank: 0,
             Gang: 0,
             Kills_Data: {
                 Kills: 0,

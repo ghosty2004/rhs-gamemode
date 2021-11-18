@@ -1,12 +1,14 @@
 module.exports = {
     Info: {},
-    Create: function(id, name, owner, position, weapon, kills, deaths) {
+    Create: function(id, name, owner, position, weapon, color, kills, deaths) {
         if(!this.Info[id]) {
             this.Info[id] = {
                 name: name,
                 owner: owner,
                 position: position,
                 weapon: weapon,
+                color: color,
+                skin: skin,
                 kills: kills,
                 deaths: deaths
             }   
