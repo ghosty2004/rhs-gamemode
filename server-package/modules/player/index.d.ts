@@ -58,7 +58,8 @@ export declare const Info: {
             "6": number
         }
     },
-    Jailed: number
+    Jailed: number,
+    Last_Chat_Message: number
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;

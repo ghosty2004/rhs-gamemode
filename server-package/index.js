@@ -377,6 +377,7 @@ CMD.on("chelp", (player) => {
     info += '{BBFF00}Use {FF0000}"!" {BBFF00}to use Clan Chat!';
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "{FFFFFF}Clan {FF0000}Commands", info, "Ok", "");
 });
+CMD.on("clan", (player) => { CMD.emit("chelp", player); });
 
 CMD.on("cinfo", async (player, params) => {
     let target = player;
@@ -650,6 +651,18 @@ function getVIPRank(rank) {
         case 4: string = "{FFFFFF}White"; break;
     }
     return string;
+}
+
+function getPlayerRankInChat(player) {
+    let tag = "";
+    if(Player.Info[player.playerid].Admin == 3) tag = "{0072FF}(Master)";
+    else if(Player.Info[player.playerid].Admin == 2) tag = "(Senior)";
+    else if(Player.Info[player.playerid].Admin == 1) tag = "(Junior)";
+    else if(Player.Info[player.playerid].VIP == 4) tag = "{FF0000}({FFFFFF}White{FF0000})";
+    else if(Player.Info[player.playerid].VIP == 3) tag = "{0077FF}(Blue)";
+    else if(Player.Info[player.playerid].VIP == 2) tag = "{FFFF00}(Yellow)";
+    else if(Player.Info[player.playerid].VIP == 1) tag = "{FF0000}(VIP)";
+    return tag;
 }
 
 function ShowSpawnTextDraw(player) {
@@ -1571,12 +1584,14 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             break;
         }
         case Dialog.AFTER_REGISTER: {
+            if(!response) CMD.emit("help", player);
             break;
         }
         case Dialog.REGISTER: {
             if(response) {
                 con.query("INSERT INTO users (name, password) VALUES(?, ?)", [player.GetPlayerName(24), md5(inputtext)], function(err, result) {
                     if(!err) {
+                        samp.SendClientMessageToAll(data.colors.ORANGE, `INFO: {00BBF6}${player.GetPlayerName(24)}(${player.playerid}) {BBFF00}s-a inregistrat pe server-ul nostru!`);
                         player.ShowPlayerDialog(Dialog.AFTER_REGISTER, samp.DIALOG_STYLE.MSGBOX, "Inregistrare {BBFF00}Reusita!", `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n{BBFF00}Te-ai inregistrat cu succes pe server-ul ${data.settings.SERVER_NAME}{BBFF00}!\n{BBFF00}Tine minte! De cate ori vei reveni, va trebuii sa te autentifici cu parola: {FF0000}${inputtext}{BBFF00}!\n\n{FFFF00}Pentru mai multe informatii, click pe buton-ul {FF0000}Ajutor{FFFF00}.\n{FFFF00}De asemenea, nu uita sa ne vizitezi si website-ul si forum-ul nostru la adresa {FF0000}${data.settings.SERVER_WEB}{FFFF00}!`, "Inchide", "Ajutor!");
                     }
                     else player.Kick();
@@ -1594,8 +1609,22 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     return true;
 });
 
-samp.OnPlayerText((player, text) => {
-    samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}{00CC00}(${player.playerid}){FFFFFF}: ${text}`);
+samp.OnPlayerText((player, text) => { 
+    let anti_spam_seconds = 3;
+    if(Player.Info[player.playerid].Admin >= 1 || Player.Info[player.playerid].VIP == 4) anti_spam_seconds = 0;
+    else if(Player.Info[player.playerid].VIP == 2) anti_spam_seconds = 2;
+    else if(Player.Info[player.playerid].VIP == 3) anti_spam_seconds = 1;
+    if((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message) < anti_spam_seconds) {
+        let ctime;
+        if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 0) ctime = 3;
+        else if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 1) ctime = 2;
+        else if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 2) ctime = 1;
+        player.SendClientMessage(data.colors.LIGHT_YELLOW, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${ctime}{BBFF00} secunde pentru a scrie ceva din nou!`);
+        return false;
+    }
+
+    Player.Info[player.playerid].Last_Chat_Message = Math.floor(Date.now() / 1000);
+    samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}${getPlayerRankInChat(player)}{00CCFF}(${player.playerid}):{FFFFFF} ${text}`);
     return false;
 });
 

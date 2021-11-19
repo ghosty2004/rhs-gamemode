@@ -59,7 +59,8 @@ module.exports = {
                     "6": 0
                 }
             },
-            Jailed: 0
+            Jailed: 0,
+            Last_Chat_Message: Math.floor(Date.now() / 1000)
         }
     }
 };
