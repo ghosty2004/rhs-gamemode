@@ -1797,13 +1797,23 @@ samp.OnPlayerText((player, text) => {
 
     Player.Info[player.playerid].Last_Chat_Message = Math.floor(Date.now() / 1000);
 
-    if(text[0] == "!") {
-        if(Player.Info[player.playerid].Clan) {
+    switch(text[0]) {
+        case "!": {
             text = text.replace("!", "");
             samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan).forEach((i) => {
                 i.SendClientMessage(data.colors.ORANGE, `Clan Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
             });
             return false;
+            break;
+        }
+        case "@": {
+            if(Player.Info[player.playerid].Admin) {
+                text = text.replace("@", "");
+                samp.getPlayers().filter(f => Player.Info[f.playerid].Admin).forEach((i) => {
+                    i.SendClientMessage(data.colors.ORANGE, `Admin Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
+                });
+            }
+            break;
         }
     }
 
