@@ -441,7 +441,8 @@ function SetupPlayerForSpawn(player, type=0) {
         else SetupPlayerForSpawn(player, 1);
     }
     else { /* Random Spawn */
-        player.SetPlayerPos(0, 0, 0);
+        player.SetPlayerPos(2127.5049, 2377.1042, 10.8203);
+        player.SetPlayerFacingAngle(179.6744);
     }
 }
 
