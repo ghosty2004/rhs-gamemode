@@ -1815,6 +1815,15 @@ samp.OnPlayerText((player, text) => {
             }
             break;
         }
+        case "#": {
+            if(Player.Info[player.playerid].VIP) {
+                text = text.replace("@", "");
+                samp.getPlayers().filter(f => Player.Info[f.playerid].VIP).forEach((i) => {
+                    i.SendClientMessage(data.colors.ORANGE, `VIP Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
+                });
+            }
+            break;
+        }
     }
 
     samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}${getPlayerRankInChat(player)}{00CCFF}(${player.playerid}):{FFFFFF} ${text}`);
