@@ -55,6 +55,26 @@ con.connect((err) => {
 const CMD = new events.Command();
 
 /* Player's Commands */
+CMD.on("spassword", (player) => {
+    con.query("SELECT spassword FROM users WHERE ID = ?", [Player.Info[player.playerid].AccID], function(err, result) {
+        let info = "";
+        if(result[0].spassword == "null") {
+            info += `${Lang(player, "{FF0000}Atentie!:", "{FF0000}Attention!:")}\n`;
+            info += "\n";
+            info += `${Lang(player, "{FFCC00}Adaugandu-ti o Parola Secundara in cont, vei ridica cu mult gradul de securitate al acestuia!", "{FFCC00}By adding a Secondary Password in your Account, you will rise up it's security!")}\n`;
+            info += `${Lang(player, "{FFCC00}De cate ori vei intra pe server, va trebuii sa te loghezi cu ambele parole.", "{FFCC00}Each time you will join our server, you must login with both passwords.")}\n`;
+            info += "\n";
+            info += `${Lang(player, "{BBFF00}Te rugam sa introduci {FF0000}Parola Secundara{BBFF00}:", "{BBFF00}Please enter before the {FF0000}Secondary Password{BBFF00}:")}`;
+            player.ShowPlayerDialog(Dialog.SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Parola Secundara", "Secondary Password"), info, "Ok", Lang(player, "Renunta", "Cancel"));
+        }
+        else {
+            info += `${Lang(player, "{49FFFF}Schimba Parola Secundara", "{49FFFF}Change Secondary Password")}\n`;
+            info += `${Lang(player, "{FF0000}Dezactiveaza Parola Secundara", "{FF0000}Remove Secondary Password")}\n`;
+            player.ShowPlayerDialog(Dialog.SPASSWORD_OPTIONS, samp.DIALOG_STYLE.LIST, Lang(player, "Parola Secundara", "Secondary Password"), info, Lang(player, "Selecteaza", "Select"), Lang(player, "Renunta", "Cancel"));
+        }
+    });
+});
+
 CMD.on("buyvip", (player) => {
     let info = `${Lang(player, "Item\tPret\tValabilitate", "Item\tPrice\tValidity")}\n`;
     info += `${Lang(player, "{FF0000}Rosu\t{00BBF6}Gratis!\t{00FF00}Permanent!", "{FF0000}Red\t{00BBF6}Free!\t{00FF00}Permanent!")}\n`;
@@ -379,6 +399,18 @@ CMD.on("chelp", (player) => {
 });
 CMD.on("clan", (player) => { CMD.emit("chelp", player); });
 
+CMD.on("cm", (player) => {
+    if(Player.Info[player.playerid].Clan) {
+        let info = "Name\tRank\n";
+        let data = samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan);
+        data.forEach((i) => {
+            info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t{00BBF6}${getClanRank(Player.Info[i.playerid].Clan_Rank)}`;
+        });
+        player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Clan Members: {FF0000}${data.length}{AFAFAF} online - {FF0000}${Clan.Info[Player.Info[player.playerid].Clan].name}`, info, "Close", "");
+    }
+    else SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
+});
+
 CMD.on("cinfo", async (player, params) => {
     let target = player;
     if(params[0]) target = getPlayer(params[0]);
@@ -405,7 +437,7 @@ CMD.on("cinfo", async (player, params) => {
 CMD.on("lclan", (player) => {
     if(Player.Info[player.playerid].Clan) {
         if(Clan.Info[Player.Info[player.playerid].Clan].owner == Player.Info[player.playerid].AccID) {
-            con.query("DELETE FROM clans WHERE id = ?", [Player.Info[player.playerid].Clan]);
+            con.query("DELETE FROM clans WHERE ID = ?", [Player.Info[player.playerid].Clan]);
             con.query("UPDATE users SET clan = 0 WHERE clan = ?", [Player.Info[player.playerid].Clan]);
             Clan.Delete(Player.Info[player.playerid].Clan);
             samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan).forEach((i) => {
@@ -483,6 +515,47 @@ CMD.on("gotop", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function SendAntiSpam(player, time) {
+    player.SendClientMessage(data.colors.LIGHT_YELLOW, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${time}{BBFF00} secunde pentru a scrie ceva din nou!`);
+}
+
+function checkAntiSpam(player) {
+    /*let time;
+    if(Player.Info[player.playerid].Admin >= 1 || Player.Info[player.playerid].VIP == 4) anti_spam_seconds = 0;
+    else if(Player.Info[player.playerid].VIP == 2) anti_spam_seconds = 2;
+    else if(Player.Info[player.playerid].VIP == 3) anti_spam_seconds = 1;*/
+
+    if(Player.Info[player.playerid].Admin >= 1 || Player.Info[player.playerid].VIP == 4) return true;
+    else if(Player.Info[player.playerid].VIP == 3) {
+        if((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message) < 1) {
+            let time;
+            if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 0) time = 1;
+            SendAntiSpam(player, time);
+            return false;
+        }
+    }
+    else if(Player.Info[player.playerid].VIP == 2) {
+        if((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message) < 2) {
+            let time;
+            if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 0) time = 2;
+            else if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 1) time = 1;
+            SendAntiSpam(player, time);
+            return false;
+        } 
+    }
+    else {
+        if((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message) < 3) {
+            let time;
+            if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 0) time = 3;
+            else if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 1) time = 2;
+            else if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 2) time = 1;
+            SendAntiSpam(player, time);
+            return false;
+        }
+    }
+    return true;
+}
+
 function getClanRank(RankID) {
     let string = "";
     switch(RankID) {
@@ -501,7 +574,7 @@ function getPlayer(IDOrName) {
 
 function getNameByAccID(AccID) {
     return new Promise((resolve, reject) => {
-        con.query("SELECT * FROM users WHERE id = ?", [AccID], function(err, result) {
+        con.query("SELECT * FROM users WHERE ID = ?", [AccID], function(err, result) {
             if(err || !result) return resolve("none");
             resolve(result[0].name);
         });
@@ -528,7 +601,7 @@ function ResetPlayerClanCreateVariables(player) {
 }
 
 function UpdatePlayerDB(player, column, value) {
-    con.query(`UPDATE users SET ${column} = ? WHERE id = ?`, [value, Player.Info[player.playerid].AccID]);
+    con.query(`UPDATE users SET ${column} = ? WHERE ID = ?`, [value, Player.Info[player.playerid].AccID]);
 }
 
 function SetupPlayerForSpawn(player, type=0) { 
@@ -658,9 +731,9 @@ function getPlayerRankInChat(player) {
     if(Player.Info[player.playerid].Admin == 3) tag = "{0072FF}(Master)";
     else if(Player.Info[player.playerid].Admin == 2) tag = "(Senior)";
     else if(Player.Info[player.playerid].Admin == 1) tag = "(Junior)";
-    else if(Player.Info[player.playerid].VIP == 4) tag = "{FF0000}({FFFFFF}White{FF0000})";
-    else if(Player.Info[player.playerid].VIP == 3) tag = "{0077FF}(Blue)";
-    else if(Player.Info[player.playerid].VIP == 2) tag = "{FFFF00}(Yellow)";
+    else if(Player.Info[player.playerid].VIP == 4) tag = "{FF0000}({FFFFFF}VIP{FF0000})";
+    else if(Player.Info[player.playerid].VIP == 3) tag = "{0077FF}(VIP)";
+    else if(Player.Info[player.playerid].VIP == 2) tag = "{FFFF00}(VIP)";
     else if(Player.Info[player.playerid].VIP == 1) tag = "{FF0000}(VIP)";
     return tag;
 }
@@ -884,10 +957,20 @@ function PreparatePlayerLogin(player) {
     con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
         if(err) return player.Kick();
         if(result == 0) { /* Register */
-            player.ShowPlayerDialog(Dialog.REGISTER, samp.DIALOG_STYLE.PASSWORD, "Inregistreaza-ti numele!", `{FFFF00}Salut, {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Numele tau nu este inregistrat. Te rugam sa-l inregistrezi pentru a-ti salva statisticile!\n{FFFF00}Introdu o parola grea pe care doar tu sa o stii pentru a te autentifica! ({FF0000}intre 3-25 de caractere{FFFF00}):`, "Register", "Nume Nou");
+            let info = "";
+            info += `{FFFF00}${Lang(player, `Salut, {FF0000}${player.GetPlayerName(24)}{FFFF00}!`, `Hi, {FF0000}${player.GetPlayerName(24)}{FFFF00}!`)}\n`;
+            info += "\n";
+            info += `{FFCC00}${Lang(player, "Numele tau nu este inregistrat. Te rugam sa-l inregistrezi pentru a-ti salva statisticile!", "Your name is not registered. Please register it to save your statistics!")}\n`;
+            info += `{FFFF00}${Lang(player, "Introdu o parola grea pe care doar tu sa o stii pentru a te autentifica! ({FF0000}intre 3-25 de caractere{FFFF00}):", "Enter a hard password before ({FF0000}Min. 3 - Max. 25 characters{FFFF00}):")}`;
+            player.ShowPlayerDialog(Dialog.REGISTER, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Inregistreaza-ti numele!", "Register your name!"), info, "Register", Lang(player, "Nume Nou", "New Name"));
         }
         else { /* Login */
-            player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, "Autentificare", `{FFFF00}Bine ai revenit {FF0000}${player.GetPlayerName(24)}{FFFF00}!\n\n{FFCC00}Trebuie sa te autentifici cu parola acestui cont inainte de a continua!\n{FFFF00}Daca acesta nu este numele contului tau, apasa pe butonul {FF0000}Nume Nou{FFFF00}!`, "Autentificare", "Nume Nou");
+            let info = "";
+            info += `{FFFF00}${Lang(player, `Bine ai revenit {FF0000}${player.GetPlayerName(24)}{FFFF00}!`, `Welcome back {FF0000}${player.GetPlayerName(24)}{FFFF00}!`)}\n`;
+            info += "\n";
+            info += `{FFCC00}${Lang(player, "Trebuie sa te autentifici cu parola acestui cont inainte de a continua!", "Please login password for this account before continuing!")}\n`;
+            info += `{FFFF00}${Lang(player, "Daca acesta nu este numele contului tau, apasa pe butonul {FF0000}Nume Nou{FFFF00}!", "If this is not your account name, click on the {FF0000}New Name{FFFF00}!")}`;
+            player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Autentificare", "Login"), info, Lang(player, "Autentificare", "Login"), Lang(player, "Nume Nou", "New Name"));
         }
     });
 }
@@ -989,6 +1072,66 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.LOGIN_SPASSWORD: {
+            if(response) {
+                con.query("SELECT * FROM users WHERE name = ? AND spassword = ?", [player.GetPlayerName(24), md5(inputtext)], function(err, result) {
+                    if(!err) {
+                        if(result == 0) {
+                            Player.Info[player.playerid].Fail_Logins++;
+                            if(Player.Info[player.playerid].Fail_Logins == 4) player.Kick();
+                            else {
+                                let info = "";
+                                info += `{FF0000}${Lang(player, `Autentificare esuata (${Player.Info[player.playerid].Fail_Logins}/4)!`, `Login failed (${Player.Info[player.playerid].Fail_Logins}/4)!`)}\n`;
+                                info += "\n";
+                                info += `{FFCC00}${Lang(player, "Ai introdus o parola secundara gresita! Te rugam sa incerci din nou!", "You have entered a wrong secondary password! Please try again!")}\n`;
+                                info += `{FFFF00}${Lang(player, `Daca ti-ai uitat parola secundara, viziteaza {FF0000}${data.settings.SERVER_WEB} {FFFF00}pentru a o reseta!`, `If you forgot your secondary password, visit {FF0000}${data.settings.SERVER_WEB} {FFFF00}to reset it!`)}`
+                                player.ShowPlayerDialog(Dialog.LOGIN_SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Autentificare - Parola Secundara", "Login - Secondary Password"), info, Lang(player, "Autentificare", "Login"), Lang(player, "Nume Nou", "New Name"));
+                            }
+                        }
+                        else {
+                            LoadPlayerStats(player);
+                        }
+                    }
+                    else player.Kick();
+                });
+            }
+            else Call_NewName(player);
+            break;
+        }
+        case Dialog.SPASSWORD: {
+            if(response) {
+                con.query("UPDATE users SET spassword = ? WHERE ID = ?", [md5(inputtext), Player.Info[player.playerid].AccID], function(err, result) {
+                    if(!err) {
+                        player.SendClientMessage(-1, Lang(player, "{FF0000}Parola Secundara {FFFF00}a fost inregistrata! Scrie {FF0000}/SPassword {FFFF00}pentru detalii si optiuni!", "{FFFF00}The {FF0000}Secondary Password {FFFF00}was registered! Type {FF0000}/SPassword {FFFF00}for details and options!"));
+                    }
+                });
+            }
+            break;
+        }
+        case Dialog.SPASSWORD_OPTIONS: {
+            if(response) {
+                switch(listitem) {
+                    case 0: {
+                        player.ShowPlayerDialog(Dialog.SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Parola Secundara", "Secondary Password"), Lang(player, "{FFFF00}Te rugam sa introduci {FF0000}Parola Secundara{FFFF00}:", "{FFFF00}Please enter below the {FF0000}Secondary Password{FFFF00}:"), "Ok", Lang(player, "Renunta", "Cancel"));
+                        break;
+                    }
+                    case 1: {
+                        try {
+                            con.query("UPDATE users SET spassword = ? WHERE ID = ?", ["null", Player.Info[player.playerid].AccID], function(err, result) {
+                                if(!err) {
+                                    player.SendClientMessage(-1, Lang(player, "{FF0000}Parola Secundara {FFFF00}a fost scoasa! Scrie {FF0000}/SPassword {FFFF00}pentru a adauga alta!", "{FFFF00}The {FF0000}Secondary Password {FFFF00}was removed! Type {FF0000}/SPassword {FFFF00}to add another!"));
+                                }
+                            });
+                        }
+                        catch(e) {
+                            console.log(e.stack);
+                        }
+                        break;
+                    }
+                }
+            }
+            break;
+        }
         case Dialog.CREATE_CLAN: {
             if(response) {
                 if(!Clan.ExistsName(inputtext)) {
@@ -1573,9 +1716,28 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                     if(!err) {
                         if(result == 0) {
                             Player.Info[player.playerid].Fail_Logins++;
-                            if(Player.Info[player.playerid].Fail_Logins == 3) player.Kick();
+                            if(Player.Info[player.playerid].Fail_Logins == 4) player.Kick();
+                            else {
+                                let info = "";
+                                info += `{FF0000}${Lang(player, `Autentificare nereusita (${Player.Info[player.playerid].Fail_Logins}/4)!`, `Login failed (${Player.Info[player.playerid].Fail_Logins}/4)!`)}\n`;
+                                info += "\n";
+                                info += `{FF0000}${Lang(player, "Ai introdus parola gresita. Te rugam sa incerci din nou!", "You entered the wrong password. Please try again!")}\n`;
+                                info += `{00FF00}${Lang(player, `Daca ti-ai uitat parola intra pe {FF0000}${data.settings.SERVER_WEB}{00FF00} pentru a o reseta!`, `If you forgot your password enter the {FF0000}${data.settings.SERVER_WEB} {00FF00}to reset it!`)}`
+                                player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Autentificare {FF0000}Nereusita", "Login {FF0000}Failed"), info, Lang(player, "Autentificare", "Login"), Lang(player, "Nume Nou", "New Name"));
+                            }
+                        }   
+                        else {
+                            Player.Info[player.playerid].Fail_Logins = 0;
+                            if(result[0].spassword == "null") LoadPlayerStats(player);
+                            else {
+                                let info = "";
+                                info += `${Lang(player, "{FF0000}Acest cont are o parola secundara!", "{FF0000}This account has a secondary password!")}\n`;
+                                info += `${Lang(player, "{FFCC00}Autentifica-te cu parola secundara pentru a putea continua!", "{FFCC00}Please login with the secondary password in order to continue!")}\n`;
+                                info += "\n";
+                                info += `${Lang(player, "{FFFF00}Scrie mai jos {FF0000}Parola Secundara{FFFF00}:", "{FFFF00}Enter below the {FF0000}Secondary Password{FFFF00}:")}`;
+                                player.ShowPlayerDialog(Dialog.LOGIN_SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Autentificare - Parola Secundara", "Login - Secondary Password"), info, Lang(player, "Autentificare", "Login"), Lang(player, "Nume Nou", "New Name"));
+                            }
                         }
-                        else LoadPlayerStats(player);
                     }
                     else player.Kick();
                 });
@@ -1591,6 +1753,8 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             if(response) {
                 con.query("INSERT INTO users (name, password) VALUES(?, ?)", [player.GetPlayerName(24), md5(inputtext)], function(err, result) {
                     if(!err) {
+                        Player.Info[player.playerid].AccID = result.insertId;
+                        LoadPlayerStats(player);
                         samp.SendClientMessageToAll(data.colors.ORANGE, `INFO: {00BBF6}${player.GetPlayerName(24)}(${player.playerid}) {BBFF00}s-a inregistrat pe server-ul nostru!`);
                         player.ShowPlayerDialog(Dialog.AFTER_REGISTER, samp.DIALOG_STYLE.MSGBOX, "Inregistrare {BBFF00}Reusita!", `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n{BBFF00}Te-ai inregistrat cu succes pe server-ul ${data.settings.SERVER_NAME}{BBFF00}!\n{BBFF00}Tine minte! De cate ori vei reveni, va trebuii sa te autentifici cu parola: {FF0000}${inputtext}{BBFF00}!\n\n{FFFF00}Pentru mai multe informatii, click pe buton-ul {FF0000}Ajutor{FFFF00}.\n{FFFF00}De asemenea, nu uita sa ne vizitezi si website-ul si forum-ul nostru la adresa {FF0000}${data.settings.SERVER_WEB}{FFFF00}!`, "Inchide", "Ajutor!");
                     }
@@ -1610,18 +1774,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
 });
 
 samp.OnPlayerText((player, text) => { 
-    let anti_spam_seconds = 3;
-    if(Player.Info[player.playerid].Admin >= 1 || Player.Info[player.playerid].VIP == 4) anti_spam_seconds = 0;
-    else if(Player.Info[player.playerid].VIP == 2) anti_spam_seconds = 2;
-    else if(Player.Info[player.playerid].VIP == 3) anti_spam_seconds = 1;
-    if((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message) < anti_spam_seconds) {
-        let ctime;
-        if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 0) ctime = 3;
-        else if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 1) ctime = 2;
-        else if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 2) ctime = 1;
-        player.SendClientMessage(data.colors.LIGHT_YELLOW, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${ctime}{BBFF00} secunde pentru a scrie ceva din nou!`);
-        return false;
-    }
+    checkAntiSpam(player);
 
     Player.Info[player.playerid].Last_Chat_Message = Math.floor(Date.now() / 1000);
     samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}${getPlayerRankInChat(player)}{00CCFF}(${player.playerid}):{FFFFFF} ${text}`);
