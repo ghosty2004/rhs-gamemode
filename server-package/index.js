@@ -291,7 +291,14 @@ CMD.on("admins", (player) => {
 });
 
 CMD.on("report", (player, params) => {
-
+    if(params[0] && params.slice(1).join(" ")) {
+        let target = getPlayer(params[0]);
+        if(target) {
+            
+        }
+        else SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    }
+    else SendUsage(player, "/report [ID/Name] [Reason]");
 });
 
 /* ============= */
