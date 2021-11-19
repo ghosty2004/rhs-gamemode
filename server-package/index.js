@@ -1024,7 +1024,7 @@ CMD.on("gotop", (player, params) => {
 /* SA:MP Functions */
 /* =============== */
 function SendAntiSpam(player, time) {
-    player.SendClientMessage(data.colors.LIGHT_YELLOW, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${time}{BBFF00} secunde pentru a scrie ceva din nou!`);
+    player.SendClientMessage(data.colors.LIGHT_YELLOW, Lang(player, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${time}{BBFF00} secunde pentru a scrie ceva din nou!`, `ANTI-SPAM: {BBFF00}Please wait {00BBF6}${time}{BBFF00} seconds to write something again!`));
 }
 
 function checkAntiSpam(player) {
@@ -2348,7 +2348,7 @@ samp.OnPlayerCommandText((player, cmdtext) => {
         if(CMD.eventNames().some(s => s == temp_string)) {
             CMD.emit(`${temp_string}`, player, params);
         }
-        else player.SendClientMessage(data.colors.RED, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`);
+        else player.SendClientMessage(data.colors.RED, Lang(player, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`, `Command {BBFF00}/${temp_string}{FF0000} don't exist! Use {BBFF00}/help{FF0000} or {BBFF00}/cmds{FF0000}!`));
     }
     return true;
 });  
