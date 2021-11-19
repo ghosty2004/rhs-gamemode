@@ -281,7 +281,13 @@ CMD.on("teles", (player) => {
 });
 
 CMD.on("admins", (player) => {
-
+    if(Player.Info[player.playerid].VIP < 2) return player.SendClientMessage(data.colors.RED, "Use /report [id/name] [reason] | if you see a hacker or if you have a problem!");
+    let info = "Name\tRank\n";
+    let data = samp.getPlayers().filter(f => Player.Info[f.playerid].Admin);
+    data.forEach((i) => {
+        info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t${getAdminRank(Player.Info[i.playerid].Admin)}\n`;
+    });
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${data.length} {00FF00}Online Admin(s)!`, info, "Close", "");
 });
 
 CMD.on("report", (player, params) => {
@@ -1075,7 +1081,7 @@ function getClanRank(RankID) {
 }
 
 function getPlayer(IDOrName) {
-    let result = samp.getPlayers().filter(f => f.GetPlayerName(24) == IDOrName || f.playerid == IDOrName)[0];
+    let result = samp.getPlayers().filter(f => f.GetPlayerName(24).toLowerCase().includes(`${toLowerCase}`.toLowerCase()) || f.playerid == IDOrName)[0];
     if(result) return result;
     else return 0;
 }
