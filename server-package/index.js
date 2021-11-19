@@ -1,5 +1,6 @@
 /* =============================== */
-/* SA:MP RHS GAMEMODE COPY VERSION
+/* SA:MP RHS GAMEMODE COPY VERSION */
+/*      Made by Ghosty2004 <3      */
 /* =============================== */
 
 /* Modules */
