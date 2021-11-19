@@ -24,9 +24,10 @@ const TextDraws = require("./textdraws");
 
 /* Data's */
 const data = {
-    mysql: require("./data/mysql"),
-    settings: require("./data/settings"),
     colors: require("./data/colors"),
+    mysql: require("./data/mysql"),
+    position: require("./data/positions"),
+    settings: require("./data/settings"),
 }
 
 /* Create MYSQL Connection */
@@ -425,6 +426,43 @@ CMD.on("createclan", (player) => {
 });
 
 /* Admins Commands */
+CMD.on("jail", (player, params) => {
+    if(Player.Info[player.playerid].Admin >= 1) {
+        if(params[0] && !isNaN(params[1]) && params.slice(2).join(" ")) {
+            let target = getPlayer(params[0]);
+            if(target) {
+                if(Player.Info[target.playerid].Jailed) return SendError(player, "Acest jucator este deja in inchisoare.", "This player already jailed.");
+                params[1] = parseInt(params[1]);
+                if(params[1] < 1 || params[1] > 30) return SendError(player, "Invalid minutes. Minim is 1 maxim is 30.");
+                samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been jailed for ${params[1]} minutes by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
+                samp.SendClientMessageToAll(0x00A6FFAA, `Reason: {D1D1D1}${params.slice(2).join(" ")}`);
+                Player.Info[target.playerid].Jailed = params[1] * 60;
+                target.SetPlayerPos(data.position.JAIL.x, data.position.JAIL.y, data.position.JAIL.z);
+            }
+            else SendError(player, Errors.PLAYER_NOT_CONNECTED);
+        }
+        else SendUsage(player, "/jail [ID/Name] [Minutes] [Reason]");
+    }
+    else SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("unjail", (player, params) => {
+    if(Player.Info[player.playerid].Admin >= 1) {
+        if(params[0]) {
+            let target = getPlayer(params[0]);
+            if(target) {
+                if(!Player.Info[target.playerid].Jailed) return SendError(player, "Jucatorul respectiv nu este in inchisoare.", "The specific player is not in jail.");
+                samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been unjailed by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
+                Player.Info[target.playerid].Jailed = 0;
+                SetupPlayerForSpawn(target);
+            }
+            else SendError(player, Errors.PLAYER_NOT_CONNECTED);
+        }
+        else SendUsage(player, "/unjail [ID/Name]");
+    }
+    else SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
 CMD.on("gotop", (player, params) => {
     if(Player.Info[player.playerid].Admin >= 1) {
         if(!isNaN(params[0]) && !isNaN(params[1]) && !isNaN(params[2])) {
@@ -495,6 +533,9 @@ function SetupPlayerForSpawn(player, type=0) {
     player.SetPlayerColor(0xFFFFFFAA);
     player.SetPlayerSkin(0);
     player.ResetPlayerWeapons();
+
+    /* Check if the player is jailed */
+    if(Player.Info[player.playerid].Jailed) return player.SetPlayerPos(data.position.JAIL.x, data.position.JAIL.y, data.position.JAIL.z);
 
     /* Type 0 = Check if the player is in a clan or gang */
     /* Type else = Set auto random spawn position */
@@ -852,6 +893,7 @@ function LoadPlayerStats(player) {
             Player.Info[player.playerid].Clan = result[0].clan;
             Player.Info[player.playerid].Clan_Rank = result[0].clan_rank;
             Player.Info[player.playerid].Gang = result[0].gang;
+            Player.Info[player.playerid].Jailed = result[0].jailed;
 
             let info = "";
             info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;

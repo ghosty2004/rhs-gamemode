@@ -58,7 +58,8 @@ module.exports = {
                     "5": 0,
                     "6": 0
                 }
-            }
+            },
+            Jailed: 0
         }
     }
 };

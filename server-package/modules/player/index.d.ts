@@ -57,7 +57,8 @@ export declare const Info: {
             "5": number,
             "6": number
         }
-    }
+    },
+    Jailed: number
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;

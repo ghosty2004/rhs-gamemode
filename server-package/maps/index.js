@@ -11,6 +11,7 @@ global.SetDynamicObjectMaterialText = SetDynamicObjectMaterialText;
 const Drift1 = require("./drifts/1");
 
 /* Others */
+const Jail = require("./others/jail");
 const LS = require("./others/ls");
 const LV = require("./others/lv");
 const Spawn = require("./others/spawn");
@@ -29,6 +30,7 @@ module.exports = {
         Drift1.Load();
 
         /* Others */
+        Jail.Load();
         LS.Load();
         LV.Load();
         Spawn.Load();
