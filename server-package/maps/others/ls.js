@@ -723,23 +723,23 @@ module.exports = {
         console.log("Loaded map LS.");
     },
     RemoveBuilding: function(player) {
-        RemoveBuildingForPlayer(player.playerid, 4024, 1479.867188, -1790.398438, 56.023399, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 4044, 1481.187500, -1785.070313, 22.382799, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 1527, 1448.234375, -1755.898438, 14.523400, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 4002, 1479.867188, -1790.398438, 56.023399, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 3980, 1481.187500, -1785.070313, 22.382799, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 4003, 1481.078125, -1747.031250, 33.523399, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 626, 1267.671875, -1675.500000, 14.601600, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 647, 1237.500000, -1643.429688, 14.851600, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 647, 1233.468750, -1643.429688, 14.851600, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 647, 1245.562500, -1643.429688, 14.851600, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 647, 1241.531250, -1643.429688, 14.851600, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 626, 1219.117188, -1640.460938, 28.421900, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 626, 1282.828125, -1619.851563, 28.421900, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 4064, 1571.601563, -1675.750000, 35.679699, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 3976, 1571.601563, -1675.750000, 35.679699, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 4206, 1479.554688, -1639.609375, 13.648400, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 4229, 1597.906250, -1699.750000, 30.210899, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 4230, 1597.906250, -1699.750000, 30.210899, 0.250000);
+        player.RemoveBuildingForPlayer(4024, 1479.867188, -1790.398438, 56.023399, 0.250000);
+        player.RemoveBuildingForPlayer(4044, 1481.187500, -1785.070313, 22.382799, 0.250000);
+        player.RemoveBuildingForPlayer(1527, 1448.234375, -1755.898438, 14.523400, 0.250000);
+        player.RemoveBuildingForPlayer(4002, 1479.867188, -1790.398438, 56.023399, 0.250000);
+        player.RemoveBuildingForPlayer(3980, 1481.187500, -1785.070313, 22.382799, 0.250000);
+        player.RemoveBuildingForPlayer(4003, 1481.078125, -1747.031250, 33.523399, 0.250000);
+        player.RemoveBuildingForPlayer(626, 1267.671875, -1675.500000, 14.601600, 0.250000);
+        player.RemoveBuildingForPlayer(647, 1237.500000, -1643.429688, 14.851600, 0.250000);
+        player.RemoveBuildingForPlayer(647, 1233.468750, -1643.429688, 14.851600, 0.250000);
+        player.RemoveBuildingForPlayer(647, 1245.562500, -1643.429688, 14.851600, 0.250000);
+        player.RemoveBuildingForPlayer(647, 1241.531250, -1643.429688, 14.851600, 0.250000);
+        player.RemoveBuildingForPlayer(626, 1219.117188, -1640.460938, 28.421900, 0.250000);
+        player.RemoveBuildingForPlayer(626, 1282.828125, -1619.851563, 28.421900, 0.250000);
+        player.RemoveBuildingForPlayer(4064, 1571.601563, -1675.750000, 35.679699, 0.250000);
+        player.RemoveBuildingForPlayer(3976, 1571.601563, -1675.750000, 35.679699, 0.250000);
+        player.RemoveBuildingForPlayer(4206, 1479.554688, -1639.609375, 13.648400, 0.250000);
+        player.RemoveBuildingForPlayer(4229, 1597.906250, -1699.750000, 30.210899, 0.250000);
+        player.RemoveBuildingForPlayer(4230, 1597.906250, -1699.750000, 30.210899, 0.250000);
     }
 }

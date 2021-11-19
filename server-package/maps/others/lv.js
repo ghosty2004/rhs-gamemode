@@ -103,12 +103,12 @@ module.exports = {
         console.log("Loaded map LV.");
     },
     RemoveBuilding: function(player) {
-        RemoveBuildingForPlayer(player.playerid, 8971, 2093.679688, 1553.320313, 22.828100, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 3509, 2089.320313, 1566.187500, 9.726600, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 8618, 2093.679688, 1553.320313, 22.828100, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 8623, 2093.875000, 1553.507813, 10.570300, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 3509, 2109.046875, 1547.273438, 9.773400, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 8836, 2027.882813, 1552.164063, 11.257800, 0.250000);
-        RemoveBuildingForPlayer(player.playerid, 9124, 2183.328125, 1647.375000, 55.398399, 0.250000);
+        player.RemoveBuildingForPlayer(8971, 2093.679688, 1553.320313, 22.828100, 0.250000);
+        player.RemoveBuildingForPlayer(3509, 2089.320313, 1566.187500, 9.726600, 0.250000);
+        player.RemoveBuildingForPlayer(8618, 2093.679688, 1553.320313, 22.828100, 0.250000);
+        player.RemoveBuildingForPlayer(8623, 2093.875000, 1553.507813, 10.570300, 0.250000);
+        player.RemoveBuildingForPlayer(3509, 2109.046875, 1547.273438, 9.773400, 0.250000);
+        player.RemoveBuildingForPlayer(8836, 2027.882813, 1552.164063, 11.257800, 0.250000);
+        player.RemoveBuildingForPlayer(9124, 2183.328125, 1647.375000, 55.398399, 0.250000);
     }
 }
