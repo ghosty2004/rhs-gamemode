@@ -21,6 +21,7 @@ const Maps = require("./maps");
 
 /* Server TextDraws */
 const TextDraws = require("./textdraws");
+const player = require("./modules/player");
 
 /* Data's */
 const data = {
@@ -91,7 +92,7 @@ CMD.on("stats", (player) => {
     info += `{BBFF00}Coins: {49FFFF}${Player.Info[player.playerid].Money}\n`;
     info += `{BBFF00}Respect: {49FFFF}+${Player.Info[player.playerid].Respect.Positive} {BBFF00}/ {49FFFF}-${Player.Info[player.playerid].Respect.Negative}\n`;
     info += `{BBFF00}Online time: {49FFFF}0 {BBFF00}hrs, {49FFFF}0 {BBFF00}mins, {49FFFF}0 {BBFF00}secs\n`;
-    info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? `{49FFFF}Yes{BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
+    info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
     info += `{BBFF00}VIP: ${Player.Info[player.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
     info += "\n";
     info += "{FF4800}Killer statistics\n";
@@ -508,9 +509,9 @@ function getNameByAccID(AccID) {
 
 function savePlayer(player) {
     if(Player.Info[player.playerid].LoggedIn) {
-        con.query("UPDATE users SET mail = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?, clan_rank = ?, gang = ? WHERE ID = ?", [
+        con.query("UPDATE users SET mail = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?, clan_rank = ?, gang = ?, jailed = ? WHERE ID = ?", [
             Player.Info[player.playerid].Mail, Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, 
-            Player.Info[player.playerid].Clan, Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].AccID
+            Player.Info[player.playerid].Clan, Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].AccID
         ]);
     }
 }
@@ -575,8 +576,16 @@ function LoadClans() {
     });
 }
 
-function Updater() {
-
+setInterval(CheckPlayers, 1000);
+function CheckPlayers() {
+    samp.getPlayers().forEach((i) => {
+        if(Player.Info[i.playerid].Jailed) {
+            Player.Info[i.playerid].Jailed--; 
+            if(Player.Info[i.playerid].Jailed == 0) {
+                SetupPlayerForSpawn(i);
+            }
+        }
+    });
 }
 
 function getRanksRankName(rank_name, rank) {
