@@ -351,6 +351,54 @@ CMD.on("vcmds", (player, params) => {
 });
 
 /* Clans Commands */
+CMD.on("chelp", (player) => {
+    let info = "";
+    info += "{FF0000}Founders/Owners Commands\n";
+    info += "{BBFF00}/setrank {FFFF00}- To set the rank of a member of the clan!\n";
+    info += "{BBFF00}/setspawn {FFFF00}- To set the clan spawn!\n";
+    info += "{BBFF00}/setcskin {FFFF00}- To set the skin of a member/leader of the clan!\n";
+    info += "\n";
+    info += "{FF0000}Leaders Commands\n";
+    info += "{BBFF00}/mkick {FFFF00}- To give off a member of the clan!\n";
+    info += "{BBFF00}/invite {FFFF00}- Invite new members to the clan!\n";
+    info += "\n";
+    info += "{FF0000}Members Commands\n";
+    info += "{BBFF00}/cad {FFFF00}- To give a notice to the members of the clan!\n";
+    info += "{BBFF00}/cm {FFFF00}- To view online clan members.\n";
+    info += "{BBFF00}/lclan {FFFF00}- To leave a clan!\n";
+    info += "\n";
+    info += "{FF0000}Simple Players Commands\n";
+    info += "{BBFF00}/createclan {FFFF00}- To create a clan!\n";
+    info += "{BBFF00}/clan {FFFF00}- To view clan commands!\n";
+    info += "{BBFF00}/cinfo {FFFF00}- To see a member of a clan!";
+    info += "\n";
+    info += '{BBFF00}Use {FF0000}"!" {BBFF00}to use Clan Chat!';
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "{FFFFFF}Clan {FF0000}Commands", info, "Ok", "");
+});
+
+CMD.on("cinfo", async (player, params) => {
+    let target = player;
+    if(params[0]) target = getPlayer(params[0]);
+    if(target) {
+        let info = "";
+        info += `{FF0000}${target.GetPlayerName(24)}{FFFF00}'s clan informations\n`;
+        info += "\n";
+        info += "{FFFF00}Informations\n";
+        info += "{BBFF00}Total kills: {49FFFF}0\n";
+        info += "{BBFF00}Total deaths: {49FFFF}0\n";
+        info += `{BBFF00}Leaders skin: {49FFFF}${Clan.Info[Player.Info[target.playerid].Clan].skin.leader}\n`;
+        info += `{BBFF00}Members skin: {49FFFF}${Clan.Info[Player.Info[target.playerid].Clan].skin.member}\n`;
+        info += `{BBFF00}Creator: {33FFFF}${await getNameByAccID(Clan.Info[Player.Info[target.playerid].Clan].owner)}\n`;
+        info += `{BBFF00}${player.GetPlayerName(24)}'s Rank: {33FFFF}${getClanRank(Player.Info[target.playerid].Clan_Rank)}\n`;
+        info += "{BBFF00}Weapons:\n";
+        info += "{FFFFFF}none, none, none, none, none, none\n";
+        info += "\n";
+        info += "{FFFF00}Type {FF0000}/cinfo [ID/Name]{FFFF00} to see others Clan Stats!";
+        player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Clan Info", info, "Ok", "");
+    }
+    else SendError(player, Errors.PLAYER_NOT_CONNECTED);
+});
+
 CMD.on("lclan", (player) => {
     if(Player.Info[player.playerid].Clan) {
         if(Clan.Info[Player.Info[player.playerid].Clan].owner == Player.Info[player.playerid].AccID) {
@@ -395,6 +443,31 @@ CMD.on("gotop", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function getClanRank(RankID) {
+    let string = "";
+    switch(RankID) {
+        case 1: string = "Member"; break;
+        case 2: string = "Leader"; break;
+        case 3: string = "Founder"; break;
+    }
+    return string;
+}
+
+function getPlayer(IDOrName) {
+    let result = samp.getPlayers().filter(f => f.GetPlayerName(24) == IDOrName || f.playerid == IDOrName)[0];
+    if(result) return result;
+    else return 0;
+}
+
+function getNameByAccID(AccID) {
+    return new Promise((resolve, reject) => {
+        con.query("SELECT * FROM users WHERE id = ?", [AccID], function(err, result) {
+            if(err || !result) return resolve("none");
+            resolve(result[0].name);
+        });
+    });
+}
+
 function savePlayer(player) {
     if(Player.Info[player.playerid].LoggedIn) {
         con.query("UPDATE users SET mail = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?, clan_rank = ?, gang = ? WHERE ID = ?", [
