@@ -708,7 +708,7 @@ function getRanksRankName(rank_name, rank) {
 function getAdminRank(rank) {
     let string = "";
     switch(rank) {
-        case 1: break;
+        case 1: string = "{FF0000}Junior"; break;
         case 2: break;
         case 3: string = "{0072FF}Master"; break;
     }
@@ -730,7 +730,7 @@ function getPlayerRankInChat(player) {
     let tag = "";
     if(Player.Info[player.playerid].Admin == 3) tag = "{0072FF}(Master)";
     else if(Player.Info[player.playerid].Admin == 2) tag = "(Senior)";
-    else if(Player.Info[player.playerid].Admin == 1) tag = "(Junior)";
+    else if(Player.Info[player.playerid].Admin == 1) tag = "{FF0000}(Junior)";
     else if(Player.Info[player.playerid].VIP == 4) tag = "{FF0000}({FFFFFF}VIP{FF0000})";
     else if(Player.Info[player.playerid].VIP == 3) tag = "{0077FF}(VIP)";
     else if(Player.Info[player.playerid].VIP == 2) tag = "{FFFF00}(VIP)";
@@ -1796,6 +1796,17 @@ samp.OnPlayerText((player, text) => {
     checkAntiSpam(player);
 
     Player.Info[player.playerid].Last_Chat_Message = Math.floor(Date.now() / 1000);
+
+    if(text[0] == "!") {
+        if(Player.Info[player.playerid].Clan) {
+            text = text.replace("!", "");
+            samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan).forEach((i) => {
+                i.SendClientMessage(data.colors.ORANGE, `Clan Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
+            });
+            return false;
+        }
+    }
+
     samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}${getPlayerRankInChat(player)}{00CCFF}(${player.playerid}):{FFFFFF} ${text}`);
     return false;
 });
