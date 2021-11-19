@@ -1,4 +1,3 @@
-const { RemoveBuildingForPlayer } = require("samp-node-lib");
 const { CreateDynamicObject, SetDynamicObjectMaterial, SetDynamicObjectMaterialText } = require("../../modules/streamer");
 
 module.exports = {
