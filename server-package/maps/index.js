@@ -2,6 +2,9 @@
 /*      MAPS        */
 /* ================ */
 
+const { CreateObject, SetObjectMaterial } = require("samp-node-lib");
+global.CreateObject = CreateObject;
+global.SetObjectMaterial = SetObjectMaterial;
 const { CreateDynamicObject, SetDynamicObjectMaterial, SetDynamicObjectMaterialText } = require("../modules/streamer");
 global.CreateDynamicObject = CreateDynamicObject;
 global.SetDynamicObjectMaterial = SetDynamicObjectMaterial;
@@ -9,6 +12,9 @@ global.SetDynamicObjectMaterialText = SetDynamicObjectMaterialText;
 
 /* Drifts */
 const Drift1 = require("./drifts/1");
+
+/* Gangs */
+const Gang1 = require("./gangs/1");
 
 /* Others */
 const Jail = require("./others/jail");
@@ -29,6 +35,9 @@ module.exports = {
         /* Drifts */
         Drift1.Load();
 
+        /* Gangs */
+        Gang1.Load();
+
         /* Others */
         Jail.Load();
         LS.Load();
@@ -46,6 +55,9 @@ module.exports = {
     RemoveBuildings: function(player) {
         /* Drifts */
         Drift1.RemoveBuilding(player);
+
+        /* Gangs */
+        // null..
 
         /* Others */
         LS.RemoveBuilding(player);

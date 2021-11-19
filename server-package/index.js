@@ -1004,16 +1004,18 @@ function LoadPlayerStats(player) {
             info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
             info += "{BBFF00}Ai fost autentificat cu succes!\n";
             info += "\n";
-            info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? "{00FF00}Yes" : "{FF0000}No"}\n`;
-            info += "{BBFF00}VIP: {FF0000}No\n";
+            info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
+            info += `{BBFF00}VIP: ${Player.Info[player.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
             info += "{BBFF00}Nota Statistici: {FF0000}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob\n";
             info += "\n";
             info += "{BBFF00}Pentru mai multe statistici, foloseste {FF0000}/stats{BBFF00}.\n";
-            info += "\n";
-            info += "{FF0000}Mesaj {FF9900}URGENT {FF0000}pentru siguranta contului tau:\n";
-            info += "{FFFFFF}In contul tau nu exista o parola secundara!\n";
-            info += "{FFFFFF}Pentru a evita pierderea contului tau,\n";
-            info += "{FFFFFF}Adauga o parola secundara folosind comanda {FF0000}/Spassword{FFFFFF}!";
+            if(result[0].spassword == "null") {
+                info += "\n";
+                info += "{FF0000}Mesaj {FF9900}URGENT {FF0000}pentru siguranta contului tau:\n";
+                info += "{FFFFFF}In contul tau nu exista o parola secundara!\n";
+                info += "{FFFFFF}Pentru a evita pierderea contului tau,\n";
+                info += "{FFFFFF}Adauga o parola secundara folosind comanda {FF0000}/Spassword{FFFFFF}!";
+            }
 
             player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
         }
@@ -1643,6 +1645,8 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             if(response) {
                 switch(listitem) {
                     case 0: {
+                        if(Player.Info[player.playerid].VIP >= 1) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
+                        samp.SendClientMessageToAll(data.colors.LIGHT_YELLOW, `INFO:{00BBF6} ${player.GetPlayerName(24)}(${player.playerid}){BBFF00} a cumparat{FF0000} VIP Rosu{BBFF00} Gratis, Pentru a cumpara VIP, scrie /BuyVIP!`);
                         let info = "";
                         info += "{00FF00}Ai cumparat cu succes {FF0000}VIP Red{00FF00} Gratis!\n";
                         info += "{00FF00}Scrie {00BBF6}/vCmds {00FF00}pentru a vedea {FF0000}Comenzile de VIP{00FF00}!";
@@ -1650,12 +1654,27 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         break;
                     }
                     case 1: {
+                        if(Player.Info[player.playerid].VIP >= 2) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
+                        if(Player.Info[player.playerid].Coins >= 20000) {
+
+                        }
+                        else SendError(player, "Nu ai destui Coins/Ore pentru a cumpara acest rank de VIP!", "You don't have enough Coins/Hours to buy that VIP rank!");
                         break;
                     }
                     case 2: {
+                        if(Player.Info[player.playerid].VIP >= 3) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
+                        if(Player.Info[player.playerid].Coins >= 80000) {
+
+                        }
+                        else SendError(player, "Nu ai destui Coins/Ore pentru a cumpara acest rank de VIP!", "You don't have enough Coins/Hours to buy that VIP rank!");
                         break;
                     }
                     case 3: {
+                        if(Player.Info[player.playerid].VIP >= 4) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
+                        if(Player.Info[player.playerid].Coins >= 150000) {
+
+                        }
+                        else SendError(player, "Nu ai destui Coins/Ore pentru a cumpara acest rank de VIP!", "You don't have enough Coins/Hours to buy that VIP rank!");
                         break;
                     }
                 }
