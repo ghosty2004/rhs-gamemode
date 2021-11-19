@@ -17,7 +17,7 @@ const Player = require("./modules/player");
 const Streamer = require("./modules/streamer");
 
 /* Server Maps */
-require("./maps");
+const Maps = require("./maps");
 
 /* Server TextDraws */
 const TextDraws = require("./textdraws");
@@ -808,10 +808,8 @@ samp.OnGameModeInit(() => {
     console.log("Gamemode creator: Ghosty2004");
     console.log("Have Fun with this shit :)");
 
+    Maps.Load();
     TextDraws.server.Load(); /* Load Server TextDraws */
-    
-    Updater();
-    return true;
 });
 
 samp.OnGameModeExit(() => {
@@ -823,6 +821,7 @@ samp.OnPlayerConnect((player) => {
     Player.ResetVariables(player);
     player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English");
     
+    Maps.RemoveBuildings(player);
     TextDraws.player.Load(player); /* Load Player TextDraws */
 
     return true;
