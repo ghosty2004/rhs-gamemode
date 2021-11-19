@@ -21,7 +21,6 @@ const Maps = require("./maps");
 
 /* Server TextDraws */
 const TextDraws = require("./textdraws");
-const player = require("./modules/player");
 
 /* Data's */
 const data = {
