@@ -1,5 +1,3 @@
-const { CreateDynamicObject, SetDynamicObjectMaterial, SetDynamicObjectMaterialText } = require("../../modules/streamer");
-
 module.exports = {
     Load: function() {
         let fso_map;

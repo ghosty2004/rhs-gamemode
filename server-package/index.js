@@ -221,7 +221,7 @@ CMD.on("credits", (player) => {
     info += `{FF0000}${Player.Info[player.playerid].Language == 1 ? "Multumiri Speciale:" : "Special Thanks:"}\n`;
     info += "{15FF00}TheRullZ_\n";
     info += "{15FF00}L0g1k\n";
-    info += "{15FF00}[9mm]_LimiTLesS_";
+    info += "{15FF00}[9mm]_LimiTLesS_\n";
     info += "\n";
     info += `{0072FF}${Player.Info[player.playerid].Language == 1 ? "Cel mai bun jucator:" : "Best Player:"}\n`;
     info += `{15FF00}${player.GetPlayerName(24)}\n`;

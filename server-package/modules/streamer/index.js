@@ -1,7 +1,7 @@
 const { callPublic, OBJECT_MATERIAL_SIZE } = require("samp-node-lib");
 
 module.exports = {
-    CreateDynamicObject: function(modelid, x, y, z, rx, ry, rz, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 600, drawdistance = 600, areaid = -1, priority = 0) {
+    CreateDynamicObject: function(modelid, x, y, z, rx, ry, rz, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 1000, drawdistance = 1000, areaid = -1, priority = 0) {
         return callPublic("_CreateDynamicObject", "iffffffiiiffii", modelid, x, y, z, rx, ry, rz, worldid, interiorid, playerid, streamdistance, drawdistance, areaid, priority);
     },
     DestroyDynamicObject: function(objectid) {

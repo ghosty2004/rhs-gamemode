@@ -1,5 +1,3 @@
-const { CreateDynamicObject, SetDynamicObjectMaterial, SetDynamicObjectMaterialText } = require("../../modules/streamer");
-
 module.exports = {
     Load: function() {
         let fso_map;
@@ -147,6 +145,5 @@ module.exports = {
         SetDynamicObjectMaterial(fso_map, 0, 19962, "samproadsigns", "chevronrightsign", 0);
         fso_map = CreateDynamicObject(19843, 2098.920654, 2304.848389, 9.639193, 0.000000, 0.000000, -41.000000, -1, -1);
         SetDynamicObjectMaterial(fso_map, 0, 19962, "samproadsigns", "chevronrightsign", 0);
-        console.log("Loaded map spawn.");
     }
 }

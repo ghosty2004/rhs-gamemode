@@ -1,5 +1,3 @@
-const { CreateDynamicObject, SetDynamicObjectMaterial, SetDynamicObjectMaterialText } = require("../../modules/streamer");
-
 module.exports = {
     Load: function() {
         let fso_map;
@@ -99,7 +97,6 @@ module.exports = {
         SetDynamicObjectMaterialText(fso_map, 0, "{ffffff}S.M.G", 90, "Quartz MS", 35, 1, 0xFFFFFFFFFFFFFFFF, 0, 1);
         fso_map = CreateDynamicObject(11360, 2056.438965, 1252.703247, 10.491868, 0.000000, 0.000000, 180.000000, -1, -1);
         SetDynamicObjectMaterialText(fso_map, 0, "{ffff00}Codrin_Boss", 90, "Quartz MS", 30, 1, 0xFFFFFFFFFFFFFFFF, 0, 1);
-        console.log("Loaded map LV.");
     },
     RemoveBuilding: function(player) {
         player.RemoveBuildingForPlayer(8971, 2093.679688, 1553.320313, 22.828100, 0.250000);
