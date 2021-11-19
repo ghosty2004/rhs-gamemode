@@ -55,6 +55,15 @@ con.connect((err) => {
 const CMD = new events.Command();
 
 /* Player's Commands */
+CMD.on("vips", (player) => {
+    let info = "Name\tRank\n";
+    let data = samp.getPlayers().filter(f => Player.Info[f.playerid].VIP);
+    data.forEach((i) => {
+        info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t${getVIPRank(Player.Info[i.playerid].VIP)}\n`;
+    });
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${data.length} {00FF00}Online VIP(s)!`, info, "Close", "");
+});
+
 CMD.on("spassword", (player) => {
     con.query("SELECT spassword FROM users WHERE ID = ?", [Player.Info[player.playerid].AccID], function(err, result) {
         let info = "";
@@ -279,7 +288,9 @@ CMD.on("report", (player, params) => {
 
 });
 
+/* ============= */
 /* VIPS Commands */
+/* ============= */
 CMD.on("vcmds", (player, params) => {
     let info = "";
 
@@ -372,7 +383,249 @@ CMD.on("vcmds", (player, params) => {
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Lang(player, "{FFCC00}Comenzi VIP - {FF0000}/BuyVIP, /Vips.", "{FFCC00}VIP Commands - {FF0000}/BuyVIP, /Vips."), info, Lang(player, "Inchide", "Close"), "");
 });
 
+/* ================ */
+/* VIP RED COMMANDS */
+/* ================ */
+CMD.on("astats", (player, params) => {
+    if(Player.Info[player.playerid].VIP < 1 && Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("time", (player, params) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("weather", (player, params) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vad", (player, params) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("goto", (player, params) => {
+    if(Player.Info[player.playerid].VIP < 1 && Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("spawnme", (player) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vclub", (player) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vdisarm", (player) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("fire", (player) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("get", (player) => {
+    if(Player.Info[player.playerid].VIP < 1 && Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("carcolor", (player, params) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("getid", (player, params) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("lockcar", (player) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vcc", (player) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("cmychat", (player) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("dos", (player) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("mycolor", (player) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vbike", (player) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vaccount", (player) => {
+    if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+/* =================== */
+/* VIP YELLOW COMMANDS */
+/* =================== */
+CMD.on("s2", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("l2", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("s3", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("l3", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("admins", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("chint", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("renew", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("ignore", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("maxammo", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("wset", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("wgm", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vipchat", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("weaps", (player) => {
+    if(Player.Info[player.playerid].VIP < 2 && Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("godmode", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("invisible", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("visible", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+}); 
+
+CMD.on("vcar", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+/* ================= */
+/* VIP BLUE COMMANDS */
+/* ================= */
+CMD.on("godcar", (player) => {
+    if(Player.Info[player.playerid].VIP < 3) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vipisland", (player) => {
+    if(Player.Info[player.playerid].VIP < 3) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("armhel", (player) => {
+    if(Player.Info[player.playerid].VIP < 3) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("writecolor", (player, params) => {
+    if(Player.Info[player.playerid].VIP < 3) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+}); 
+
+CMD.on("spec", (player, params) => {
+    if(Player.Info[player.playerid].VIP < 3 && Player.Info[player.playerid].Admin < 1) return SendError(player, "You must have VIP Blue or Admin Junior to use this command!");
+});
+
+CMD.on("specoff", (player) => {
+    if(Player.Info[player.playerid].VIP < 3 && Player.Info[player.playerid].Admin < 1) return SendError(player, "You must have VIP Blue or Admin Junior to use this command!");
+});
+
+CMD.on("vheli", (player) => {
+    if(Player.Info[player.playerid].VIP < 3) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vtank", (player) => {
+    if(Player.Info[player.playerid].VIP < 3) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vhydra", (player) => {
+    if(Player.Info[player.playerid].VIP < 3) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vminigun", (player) => {
+    if(Player.Info[player.playerid].VIP < 3) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("eject", (player, params) => {
+    if(Player.Info[player.playerid].VIP < 3) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+/* ================== */
+/* VIP WHITE COMMANDS */
+/* ================== */
+CMD.on("highlight", (player) => {
+    if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vhunter", (player) => {
+    if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vrustler", (player) => {
+    if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vsatchel", (player) => {
+    if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vtag", (player, params) => {
+    if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vtagoff", (player) => {
+    if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("vweapons", (player) => {
+    if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("cartext", (player) => {
+    if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("tags", (player) => {
+    if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+CMD.on("songforall", (player) => {
+    if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+});
+
+/* ============== */
 /* Clans Commands */
+/* ============== */
 CMD.on("chelp", (player) => {
     let info = "";
     info += "{FF0000}Founders/Owners Commands\n";
@@ -404,7 +657,7 @@ CMD.on("cm", (player) => {
         let info = "Name\tRank\n";
         let data = samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan);
         data.forEach((i) => {
-            info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t{00BBF6}${getClanRank(Player.Info[i.playerid].Clan_Rank)}`;
+            info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t{00BBF6}${getClanRank(Player.Info[i.playerid].Clan_Rank)}\n`;
         });
         player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Clan Members: {FF0000}${data.length}{AFAFAF} online - {FF0000}${Clan.Info[Player.Info[player.playerid].Clan].name}`, info, "Close", "");
     }
@@ -459,57 +712,312 @@ CMD.on("createclan", (player) => {
     player.ShowPlayerDialog(Dialog.CREATE_CLAN, samp.DIALOG_STYLE.INPUT, "{BBFF00}Create Clan", "{0072FF}You are now creating a clan!\nEnter below the name of your clan to continue...", "Continue", "Close");
 });
 
+/* =============== */
 /* Admins Commands */
+/* =============== */
+CMD.on("acmds", (player) => {
+    let info = "";
+    info += "{FF0000}Junior:\n";
+    info += "{FF0000}/Reports, /Muted, /Mute, /UnMute, /Kick, /Warn, /Jailed, /GetInfo\n";
+    info += "{FF0000}/Jail, /UnJail, /Explode, /IP, /Aka, /GiveCar, /AdminLand\n";
+    info += "{FF0000}/Goto, /Get, /God, /GodCar, /ASay, /Weaps, /Spec(Off), /Caps\n";
+    info += "{FF0000}/Disarm, /Set [Interior / Weather / Time / World / Skin], /LastOn\n";
+    info += "{FF0000}/Spawn, /Question, /Reaction, /Eject, /Clearchat(/Cc)\n";
+    info += "\n";
+    info += "{FFFF00}Senior:\n";
+    info += "{FFFF00}/Ban, /StarEvent, /EndStarEvent, /GiveWeapon, /Write, /AHAll\n";
+    info += "{FFFF00}/Slap, /Freeze, /UnFreeze, /Frozen, /Announce, /Read, /Rac\n";
+    info += "{FFFF00}/DMEvent, /StopDMEvent, /AnnounceDMEvent, /SongForAllOff, /Teleplayer\n";
+    info += "{FFFF00}/Set [Wanted / Health / Armour / Color], /CarHealth, /Screen\n";
+    info += "\n";
+    info += "{0072FF}Master:\n";
+    info += "{0072FF}/GetHere, /GetAll, /AKill, /LWeaps, /GiveAllWeapon\n";
+    info += "{0072FF}/Set [Money], /SpawnAll, /MuteAll, /UnMuteAll, /DisarmAll\n";
+    info += "{0072FF}/FreezeAll, /UnFreezeAll, /SlapAll, /ExplodeAll\n";
+    info += "{0072FF}/GiveAll [Money], /SetAll [Money / Weather / Time / World /Wanted]\n";
+    info += "\n";
+    info += "{00FF00}Use: {FF0000}'@' {00FF00}to talk in {FF0000}Admin Chat{00FF00}!\n";
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Admin {FF0000}Commands", info, "Close", "");
+});
+
+/* ===================== */
+/* ADMIN JUNIOR COMMANDS */
+/* ===================== */
+CMD.on("reports", (player) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("muted", (player) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("mute", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("unmute", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("kick", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("warn", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("jailed", (player) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("getinfo", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
 CMD.on("jail", (player, params) => {
-    if(Player.Info[player.playerid].Admin >= 1) {
-        if(params[0] && !isNaN(params[1]) && params.slice(2).join(" ")) {
-            let target = getPlayer(params[0]);
-            if(target) {
-                if(Player.Info[target.playerid].Jailed) return SendError(player, "Acest jucator este deja in inchisoare.", "This player already jailed.");
-                params[1] = parseInt(params[1]);
-                if(params[1] < 1 || params[1] > 30) return SendError(player, "Invalid minutes. Minim is 1 maxim is 30.");
-                samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been jailed for ${params[1]} minutes by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
-                samp.SendClientMessageToAll(0x00A6FFAA, `Reason: {D1D1D1}${params.slice(2).join(" ")}`);
-                Player.Info[target.playerid].Jailed = params[1] * 60;
-                target.SetPlayerPos(data.position.JAIL.x, data.position.JAIL.y, data.position.JAIL.z);
-            }
-            else SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(params[0] && !isNaN(params[1]) && params.slice(2).join(" ")) {
+        let target = getPlayer(params[0]);
+        if(target) {
+            if(Player.Info[target.playerid].Jailed) return SendError(player, "Acest jucator este deja in inchisoare.", "This player already jailed.");
+            params[1] = parseInt(params[1]);
+            if(params[1] < 1 || params[1] > 30) return SendError(player, "Invalid minutes. Minim is 1 maxim is 30.");
+            samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been jailed for ${params[1]} minutes by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
+            samp.SendClientMessageToAll(0x00A6FFAA, `Reason: {D1D1D1}${params.slice(2).join(" ")}`);
+            Player.Info[target.playerid].Jailed = params[1] * 60;
+            target.SetPlayerPos(data.position.JAIL.x, data.position.JAIL.y, data.position.JAIL.z);
         }
-        else SendUsage(player, "/jail [ID/Name] [Minutes] [Reason]");
+        else SendError(player, Errors.PLAYER_NOT_CONNECTED);
     }
-    else SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    else SendUsage(player, "/jail [ID/Name] [Minutes] [Reason]");
 });
 
 CMD.on("unjail", (player, params) => {
-    if(Player.Info[player.playerid].Admin >= 1) {
-        if(params[0]) {
-            let target = getPlayer(params[0]);
-            if(target) {
-                if(!Player.Info[target.playerid].Jailed) return SendError(player, "Jucatorul respectiv nu este in inchisoare.", "The specific player is not in jail.");
-                samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been unjailed by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
-                Player.Info[target.playerid].Jailed = 0;
-                SetupPlayerForSpawn(target);
-            }
-            else SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(params[0]) {
+        let target = getPlayer(params[0]);
+        if(target) {
+            if(!Player.Info[target.playerid].Jailed) return SendError(player, "Jucatorul respectiv nu este in inchisoare.", "The specific player is not in jail.");
+            samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been unjailed by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
+            Player.Info[target.playerid].Jailed = 0;
+            SetupPlayerForSpawn(target);
         }
-        else SendUsage(player, "/unjail [ID/Name]");
+        else SendError(player, Errors.PLAYER_NOT_CONNECTED);
     }
-    else SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    else SendUsage(player, "/unjail [ID/Name]");
+});
+
+CMD.on("explode", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("ip", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("aka", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("givecar", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("adminland", (player) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("god", (player) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("asay", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("caps", (player) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("disarm", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("set", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("laston", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("spawn", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("question", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("reaction", (player) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+}); 
+
+CMD.on("clearchat", (player) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+CMD.on("cc", (player) => { CMD.emit("clearchat", player); });
+
+/* ===================== */
+/* ADMIN SENIOR COMMANDS */
+/* ===================== */
+CMD.on("ban", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("starevent", (player) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("endstarevent", (player) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("giveweapon", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("write", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("ahall", (player) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("slap", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("freeze", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("unfreeze", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("frozen", (player) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("announce", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("read", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("rac", (player) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("dmevent", (player) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("stopdmevent", (player) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("announcedmevent", (player) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("songforalloff", (player) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("teleplayer", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+/* ===================== */
+/* ADMIN MASTER COMMANDS */
+/* ===================== */
+CMD.on("gethere", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("getall", (player) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("akill", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("lweaps", (player) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("giveallweapon", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+}); 
+
+CMD.on("spawnall", (player) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("muteall", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("unmuteall", (player) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("disarmall", (player) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("freezeall", (player) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("unfreezeall", (player) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("slapall", (player) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("explodeall", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("giveall", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("setall", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
 });
 
 CMD.on("gotop", (player, params) => {
-    if(Player.Info[player.playerid].Admin >= 1) {
-        if(!isNaN(params[0]) && !isNaN(params[1]) && !isNaN(params[2])) {
-            const position = {
-                x: parseInt(params[0]),
-                y: parseInt(params[1]),
-                z: parseInt(params[2])
-            }
-            player.SetPlayerPos(position.x, position.y, position.z);
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!isNaN(params[0]) && !isNaN(params[1]) && !isNaN(params[2])) {
+        const position = {
+            x: parseInt(params[0]),
+            y: parseInt(params[1]),
+            z: parseInt(params[2])
         }
-        else SendUsage(player, "/gotop [X] [Y] [Z]");
+        player.SetPlayerPos(position.x, position.y, position.z);
     }
-    else SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    else SendUsage(player, "/gotop [X] [Y] [Z]");
 });
 
 /* =============== */
