@@ -1469,6 +1469,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
 });
 
 samp.OnPlayerText((player, text) => {
+    samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}{00CC00}(${player.playerid}){FFFFFF}: ${text}`);
     return false;
 });
 
