@@ -16,6 +16,6 @@ node_modules/sqlstring
 node_modules/string_decoder
 node_modules/util-deprecate
 node_modules/.package-lock.json
-server-package/data/mysql.js
+server_package/data/mysql.js
 server_log.txt
 samp-node.log
