@@ -59,7 +59,11 @@ export declare const Info: {
         }
     },
     Jailed: number,
-    Last_Chat_Message: number
+    Last_Chat_Message: number,
+    SpecialZone: {
+        Targets: boolean
+    },
+    TargetsPoints: number
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;

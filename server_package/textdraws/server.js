@@ -9,12 +9,12 @@ const {
 } = require("samp-node-lib");
 
 module.exports = {
+    logs: null,
     spawn: {},
     connect: {},
-    logs: null,
     Load: function() {
         /* Logs TextDraw */
-        this.logs = TextDrawCreate(252.000000, 408.000000, "~b~~h~[RHS]_K1L3R_ ~y~~h~has gone to ~r~~h~Grove Street ~b~~h~- /grov~n~~r~~h~sal_mane(9) ~y~~h~joined the server!~n~~b~~h~MARTINHORST2010 ~y~~h~has gone to ~r~~h~Las Venturas ~b~~h~- /lv~n~");
+        this.logs = TextDrawCreate(252.000000, 408.000000, "");
         TextDrawLetterSize(this.logs, 0.199994, 1.300000);
         TextDrawTextSize(this.logs, 1280.000000, 1280.000000);
         TextDrawAlignment(this.logs, 0);

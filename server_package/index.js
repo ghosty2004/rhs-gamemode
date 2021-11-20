@@ -197,7 +197,13 @@ CMD.on("business", (player) => {
 });
 
 CMD.on("leave", (player) => {
-
+    if(isPlayerInSpecialZone(player)) {
+        if(Player.Info[player.playerid].SpecialZone.Targets) {
+            Player.Info[player.playerid].SpecialZone.Targets = false;
+            Player.Info[player.playerid].TargetsPoints = 0;
+        }
+        player.SpawnPlayer();
+    }
 });
 
 CMD.on("int", (player) => {
@@ -723,6 +729,47 @@ CMD.on("minigames", (player) => {
     info += "{49FFFF}/Football\t{BBFF00}Play Football\n";
     info += "{49FFFF}/Zm\t{BBFF00}Zombies vs Humans";
     player.ShowPlayerDialog(Dialog.TELES_MINIGAMES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Minigames", info, "Teleport", "Back");
+});
+
+CMD.on("gifts", (player) => {
+
+});
+
+CMD.on("lastman", (player) => {
+
+});
+
+CMD.on("hns", (player) => {
+
+});
+
+CMD.on("gparkour", (player) => {
+
+});
+
+CMD.on("sfparkour", (player) => {
+
+});
+
+CMD.on("targets", (player) => {
+    Player.Info[player.playerid].SpecialZone.Targets = true;
+    TelePlayer(player, "targets", "Targets", -498.7933, -2675.3245, 1081.9259, 271.9457);
+});
+
+CMD.on("skyclimb", (player) => {
+
+});
+
+CMD.on("derby", (player) => {
+
+});
+
+CMD.on("football", (player) => {
+
+});
+
+CMD.on("zm", (player) => {
+
 });
 
 CMD.on("challanges", (player) => {
@@ -1590,6 +1637,12 @@ CMD.on("setall", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function isPlayerInSpecialZone(player) {
+    let value = false;
+    if(Player.Info[player.playerid].SpecialZone.Targets) value = true;
+    return value;
+}
+
 function AddToTDLogs(string) {
     ServerLogs[2] = ServerLogs[1];
     ServerLogs[1] = ServerLogs[0];
@@ -1601,11 +1654,11 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function TelePlayer(player, command_name) {
-    player.GameTextForPlayer(`~y~~h~Welcome to~n~~g~~h~${Teleport.Info[command_name].name}`, 4000, 3);
-    player.SetPlayerPos(Teleport.Info[command_name].position[0], Teleport.Info[command_name].position[1], Teleport.Info[command_name].position[2]);
-    player.SetPlayerFacingAngle(Teleport.Info[command_name].position[3]);
-    AddToTDLogs(`~b~~h~${player.GetPlayerName(24)} ~y~~h~has gone to ~r~~h~${Teleport.Info[command_name].name} ~b~~h~- /${command_name}`);
+function TelePlayer(player, cmdtext, name, x, y, z, angle) {
+    player.GameTextForPlayer(`~y~~h~Welcome to~n~~g~~h~${name}`, 4000, 3);
+    player.SetPlayerPos(x, y, z);
+    player.SetPlayerFacingAngle(angle);
+    AddToTDLogs(`~b~~h~${player.GetPlayerName(24)} ~y~~h~has gone to ~r~~h~${name} ~b~~h~- /${cmdtext}`);
 }
 
 function CheckCustomChat(player, text) {
@@ -2210,7 +2263,7 @@ samp.OnPlayerDisconnect((player, reason) => {
 
     let reason_string = "";
     switch(reason) {
-        case 0: reason_string = "~y~~h~(Timeout)"; break;
+        case 0: reason_string = "~p~~h~(Timeout)"; break;
         case 1: reason_string = "~r~~h~(Leaving)"; break;
         case 2: reason_string = "~r~~h~(Kick/Ban)"; break;
     }
@@ -2610,7 +2663,8 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                 con.query("SELECT * FROM teleports WHERE type = ?", ["others"], function(err, result) {
                     for(let i = 0; i < result.length; i++) {
                         if(i == listitem) {
-                            TelePlayer(player, result[i].command);
+                            let position = JSON.parse(result[i].position);
+                            TelePlayer(player, result[i].command, result[i].name, position[0], position[1], position[2], position[3]);
                             break;
                         }
                     }
@@ -2820,15 +2874,16 @@ samp.OnPlayerCommandText((player, cmdtext) => {
         cmdtext = cmdtext.toLowerCase(); 
         cmdtext = replaceAll(cmdtext, "/", ""); 
         let params = cmdtext.split(/[ ]+/);
-        let temp_string = params[0];
+        cmdtext = params[0];
         params.shift();
-        if(Teleport.Exists(temp_string)) {
-            TelePlayer(player, temp_string);
+        if(isPlayerInSpecialZone(player) && cmdtext != "leave") return player.GameTextForPlayer("~w~~h~Use ~r~~h~/Leave ~w~~h~to ~r~~h~Leave~w~~h~!", 4000, 4);
+        if(CMD.eventNames().some(s => s == cmdtext)) {
+            CMD.emit(cmdtext, player, params);
         }
-        else if(CMD.eventNames().some(s => s == temp_string)) {
-            CMD.emit(`${temp_string}`, player, params);
+        else if(Teleport.Exists(cmdtext)) {
+            TelePlayer(player, cmdtext, Teleport.Info[cmdtext].name, Teleport.Info[cmdtext].position[0], Teleport.Info[cmdtext].position[1], Teleport.Info[cmdtext].position[2], Teleport.Info[cmdtext].position[3]);
         }
-        else player.SendClientMessage(data.colors.RED, Lang(player, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`, `Command {BBFF00}/${temp_string}{FF0000} don't exist! Use {BBFF00}/help{FF0000} or {BBFF00}/cmds{FF0000}!`));
+        else player.SendClientMessage(data.colors.RED, Lang(player, `Comanda {BBFF00}/${cmdtext}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`, `Command {BBFF00}/${cmdtext}{FF0000} don't exist! Use {BBFF00}/help{FF0000} or {BBFF00}/cmds{FF0000}!`));
     }
     return true;
 });  

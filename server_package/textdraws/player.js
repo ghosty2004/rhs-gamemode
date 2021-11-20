@@ -6,8 +6,24 @@ const {
 } = require("samp-node-lib");
 
 module.exports = {
+    targets_points: null,
     date: null,
     Load: function(player) {
+        /* Targets Points TextDraw */
+        this.targets_points = CreatePlayerTextDraw(player.playerid, 637.000000, 396.000000, "~r~~h~Points: ~w~~h~0");
+        PlayerTextDrawLetterSize(player.playerid, this.targets_points, 0.359999, 1.599999);
+        PlayerTextDrawTextSize(player.playerid, this.targets_points, 1280.000000, 1280.000000);
+        PlayerTextDrawAlignment(player.playerid, this.targets_points, 3);
+        PlayerTextDrawColor(player.playerid, this.targets_points, 0xFF0000FF);
+        PlayerTextDrawUseBox(player.playerid, this.targets_points, 0);
+        PlayerTextDrawBoxColor(player.playerid, this.targets_points, 0x80808080);
+        PlayerTextDrawSetShadow(player.playerid, this.targets_points, 1);
+        PlayerTextDrawSetOutline(player.playerid, this.targets_points, 0);
+        PlayerTextDrawBackgroundColor(player.playerid, this.targets_points, 0x000000FF);
+        PlayerTextDrawFont(player.playerid, this.targets_points, 3);
+        PlayerTextDrawSetProportional(player.playerid, this.targets_points, 1);
+        PlayerTextDrawSetSelectable(player.playerid, this.targets_points, 0);
+
         /* Date TextDraw */
         const d = new Date();
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];

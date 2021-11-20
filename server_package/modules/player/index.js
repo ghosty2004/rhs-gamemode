@@ -60,7 +60,11 @@ module.exports = {
                 }
             },
             Jailed: 0,
-            Last_Chat_Message: Math.floor(Date.now() / 1000)
+            Last_Chat_Message: Math.floor(Date.now() / 1000),
+            SpecialZone: {
+                Targets: false
+            },
+            TargetsPoints: 0
         }
     }
 };
