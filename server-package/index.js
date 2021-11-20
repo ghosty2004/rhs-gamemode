@@ -618,6 +618,226 @@ CMD.on("teles", (player) => {
     player.ShowPlayerDialog(Dialog.TELES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Teleports category", info, "Select", "Close");
 });
 
+CMD.on("stunts", (player) => {
+    let info = "Command\tDescription\n";
+    info += "{49FFFF}/Aa\t{BBFF00}Old Airport\n";
+    info += "{49FFFF}/LsAir\t{BBFF00}Los Santos Airport\n";
+    info += "{49FFFF}/SfAir\t{BBFF00}San Fierro Airport\n";
+    info += "{49FFFF}/Jizzy\t{BBFF00}Jizzy Stunt\n";
+    info += "{49FFFF}/Chrome\t{BBFF00}Stunt Chrome\n";
+    info += "{49FFFF}/Rc\t{BBFF00}Roller Coaster\n";
+    info += "{49FFFF}/Bmx\t{BBFF00}Stunt BMX\n";
+    info += "{49FFFF}/Mc\t{BBFF00}Monster Crash\n";
+    info += "{49FFFF}/Sstunts\t{BBFF00}Simple Stunts";
+    player.ShowPlayerDialog(Dialog.TELES_STUNTS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Stunts", info, "Teleport", "Back");
+});
+
+CMD.on("jumps", (player) => {
+    let info = "Command\tDescription\n";
+    info += "{49FFFF}/Basejump\t{BBFF00}Base Jump\n";
+    info += "{49FFFF}/Gdj\t{BBFF00}Glass and Dance Jump\n";
+    info += "{49FFFF}/Wj\t{BBFF00}Water Jump\n";
+    info += "{49FFFF}/Jj\t{BBFF00}Jizzy Jump\n";
+    info += "{49FFFF}/Tr\t{BBFF00}Trampoline Jump\n";
+    info += "{49FFFF}/AaTube\t{BBFF00}Old Airport Tube\n";
+    info += "{49FFFF}/Tj\t{BBFF00}Tube Jump\n";
+    info += "{49FFFF}/Bcar\t{BBFF00}Basket Car\n";
+    info += "{49FFFF}/Bj\t{BBFF00}Building Jump";
+    player.ShowPlayerDialog(Dialog.TELES_JUMPS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Jumps Zones", info, "Teleport", "Back");
+});
+
+CMD.on("dm", (player) => {
+    let info = "Command\tDescription\tPlaying\n";
+    info += `{49FFFF}/Minigun\t{BBFF00}Minigun DeathMatch\t{00BBF6}0 Players\n`;
+    info += `{49FFFF}/De\t{BBFF00}Desert Eagle DeathMatch\t{00BBF6}0 Players\n`;
+    info += `{49FFFF}/M4\t{BBFF00}M4 DeathMatch\t{00BBF6}0 Players\n`;
+    info += `{49FFFF}/Os\t{BBFF00}One Shot DeathMatch\t{00BBF6}0 Players\n`;
+    info += `{49FFFF}/Sniper\t{BBFF00}Sniper DeathMatch\t{00BBF6}0 Players\n`;
+    info += `{49FFFF}/Mrf\t{BBFF00}Minigun-Rocket-Flame\t{00BBF6}0 Players\n`;
+    info += `{49FFFF}/GArena\t{BBFF00}Gang Arena DeathMatch\t{00BBF6}0 Players\n`;
+    info += `{49FFFF}/Oh\t{BBFF00}One Hit DeathMatch\t{00BBF6}1 Players\n`;
+    info += `{49FFFF}/Prodm\t{BBFF00}Pro DeathMatch\t{00BBF6}0 Players\n`;
+    info += `{49FFFF}/Helldm\t{BBFF00}Hell DeathMatch\t{00BBF6}0 Players\n`;
+    info += `{49FFFF}/GunWar\t{BBFF00}Gun War DeathMatch\t{00BBF6}0 Players`;
+    player.ShowPlayerDialog(Dialog.TELES_DM, samp.DIALOG_STYLE.TABLIST_HEADERS, "Death match zone", info, "Teleport", "Back");
+});
+
+CMD.on("int", (player) => {
+
+});
+
+CMD.on("drifts", (player) => {
+    let info = "";
+    info += "{0072FF}/Drift 1\n";
+    info += "{0072FF}/Drift 2\n";
+    info += "{FF0000}/Drift 3\n";
+    info += "{FF0000}/Drift 4\n";
+    info += "{FF0000}/Drift 5\n";
+    info += "{FFFF00}/Drift 6\n";
+    info += "{FFFF00}/LvAir";
+    player.ShowPlayerDialog(Dialog.TELES_DRIFTS, samp.DIALOG_STYLE.LIST, "Drifts", info, "Teleport", "Back");
+});
+
+CMD.on("races", (player) => {
+
+});
+
+CMD.on("jobs", (player) => {
+    let info = "";
+    info += "{BBFF00}Truck Driver\n";
+    info += "{BBFF00}Air Pilot\n";
+    info += "{BBFF00}Pizza Boy\n";
+    info += "{BBFF00}Ambulance Driver\n";
+    info += "{BBFF00}Policeman\n";
+    info += "{BBFF00}Fisherman\n";
+    info += "{BBFF00}Hunterman";
+    player.ShowPlayerDialog(Dialog.TELES_JOBS, samp.DIALOG_STYLE.LIST, "Jobs", info, "Teleport", "Back");
+});
+
+CMD.on("minigames", (player) => {
+    let info = "Command\tDescription\n";
+    info += "{49FFFF}/Gifts\t{BBFF00}The Gifts(Reward VIP Blue)\n";
+    info += "{49FFFF}/LastMan\t{BBFF00}The Last Man Standing Alive!\n";
+    info += "{49FFFF}/Hns\t{BBFF00}Hide'n Seek\n";
+    info += "{49FFFF}/GParkour\t{BBFF00}Grove Parkour\n";
+    info += "{49FFFF}/SfParkour\t{BBFF00}San Fierro Parkour\n";
+    info += "{49FFFF}/Targets\t{BBFF00}Targets Training\n";
+    info += "{49FFFF}/SkyClimb\t{BBFF00}The Sky Climb\n";
+    info += "{49FFFF}/Derby\t{BBFF00}The Derby\n";
+    info += "{49FFFF}/Football\t{BBFF00}Play Football\n";
+    info += "{49FFFF}/Zm\t{BBFF00}Zombies vs Humans";
+    player.ShowPlayerDialog(Dialog.TELES_MINIGAMES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Minigames", info, "Teleport", "Back");
+});
+
+CMD.on("challanges", (player) => {
+    let info = "Command\tDescription\n";
+    info += "{49FFFF}/Derby\t{BBFF00}Derby\n";
+    info += "{49FFFF}/Bmx\t{BBFF00}Bmx\n";
+    info += "{49FFFF}/Quad\t{BBFF00}Quad\n";
+    info += "{49FFFF}/Karting\t{BBFF00}Karting\n";
+    info += "{49FFFF}/Monster\t{BBFF00}Monster Crash";
+    player.ShowPlayerDialog(Dialog.TELES_CHALLANGES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Challenges", info, "Teleport", "Back");
+});
+
+CMD.on("parkours", (player) => {
+    let info = "Command\tDescription\n";
+    info += "{49FFFF}/proparkour\t{BBFF00}Pro Parkour\n";
+    info += "{49FFFF}/gparkour\t{BBFF00}Grove Parkour\n";
+    info += "{49FFFF}/sfparkour\t{BBFF00}San Fierro Parkour\n";
+    info += "{49FFFF}/cpk\t{BBFF00}City Parkour";
+    player.ShowPlayerDialog(Dialog.TELES_PARKOURS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Parkours Teleports", info, "Teleport", "Back");
+});
+
+CMD.on("partys", (player) => {
+    let info = "Command\tDescription\n";
+    info += "{49FFFF}/Party\t{BBFF00}Party\n";
+    info += "{49FFFF}/Bamboo\t{BBFF00}Bamboo Club\n";
+    info += "{49FFFF}/Bar\t{BBFF00}Party Bar\n";
+    info += "{49FFFF}/Minecraft\t{BBFF00}Party Minecraft\n";
+    info += "{49FFFF}/Island\t{BBFF00}Island";
+    player.ShowPlayerDialog(Dialog.TELES_PARTYS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Partys", info, "Teleport", "Back");
+});
+
+CMD.on("splaces", (player) => {
+    let info = "Command\tDescription\n";
+    info += "{49FFFF}/Bamboo\t{BBFF00}Bamboo Club\n";
+    info += "{49FFFF}/Drag\t{BBFF00}Drag Race\n";
+    info += "{49FFFF}/Airship\t{BBFF00}Airship\n";
+    info += "{49FFFF}/Jungle\t{BBFF00}Jungle\n";
+    info += "{49FFFF}/Paradise\t{BBFF00}Paradise\n";
+    info += "{49FFFF}/Bahamas\t{BBFF00}Bahamas\n";
+    info += "{49FFFF}/VipIsland\t{BBFF00}VIP Island\n";
+    info += "{49FFFF}/Drag2\t{BBFF00}Drag Race 2\n";
+    info += "{49FFFF}/Pirateland\t{BBFF00}Pirateland\n";
+    info += "{49FFFF}/Planes\t{BBFF00}Planes Airport\n";
+    info += "{49FFFF}/Atlantis\t{BBFF00}Atlantis\n";
+    info += "{49FFFF}/Rec\t{BBFF00}Recruitment Zone\n";
+    info += "{49FFFF}/Th\t{BBFF00}Tree House\n";
+    info += "{49FFFF}/Spiral\t{BBFF00}Spiral\n";
+    info += "{49FFFF}/Smash\t{BBFF00}Smash\n";
+    info += "{49FFFF}/Showroom\t{BBFF00}Show Room\n";
+    info += "{49FFFF}/Market\t{BBFF00}Market\n";
+    info += "{49FFFF}/Justglass\t{BBFF00}Just Glass\n";
+    info += "{49FFFF}/Drag3\t{BBFF00}Drag Race 3";
+    player.ShowPlayerDialog(Dialog.TELES_SPECIAL_PLACES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Special Places", info, "Teleport", "Back");
+});
+
+CMD.on("others", (player) => {
+    let info = "Command\tDescription\n";
+    info += "{49FFFF}/Ls\t{BBFF00}Los Santos\n";
+    info += "{49FFFF}/Sf\t{BBFF00}San Fierro\n";
+    info += "{49FFFF}/Lv\t{BBFF00}Las Venturas\n";
+    info += "{49FFFF}/Lvps\t{BBFF00}Las Venturas Pay and Spray\n";
+    info += "{49FFFF}/Lv4d\t{BBFF00}Four Dragos Casino\n";
+    info += "{49FFFF}/Lvstrip\t{BBFF00}Las Venturas Strip\n";
+    info += "{49FFFF}/Lvpd\t{BBFF00}Las Venturas Police Dep\n";
+    info += "{49FFFF}/Lvtrans\t{BBFF00}Las Venturas Transfender\n";
+    info += "{49FFFF}/Sfps\t{BBFF00}San Fierro Pay and Spray\n";
+    info += "{49FFFF}/Sftrain\t{BBFF00}San Fierro Train\n";
+    info += "{49FFFF}/Lspool\t{BBFF00}Los Santos Pool\n";
+    info += "{49FFFF}/Maddog\t{BBFF00}Madd Dog's House\n";
+    info += "{49FFFF}/Vinewood\t{BBFF00}Vinewood\n";
+    info += "{49FFFF}/Beach\t{BBFF00}Santa Maria Beach\n";
+    info += "{49FFFF}/Grove\t{BBFF00}Grove Street\n";
+    info += "{49FFFF}/Pimps\t{BBFF00}Pimps\n";
+    info += "{49FFFF}/Chilliad\t{BBFF00}Mount Chilliad\n";
+    info += "{49FFFF}/Lvpd\t{BBFF00}Las Venturas PD\n";
+    info += "{49FFFF}/Lspd\t{BBFF00}Los Santos PD\n";
+    info += "{49FFFF}/Sfpd\t{BBFF00}San Fierro PD\n";
+    info += "{49FFFF}/Dam\t{BBFF00}Dam\n";
+    info += "{49FFFF}/Hut\t{BBFF00}Forest Hut\n";
+    info += "{49FFFF}/Desertramp\t{BBFF00}Desert Ramp\n";
+    info += "{49FFFF}/Disco\t{BBFF00}Alhambra Club\n";
+    info += "{49FFFF}/Lssp\t{BBFF00}Los Santos Spawn Place\n";
+    info += "{49FFFF}/Lst\t{BBFF00}Los Santos Trains\n";
+    info += "{49FFFF}/Lvt\t{BBFF00}Las Venturas Trains\n";
+    info += "{49FFFF}/Sft\t{BBFF00}San Fierro Trains\n";
+    info += "{49FFFF}/Sffire\t{BBFF00}SF Fire Departament\n";
+    info += "{49FFFF}/Lsammu\t{BBFF00}Los Santos Ammunation\n";
+    info += "{49FFFF}/Lvammu\t{BBFF00}Las Venturas Ammunation\n";
+    info += "{49FFFF}/Sfammu\t{BBFF00}San Fierro Ammunation\n";
+    info += "{49FFFF}/Sfh\t{BBFF00}San Fierro Hospital\n";
+    info += "{49FFFF}/Quarry\t{BBFF00}Quarry\n";
+    info += "{49FFFF}/a51\t{BBFF00}A51\n";
+    info += "{49FFFF}/lvchina\t{BBFF00}Las Venturas China\n";
+    info += "{49FFFF}/lvsp\t{BBFF00}Las Venturas Spawn Place";
+    player.ShowPlayerDialog(Dialog.TELES_OTHERS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Other Teleports", info, "Teleport", "Back");
+});
+
+CMD.on("sstunts", (player) => {
+    let info = "";
+    info += "{0072FF}Simple Stunt 1\n";
+    info += "{0072FF}Simple Stunt 2\n";
+    info += "{0072FF}Simple Stunt 3\n";
+    info += "{0072FF}Simple Stunt 4\n";
+    info += "{0072FF}Simple Stunt 5\n";
+    info += "{0072FF}Simple Stunt 6\n";
+    info += "{0072FF}Simple Stunt 7\n";
+    info += "{0072FF}Simple Stunt 8\n";
+    info += "{0072FF}Simple Stunt 9\n";
+    info += "{FFFF00}Simple Stunt 10\n";
+    info += "{FFFF00}Simple Stunt 11\n";
+    info += "{FFFF00}Simple Stunt 12\n";
+    info += "{FFFF00}Simple Stunt 13\n";
+    info += "{FFFF00}Simple Stunt 14\n";
+    info += "{FFFF00}Simple Stunt 15\n";
+    info += "{FFFF00}Simple Stunt 16\n";
+    info += "{FFFF00}Simple Stunt 17\n";
+    info += "{FFFF00}Simple Stunt 18\n";
+    info += "{FFFF00}Simple Stunt 19\n";
+    info += "{FFFF00}Simple Stunt 20\n";
+    info += "{FFFF00}Simple Stunt 21\n";
+    info += "{FF0000}Simple Stunt 22\n";
+    info += "{FF0000}Simple Stunt 23\n";
+    info += "{FF0000}Simple Stunt 24\n";
+    info += "{FF0000}Simple Stunt 25\n";
+    info += "{FF0000}Simple Stunt 26\n";
+    info += "{FF0000}Simple Stunt 27\n";
+    info += "{FF0000}Simple Stunt 28\n";
+    info += "{FF0000}Simple Stunt 29";
+    player.ShowPlayerDialog(Dialog.TELES_SIMPLE_STUNTS, samp.DIALOG_STYLE.LIST, "Simple Stunts", info, "Teleport", "Back");
+});
+
 /* ============= */
 /* VIPS Commands */
 /* ============= */
@@ -1386,10 +1606,10 @@ CMD.on("createteleport", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
-function TelePlayer(player, name, position_x, position_y, position_z, facing_angle) {
-    player.GameTextForPlayer(`~y~~h~Welcome to~n~~g~~h~${name}`, 4000, 3);
-    player.SetPlayerPos(position_x, position_y, position_z);
-    player.SetPlayerFacingAngle(facing_angle);
+function TelePlayer(player, command_name) {
+    player.GameTextForPlayer(`~y~~h~Welcome to~n~~g~~h~${Teleport.Info[command_name].name}`, 4000, 3);
+    player.SetPlayerPos(Teleport.Info[command_name].position[0], Teleport.Info[command_name].position[1], Teleport.Info[command_name].position[2]);
+    player.SetPlayerFacingAngle(Teleport.Info[command_name].position[3]);
 }
 
 function CheckCustomChat(player, text) {
@@ -2246,221 +2466,59 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             if(response) {
                 switch(listitem) {
                     case 0: { /* Stunts */
-                        let info = "Command\tDescription\n";
-                        info += "{49FFFF}/Aa\t{BBFF00}Old Airport\n";
-                        info += "{49FFFF}/LsAir\t{BBFF00}Los Santos Airport\n";
-                        info += "{49FFFF}/SfAir\t{BBFF00}San Fierro Airport\n";
-                        info += "{49FFFF}/Jizzy\t{BBFF00}Jizzy Stunt\n";
-                        info += "{49FFFF}/Chrome\t{BBFF00}Stunt Chrome\n";
-                        info += "{49FFFF}/Rc\t{BBFF00}Roller Coaster\n";
-                        info += "{49FFFF}/Bmx\t{BBFF00}Stunt BMX\n";
-                        info += "{49FFFF}/Mc\t{BBFF00}Monster Crash\n";
-                        info += "{49FFFF}/Sstunts\t{BBFF00}Simple Stunts";
-                        player.ShowPlayerDialog(Dialog.TELES_STUNTS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Stunts", info, "Teleport", "Back");
+                        CMD.emit("stunts", player);
                         break;
                     }
                     case 1: { /* Jumps */
-                        let info = "Command\tDescription\n";
-                        info += "{49FFFF}/Basejump\t{BBFF00}Base Jump\n";
-                        info += "{49FFFF}/Gdj\t{BBFF00}Glass and Dance Jump\n";
-                        info += "{49FFFF}/Wj\t{BBFF00}Water Jump\n";
-                        info += "{49FFFF}/Jj\t{BBFF00}Jizzy Jump\n";
-                        info += "{49FFFF}/Tr\t{BBFF00}Trampoline Jump\n";
-                        info += "{49FFFF}/AaTube\t{BBFF00}Old Airport Tube\n";
-                        info += "{49FFFF}/Tj\t{BBFF00}Tube Jump\n";
-                        info += "{49FFFF}/Bcar\t{BBFF00}Basket Car\n";
-                        info += "{49FFFF}/Bj\t{BBFF00}Building Jump";
-                        player.ShowPlayerDialog(Dialog.TELES_JUMPS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Jumps Zones", info, "Teleport", "Back");
+                        CMD.emit("jumps", player);
                         break;
                     }
                     case 2: { /* Death Matchs */
-                        let info = "Command\tDescription\tPlaying\n";
-                        info += `{49FFFF}/Minigun\t{BBFF00}Minigun DeathMatch\t{00BBF6}0 Players\n`;
-                        info += `{49FFFF}/De\t{BBFF00}Desert Eagle DeathMatch\t{00BBF6}0 Players\n`;
-                        info += `{49FFFF}/M4\t{BBFF00}M4 DeathMatch\t{00BBF6}0 Players\n`;
-                        info += `{49FFFF}/Os\t{BBFF00}One Shot DeathMatch\t{00BBF6}0 Players\n`;
-                        info += `{49FFFF}/Sniper\t{BBFF00}Sniper DeathMatch\t{00BBF6}0 Players\n`;
-                        info += `{49FFFF}/Mrf\t{BBFF00}Minigun-Rocket-Flame\t{00BBF6}0 Players\n`;
-                        info += `{49FFFF}/GArena\t{BBFF00}Gang Arena DeathMatch\t{00BBF6}0 Players\n`;
-                        info += `{49FFFF}/Oh\t{BBFF00}One Hit DeathMatch\t{00BBF6}1 Players\n`;
-                        info += `{49FFFF}/Prodm\t{BBFF00}Pro DeathMatch\t{00BBF6}0 Players\n`;
-                        info += `{49FFFF}/Helldm\t{BBFF00}Hell DeathMatch\t{00BBF6}0 Players\n`;
-                        info += `{49FFFF}/GunWar\t{BBFF00}Gun War DeathMatch\t{00BBF6}0 Players`;
-                        player.ShowPlayerDialog(Dialog.TELES_DM, samp.DIALOG_STYLE.TABLIST_HEADERS, "Death match zone", info, "Teleport", "Back");
+                        CMD.emit("dm", player);
                         break;
                     }
                     case 3: { /* Interiors */
+                        CMD.emit("int", player);
                         break;
                     }
                     case 4: { /* Drifts */
-                        let info = "";
-                        info += "{0072FF}/Drift 1\n";
-                        info += "{0072FF}/Drift 2\n";
-                        info += "{FF0000}/Drift 3\n";
-                        info += "{FF0000}/Drift 4\n";
-                        info += "{FF0000}/Drift 5\n";
-                        info += "{FFFF00}/Drift 6\n";
-                        info += "{FFFF00}/LvAir";
-                        player.ShowPlayerDialog(Dialog.TELES_DRIFTS, samp.DIALOG_STYLE.LIST, "Drifts", info, "Teleport", "Back");
+                        CMD.emit("drifts", player);
                         break;
                     }
                     case 5: { /* Races */
+                        CMD.emit("races", player);
                         break;
                     }
                     case 6: { /* Jobs */
-                        let info = "";
-                        info += "{BBFF00}Truck Driver\n";
-                        info += "{BBFF00}Air Pilot\n";
-                        info += "{BBFF00}Pizza Boy\n";
-                        info += "{BBFF00}Ambulance Driver\n";
-                        info += "{BBFF00}Policeman\n";
-                        info += "{BBFF00}Fisherman\n";
-                        info += "{BBFF00}Hunterman";
-                        player.ShowPlayerDialog(Dialog.TELES_JOBS, samp.DIALOG_STYLE.LIST, "Jobs", info, "Teleport", "Back");
+                        CMD.emit("jobs", player);
                         break;
                     }
                     case 7: { /* Minigames */
-                        let info = "Command\tDescription\n";
-                        info += "{49FFFF}/Gifts\t{BBFF00}The Gifts(Reward VIP Blue)\n";
-                        info += "{49FFFF}/LastMan\t{BBFF00}The Last Man Standing Alive!\n";
-                        info += "{49FFFF}/Hns\t{BBFF00}Hide'n Seek\n";
-                        info += "{49FFFF}/GParkour\t{BBFF00}Grove Parkour\n";
-                        info += "{49FFFF}/SfParkour\t{BBFF00}San Fierro Parkour\n";
-                        info += "{49FFFF}/Targets\t{BBFF00}Targets Training\n";
-                        info += "{49FFFF}/SkyClimb\t{BBFF00}The Sky Climb\n";
-                        info += "{49FFFF}/Derby\t{BBFF00}The Derby\n";
-                        info += "{49FFFF}/Football\t{BBFF00}Play Football\n";
-                        info += "{49FFFF}/Zm\t{BBFF00}Zombies vs Humans";
-                        player.ShowPlayerDialog(Dialog.TELES_MINIGAMES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Minigames", info, "Teleport", "Back");
+                        CMD.emit("minigames", player);
                         break;
                     }
                     case 8: { /* Challenges */
-                        let info = "Command\tDescription\n";
-                        info += "{49FFFF}/Derby\t{BBFF00}Derby\n";
-                        info += "{49FFFF}/Bmx\t{BBFF00}Bmx\n";
-                        info += "{49FFFF}/Quad\t{BBFF00}Quad\n";
-                        info += "{49FFFF}/Karting\t{BBFF00}Karting\n";
-                        info += "{49FFFF}/Monster\t{BBFF00}Monster Crash";
-                        player.ShowPlayerDialog(Dialog.TELES_CHALLANGES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Challenges", info, "Teleport", "Back");
+                        CMD.emit("challanges", player);
                         break;
                     }
                     case 9: { /* Parkours */
-                        let info = "Command\tDescription\n";
-                        info += "{49FFFF}/proparkour\t{BBFF00}Pro Parkour\n";
-                        info += "{49FFFF}/gparkour\t{BBFF00}Grove Parkour\n";
-                        info += "{49FFFF}/sfparkour\t{BBFF00}San Fierro Parkour\n";
-                        info += "{49FFFF}/cpk\t{BBFF00}City Parkour";
-                        player.ShowPlayerDialog(Dialog.TELES_PARKOURS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Parkours Teleports", info, "Teleport", "Back");
+                        CMD.emit("parkours", player);
                         break;
                     }
                     case 10: { /* Partys */
-                        let info = "Command\tDescription\n";
-                        info += "{49FFFF}/Party\t{BBFF00}Party\n";
-                        info += "{49FFFF}/Bamboo\t{BBFF00}Bamboo Club\n";
-                        info += "{49FFFF}/Bar\t{BBFF00}Party Bar\n";
-                        info += "{49FFFF}/Minecraft\t{BBFF00}Party Minecraft\n";
-                        info += "{49FFFF}/Island\t{BBFF00}Island";
-                        player.ShowPlayerDialog(Dialog.TELES_PARTYS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Partys", info, "Teleport", "Back");
+                        CMD.emit("partys", player);
                         break;
                     }
                     case 11: { /* Special Places */
-                        let info = "Command\tDescription\n";
-                        info += "{49FFFF}/Bamboo\t{BBFF00}Bamboo Club\n";
-                        info += "{49FFFF}/Drag\t{BBFF00}Drag Race\n";
-                        info += "{49FFFF}/Airship\t{BBFF00}Airship\n";
-                        info += "{49FFFF}/Jungle\t{BBFF00}Jungle\n";
-                        info += "{49FFFF}/Paradise\t{BBFF00}Paradise\n";
-                        info += "{49FFFF}/Bahamas\t{BBFF00}Bahamas\n";
-                        info += "{49FFFF}/VipIsland\t{BBFF00}VIP Island\n";
-                        info += "{49FFFF}/Drag2\t{BBFF00}Drag Race 2\n";
-                        info += "{49FFFF}/Pirateland\t{BBFF00}Pirateland\n";
-                        info += "{49FFFF}/Planes\t{BBFF00}Planes Airport\n";
-                        info += "{49FFFF}/Atlantis\t{BBFF00}Atlantis\n";
-                        info += "{49FFFF}/Rec\t{BBFF00}Recruitment Zone\n";
-                        info += "{49FFFF}/Th\t{BBFF00}Tree House\n";
-                        info += "{49FFFF}/Spiral\t{BBFF00}Spiral\n";
-                        info += "{49FFFF}/Smash\t{BBFF00}Smash\n";
-                        info += "{49FFFF}/Showroom\t{BBFF00}Show Room\n";
-                        info += "{49FFFF}/Market\t{BBFF00}Market\n";
-                        info += "{49FFFF}/Justglass\t{BBFF00}Just Glass\n";
-                        info += "{49FFFF}/Drag3\t{BBFF00}Drag Race 3";
-                        player.ShowPlayerDialog(Dialog.TELES_SPECIAL_PLACES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Special Places", info, "Teleport", "Back");
+                        CMD.emit("splaces", player);
                         break;
                     }
                     case 12: { /* Others */
-                        let info = "Command\tDescription\n";
-                        info += "{49FFFF}/Ls\t{BBFF00}Los Santos\n";
-                        info += "{49FFFF}/Sf\t{BBFF00}San Fierro\n";
-                        info += "{49FFFF}/Lv\t{BBFF00}Las Venturas\n";
-                        info += "{49FFFF}/Lvps\t{BBFF00}Las Venturas Pay and Spray\n";
-                        info += "{49FFFF}/Lv4d\t{BBFF00}Four Dragos Casino\n";
-                        info += "{49FFFF}/Lvstrip\t{BBFF00}Las Venturas Strip\n";
-                        info += "{49FFFF}/Lvpd\t{BBFF00}Las Venturas Police Dep\n";
-                        info += "{49FFFF}/Lvtrans\t{BBFF00}Las Venturas Transfender\n";
-                        info += "{49FFFF}/Sfps\t{BBFF00}San Fierro Pay and Spray\n";
-                        info += "{49FFFF}/Sftrain\t{BBFF00}San Fierro Train\n";
-                        info += "{49FFFF}/Lspool\t{BBFF00}Los Santos Pool\n";
-                        info += "{49FFFF}/Maddog\t{BBFF00}Madd Dog's House\n";
-                        info += "{49FFFF}/Vinewood\t{BBFF00}Vinewood\n";
-                        info += "{49FFFF}/Beach\t{BBFF00}Santa Maria Beach\n";
-                        info += "{49FFFF}/Grove\t{BBFF00}Grove Street\n";
-                        info += "{49FFFF}/Pimps\t{BBFF00}Pimps\n";
-                        info += "{49FFFF}/Chilliad\t{BBFF00}Mount Chilliad\n";
-                        info += "{49FFFF}/Lvpd\t{BBFF00}Las Venturas PD\n";
-                        info += "{49FFFF}/Lspd\t{BBFF00}Los Santos PD\n";
-                        info += "{49FFFF}/Sfpd\t{BBFF00}San Fierro PD\n";
-                        info += "{49FFFF}/Dam\t{BBFF00}Dam\n";
-                        info += "{49FFFF}/Hut\t{BBFF00}Forest Hut\n";
-                        info += "{49FFFF}/Desertramp\t{BBFF00}Desert Ramp\n";
-                        info += "{49FFFF}/Disco\t{BBFF00}Alhambra Club\n";
-                        info += "{49FFFF}/Lssp\t{BBFF00}Los Santos Spawn Place\n";
-                        info += "{49FFFF}/Lst\t{BBFF00}Los Santos Trains\n";
-                        info += "{49FFFF}/Lvt\t{BBFF00}Las Venturas Trains\n";
-                        info += "{49FFFF}/Sft\t{BBFF00}San Fierro Trains\n";
-                        info += "{49FFFF}/Sffire\t{BBFF00}SF Fire Departament\n";
-                        info += "{49FFFF}/Lsammu\t{BBFF00}Los Santos Ammunation\n";
-                        info += "{49FFFF}/Lvammu\t{BBFF00}Las Venturas Ammunation\n";
-                        info += "{49FFFF}/Sfammu\t{BBFF00}San Fierro Ammunation\n";
-                        info += "{49FFFF}/Sfh\t{BBFF00}San Fierro Hospital\n";
-                        info += "{49FFFF}/Quarry\t{BBFF00}Quarry\n";
-                        info += "{49FFFF}/a51\t{BBFF00}A51\n";
-                        info += "{49FFFF}/lvchina\t{BBFF00}Las Venturas China\n";
-                        info += "{49FFFF}/lvsp\t{BBFF00}Las Venturas Spawn Place";
-                        player.ShowPlayerDialog(Dialog.TELES_OTHERS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Other Teleports", info, "Teleport", "Back");
+                        CMD.emit("others", player);
                         break;
                     }
                     case 13: { /* Simple Stunts */
-                        let info = "";
-                        info += "{0072FF}Simple Stunt 1\n";
-                        info += "{0072FF}Simple Stunt 2\n";
-                        info += "{0072FF}Simple Stunt 3\n";
-                        info += "{0072FF}Simple Stunt 4\n";
-                        info += "{0072FF}Simple Stunt 5\n";
-                        info += "{0072FF}Simple Stunt 6\n";
-                        info += "{0072FF}Simple Stunt 7\n";
-                        info += "{0072FF}Simple Stunt 8\n";
-                        info += "{0072FF}Simple Stunt 9\n";
-                        info += "{FFFF00}Simple Stunt 10\n";
-                        info += "{FFFF00}Simple Stunt 11\n";
-                        info += "{FFFF00}Simple Stunt 12\n";
-                        info += "{FFFF00}Simple Stunt 13\n";
-                        info += "{FFFF00}Simple Stunt 14\n";
-                        info += "{FFFF00}Simple Stunt 15\n";
-                        info += "{FFFF00}Simple Stunt 16\n";
-                        info += "{FFFF00}Simple Stunt 17\n";
-                        info += "{FFFF00}Simple Stunt 18\n";
-                        info += "{FFFF00}Simple Stunt 19\n";
-                        info += "{FFFF00}Simple Stunt 20\n";
-                        info += "{FFFF00}Simple Stunt 21\n";
-                        info += "{FF0000}Simple Stunt 22\n";
-                        info += "{FF0000}Simple Stunt 23\n";
-                        info += "{FF0000}Simple Stunt 24\n";
-                        info += "{FF0000}Simple Stunt 25\n";
-                        info += "{FF0000}Simple Stunt 26\n";
-                        info += "{FF0000}Simple Stunt 27\n";
-                        info += "{FF0000}Simple Stunt 28\n";
-                        info += "{FF0000}Simple Stunt 29";
-                        player.ShowPlayerDialog(Dialog.TELES_SIMPLE_STUNTS, samp.DIALOG_STYLE.LIST, "Simple Stunts", info, "Teleport", "Back");
+                        CMD.emit("sstunts", player);
                         break;
                     }
                 }
@@ -2748,7 +2806,7 @@ samp.OnPlayerCommandText((player, cmdtext) => {
         let temp_string = params[0];
         params.shift();
         if(Teleport.Exists(temp_string)) {
-            TelePlayer(player, Teleport.Info[temp_string].name, Teleport.Info[temp_string].position[0], Teleport.Info[temp_string].position[1], Teleport.Info[temp_string].position[2], Teleport.Info[temp_string].position[3]);
+            TelePlayer(player, temp_string);
         }
         else if(CMD.eventNames().some(s => s == temp_string)) {
             CMD.emit(`${temp_string}`, player, params);
