@@ -24,6 +24,7 @@ const LS = require("./others/ls");
 const LV = require("./others/lv");
 const LVTrans = require("./others/lvtrans");
 const Pimps = require("./others/pimps");
+const Quarry = require("./others/quarry.js");
 const SF = require("./others/sf");
 const Spawn = require("./others/spawn");
 const Voller = require("./others/voller");
@@ -50,6 +51,7 @@ module.exports = {
         LV.Load();
         LVTrans.Load();
         Pimps.Load();
+        Quarry.Load();
         SF.Load();
         Spawn.Load();
         Voller.Load();
