@@ -1,4 +1,4 @@
-const { callPublic, OBJECT_MATERIAL_SIZE, getPlayers } = require("samp-node-lib");
+const { callPublic, OBJECT_MATERIAL_SIZE, getPlayers, SampEvents } = require("samp-node-lib");
 
 module.exports = {
     CreateDynamicObject: function(modelid, x, y, z, rx, ry, rz, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 1000, drawdistance = 1000, areaid = -1, priority = 0) {
@@ -26,8 +26,10 @@ module.exports = {
     IsValidDynamicPickup: function(pickupid) {
         return callPublic("_IsValidDynamicPickup", "i", pickupid);
     },
-    CreateDynamic3DTextLabel: function(text, color, x, y, z, drawdistance) {
-        let value = callPublic("_CreateDynamic3DTextLabel", "siffff", text, color, x, y, z, drawdistance);
+    CreateDynamic3DTextLabel: function(text, color, x, y, z, drawdistance, attachedplayer=-1, attachedvehicle=-1, testlos=false, worldid=-1, interiorid=-1) {
+        if(attachedplayer == -1) attachedplayer = 0xFFFF;
+        if(attachedvehicle == -1) attachedvehicle = 0xFFFF;
+        let value = callPublic("_CreateDynamic3DTextLabel", "siffffiiiii", text, color, x, y, z, drawdistance, attachedplayer, attachedvehicle, testlos, worldid, interiorid);
         return value;
     },
     DestroyDynamic3DTextLabel: function(id) {

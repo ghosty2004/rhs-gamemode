@@ -42,9 +42,9 @@ forward _IsValidDynamicPickup(STREAMER_TAG_PICKUP:pickupid);
 public _IsValidDynamicPickup(STREAMER_TAG_PICKUP:pickupid) { return IsValidDynamicPickup(STREAMER_TAG_PICKUP:pickupid); }
 
 // => 3D Text Labels
-forward _CreateDynamic3DTextLabel(text[], color, Float:x, Float:y, Float:z, Float:drawdistance);
-public _CreateDynamic3DTextLabel(text[], color, Float:x, Float:y, Float:z, Float:drawdistance) { 
-    return CreateDynamic3DTextLabel(text, color, Float:x, Float:y, Float:z, Float:drawdistance); 
+forward _CreateDynamic3DTextLabel(text[], color, Float:x, Float:y, Float:z, Float:drawdistance, attachedplayer, attachedvehicle, testlos, worldid, interiorid);
+public _CreateDynamic3DTextLabel(text[], color, Float:x, Float:y, Float:z, Float:drawdistance, attachedplayer, attachedvehicle, testlos, worldid, interiorid) { 
+    return CreateDynamic3DTextLabel(text, color, Float:x, Float:y, Float:z, Float:drawdistance, attachedplayer, attachedvehicle, testlos, worldid, interiorid); 
 }
 
 forward _DestroyDynamic3DTextLabel(STREAMER_TAG_3D_TEXT_LABEL:id);
