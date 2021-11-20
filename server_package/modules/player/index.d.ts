@@ -14,6 +14,7 @@ export declare const Info: {
     },
     ConnectTime: number,
     Admin: number,
+    RconType: number,
     VIP: number,
     VIP_Expire: number,
     Clan: number,

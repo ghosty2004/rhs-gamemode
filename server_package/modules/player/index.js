@@ -15,6 +15,7 @@ module.exports = {
             },
             ConnectTime: Date.now(),
             Admin: 0,
+            RconType: 0,
             VIP: 0,
             VIP_Expire: 0,
             Clan: 0,
