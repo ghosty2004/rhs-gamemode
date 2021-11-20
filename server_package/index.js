@@ -1794,7 +1794,6 @@ function UpdatePlayerDB(player, column, value) {
 }
 
 function SetupPlayerForSpawn(player, type=0) { 
-    console.log(`setting up spawn for ${player.GetPlayerName(24)}`);
     player.SetPlayerColor(0xFFFFFFAA);
     player.SetPlayerSkin(0);
     player.ResetPlayerWeapons();
@@ -2196,6 +2195,8 @@ function LoadPlayerStats(player) {
         if(!err && result) {  
             Player.Info[player.playerid].LoggedIn = true;
 
+            player.SpawnPlayer();
+
             Player.Info[player.playerid].AccID = result[0].ID;
             Player.Info[player.playerid].Mail = result[0].mail;
             Player.Info[player.playerid].Admin = result[0].admin;
@@ -2222,10 +2223,7 @@ function LoadPlayerStats(player) {
                 info += "{FFFFFF}Pentru a evita pierderea contului tau,\n";
                 info += "{FFFFFF}Adauga o parola secundara folosind comanda {FF0000}/Spassword{FFFFFF}!";
             }
-
             player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
-
-            //player.SpawnPlayer();
         }
         else player.Kick();
     });
@@ -2242,6 +2240,10 @@ samp.OnGameModeInit(() => {
     Maps.Load(); /* Load Server Maps */
     TextDraws.server.Load(); /* Load Server TextDraws */
     Minigames.Load(); /* Load Server Minigames */
+
+    samp.AddPlayerClass(0, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0);
+
+    return true;
 });
 
 samp.OnGameModeExit(() => {
@@ -2275,10 +2277,10 @@ samp.OnPlayerConnect((player) => {
 });
 
 samp.OnPlayerDisconnect((player, reason) => {
+    savePlayer(player);
     Player.ResetVariables(player);
     HideConnectTextDraw(player);
     HideSpawnTextDraw(player);
-    savePlayer(player);
 
     let reason_string = "";
     switch(reason) {
@@ -2288,16 +2290,6 @@ samp.OnPlayerDisconnect((player, reason) => {
     }
     AddToTDLogs(`~r~~h~${player.GetPlayerName(24)}(${player.playerid}) ~w~~h~has left the server ${reason_string}!`);
     return true;
-});
-
-samp.OnPlayerSpawn((player) => {
-    if(!Player.Info[player.playerid].LoggedIn) return player.Kick();
-    HideConnectTextDraw(player);
-    ShowSpawnTextDraw(player);
-    if(Player.Info[player.playerid].Mail == "none") {
-        player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
-    }
-    SetupPlayerForSpawn(player);
 });
 
 samp.OnPlayerUpdate((player) => {
@@ -2780,7 +2772,8 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.ADD_MAIL: {
             if(response) {
                 if(validateEmail(inputtext)) {
-                    player.SendClientMessage(player, data.colors.YELLOW, Lang(player, `Ti-ai adaugat cu succes E-Mail-ul {FF0000}${inputtext} {FFFF00}in Cont!`, `You have successfully added the {FF0000}${inputtext} {FFFF00}E-Mail in your Account!`));
+                    player.SendClientMessage(data.colors.YELLOW, Lang(player, `Ti-ai adaugat cu succes E-Mail-ul {FF0000}${inputtext} {FFFF00}in Cont!`, `You have successfully added the {FF0000}${inputtext} {FFFF00}E-Mail in your Account!`));
+                    Player.Info[player.playerid].Mail = inputtext;
                 }
                 else player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
             }
@@ -2904,3 +2897,14 @@ samp.OnPlayerCommandText((player, cmdtext) => {
     }
     return true;
 });  
+
+samp.OnPlayerSpawn((player) => {
+    if(!Player.Info[player.playerid].LoggedIn) return player.Kick();
+    HideConnectTextDraw(player);
+    ShowSpawnTextDraw(player);
+    if(Player.Info[player.playerid].Mail == "none") {
+        player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
+    }
+    SetupPlayerForSpawn(player);
+    return true;
+});
