@@ -1368,22 +1368,19 @@ CMD.on("setall", (player, params) => {
 /* Rcons Commands */
 /* ============== */
 CMD.on("createteleport", (player, params) => {
-    try {
-        if(params[0] && params.slice(1).join(" ")) {
-            if(!Teleport.Exists(params[0])) {
-                params[0] = params[0].replace("/", "");
-                con.query("INSERT INTO teleports (command, name, position) VALUES(?, ?, ?)", [params[0], params.slice(1).join(" "), JSON.stringify([player.position.x, player.position.y, player.position.z, player.position.angle])], function(err, result) {
-                    if(!err) {
-                        Teleport.Create(result.insertId, params[0], params.slice(1).join(" "), [player.position.x, player.position.y, player.position.z, player.position.angle]);
-                        player.SendClientMessage(data.colors.LIGHT_YELLOW, `You have successfully created teleport {FFFFFF}/${params[0]} {BBFF00}with ID {FFFFFF}${result.insertId}{BBFF00}.`);
-                    }
-                });
-            }
-            else SendError(player, "This teleport already exists.");
+    if(params[0] && params.slice(1).join(" ")) {
+        if(!Teleport.Exists(params[0])) {
+            params[0] = params[0].replace("/", "");
+            con.query("INSERT INTO teleports (command, name, position) VALUES(?, ?, ?)", [params[0], params.slice(1).join(" "), JSON.stringify([player.position.x, player.position.y, player.position.z, player.position.angle])], function(err, result) {
+                if(!err) {
+                    Teleport.Create(result.insertId, params[0], params.slice(1).join(" "), [player.position.x, player.position.y, player.position.z, player.position.angle]);
+                    player.SendClientMessage(data.colors.LIGHT_YELLOW, `You have successfully created teleport {FFFFFF}/${params[0]} {BBFF00}with ID {FFFFFF}${result.insertId}{BBFF00}.`);
+                }
+            });
         }
-        else SendUsage(player, "/CreateTeleport [Command] [Name]");
+        else SendError(player, "This teleport already exists.");
     }
-    catch(e) { console.log(e.stack); }
+    else SendUsage(player, "/CreateTeleport [Command] [Name]");
 });
 
 /* =============== */
