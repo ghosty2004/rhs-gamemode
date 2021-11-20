@@ -1872,7 +1872,7 @@ function CheckCustomChat(player, text) {
     }
     else if(text[0] == "#") {
         if(Player.Info[player.playerid].VIP) {
-            text = text.replace("@", "");
+            text = text.replace("#", "");
             samp.getPlayers().filter(f => Player.Info[f.playerid].VIP).forEach((i) => {
                 i.SendClientMessage(data.colors.ORANGE, `VIP Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
             });
