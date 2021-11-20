@@ -19,3 +19,4 @@ node_modules/.package-lock.json
 server_package/data/mysql.js
 server_log.txt
 samp-node.log
+server.cfg

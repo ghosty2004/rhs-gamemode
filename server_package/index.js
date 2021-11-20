@@ -25,6 +25,8 @@ const Maps = require("./maps");
 /* Server TextDraws */
 const TextDraws = require("./textdraws");
 
+const ServerLogs = ["", "", ""];
+
 /* Data's */
 const data = {
     colors: require("./data/colors"),
@@ -114,7 +116,11 @@ CMD.on("spassword", (player) => {
 });
 
 CMD.on("skin", (player, params) => {
-
+    if(params[0]) {
+        params[0] = parseInt(params[0]);
+        player.SetPlayerSkin(params[0]);
+    }   
+    else SendUsage(player, "/skin [ID]");
 });
 
 CMD.on("anim", (player, params) => {
@@ -458,34 +464,44 @@ CMD.on("buyvip", (player) => {
     player.ShowPlayerDialog(Dialog.BUYVIP, samp.DIALOG_STYLE.TABLIST_HEADERS, Lang(player, "Cumpara VIP - Scrie {FF0000}/vcmds {D1D1D1}pentru comenzi.", "Buy VIP - Type {FF0000}/vcmds {D1D1D1}for commands."), info, Lang(player, "Cumpara", "Buy"), Lang(player, "Inchide", "Close"));
 });
 
-CMD.on("stats", (player) => {
-    let info = "";
-    info += "{FF4800}General statistics\n";
-    info += `{BBFF00}Money: {49FFFF}$${Player.Info[player.playerid].Money}\n`;
-    info += `{BBFF00}Coins: {49FFFF}${Player.Info[player.playerid].Money}\n`;
-    info += `{BBFF00}Respect: {49FFFF}+${Player.Info[player.playerid].Respect.Positive} {BBFF00}/ {49FFFF}-${Player.Info[player.playerid].Respect.Negative}\n`;
-    info += `{BBFF00}Online time: {49FFFF}0 {BBFF00}hrs, {49FFFF}0 {BBFF00}mins, {49FFFF}0 {BBFF00}secs\n`;
-    info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
-    info += `{BBFF00}VIP: ${Player.Info[player.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
-    info += "\n";
-    info += "{FF4800}Killer statistics\n";
-    info += `{BBFF00}Kills: {49FFFF}${Player.Info[player.playerid].Kills_Data.Kills} {BBFF00}| Headshots: {49FFFF}${Player.Info[player.playerid].Kills_Data.HeadShots}\n`;
-    info += `{BBFF00}Killing Spree: {49FFFF}${Player.Info[player.playerid].Kills_Data.KillingSpree} {BBFF00}| Best Killing Spree: {49FFFF}${Player.Info[player.playerid].Kills_Data.BestKillingSpree}\n`;
-    info += `{BBFF00}Deaths: {49FFFF}${Player.Info[player.playerid].Kills_Data.Deaths}\n`;
-    info += `{BBFF00}Killer Rank: ${getRanksRankName("kills", Player.Info[player.playerid].Kills_Data.Kills)}\n`;
-    info += "\n";
-    info += `{FF4800}Driving skills\n`;
-    info += `{BBFF00}Drift Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.DriftPoints} {BBFF00}(${getRanksRankName("drift", Player.Info[player.playerid].Driving_Data.DriftPoints)}{BBFF00})\n`;
-    info += `{BBFF00}Stunt Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.StuntPoints} {BBFF00}(${getRanksRankName("stunt", Player.Info[player.playerid].Driving_Data.StuntPoints)}{BBFF00})\n`;
-    info += `{BBFF00}Race Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.RacePoints} {BBFF00}(${getRanksRankName("race", Player.Info[player.playerid].Driving_Data.RacePoints)}{BBFF00})\n`;
-    info += "\n";
-    info += "{FF4800}Properties\n";
-    info += `{BBFF00}Business: ${Player.Info[player.playerid].Properties.Business ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
-    info += `{BBFF00}House: ${Player.Info[player.playerid].Properties.House ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
-    info += `{BBFF00}Personal Vehicle: {FF0000}No\n`;
-    info += "\n";
-    info += `{FF4800}Statistics note: {49FFFF}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob`
-    player.ShowPlayerDialog(Dialog.STATS, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${player.GetPlayerName(24)}{BBFF00}'s stats!`, info, "Ok", "Description");
+CMD.on("stats", (player, params) => {
+    try {
+        let target = player;
+        if(params[0]) target = getPlayer(params[0]);
+        if(target) {
+            let info = "";
+            info += "{FF4800}General statistics\n";
+            info += `{BBFF00}Money: {49FFFF}$${Player.Info[player.playerid].Money}\n`;
+            info += `{BBFF00}Coins: {49FFFF}${Player.Info[player.playerid].Money}\n`;
+            info += `{BBFF00}Respect: {49FFFF}+${Player.Info[player.playerid].Respect.Positive} {BBFF00}/ {49FFFF}-${Player.Info[player.playerid].Respect.Negative}\n`;
+            info += `{BBFF00}Online time: {49FFFF}0 {BBFF00}hrs, {49FFFF}0 {BBFF00}mins, {49FFFF}0 {BBFF00}secs\n`;
+            info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
+            info += `{BBFF00}VIP: ${Player.Info[player.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
+            info += "\n";
+            info += "{FF4800}Killer statistics\n";
+            info += `{BBFF00}Kills: {49FFFF}${Player.Info[player.playerid].Kills_Data.Kills} {BBFF00}| Headshots: {49FFFF}${Player.Info[player.playerid].Kills_Data.HeadShots}\n`;
+            info += `{BBFF00}Killing Spree: {49FFFF}${Player.Info[player.playerid].Kills_Data.KillingSpree} {BBFF00}| Best Killing Spree: {49FFFF}${Player.Info[player.playerid].Kills_Data.BestKillingSpree}\n`;
+            info += `{BBFF00}Deaths: {49FFFF}${Player.Info[player.playerid].Kills_Data.Deaths}\n`;
+            info += `{BBFF00}Killer Rank: ${getRanksRankName("kills", Player.Info[player.playerid].Kills_Data.Kills)}\n`;
+            info += "\n";
+            info += `{FF4800}Driving skills\n`;
+            info += `{BBFF00}Drift Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.DriftPoints} {BBFF00}(${getRanksRankName("drift", Player.Info[player.playerid].Driving_Data.DriftPoints)}{BBFF00})\n`;
+            info += `{BBFF00}Stunt Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.StuntPoints} {BBFF00}(${getRanksRankName("stunt", Player.Info[player.playerid].Driving_Data.StuntPoints)}{BBFF00})\n`;
+            info += `{BBFF00}Race Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.RacePoints} {BBFF00}(${getRanksRankName("race", Player.Info[player.playerid].Driving_Data.RacePoints)}{BBFF00})\n`;
+            info += "\n";
+            info += "{FF4800}Properties\n";
+            info += `{BBFF00}Business: ${Player.Info[player.playerid].Properties.Business ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
+            info += `{BBFF00}House: ${Player.Info[player.playerid].Properties.House ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
+            info += `{BBFF00}Personal Vehicle: {FF0000}No\n`;
+            info += "\n";
+            info += `{FF4800}Statistics note: {49FFFF}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob`
+            player.ShowPlayerDialog(Dialog.STATS, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${player.GetPlayerName(24)}{BBFF00}'s stats!`, info, "Ok", `${target == player ? "Description" : ""}`);
+        }
+        else SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    }
+    catch(e) {
+        console.log(e.stack)
+    }
 });
 
 CMD.on("help", (player) => {
@@ -1574,6 +1590,13 @@ CMD.on("setall", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function AddToTDLogs(string) {
+    ServerLogs[2] = ServerLogs[1];
+    ServerLogs[1] = ServerLogs[0];
+    ServerLogs[0] = string;
+    samp.TextDrawSetString(TextDraws.server.logs, `${ServerLogs[0]}~n~${ServerLogs[1]}~n~${ServerLogs[2]}`);
+}
+
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -1582,6 +1605,7 @@ function TelePlayer(player, command_name) {
     player.GameTextForPlayer(`~y~~h~Welcome to~n~~g~~h~${Teleport.Info[command_name].name}`, 4000, 3);
     player.SetPlayerPos(Teleport.Info[command_name].position[0], Teleport.Info[command_name].position[1], Teleport.Info[command_name].position[2]);
     player.SetPlayerFacingAngle(Teleport.Info[command_name].position[3]);
+    AddToTDLogs(`~b~~h~${player.GetPlayerName(24)} ~y~~h~has gone to ~r~~h~${Teleport.Info[command_name].name} ~b~~h~- /${command_name}`);
 }
 
 function CheckCustomChat(player, text) {
@@ -1670,7 +1694,7 @@ function getClanRank(RankID) {
 }
 
 function getPlayer(IDOrName) {
-    let result = samp.getPlayers().filter(f => f.GetPlayerName(24).toLowerCase().includes(`${toLowerCase}`.toLowerCase()) || f.playerid == IDOrName)[0];
+    let result = samp.getPlayers().filter(f => f.GetPlayerName(24).toLowerCase().includes(`${IDOrName}`.toLowerCase()) || f.playerid == IDOrName)[0];
     if(result) return result;
     else return 0;
 }
@@ -1865,6 +1889,7 @@ function getPlayerRankInChat(player) {
 function ShowSpawnTextDraw(player) {
     for(let i = 0; i <= 3; i++) player.TextDrawShowForPlayer(TextDraws.server.spawn[i]);
     player.PlayerTextDrawShow(TextDraws.player.date);
+    player.TextDrawShowForPlayer(TextDraws.server.logs);
 }
 
 function HideSpawnTextDraw(player) {
@@ -2142,6 +2167,8 @@ function LoadPlayerStats(player) {
             }
 
             player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
+
+            player.SpawnPlayer();
         }
         else player.Kick();
     });
@@ -2171,6 +2198,7 @@ samp.OnPlayerConnect((player) => {
     Maps.RemoveBuildings(player);
     TextDraws.player.Load(player); /* Load Player TextDraws */
 
+    AddToTDLogs(`~r~~h~${player.GetPlayerName(24)}(${player.playerid}) ~y~~h~joined the server!`);
     return true;
 });
 
@@ -2179,10 +2207,20 @@ samp.OnPlayerDisconnect((player, reason) => {
     HideConnectTextDraw(player);
     HideSpawnTextDraw(player);
     savePlayer(player);
+
+    let reason_string = "";
+    switch(reason) {
+        case 0: reason_string = "~y~~h~(Timeout)"; break;
+        case 1: reason_string = "~r~~h~(Leaving)"; break;
+        case 2: reason_string = "~r~~h~(Kick/Ban)"; break;
+    }
+    AddToTDLogs(`~r~~h~${player.GetPlayerName(24)}(${player.playerid}) ~w~~h~has left the server ${reason_string}!`);
     return true;
 });
 
-samp.OnPlayerSpawn((player) => {
+samp.registerEvent("OnSpawnPlayer", "i");
+samp.on("OnSpawnPlayer", (playerid) => {
+    let player = samp.getPlayers().filter(f => f.playerid == playerid)[0];
     if(!Player.Info[player.playerid].LoggedIn) return player.Kick();
     HideConnectTextDraw(player);
     ShowSpawnTextDraw(player);
@@ -2190,7 +2228,6 @@ samp.OnPlayerSpawn((player) => {
         player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
     }
     SetupPlayerForSpawn(player);
-    return true;
 });
 
 samp.OnPlayerUpdate((player) => {
