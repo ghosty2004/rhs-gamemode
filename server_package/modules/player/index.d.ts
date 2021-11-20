@@ -13,6 +13,11 @@ export declare const Info: {
         Negative: number
     },
     ConnectTime: number,
+    OnlineTime: {
+        Hours: number,
+        Minutes: number,
+        Seconds: number
+    },
     Admin: number,
     RconType: number,
     VIP: number,

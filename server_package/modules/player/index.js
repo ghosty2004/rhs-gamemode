@@ -13,7 +13,12 @@ module.exports = {
                 Positive: 0,
                 Negative: 0
             },
-            ConnectTime: Date.now(),
+            ConnectTime: Math.floor(Date.now() / 1000),
+            OnlineTime: {
+                Hours: 0,
+                Minutes: 0,
+                Seconds: 0
+            },
             Admin: 0,
             RconType: 0,
             VIP: 0,

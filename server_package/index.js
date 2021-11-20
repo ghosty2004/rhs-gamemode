@@ -479,12 +479,14 @@ CMD.on("stats", (player, params) => {
         let target = player;
         if(params[0]) target = getPlayer(params[0]);
         if(target) {
+            let OnlineTime = TotalGameTime(player);
+
             let info = "";
             info += "{FF4800}General statistics\n";
             info += `{BBFF00}Money: {49FFFF}$${Player.Info[player.playerid].Money}\n`;
             info += `{BBFF00}Coins: {49FFFF}${Player.Info[player.playerid].Money}\n`;
             info += `{BBFF00}Respect: {49FFFF}+${Player.Info[player.playerid].Respect.Positive} {BBFF00}/ {49FFFF}-${Player.Info[player.playerid].Respect.Negative}\n`;
-            info += `{BBFF00}Online time: {49FFFF}0 {BBFF00}hrs, {49FFFF}0 {BBFF00}mins, {49FFFF}0 {BBFF00}secs\n`;
+            info += `{BBFF00}Online time: {49FFFF}${OnlineTime.hours} {BBFF00}hrs, {49FFFF}${OnlineTime.minutes} {BBFF00}mins, {49FFFF}${OnlineTime.seconds} {BBFF00}secs\n`;
             info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
             info += `{BBFF00}VIP: ${Player.Info[player.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
             info += "\n";
@@ -1817,6 +1819,14 @@ CMD.on("setall", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function TotalGameTime(player) {
+    let total_time = ((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].ConnectTime) + (Player.Info[player.playerid].OnlineTime.Hours*60*60) + (Player.Info[player.playerid].OnlineTime.Minutes*60) + (Player.Info[player.playerid].OnlineTime.Seconds));
+    let hours = Math.floor(total_time / 3600);
+    let minutes = Math.floor(total_time / 60);
+    let seconds = Math.floor(total_time % 60);
+    return {hours: hours, minutes: minutes, seconds: seconds};
+}
+
 function kickPlayer(player) {
     setTimeout(player.Kick, 200);
 }
@@ -1953,13 +1963,15 @@ function getNameByAccID(AccID) {
 
 function savePlayer(player) {
     if(Player.Info[player.playerid].LoggedIn) {
-        con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?, clan_rank = ?, gang = ?,\
-        kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, jailed = ? WHERE ID = ?", [
+        let OnlineTime = TotalGameTime(player);
+
+        con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, hours = ?, minutes = ?, seconds = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?,\
+        clan_rank = ?, gang = ?, kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, jailed = ? WHERE ID = ?", [
             Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
-            Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, 
-            Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, Player.Info[player.playerid].Kills_Data.KillingSpree, Player.Info[player.playerid].Kills_Data.BestKillingSpree, 
-            Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints,
-            Player.Info[player.playerid].Jailed, Player.Info[player.playerid].AccID
+            OnlineTime.hours, OnlineTime.minutes, OnlineTime.seconds, Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, 
+            Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, Player.Info[player.playerid].Kills_Data.KillingSpree, 
+            Player.Info[player.playerid].Kills_Data.BestKillingSpree, Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, 
+            Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].AccID
         ]);
     }
 }
@@ -2398,6 +2410,9 @@ function LoadPlayerStats(player) {
             Player.Info[player.playerid].Coins = result[0].coins;
             Player.Info[player.playerid].Respect.Positive = result[0].respect_positive;
             Player.Info[player.playerid].Respect.Negative = result[0].respect_negative;
+            Player.Info[player.playerid].OnlineTime.Hours = result[0].hours;
+            Player.Info[player.playerid].OnlineTime.Minutes = result[0].minutes;
+            Player.Info[player.playerid].OnlineTime.Seconds = result[0].seconds;
             Player.Info[player.playerid].Admin = result[0].admin;
             Player.Info[player.playerid].VIP = result[0].VIP;
             Player.Info[player.playerid].VIP_Expire = result[0].VIP_Expire;
