@@ -16,6 +16,9 @@ const Drift1 = require("./drifts/1");
 /* Gangs */
 const Gang1 = require("./gangs/1");
 
+/* Minigames */
+const Targets = require("./minigames/targets");
+
 /* Others */
 const Beach = require("./others/beach");
 const Chilliad = require("./others/chilliad");
@@ -43,6 +46,9 @@ module.exports = {
 
         /* Gangs */
         Gang1.Load();
+
+        /* Minigames */
+        Targets.Load();
 
         /* Others */
         Beach.Load();
