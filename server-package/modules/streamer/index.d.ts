@@ -7,6 +7,7 @@ export declare function CreateDynamicPickup(modelid: number, type: number, x: nu
 export declare function DestroyDynamicPickup(pickupid: number): void;
 export declare function IsValidDynamicPickup(pickupid: number): boolean;
 export declare function CreateDynamic3DTextLabel(text: string, color: number, x: number, y: number, z: number, drawdistance: number, attachedplayer: number, attachedvehicle: number, testlos: boolean, worldid: number, interiorid: number): number;
+export declare function DestroyDynamic3DTextLabel(id: number): boolean;
 export declare function IsValidDynamic3DTextLabel(id: number): boolean;
 export declare function UpdateDynamic3DTextLabelText(id: number, color: number, text: string): void;
 export declare function Update(playerid: number): void;
