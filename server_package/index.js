@@ -14,6 +14,7 @@ const Clan = require("./modules/clan");
 const Dialog = require("./modules/dialog");
 const Errors = require("./modules/errors");
 const events = require("./modules/events");
+const Minigames = require("./modules/minigames");
 const Player = require("./modules/player");
 const SpawnZone = require("./modules/spawnzone");
 const Streamer = require("./modules/streamer");
@@ -26,6 +27,9 @@ const Maps = require("./maps");
 const TextDraws = require("./textdraws");
 
 const ServerLogs = ["", "", ""];
+
+/* Functions */
+const { getRandomInt } = require("./modules/functions");
 
 /* Data's */
 const data = {
@@ -753,6 +757,8 @@ CMD.on("sfparkour", (player) => {
 
 CMD.on("targets", (player) => {
     Player.Info[player.playerid].SpecialZone.Targets = true;
+    player.GivePlayerWeapon(Minigames.Targets.Weapon, 9999);
+    player.SetPlayerVirtualWorld(1000);
     TelePlayer(player, "targets", "Targets", -498.7933, -2675.3245, 1081.9259, 271.9457);
 });
 
@@ -1269,21 +1275,24 @@ CMD.on("cinfo", async (player, params) => {
     let target = player;
     if(params[0]) target = getPlayer(params[0]);
     if(target) {
-        let info = "";
-        info += `{FF0000}${Clan.Info[Player.Info[target.playerid].Clan].name}{FFFF00}'s clan informations\n`;
-        info += "\n";
-        info += "{FFFF00}Informations\n";
-        info += "{BBFF00}Total kills: {49FFFF}0\n";
-        info += "{BBFF00}Total deaths: {49FFFF}0\n";
-        info += `{BBFF00}Leaders skin: {49FFFF}${Clan.Info[Player.Info[target.playerid].Clan].skin.leader}\n`;
-        info += `{BBFF00}Members skin: {49FFFF}${Clan.Info[Player.Info[target.playerid].Clan].skin.member}\n`;
-        info += `{BBFF00}Creator: {33FFFF}${await getNameByAccID(Clan.Info[Player.Info[target.playerid].Clan].owner)}\n`;
-        info += `{BBFF00}${player.GetPlayerName(24)}'s Rank: {33FFFF}${getClanRank(Player.Info[target.playerid].Clan_Rank)}\n`;
-        info += "{BBFF00}Weapons:\n";
-        info += "{FFFFFF}none, none, none, none, none, none\n";
-        info += "\n";
-        info += "{FFFF00}Type {FF0000}/cinfo [ID/Name]{FFFF00} to see others Clan Stats!";
-        player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Clan Info", info, "Ok", "");
+        if(Player.Info[target.playerid].Clan) {
+            let info = "";
+            info += `{FF0000}${Clan.Info[Player.Info[target.playerid].Clan].name}{FFFF00}'s clan informations\n`;
+            info += "\n";
+            info += "{FFFF00}Informations\n";
+            info += "{BBFF00}Total kills: {49FFFF}0\n";
+            info += "{BBFF00}Total deaths: {49FFFF}0\n";
+            info += `{BBFF00}Leaders skin: {49FFFF}${Clan.Info[Player.Info[target.playerid].Clan].skin.leader}\n`;
+            info += `{BBFF00}Members skin: {49FFFF}${Clan.Info[Player.Info[target.playerid].Clan].skin.member}\n`;
+            info += `{BBFF00}Creator: {33FFFF}${await getNameByAccID(Clan.Info[Player.Info[target.playerid].Clan].owner)}\n`;
+            info += `{BBFF00}${player.GetPlayerName(24)}'s Rank: {33FFFF}${getClanRank(Player.Info[target.playerid].Clan_Rank)}\n`;
+            info += "{BBFF00}Weapons:\n";
+            info += "{FFFFFF}none, none, none, none, none, none\n";
+            info += "\n";
+            info += "{FFFF00}Type {FF0000}/cinfo [ID/Name]{FFFF00} to see others Clan Stats!";
+            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Clan Info", info, "Ok", "");
+        }
+        else SendError(player, "Acest jucator nu are clan.", "This player don't have a clan.");
     }
     else SendError(player, Errors.PLAYER_NOT_CONNECTED);
 });
@@ -1785,6 +1794,7 @@ function UpdatePlayerDB(player, column, value) {
 }
 
 function SetupPlayerForSpawn(player, type=0) { 
+    console.log(`setting up spawn for ${player.GetPlayerName(24)}`);
     player.SetPlayerColor(0xFFFFFFAA);
     player.SetPlayerSkin(0);
     player.ResetPlayerWeapons();
@@ -2177,12 +2187,6 @@ function PreparatePlayerLogin(player) {
     });
 }
 
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); 
-}
-
 function Call_NewName(player) {
     player.ShowPlayerDialog(Dialog.NEW_NAME, samp.DIALOG_STYLE.INPUT, "Change Name", "{BBFF00}Please enter below new nickname wich you want to have\n{FFFF00}This name need to between {FF0000}3-20{FFFF00} characters long!:", "Change", "Random Name");
 }
@@ -2221,7 +2225,7 @@ function LoadPlayerStats(player) {
 
             player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
 
-            player.SpawnPlayer();
+            //player.SpawnPlayer();
         }
         else player.Kick();
     });
@@ -2235,11 +2239,26 @@ samp.OnGameModeInit(() => {
     console.log("Have Fun with this shit :)");
     console.log(`NodeJS Version: ${process.version}`);
 
-    Maps.Load();
+    Maps.Load(); /* Load Server Maps */
     TextDraws.server.Load(); /* Load Server TextDraws */
+    Minigames.Load(); /* Load Server Minigames */
 });
 
 samp.OnGameModeExit(() => {
+    return true;
+});
+
+samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
+    /* Targets Minigame */
+    if(Player.Info[player.playerid].SpecialZone.Targets) {
+        if(weaponid == Minigames.Targets.Weapon) {
+            if(hittype == samp.BULLET_HIT_TYPE.OBJECT) {
+                if(hitid == Minigames.Targets.HitObject) {
+                    Minigames.Targets.Hit(player);
+                }
+            }
+        }
+    }
     return true;
 });
 
@@ -2271,9 +2290,7 @@ samp.OnPlayerDisconnect((player, reason) => {
     return true;
 });
 
-samp.registerEvent("OnSpawnPlayer", "i");
-samp.on("OnSpawnPlayer", (playerid) => {
-    let player = samp.getPlayers().filter(f => f.playerid == playerid)[0];
+samp.OnPlayerSpawn((player) => {
     if(!Player.Info[player.playerid].LoggedIn) return player.Kick();
     HideConnectTextDraw(player);
     ShowSpawnTextDraw(player);

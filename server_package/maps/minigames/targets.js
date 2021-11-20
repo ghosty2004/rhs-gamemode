@@ -1,7 +1,6 @@
 module.exports = {
     Load: function() {
         let fso_map;
-        CreateObject(1276, -457.156891, -2668.693848, 1071.062622, 0.000000, 0.000000, -90.000000, 3139.0); // 0
         fso_map = CreateDynamicObject(3095, -500.529999, -2679.088867, 1083.150024, 90.000000, 90.000000, 0.000000, -1, -1);
         SetDynamicObjectMaterial(fso_map, 0, 18018, "genintintbarb", "GB_midbar01", 0);
         fso_map = CreateDynamicObject(3095, -500.519989, -2670.088867, 1083.150024, 90.000000, 90.000000, 0.000000, -1, -1);

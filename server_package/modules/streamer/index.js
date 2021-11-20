@@ -1,6 +1,14 @@
-const { callPublic, OBJECT_MATERIAL_SIZE, getPlayers, SampEvents } = require("samp-node-lib");
+const { callPublic, OBJECT_MATERIAL_SIZE, getPlayers } = require("samp-node-lib");
 
 module.exports = {
+    Update: function(playerid) {
+        callPublic("_samp_Streamer_Update", "i", playerid);
+    },
+    UpdateAll: function() {
+        getPlayers().forEach((player) => {
+            this.Update(player.playerid);
+        });
+    },
     CreateDynamicObject: function(modelid, x, y, z, rx, ry, rz, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 1000, drawdistance = 1000, areaid = -1, priority = 0) {
         return callPublic("_CreateDynamicObject", "iffffffiiiffii", modelid, x, y, z, rx, ry, rz, worldid, interiorid, playerid, streamdistance, drawdistance, areaid, priority);
     },
@@ -42,12 +50,4 @@ module.exports = {
     UpdateDynamic3DTextLabelText: function(id, color, text) {
         callPublic("_UpdateDynamic3DTextLabelText", "iis", id, color, text);
     }
-    /*Update: function(playerid) {
-        callPublic("_samp_Streamer_Update", "i", playerid);
-    },
-    UpdateAll: function() {
-        getPlayers().forEach((player) => {
-            this.Update(player.playerid);
-        });
-    }*/
 }
