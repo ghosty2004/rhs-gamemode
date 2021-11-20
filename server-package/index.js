@@ -1360,12 +1360,9 @@ function SendAntiSpam(player, time) {
 }
 
 function checkAntiSpam(player) {
-    /*let time;
-    if(Player.Info[player.playerid].Admin >= 1 || Player.Info[player.playerid].VIP == 4) anti_spam_seconds = 0;
-    else if(Player.Info[player.playerid].VIP == 2) anti_spam_seconds = 2;
-    else if(Player.Info[player.playerid].VIP == 3) anti_spam_seconds = 1;*/
-
+    /* Unlimited */
     if(Player.Info[player.playerid].Admin >= 1 || Player.Info[player.playerid].VIP == 4) return true;
+    /* 1 Second */
     else if(Player.Info[player.playerid].VIP == 3) {
         if((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message) < 1) {
             let time;
@@ -1374,6 +1371,7 @@ function checkAntiSpam(player) {
             return false;
         }
     }
+    /* 2 Seconds */
     else if(Player.Info[player.playerid].VIP == 2) {
         if((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message) < 2) {
             let time;
@@ -1383,6 +1381,7 @@ function checkAntiSpam(player) {
             return false;
         } 
     }
+    /* 3 Seconds */
     else {
         if((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message) < 3) {
             let time;
