@@ -150,11 +150,11 @@ CMD.on("decline", (player) => {
 
 CMD.on("vips", (player) => {
     let info = "Name\tRank\n";
-    let data = samp.getPlayers().filter(f => Player.Info[f.playerid].VIP);
-    data.forEach((i) => {
+    let result = samp.getPlayers().filter(f => Player.Info[f.playerid].VIP);
+    result.forEach((i) => {
         info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t${getVIPRank(Player.Info[i.playerid].VIP)}\n`;
     });
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${data.length} {00FF00}Online VIP(s)!`, info, "Close", "");
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${result.length} {00FF00}Online VIP(s)!`, info, "Close", "");
 });
 
 CMD.on("mp3", (player) => {
@@ -797,11 +797,11 @@ CMD.on("vaccount", (player) => {
 CMD.on("admins", (player) => {
     if(Player.Info[player.playerid].VIP < 2) return player.SendClientMessage(data.colors.RED, "Use /report [id/name] [reason] | if you see a hacker or if you have a problem!");
     let info = "Name\tRank\n";
-    let data = samp.getPlayers().filter(f => Player.Info[f.playerid].Admin);
-    data.forEach((i) => {
+    let result = samp.getPlayers().filter(f => Player.Info[f.playerid].Admin);
+    result.forEach((i) => {
         info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t${getAdminRank(Player.Info[i.playerid].Admin)}\n`;
     });
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${data.length} {00FF00}Online Admin(s)!`, info, "Close", "");
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${result.length} {00FF00}Online Admin(s)!`, info, "Close", "");
 });
 
 CMD.on("s2", (player) => {
@@ -817,10 +817,6 @@ CMD.on("s3", (player) => {
 });
 
 CMD.on("l3", (player) => {
-    if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
-});
-
-CMD.on("admins", (player) => {
     if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
 });
 
@@ -994,11 +990,11 @@ CMD.on("clan", (player) => { CMD.emit("chelp", player); });
 CMD.on("cm", (player) => {
     if(Player.Info[player.playerid].Clan) {
         let info = "Name\tRank\n";
-        let data = samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan);
-        data.forEach((i) => {
+        let result = samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan);
+        result.forEach((i) => {
             info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t{00BBF6}${getClanRank(Player.Info[i.playerid].Clan_Rank)}\n`;
         });
-        player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Clan Members: {FF0000}${data.length}{AFAFAF} online - {FF0000}${Clan.Info[Player.Info[player.playerid].Clan].name}`, info, "Close", "");
+        player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Clan Members: {FF0000}${result.length}{AFAFAF} online - {FF0000}${Clan.Info[Player.Info[player.playerid].Clan].name}`, info, "Close", "");
     }
     else SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
 });
@@ -1378,6 +1374,37 @@ CMD.on("createteleport", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function CheckCustomChat(player, text) {
+    if(text[0] == "!") {
+        if(Player.Info[player.playerid].Clan) {
+            text = text.replace("!", "");
+            samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan).forEach((i) => {
+                i.SendClientMessage(data.colors.ORANGE, `Clan Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
+            });
+            return false;
+        }
+    }
+    else if(text[0] == "@") {
+        if(Player.Info[player.playerid].Admin) {
+            text = text.replace("@", "");
+            samp.getPlayers().filter(f => Player.Info[f.playerid].Admin).forEach((i) => {
+                i.SendClientMessage(data.colors.ORANGE, `Admin Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
+            });
+            return false;
+        }
+    }
+    else if(text[0] == "#") {
+        if(Player.Info[player.playerid].VIP) {
+            text = text.replace("@", "");
+            samp.getPlayers().filter(f => Player.Info[f.playerid].VIP).forEach((i) => {
+                i.SendClientMessage(data.colors.ORANGE, `VIP Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
+            });
+            return false;
+        }
+    }
+   return true;
+}
+
 function replaceAll(string, search, replace) {
     return string.replace(new RegExp(search, 'g'), replace);
 }
@@ -2671,38 +2698,10 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
 });
 
 samp.OnPlayerText((player, text) => { 
-    checkAntiSpam(player);
+    if(!checkAntiSpam(player)) return false;
 
     Player.Info[player.playerid].Last_Chat_Message = Math.floor(Date.now() / 1000);
-
-    switch(text[0]) {
-        case "!": {
-            text = text.replace("!", "");
-            samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan).forEach((i) => {
-                i.SendClientMessage(data.colors.ORANGE, `Clan Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
-            });
-            return false;
-            break;
-        }
-        case "@": {
-            if(Player.Info[player.playerid].Admin) {
-                text = text.replace("@", "");
-                samp.getPlayers().filter(f => Player.Info[f.playerid].Admin).forEach((i) => {
-                    i.SendClientMessage(data.colors.ORANGE, `Admin Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
-                });
-            }
-            break;
-        }
-        case "#": {
-            if(Player.Info[player.playerid].VIP) {
-                text = text.replace("@", "");
-                samp.getPlayers().filter(f => Player.Info[f.playerid].VIP).forEach((i) => {
-                    i.SendClientMessage(data.colors.ORANGE, `VIP Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
-                });
-            }
-            break;
-        }
-    }
+    if(!CheckCustomChat(player, text)) return false;
 
     samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}${getPlayerRankInChat(player)}{00CCFF}(${player.playerid}):{FFFFFF} ${text}`);
     return false;
