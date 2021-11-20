@@ -1555,7 +1555,7 @@ CMD.on("setall", (player, params) => {
 /* ============== */
 /* Rcons Commands */
 /* ============== */
-CMD.on("createteleport", (player, params) => {
+/*CMD.on("createteleport", (player, params) => {
     if(params[0] && params.slice(1).join(" ")) {
         if(!Teleport.Exists(params[0])) {
             params[0] = params[0].replace("/", "");
@@ -1569,7 +1569,7 @@ CMD.on("createteleport", (player, params) => {
         else SendError(player, "This teleport already exists.");
     }
     else SendUsage(player, "/CreateTeleport [Command] [Name]");
-});
+});*/
 
 /* =============== */
 /* SA:MP Functions */
