@@ -988,6 +988,20 @@ CMD.on("chelp", (player) => {
 });
 CMD.on("clan", (player) => { CMD.emit("chelp", player); });
 
+CMD.on("setrank", (player, params) => {
+    if(Player.Info[player.playerid].Clan_Rank < 3) return SendError(player, "You need to be Gang Owner or Clan Founder to use this command!");
+    if(params[0] && !isNaN(params[1])) {
+        let target = getPlayer(params[0]);
+        if(target) {
+            if(Player.Info[target.playerid].Clan != Player.Info[player.playerid].Clan) return SendError(player, "This player need to be member in your clan!");
+            params[1] = parseInt(params[1]);
+            if(params[1] < 0 || params[1] > 3) return SendError(player, "");
+        }
+        else SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    }
+    else SendUsage(player, "/SetRank [ID/Name] [Rank: 1-3]");
+});
+
 CMD.on("cm", (player) => {
     if(Player.Info[player.playerid].Clan) {
         let info = "Name\tRank\n";
@@ -1358,9 +1372,9 @@ CMD.on("createteleport", (player, params) => {
         if(params[0] && params.slice(1).join(" ")) {
             if(!Teleport.Exists(params[0])) {
                 params[0] = params[0].replace("/", "");
-                con.query("INSERT INTO teleports (command, name, position) VALUES(?, ?, ?)", [params[0], params.slice(1).join(" "), JSON.stringify(player.GetPlayerPos())], function(err, result) {
+                con.query("INSERT INTO teleports (command, name, position) VALUES(?, ?, ?)", [params[0], params.slice(1).join(" "), JSON.stringify([player.position.x, player.position.y, player.position.z, player.position.angle])], function(err, result) {
                     if(!err) {
-                        Teleport.Create(result.insertId, params[0], params.slice(1).join(" "), player.GetPlayerPos());
+                        Teleport.Create(result.insertId, params[0], params.slice(1).join(" "), [player.position.x, player.position.y, player.position.z, player.position.angle]);
                         player.SendClientMessage(data.colors.LIGHT_YELLOW, `You have successfully created teleport {FFFFFF}/${params[0]} {BBFF00}with ID {FFFFFF}${result.insertId}{BBFF00}.`);
                     }
                 });

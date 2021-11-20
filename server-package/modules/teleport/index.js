@@ -26,4 +26,10 @@ module.exports = {
         if(Object.entries(this.Info).some(s => s.some(s => s.id == id))) return true;
         else return false;
     },
+    GetPosition: function(commandname) {
+        if(this.Info[commandname]) {
+            return this.Info[commandname].position
+        }
+        else return false;
+    }
 }
