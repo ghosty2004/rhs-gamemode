@@ -7,4 +7,3 @@ export declare function Create(id: number, commandname: string, name: string, po
 export declare function Delete(commandname: string): boolean;
 export declare function Exists(commandname: string): boolean;
 export declare function ExistsId(id: number): boolean;
-export declare function GetPosition(commandname: string): Array<number>|boolean

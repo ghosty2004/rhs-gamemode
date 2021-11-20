@@ -1389,6 +1389,12 @@ CMD.on("createteleport", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function TelePlayer(player, name, position_x, position_y, position_z, facing_angle) {
+    player.GameTextForPlayer(`~y~~h~Welcome to~n~~g~~h~${name}`, 4000, 3);
+    player.SetPlayerPos(position_x, position_y, position_z);
+    player.SetPlayerFacingAngle(facing_angle);
+}
+
 function CheckCustomChat(player, text) {
     if(text[0] == "!") {
         if(Player.Info[player.playerid].Clan) {
@@ -2739,7 +2745,10 @@ samp.OnPlayerCommandText((player, cmdtext) => {
         let params = cmdtext.split(/[ ]+/);
         let temp_string = params[0];
         params.shift();
-        if(CMD.eventNames().some(s => s == temp_string)) {
+        if(Teleport.Exists(temp_string)) {
+            TelePlayer(player, Teleport.Info[temp_string].name, Teleport.Info[temp_string].position[0], Teleport.Info[temp_string].position[1], Teleport.Info[temp_string].position[2], Teleport.Info[temp_string].position[3]);
+        }
+        else if(CMD.eventNames().some(s => s == temp_string)) {
             CMD.emit(`${temp_string}`, player, params);
         }
         else player.SendClientMessage(data.colors.RED, Lang(player, `Comanda {BBFF00}/${temp_string}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`, `Command {BBFF00}/${temp_string}{FF0000} don't exist! Use {BBFF00}/help{FF0000} or {BBFF00}/cmds{FF0000}!`));
