@@ -1,4 +1,4 @@
-const { callPublic, OBJECT_MATERIAL_SIZE } = require("samp-node-lib");
+const { callPublic, OBJECT_MATERIAL_SIZE, getPlayers } = require("samp-node-lib");
 
 module.exports = {
     CreateDynamicObject: function(modelid, x, y, z, rx, ry, rz, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 1000, drawdistance = 1000, areaid = -1, priority = 0) {
@@ -18,24 +18,20 @@ module.exports = {
     },
     CreateDynamicPickup: function(modelid, type, x, y, z, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 200.0, areaid = -1, priority = 0) {
         let value = callPublic("_CreateDynamicPickup", "iifffiiifii", modelid, type, x, y, z, worldid, interiorid, playerid, streamdistance, areaid, priority);
-        this.UpdateAll(); 
         return value;
     },
     DestroyDynamicPickup: function(pickupid) {
         callPublic("_DestroyDynamicPickup", "i", pickupid);
-        this.UpdateAll();
     },
     IsValidDynamicPickup: function(pickupid) {
         return callPublic("_IsValidDynamicPickup", "i", pickupid);
     },
     CreateDynamic3DTextLabel: function(text, color, x, y, z, drawdistance) {
         let value = callPublic("_CreateDynamic3DTextLabel", "siffff", text, color, x, y, z, drawdistance);
-        this.UpdateAll();
         return value;
     },
     DestroyDynamic3DTextLabel: function(id) {
         let value = callPublic("_DestroyDynamic3DTextLabel", "i", id);
-        this.UpdateAll();
         return value;
     },
     IsValidDynamic3DTextLabel: function(id) {
@@ -43,14 +39,13 @@ module.exports = {
     },
     UpdateDynamic3DTextLabelText: function(id, color, text) {
         callPublic("_UpdateDynamic3DTextLabelText", "iis", id, color, text);
-        this.UpdateAll();
-    },
-    Update: function(playerid) {
+    }
+    /*Update: function(playerid) {
         callPublic("_samp_Streamer_Update", "i", playerid);
     },
     UpdateAll: function() {
-        samp.getPlayers().forEach((player) => {
+        getPlayers().forEach((player) => {
             this.Update(player.playerid);
         });
-    }
+    }*/
 }

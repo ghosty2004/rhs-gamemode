@@ -15,6 +15,7 @@ const Dialog = require("./modules/dialog");
 const Errors = require("./modules/errors");
 const events = require("./modules/events");
 const Player = require("./modules/player");
+const SpawnZone = require("./modules/spawnzone");
 const Streamer = require("./modules/streamer");
 const Teleport = require("./modules/teleport");
 
@@ -1523,21 +1524,31 @@ function SetupPlayerForSpawn(player, type=0) {
         else SetupPlayerForSpawn(player, 1);
     }
     else { /* Random Spawn */
-        player.SetPlayerPos(2127.5049, 2377.1042, 10.8203);
-        player.SetPlayerFacingAngle(179.6744);
+        let position = SpawnZone.Random();
+        player.SetPlayerPos(position[0], position[1], position[2]);
+        player.SetPlayerFacingAngle(position[3]);
     }
 }
 
 function LoadFromDB() {
+    LoadSpawnZones();
     LoadTeleports();
     LoadClans();
+}
+
+function LoadSpawnZones() {
+    con.query("SELECT * FROM spawnzones", function(err, result) {
+        for(let i = 0; i < result.length; i++) {
+            SpawnZone.Create(result[i].ID, result[i].name, JSON.parse(result[i].position));
+        }
+        console.log(`Loaded ${result.length} spawn zones.`);
+    });
 }
 
 function LoadTeleports() {
     con.query("SELECT * FROM teleports", function(err, result) {
         for(let i = 0; i < result.length; i++) {
-            let position = JSON.parse(result[i].position);
-            Teleport.Create(result[i].ID, result[i].command, result[i].name, [position[0], position[1], position[2]]);
+            Teleport.Create(result[i].ID, result[i].command, result[i].name, JSON.parse(result[i].position));
         }
         console.log(`Loaded ${result.length} teleports.`);
     });
