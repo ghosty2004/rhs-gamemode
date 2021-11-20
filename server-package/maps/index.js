@@ -20,6 +20,8 @@ const Gang1 = require("./gangs/1");
 const Jail = require("./others/jail");
 const LS = require("./others/ls");
 const LV = require("./others/lv");
+const LVTrans = require("./others/lvtrans");
+const SF = require("./others/sf");
 const Spawn = require("./others/spawn");
 const Voller = require("./others/voller");
 
@@ -42,6 +44,8 @@ module.exports = {
         Jail.Load();
         LS.Load();
         LV.Load();
+        LVTrans.Load();
+        SF.Load();
         Spawn.Load();
         Voller.Load();
 
@@ -62,6 +66,8 @@ module.exports = {
         /* Others */
         LS.RemoveBuilding(player);
         LV.RemoveBuilding(player);
+        LVTrans.RemoveBuilding(player);
+        SF.RemoveBuilding(player);
         Voller.RemoveBuilding(player);
 
         /* Stunt Zones */
