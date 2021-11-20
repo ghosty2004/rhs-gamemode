@@ -54,14 +54,41 @@ con.connect((err) => {
 /* ============== */
 const CMD = new events.Command();
 
-/* Player's Commands */
-CMD.on("vips", (player) => {
-    let info = "Name\tRank\n";
-    let data = samp.getPlayers().filter(f => Player.Info[f.playerid].VIP);
-    data.forEach((i) => {
-        info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t${getVIPRank(Player.Info[i.playerid].VIP)}\n`;
-    });
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${data.length} {00FF00}Online VIP(s)!`, info, "Close", "");
+/* ================ */
+/* Players Commands */
+/* ================ */
+CMD.on("cmds", (player) => {
+    ShowCMDS(player, 1);
+});
+
+CMD.on("createclan", (player) => {
+    if(Player.Info[player.playerid].Clan) return SendError(player, "You already have a Clan. Type /lclan to leave your current clan!");
+    player.GameTextForPlayer("~n~~n~~n~~n~~n~~n~~n~~n~~r~~h~Create ~w~~h~your own ~g~~h~clan!", 4000, 4);
+    player.ShowPlayerDialog(Dialog.CREATE_CLAN, samp.DIALOG_STYLE.INPUT, "{BBFF00}Create Clan", "{0072FF}You are now creating a clan!\nEnter below the name of your clan to continue...", "Continue", "Close");
+});
+
+CMD.on("car", (player, params) => {
+
+});
+
+CMD.on("v", (player, params) => { CMD.emit("car", player, params); });
+
+CMD.on("nrg", (player) => {
+
+});
+
+CMD.on("ro", (player) => {
+    player.SendClientMessage(data.colors.YELLOW, "Ti-ai schimbat limba in {FF0000}Romana{FFFF00}!");
+    Player.Info[player.playerid].Language = 1;
+});
+
+CMD.on("eng", (player) => {
+    player.SendClientMessage(data.colors.YELLOW, "You changed your language in {FF0000}English{FFFF00}!");
+    Player.Info[player.playerid].Language = 2;
+});
+
+CMD.on("htds", (player) => {
+
 });
 
 CMD.on("spassword", (player) => {
@@ -84,13 +111,317 @@ CMD.on("spassword", (player) => {
     });
 });
 
-CMD.on("buyvip", (player) => {
-    let info = `${Lang(player, "Item\tPret\tValabilitate", "Item\tPrice\tValidity")}\n`;
-    info += `${Lang(player, "{FF0000}Rosu\t{00BBF6}Gratis!\t{00FF00}Permanent!", "{FF0000}Red\t{00BBF6}Free!\t{00FF00}Permanent!")}\n`;
-    info += `${Lang(player, "{FFFF00}Galben\t{BBFF00}20.000 Coins + 20 Ore\t{00FF00}Permanent!", "{FFFF00}Yellow\t{BBFF00}20.000 Coins + 20 Hours\t{00FF00}Permanent!")}\n`;
-    info += `${Lang(player, "{0077FF}Albastru\t{BBFF00}80.000 Coins + 80 Ore\t{00FF00}Permanent!", "{0077FF}Blue\t{BBFF00}80.000 Coins + 80 Hours\t{00FF00}Permanent!")}\n`;
-    info += `${Lang(player, "{FFFFFF}Alb\t{BBFF00}150.000 Coins + 150 Ore\t{00BBF6}30 Zile!", "{FFFFFF}White\t{BBFF00}150.000 Coins + 150 Hours\t{00BBF6}30 Days!")}`;
-    player.ShowPlayerDialog(Dialog.BUYVIP, samp.DIALOG_STYLE.TABLIST_HEADERS, Lang(player, "Cumpara VIP - Scrie {FF0000}/vcmds {D1D1D1}pentru comenzi.", "Buy VIP - Type {FF0000}/vcmds {D1D1D1}for commands."), info, Lang(player, "Cumpara", "Buy"), Lang(player, "Inchide", "Close"));
+CMD.on("skin", (player, params) => {
+
+});
+
+CMD.on("anim", (player, params) => {
+
+});
+
+CMD.on("changename", (player) => {
+    
+});
+
+CMD.on("atrade", (player, params) => {
+
+});
+
+CMD.on("trade", (player) => {
+
+});
+
+CMD.on("brb", (player) => {
+
+});
+
+CMD.on("back", (player) => {
+
+});
+
+CMD.on("accept", (player) => {
+
+});
+
+CMD.on("decline", (player) => {
+
+});
+
+CMD.on("vips", (player) => {
+    let info = "Name\tRank\n";
+    let data = samp.getPlayers().filter(f => Player.Info[f.playerid].VIP);
+    data.forEach((i) => {
+        info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t${getVIPRank(Player.Info[i.playerid].VIP)}\n`;
+    });
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${data.length} {00FF00}Online VIP(s)!`, info, "Close", "");
+});
+
+CMD.on("mp3", (player) => {
+
+});
+
+CMD.on("kill", (player) => {
+
+});
+
+CMD.on("jetpack", (player) => {
+
+});
+
+CMD.on("myint", (player, params) => {
+
+});
+
+CMD.on("vworld", (player, params) => {
+
+});
+
+CMD.on("godp", (player) => {
+
+});
+
+CMD.on("house", (player) => {
+
+});
+
+CMD.on("business", (player) => {
+
+});
+
+CMD.on("leave", (player) => {
+
+});
+
+CMD.on("int", (player) => {
+
+});
+
+CMD.on("weapons", (player) => {
+
+});
+CMD.on("arme", (player) => { CMD.emit("weapons", player); });
+
+CMD.on("fweapons", (player) => {
+
+});
+
+CMD.on("bweapons", (player) => {
+
+});
+
+CMD.on("para", (player) => {
+
+});
+
+CMD.on("camera", (player) => {
+
+});
+
+CMD.on("dick", (player) => {
+
+});
+
+CMD.on("pee", (player) => {
+
+});
+
+CMD.on("beer", (player) => {
+
+});
+
+CMD.on("wine", (player) => {
+
+});
+
+CMD.on("soda", (player) => {
+
+});
+
+CMD.on("cigar", (player) => {
+
+});
+
+CMD.on("drunkoff", (player) => {
+
+});
+
+CMD.on("day", (player) => {
+
+});
+CMD.on("zi", (player) => { CMD.emit("day", player); });
+
+CMD.on("night", (player) => {
+
+});
+CMD.on("noapte", (player) => { CMD.emit("night", player); });
+
+CMD.on("morning", (player) => {
+
+});
+
+CMD.on("evening", (player) => {
+
+});
+
+CMD.on("dance", (player, params) => {
+
+});
+
+CMD.on("count", (player) => {
+
+});
+
+CMD.on("fpd", (player) => {
+
+});
+
+CMD.on("tune", (player) => {
+
+});
+
+CMD.on("tcar", (player, params) => {
+
+});
+
+CMD.on("neon", (player) => {
+
+});
+
+CMD.on("respect", (player, params) => {
+
+});
+
+CMD.on("speed", (player) => {
+
+});
+
+CMD.on("fix", (player) => {
+
+});
+
+CMD.on("happy", (player) => {
+
+});
+
+CMD.on("sad", (player) => {
+
+});
+
+CMD.on("tow", (player) => {
+
+});
+
+CMD.on("vcontrol", (player) => {
+
+});
+
+CMD.on("ad", (player, params) => {
+
+});
+
+CMD.on("hidetag", (player) => {
+
+});
+
+CMD.on("vup", (player) => {
+
+});
+
+CMD.on("pm", (player, params) => {
+
+});
+
+CMD.on("hold", (player) => {
+
+});
+
+CMD.on("report", (player, params) => {
+    if(params[0] && params.slice(1).join(" ")) {
+        let target = getPlayer(params[0]);
+        if(target) {
+            
+        }
+        else SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    }
+    else SendUsage(player, "/report [ID/Name] [Reason]");
+});
+
+CMD.on("up", (player, params) => {
+
+});
+
+CMD.on("dive", (player) => {
+
+});
+
+CMD.on("rw", (player) => {
+
+});
+
+CMD.on("ww", (player) => {
+
+});
+
+CMD.on("walks", (player) => {
+
+});
+
+CMD.on("fstyles", (player) => {
+
+});
+
+CMD.on("np", (player) => {
+
+});
+
+CMD.on("s", (player) => {
+
+});
+
+CMD.on("l", (player) => {
+
+});
+
+CMD.on("c4", (player) => {
+
+});
+
+CMD.on("top", (player) => {
+
+});
+
+CMD.on("holdoff", (player) => {
+
+});
+
+CMD.on("session", (player) => {
+
+});
+
+CMD.on("ostats", (player, params) => {
+
+});
+
+CMD.on("skill", (player) => {
+
+});
+
+CMD.on("ramp", (player) => {
+
+});
+
+CMD.on("statsserver", (player) => {
+
+});
+
+CMD.on("howto", (player) => {
+
+});
+
+CMD.on("important", (player) => { ShowImportant(player, 1); });
+
+CMD.on("duel", (player, params) => {
+
 });
 
 CMD.on("ranks", (player) => {
@@ -104,14 +435,25 @@ CMD.on("ranks", (player) => {
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Stats Ranks", info, "Close", "");
 });
 
-CMD.on("ro", (player) => {
-    player.SendClientMessage(data.colors.YELLOW, "Ti-ai schimbat limba in {FF0000}Romana{FFFF00}!");
-    Player.Info[player.playerid].Language = 1;
+CMD.on("wtime", (player, params) => {
+
 });
 
-CMD.on("eng", (player) => {
-    player.SendClientMessage(data.colors.YELLOW, "You changed your language in {FF0000}English{FFFF00}!");
-    Player.Info[player.playerid].Language = 2;
+CMD.on("blacklisted", (player) => {
+
+});
+
+CMD.on("email", (player) => {
+
+});
+
+CMD.on("buyvip", (player) => {
+    let info = `${Lang(player, "Item\tPret\tValabilitate", "Item\tPrice\tValidity")}\n`;
+    info += `${Lang(player, "{FF0000}Rosu\t{00BBF6}Gratis!\t{00FF00}Permanent!", "{FF0000}Red\t{00BBF6}Free!\t{00FF00}Permanent!")}\n`;
+    info += `${Lang(player, "{FFFF00}Galben\t{BBFF00}20.000 Coins + 20 Ore\t{00FF00}Permanent!", "{FFFF00}Yellow\t{BBFF00}20.000 Coins + 20 Hours\t{00FF00}Permanent!")}\n`;
+    info += `${Lang(player, "{0077FF}Albastru\t{BBFF00}80.000 Coins + 80 Ore\t{00FF00}Permanent!", "{0077FF}Blue\t{BBFF00}80.000 Coins + 80 Hours\t{00FF00}Permanent!")}\n`;
+    info += `${Lang(player, "{FFFFFF}Alb\t{BBFF00}150.000 Coins + 150 Ore\t{00BBF6}30 Zile!", "{FFFFFF}White\t{BBFF00}150.000 Coins + 150 Hours\t{00BBF6}30 Days!")}`;
+    player.ShowPlayerDialog(Dialog.BUYVIP, samp.DIALOG_STYLE.TABLIST_HEADERS, Lang(player, "Cumpara VIP - Scrie {FF0000}/vcmds {D1D1D1}pentru comenzi.", "Buy VIP - Type {FF0000}/vcmds {D1D1D1}for commands."), info, Lang(player, "Cumpara", "Buy"), Lang(player, "Inchide", "Close"));
 });
 
 CMD.on("stats", (player) => {
@@ -224,12 +566,6 @@ CMD.on("tutorial", (player) => {
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Tutorial - Cum poti face 10/10 stats!", "Tutorial - How to make 10/10 stats!"), info, "Ok", "");
 });
 
-CMD.on("important", (player) => { ShowImportant(player, 1); });
-
-CMD.on("cmds", (player) => {
-    ShowCMDS(player, 1);
-});
-
 CMD.on("credits", (player) => {
     let info = "";
     info += `{00BBF6}${Player.Info[player.playerid].Language == 1 ? "Mai jos ai o lista cu cei ce au contribuit la crearea acestui server:" : "Before is a list with server's creators:"}\n`;
@@ -278,27 +614,6 @@ CMD.on("teles", (player) => {
     info += "{49FFFF}/Others\t{BBFF00}Other Places\n";
     info += "{49FFFF}/Sstunts\t{BBFF00}Simple Stunts";
     player.ShowPlayerDialog(Dialog.TELES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Teleports category", info, "Select", "Close");
-});
-
-CMD.on("admins", (player) => {
-    if(Player.Info[player.playerid].VIP < 2) return player.SendClientMessage(data.colors.RED, "Use /report [id/name] [reason] | if you see a hacker or if you have a problem!");
-    let info = "Name\tRank\n";
-    let data = samp.getPlayers().filter(f => Player.Info[f.playerid].Admin);
-    data.forEach((i) => {
-        info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t${getAdminRank(Player.Info[i.playerid].Admin)}\n`;
-    });
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${data.length} {00FF00}Online Admin(s)!`, info, "Close", "");
-});
-
-CMD.on("report", (player, params) => {
-    if(params[0] && params.slice(1).join(" ")) {
-        let target = getPlayer(params[0]);
-        if(target) {
-            
-        }
-        else SendError(player, Errors.PLAYER_NOT_CONNECTED);
-    }
-    else SendUsage(player, "/report [ID/Name] [Reason]");
 });
 
 /* ============= */
@@ -478,6 +793,16 @@ CMD.on("vaccount", (player) => {
 /* =================== */
 /* VIP YELLOW COMMANDS */
 /* =================== */
+CMD.on("admins", (player) => {
+    if(Player.Info[player.playerid].VIP < 2) return player.SendClientMessage(data.colors.RED, "Use /report [id/name] [reason] | if you see a hacker or if you have a problem!");
+    let info = "Name\tRank\n";
+    let data = samp.getPlayers().filter(f => Player.Info[f.playerid].Admin);
+    data.forEach((i) => {
+        info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t${getAdminRank(Player.Info[i.playerid].Admin)}\n`;
+    });
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${data.length} {00FF00}Online Admin(s)!`, info, "Close", "");
+});
+
 CMD.on("s2", (player) => {
     if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
 });
@@ -717,12 +1042,6 @@ CMD.on("lclan", (player) => {
         }  
     }
     else SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
-});
-
-CMD.on("createclan", (player) => {
-    if(Player.Info[player.playerid].Clan) return SendError(player, "You already have a Clan. Type /lclan to leave your current clan!");
-    player.GameTextForPlayer("~n~~n~~n~~n~~n~~n~~n~~n~~r~~h~Create ~w~~h~your own ~g~~h~clan!", 4000, 4);
-    player.ShowPlayerDialog(Dialog.CREATE_CLAN, samp.DIALOG_STYLE.INPUT, "{BBFF00}Create Clan", "{0072FF}You are now creating a clan!\nEnter below the name of your clan to continue...", "Continue", "Close");
 });
 
 /* =============== */
@@ -1230,7 +1549,7 @@ function getAdminRank(rank) {
     let string = "";
     switch(rank) {
         case 1: string = "{FF0000}Junior"; break;
-        case 2: break;
+        case 2: string = "{FFFF00}Senior"; break;
         case 3: string = "{0072FF}Master"; break;
     }
     return string;
@@ -1250,7 +1569,7 @@ function getVIPRank(rank) {
 function getPlayerRankInChat(player) {
     let tag = "";
     if(Player.Info[player.playerid].Admin == 3) tag = "{0072FF}(Master)";
-    else if(Player.Info[player.playerid].Admin == 2) tag = "(Senior)";
+    else if(Player.Info[player.playerid].Admin == 2) tag = "{FFFF00}(Senior)";
     else if(Player.Info[player.playerid].Admin == 1) tag = "{FF0000}(Junior)";
     else if(Player.Info[player.playerid].VIP == 4) tag = "{FF0000}({FFFFFF}VIP{FF0000})";
     else if(Player.Info[player.playerid].VIP == 3) tag = "{0077FF}(VIP)";
