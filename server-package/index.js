@@ -2153,6 +2153,7 @@ samp.OnGameModeInit(() => {
     console.log("Romania HarD Stunt GameMode successfully loaded.");
     console.log("Gamemode creator: Ghosty2004");
     console.log("Have Fun with this shit :)");
+    console.log(`NodeJS Version: ${process.version}`);
 
     Maps.Load();
     TextDraws.server.Load(); /* Load Server TextDraws */
