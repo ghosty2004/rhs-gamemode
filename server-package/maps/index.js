@@ -17,10 +17,12 @@ const Drift1 = require("./drifts/1");
 const Gang1 = require("./gangs/1");
 
 /* Others */
+const Beach = require("./others/beach");
 const Jail = require("./others/jail");
 const LS = require("./others/ls");
 const LV = require("./others/lv");
 const LVTrans = require("./others/lvtrans");
+const Pimps = require("./others/pimps");
 const SF = require("./others/sf");
 const Spawn = require("./others/spawn");
 const Voller = require("./others/voller");
@@ -41,10 +43,12 @@ module.exports = {
         Gang1.Load();
 
         /* Others */
+        Beach.Load();
         Jail.Load();
         LS.Load();
         LV.Load();
         LVTrans.Load();
+        Pimps.Load();
         SF.Load();
         Spawn.Load();
         Voller.Load();
@@ -64,9 +68,11 @@ module.exports = {
         // null..
 
         /* Others */
+        Beach.RemoveBuilding(player);
         LS.RemoveBuilding(player);
         LV.RemoveBuilding(player);
         LVTrans.RemoveBuilding(player);
+        Pimps.RemoveBuilding(player);
         SF.RemoveBuilding(player);
         Voller.RemoveBuilding(player);
 
