@@ -1004,7 +1004,7 @@ CMD.on("cinfo", async (player, params) => {
     if(params[0]) target = getPlayer(params[0]);
     if(target) {
         let info = "";
-        info += `{FF0000}${target.GetPlayerName(24)}{FFFF00}'s clan informations\n`;
+        info += `{FF0000}${Clan.Info[Player.Info[target.playerid].Clan].name}{FFFF00}'s clan informations\n`;
         info += "\n";
         info += "{FFFF00}Informations\n";
         info += "{BBFF00}Total kills: {49FFFF}0\n";
