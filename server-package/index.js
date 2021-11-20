@@ -16,6 +16,7 @@ const Errors = require("./modules/errors");
 const events = require("./modules/events");
 const Player = require("./modules/player");
 const Streamer = require("./modules/streamer");
+const Teleport = require("./modules/teleport");
 
 /* Server Maps */
 const Maps = require("./maps");
@@ -343,7 +344,7 @@ CMD.on("report", (player, params) => {
         }
         else SendError(player, Errors.PLAYER_NOT_CONNECTED);
     }
-    else SendUsage(player, "/report [ID/Name] [Reason]");
+    else SendUsage(player, "/Report [ID/Name] [Reason]");
 });
 
 CMD.on("up", (player, params) => {
@@ -1075,6 +1076,19 @@ CMD.on("acmds", (player) => {
 /* ===================== */
 /* ADMIN JUNIOR COMMANDS */
 /* ===================== */
+CMD.on("gotop", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!isNaN(params[0]) && !isNaN(params[1]) && !isNaN(params[2])) {
+        const position = {
+            x: parseInt(params[0]),
+            y: parseInt(params[1]),
+            z: parseInt(params[2])
+        }
+        player.SetPlayerPos(position.x, position.y, position.z);
+    }
+    else SendUsage(player, "/GotoP [X] [Y] [Z]");
+});
+
 CMD.on("reports", (player) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
 });
@@ -1122,7 +1136,7 @@ CMD.on("jail", (player, params) => {
         }
         else SendError(player, Errors.PLAYER_NOT_CONNECTED);
     }
-    else SendUsage(player, "/jail [ID/Name] [Minutes] [Reason]");
+    else SendUsage(player, "/Jail [ID/Name] [Minutes] [Reason]");
 });
 
 CMD.on("unjail", (player, params) => {
@@ -1137,7 +1151,7 @@ CMD.on("unjail", (player, params) => {
         }
         else SendError(player, Errors.PLAYER_NOT_CONNECTED);
     }
-    else SendUsage(player, "/unjail [ID/Name]");
+    else SendUsage(player, "/UnJail [ID/Name]");
 });
 
 CMD.on("explode", (player, params) => {
@@ -1339,22 +1353,35 @@ CMD.on("setall", (player, params) => {
     if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
 });
 
-CMD.on("gotop", (player, params) => {
-    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-    if(!isNaN(params[0]) && !isNaN(params[1]) && !isNaN(params[2])) {
-        const position = {
-            x: parseInt(params[0]),
-            y: parseInt(params[1]),
-            z: parseInt(params[2])
+/* ============== */
+/* Rcons Commands */
+/* ============== */
+CMD.on("createteleport", (player, params) => {
+    try {
+        if(params[0] && params.slice(1).join(" ")) {
+            if(!Teleport.Exists(params[0])) {
+                params[0] = params[0].replace("/", "");
+                con.query("INSERT INTO teleports (command, name, position) VALUES(?, ?, ?)", [params[0], params.slice(1).join(" "), JSON.stringify(player.GetPlayerPos())], function(err, result) {
+                    if(!err) {
+                        Teleport.Create(result.insertId, params[0], params.slice(1).join(" "), player.GetPlayerPos());
+                        player.SendClientMessage(data.colors.LIGHT_YELLOW, `You have successfully created teleport {FFFFFF}/${params[0]} {BBFF00}with ID {FFFFFF}${result.insertId}{BBFF00}.`);
+                    }
+                });
+            }
+            else SendError(player, "This teleport already exists.");
         }
-        player.SetPlayerPos(position.x, position.y, position.z);
+        else SendUsage(player, "/CreateTeleport [Command] [Name]");
     }
-    else SendUsage(player, "/gotop [X] [Y] [Z]");
+    catch(e) { console.log(e.stack); }
 });
 
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function replaceAll(string, search, replace) {
+    return string.replace(new RegExp(search, 'g'), replace);
+}
+
 function SendAntiSpam(player, time) {
     player.SendClientMessage(data.colors.LIGHT_YELLOW, Lang(player, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${time}{BBFF00} secunde pentru a scrie ceva din nou!`, `ANTI-SPAM: {BBFF00}Please wait {00BBF6}${time}{BBFF00} seconds to write something again!`));
 }
@@ -1475,7 +1502,18 @@ function SetupPlayerForSpawn(player, type=0) {
 }
 
 function LoadFromDB() {
+    LoadTeleports();
     LoadClans();
+}
+
+function LoadTeleports() {
+    con.query("SELECT * FROM teleports", function(err, result) {
+        for(let i = 0; i < result.length; i++) {
+            let position = JSON.parse(result[i].position);
+            Teleport.Create(result[i].ID, result[i].command, result[i].name, [position[0], position[1], position[2]]);
+        }
+        console.log(`Loaded ${result.length} teleports.`);
+    });
 }
 
 function LoadClans() {
@@ -1607,7 +1645,7 @@ function SendUsage(player, text) {
 }
 
 function SendError(player, ro_error, en_error=ro_error /* Set default value for en error if it's missing */) {
-    player.SendClientMessage(0xFF0000AA, "ERROR:" + Player.Info[player.playerid].Language == 1 ? ro_error : en_error);
+    player.SendClientMessage(0xFF0000AA, `ERROR: ${Lang(player, ro_error, en_error)}`);
 }
 
 function ShowImportant(player, page) {
@@ -1721,7 +1759,7 @@ function ShowCMDS(player, page) {
             info += `{FFCC00}/weapons {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "Cumpara-ti niste 'jucarii'." : "Buy some 'toys'."}\n`;
             info += `{FFCC00}/fweapons {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "Cumpara-ti niste 'jucarii' de copii mici." : "Buy some kids 'toys'."}\n`;
             info += `{FFCC00}/bweapons {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "Cumpara-ti niste 'jucarii' de baieti mari. :))" : "Buy some big boys 'toys'. :))"}\n`;
-            player.ShowPlayerDialog(Dialog.CMDS_1, samp.DIALOG_STYLE.MSGBOX, Player.Info[player.playerid].Language == 1 ? "Comenzi - Pagina {FF0000}1" : "Commands - Page {FF0000}1", info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", Player.Info[player.playerid].Language == 1 ? "Pagina 2" : "Page 2");
+            player.ShowPlayerDialog(Dialog.CMDS_1, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Comenzi - Pagina {FF0000}1", "Commands - Page {FF0000}1"), info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", Player.Info[player.playerid].Language == 1 ? "Pagina 2" : "Page 2");
             break;
         }
         case 2: {
@@ -1753,7 +1791,7 @@ function ShowCMDS(player, page) {
             info += `{FF0000}/hidetag {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Ascunde-ti tie sau celorlalti jucatori tag-ul!" : "Hide your/others' tag."}\n`;
             info += `{FF0000}/vCmds {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Vezi o lista cu comenzile de VIP." : "View a list with all VIP Commands."}\n`;
             info += `{FF0000}/vup {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Activeaza/Dezactiveaza functia de VUP a vehiculului." : "Activate/Deactivate Vehicle's VUP Function."}\n`;
-            player.ShowPlayerDialog(Dialog.CMDS_2, samp.DIALOG_STYLE.MSGBOX, Player.Info[player.playerid].Language == 1 ? "Comenzi - Pagina {FF0000}2" : "Commands - Page {FF0000}2", info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", Player.Info[player.playerid].Language == 1 ? "Pagina 2" : "Page 2");
+            player.ShowPlayerDialog(Dialog.CMDS_2, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Comenzi - Pagina {FF0000}2", "Commands - Page {FF0000}2"), info, Lang(player, "Pagina 1", "Page 1"), Lang(player, "Pagin 3", "Page 3"));
             break;
         }
         case 3: {
@@ -1782,7 +1820,7 @@ function ShowCMDS(player, page) {
             info += `{FF0000}/wtime {05C81F}- ${Player.Info[player.playerid].Language == 1 ? "Pentru a vedea cat este ceasul!" : "To see what the clock is!"}\n`;
             info += `{FF0000}/blacklisted {05C81F}- ${Player.Info[player.playerid].Language == 1 ? "Pentru a vedea cine se afla pe lista neagra!" : "To see who is blacklisted!"}\n`;
             info += `{FF0000}/email {05C81F}- ${Player.Info[player.playerid].Language == 1 ? "Pentru a schimba sau adauga un e-mail in contul tau!" : "To change or add a e-mail to your account!"}\n`;
-            player.ShowPlayerDialog(Dialog.CMDS_3, samp.DIALOG_STYLE.MSGBOX, Player.Info[player.playerid].Language == 1 ? "Comenzi - Pagina {FF0000}3" : "Commands - Page {FF0000}3", info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", Player.Info[player.playerid].Language == 1 ? "Pagina 1" : "Page 1");
+            player.ShowPlayerDialog(Dialog.CMDS_3, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Comenzi - Pagina {FF0000}3", "Commands - Page {FF0000}3"), info, Lang(player, "Inchide", "Close"), Lang(player, "Pagina 2", "Page 2"));
             break;
         }
     }
@@ -2548,11 +2586,12 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             break;
         }
         case Dialog.CMDS_2: {
-            if(!response) ShowCMDS(player, 3);
+            if(response) ShowCMDS(player, 1);
+            else ShowCMDS(player, 3);
             break;
         }
         case Dialog.CMDS_3: {
-            if(!response) ShowCMDS(player, 1);
+            if(!response) ShowCMDS(player, 2);
             break;
         }
         case Dialog.NEW_NAME: {
