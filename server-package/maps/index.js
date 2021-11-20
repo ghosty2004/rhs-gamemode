@@ -18,6 +18,7 @@ const Gang1 = require("./gangs/1");
 
 /* Others */
 const Beach = require("./others/beach");
+const Chilliad = require("./others/chilliad");
 const Jail = require("./others/jail");
 const LS = require("./others/ls");
 const LV = require("./others/lv");
