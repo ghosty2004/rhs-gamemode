@@ -33,10 +33,6 @@ module.exports = {
                 RacePoints: 0,
 
             },
-            Properties: {
-                Business: 0,
-                House: 0
-            },
             Description: {
                 "1": "",
                 "2": "",

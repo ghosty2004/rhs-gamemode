@@ -32,10 +32,6 @@ export declare const Info: {
         RacePoints: number,
 
     },
-    Properties: {
-        Business: number,
-        House: number
-    },
     Description: {
         "1": string,
         "2": string,

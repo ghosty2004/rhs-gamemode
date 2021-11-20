@@ -500,8 +500,8 @@ CMD.on("stats", (player, params) => {
             info += `{BBFF00}Race Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.RacePoints} {BBFF00}(${getRanksRankName("race", Player.Info[player.playerid].Driving_Data.RacePoints)}{BBFF00})\n`;
             info += "\n";
             info += "{FF4800}Properties\n";
-            info += `{BBFF00}Business: ${Player.Info[player.playerid].Properties.Business ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
-            info += `{BBFF00}House: ${Player.Info[player.playerid].Properties.House ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
+            info += `{BBFF00}Business: {FF0000}No\n`;
+            info += `{BBFF00}House: {FF0000}No\n`;
             info += `{BBFF00}Personal Vehicle: {FF0000}No\n`;
             info += "\n";
             info += `{FF4800}Statistics note: {49FFFF}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob`
@@ -1463,6 +1463,117 @@ CMD.on("disarm", (player, params) => {
 
 CMD.on("set", (player, params) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(params[0] && params[1] && !isNaN(params[2])) {
+        let target = getPlayer(params[1]);
+        if(target) {
+            params[2] = parseInt(params[2]);
+
+            if(params[0] == "time") {
+                if(params[2] < 0 || params[2] > 23) return SendError(player, "Invalid time (0-23)!");
+                target.SendClientMessage(data.colors.YELLOW, `Administrator {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Time to {FF0000}${params[2]}:00{FFFF00}!`);
+                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Time to {FF0000}${params[2]}:00{FFFF00}!`);
+                target.SetPlayerTime(params[2], 0);
+                SendACMD(player, "Set Time");
+            }
+            else if(params[0] == "weather") {
+                if(params[2] < 0 || params[2] > 20) return SendError(player, "Invalid weather (0-20)!");
+                target.SendClientMessage(data.colors.YELLOW, `Administrator {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Weather to {FF0000}${params[2]}{FFFF00}!`);
+                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Weather to {FF0000}${params[2]}{FFFF00}!`);
+                target.SetPlayerWeather(params[2]);
+                SendACMD(player, "Set Weather");
+            }
+            else if(params[0] == "world") {
+                target.SendClientMessage(data.colors.YELLOW, `Administrator {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your World to {FF0000}${params[2]}{FFFF00}!`);
+                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s World to {FF0000}${params[2]}{FFFF00}!`);
+                target.SetPlayerVirtualWorld(params[2]);
+                SendACMD(player, "Set World");
+            }
+            else if(params[0] == "admin") {
+
+            }
+            else if(params[0] == "vip") {
+
+            }
+            else if(params[0] == "health") {
+                if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+            }
+            else if(params[0] == "armour") {
+                if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+            }
+            else if(params[0] == "coins") {
+
+            }
+            else if(params[0] == "kills") {
+
+            }
+            else if(params[0] == "deaths") {
+
+            }
+            else if(params[0] == "color") {
+                if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+            }
+            else if(params[0] == "skin") {
+                target.SendClientMessage(data.colors.YELLOW, `Administrator {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Skin to {FF0000}${params[2]}{FFFF00}!`);
+                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Skin to {FF0000}${params[2]}{FFFF00}!`);
+                target.SetPlayerSkin(params[2]);
+                SendACMD(player, "Set Color");
+            }
+            else if(params[0] == "interior") {
+                target.SendClientMessage(data.colors.YELLOW, `Administrator {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Interior to {FF0000}${params[2]}{FFFF00}!`);
+                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Interior to {FF0000}${params[2]}{FFFF00}!`);
+                target.SetPlayerInterior(params[2]);
+                SendACMD(player, "Set Interior");
+            }
+            else if(params[0] == "wanted") {
+                if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                if(params[2] < 0 || params[2] > 6) return SendError(player, "Invalid wanted level (0-6)!");
+                target.SendClientMessage(data.colors.YELLOW, `Administrator {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Wanted level to {FF0000}${params[2]}{FFFF00}!`);
+                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Wanted level to {FF0000}${params[2]}{FFFF00}!`);
+                target.SetPlayerWantedLevel(params[2]);
+                SendACMD(player, "Set Wanted");
+            }
+            else if(params[0] == "respect+") {
+
+            }
+            else if(params[0] == "respect-") {
+
+            }
+            else if(params[0] == "online") {
+
+            }
+            else if(params[0] == "money") {
+                if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid money (0-999999999)!");
+                Player.Info[target.playerid].Money = params[2];
+                target.ResetPlayerMoney();
+                target.GivePlayerMoney(Player.Info[target.playerid].Money);
+                SendACMD(player, "Set Money");
+            }
+            else if(params[0] == "drift") {
+
+            }
+            else if(params[0] == "race") {
+
+            }
+            else if(params[0] == "stunt") {
+
+            }
+            else if(params[0] == "bestkilling") {
+
+            }
+            else if(params[0] == "kicks") {
+
+            }
+            else Usage();
+        }
+        else SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    }
+    else Usage();
+    function Usage() {
+        SendUsage(player, "/Set [Option] [ID/Name] [Amount]");
+        player.SendClientMessage(data.colors.RED, "Options: {FFFFFF}Time, Weather, World, Admin, VIP, Health, Armour, Coins, Kills, Deaths, Color");
+        player.SendClientMessage(data.colors.RED, "Options: {FFFFFF}Skin, Interior, Wanted, Respect(-/+), Online, Money, Drift, Race, Stunt, BestKilling, Kicks");
+    }
 });
 
 CMD.on("laston", (player, params) => {
@@ -1646,6 +1757,12 @@ CMD.on("setall", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function SendACMD(player, cmdtext) {
+    samp.getPlayers().filter(f => Player.Info[f.playerid].Admin).forEach((i) => {
+        i.SendClientMessage(data.colors.BLUE, `Admin: {FFFF00}${player.GetPlayerName(24)} {0000FF}has used the command: {FFFF00}${cmdtext}`);
+    });
+}
+
 function isPlayerInSpecialZone(player) {
     let value = false;
     if(Player.Info[player.playerid].SpecialZone.Targets) value = true;
@@ -1772,9 +1889,13 @@ function getNameByAccID(AccID) {
 
 function savePlayer(player) {
     if(Player.Info[player.playerid].LoggedIn) {
-        con.query("UPDATE users SET mail = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?, clan_rank = ?, gang = ?, jailed = ? WHERE ID = ?", [
-            Player.Info[player.playerid].Mail, Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, 
-            Player.Info[player.playerid].Clan, Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].AccID
+        con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?, clan_rank = ?, gang = ?,\
+        kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, jailed = ? WHERE ID = ?", [
+            Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
+            Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, 
+            Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, Player.Info[player.playerid].Kills_Data.KillingSpree, Player.Info[player.playerid].Kills_Data.BestKillingSpree, 
+            Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints,
+            Player.Info[player.playerid].Jailed, Player.Info[player.playerid].AccID
         ]);
     }
 }
@@ -2199,13 +2320,27 @@ function LoadPlayerStats(player) {
 
             Player.Info[player.playerid].AccID = result[0].ID;
             Player.Info[player.playerid].Mail = result[0].mail;
+            Player.Info[player.playerid].Money = result[0].money;
+            Player.Info[player.playerid].Coins = result[0].coins;
+            Player.Info[player.playerid].Respect.Positive = result[0].respect_positive;
+            Player.Info[player.playerid].Respect.Negative = result[0].respect_negative;
             Player.Info[player.playerid].Admin = result[0].admin;
             Player.Info[player.playerid].VIP = result[0].VIP;
             Player.Info[player.playerid].VIP_Expire = result[0].VIP_Expire;
             Player.Info[player.playerid].Clan = result[0].clan;
             Player.Info[player.playerid].Clan_Rank = result[0].clan_rank;
             Player.Info[player.playerid].Gang = result[0].gang;
+            Player.Info[player.playerid].Kills_Data.Kills = result[0].kills; 
+            Player.Info[player.playerid].Kills_Data.HeadShots = result[0].headshots;
+            Player.Info[player.playerid].Kills_Data.KillingSpree = result[0].killingspree;
+            Player.Info[player.playerid].Kills_Data.BestKillingSpree = result[0].bestkillingspree;
+            Player.Info[player.playerid].Kills_Data.Deaths = result[0].deaths;
+            Player.Info[player.playerid].Driving_Data.DriftPoints = result[0].driftpoints;
+            Player.Info[player.playerid].Driving_Data.StuntPoints = result[0].stuntpoints;
+            Player.Info[player.playerid].Driving_Data.RacePoints = result[0].racepoints;
             Player.Info[player.playerid].Jailed = result[0].jailed;
+
+            player.GivePlayerMoney(Player.Info[player.playerid].Money);
 
             let info = "";
             info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
