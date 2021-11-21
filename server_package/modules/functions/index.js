@@ -10,5 +10,12 @@ module.exports = {
         let result = getPlayers().filter(f => f.GetPlayerName(24).toLowerCase().includes(`${IDOrName}`.toLowerCase()) || f.playerid == IDOrName)[0];
         if(result) return result;
         else return 0;
+    },
+    secondsToHms: function(d) {
+        d = Number(d);
+        let hours = Math.floor(d / 3600);
+        let minutes = Math.floor(d % 3600 / 60);
+        let seconds = Math.floor(d % 3600 % 60);
+        return {hours: hours, minutes: minutes, seconds: seconds};
     }
 }

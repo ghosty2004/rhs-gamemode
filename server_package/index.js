@@ -13,9 +13,10 @@ const Clan = require("./modules/clan");
 const Dialog = require("./modules/dialog");
 const Errors = require("./modules/errors");
 const events = require("./modules/events");
-const con = require("./modules/mysql"); 
 const Minigames = require("./modules/minigames");
+const con = require("./modules/mysql"); 
 const Player = require("./modules/player");
+const Server = require("./modules/server");
 const SpawnZone = require("./modules/spawnzone");
 const Streamer = require("./modules/streamer");
 const Teleport = require("./modules/teleport");
@@ -30,7 +31,7 @@ const TextDraws = require("./textdraws");
 const ServerLogs = ["", "", ""];
 
 /* Functions */
-const { getRandomInt, getPlayer } = require("./modules/functions");
+const { getRandomInt, getPlayer, secondsToHms } = require("./modules/functions");
 
 /* Data's */
 const data = {
@@ -526,8 +527,16 @@ CMD.on("ramp", (player) => {
 
 });
 
-CMD.on("statsserver", (player) => {
+CMD.on("statsserver", async (player) => {
+    let OnlineTime = secondsToHms(Server.Info.StartTime);
 
+    let info = "";
+    info += `{BBFF00}Server has been started for{00BBF6} ${OnlineTime.hours} {BBFF00}hours, {00BBF6}${OnlineTime.minutes} {BBFF00}minutes {00BBF6}${OnlineTime.seconds} {BBFF00}seconds\n`;
+    info += `{BBFF00}Players joined to the server{00BBF6} ${Server.Info.NewJoinedPlayers}\n`;
+    info += `{BBFF00}New players registered on server{00BBF6} ${Server.Info.NewRegistredPlayers}\n`;
+    info += `{BBFF00}Total players registered on server{00BBF6} ${await getRegistredPlayersCount()}\n`;
+    info += `{BBFF00}Messages has been sent{00BBF6} ${Server.Info.Messages}`;
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Server Stats", info, "Close", "");
 });
 
 CMD.on("howto", (player) => {
@@ -2003,6 +2012,15 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function getRegistredPlayersCount() {
+    return new Promise((resolve, reject) => {
+        con.query("SELECT COUNT(*) AS count FROM users", function(err, result) {
+            if(!err && result != 0) resolve(result[0].count);
+            else resolve(0);
+        });
+    });
+}
+
 function Updater() {
     /* Server HostName Changer */
     samp.SendRconCommand(`hostname ${data.settings.RANDOM_SERVER_NAMES[getRandomInt(0, data.settings.RANDOM_SERVER_NAMES.length)]}`)
@@ -2895,6 +2913,8 @@ samp.OnPlayerConnect(async(player) => {
         TextDraws.player.Load(player); /* Load Player TextDraws */
         CheckPlayerAka(player);
 
+        Server.Info.NewJoinedPlayers++;
+
         AddToTDLogs(`~r~~h~${player.GetPlayerName(24)}(${player.playerid}) ~y~~h~joined the server!`);
     }
     return true;
@@ -3644,7 +3664,8 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                     if(!err) {
                         Player.Info[player.playerid].AccID = result.insertId;
                         LoadPlayerStats(player);
-                        samp.SendClientMessageToAll(data.colors.ORANGE, `INFO: {00BBF6}${player.GetPlayerName(24)}(${player.playerid}) {BBFF00}s-a inregistrat pe server-ul nostru!`);
+                        Server.Info.NewRegistredPlayers++;
+                        samp.SendClientMessageToAll(data.colors.ORANGE, `INFO: {00BBF6}${player.GetPlayerName(24)}(${player.playerid}){BBFF00} ${Lang(player, `s-a inregistrat pe server-ul nostru!`, `has registered on our server!`)}`);
                         player.ShowPlayerDialog(Dialog.AFTER_REGISTER, samp.DIALOG_STYLE.MSGBOX, "Inregistrare {BBFF00}Reusita!", `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n{BBFF00}Te-ai inregistrat cu succes pe server-ul ${data.settings.SERVER_NAME}{BBFF00}!\n{BBFF00}Tine minte! De cate ori vei reveni, va trebuii sa te autentifici cu parola: {FF0000}${inputtext}{BBFF00}!\n\n{FFFF00}Pentru mai multe informatii, click pe buton-ul {FF0000}Ajutor{FFFF00}.\n{FFFF00}De asemenea, nu uita sa ne vizitezi si website-ul si forum-ul nostru la adresa {FF0000}${data.settings.SERVER_WEB}{FFFF00}!`, "Inchide", "Ajutor!");
                     }
                     else player.Kick();
@@ -3666,6 +3687,8 @@ samp.OnPlayerText((player, text) => {
     if(!checkAntiSpam(player)) return false;
 
     Player.Info[player.playerid].Last_Chat_Message = Math.floor(Date.now() / 1000);
+    Server.Info.Messages++;
+    
     if(!CheckCustomChat(player, text)) return false;
 
     samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}${getPlayerRankInChat(player)}{00CCFF}(${player.playerid}):{FFFFFF} ${text}`);
