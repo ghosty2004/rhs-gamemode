@@ -320,7 +320,8 @@ CMD.on("para", (player) => {
 });
 
 CMD.on("camera", (player) => {
-
+    player.GivePlayerWeapon(43, 9999);
+    player.SendClientMessage(data.colors.GREEN, Lang(player, "Ai primit un {00BBF6}Aparat foto{00FF00}!", "You took a {00BBF6}Camera{00FF00}!"));
 });
 
 CMD.on("dick", (player) => {
