@@ -1723,6 +1723,27 @@ CMD.on("cc", (player) => { CMD.emit("clearchat", player); });
 /* ===================== */
 CMD.on("ban", (player, params) => {
     if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0] && isNaN(params[1]) && !params.slice(2).join(" ")) return SendUsage(player, "/Ban [ID/Name] [Day(s)] [Reason]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    if(!Player.Info[target.playerid].LoggedIn) return SendError(player, Errors.PLAYER_NOT_LOGGED);
+    params[1] = parseInt(params[1]);
+    if(params[1] < 1 || params[1] > 99) return SendError(player, "Invalid day(s) (1-99)!");
+    samp.SendClientMessageToAll(data.colors.LIGHT_BLUE, "================(Ban Details)================");
+    samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {CEC8C8}has been banned by Admin {00BBF6}${player.GetPlayerName(24)} {CEC8C8}for {FF0000}${params[1]} {CEC8C8}day(s)!`);
+    samp.SendClientMessageToAll(data.colors.GRAY, `Reason: {00BBF6}${params.slice(2).join(" ")}`);
+    samp.SendClientMessageToAll(data.colors.LIGHT_BLUE, "==========================================");
+    for(let i = 0; i < 30; i++) target.SendClientMessage(-1, "");
+    target.SendClientMessage(data.colors.LIGHT_BLUE, `============(${Lang(target, "Detalii Ban", "Ban Details")})============`);
+    target.SendClientMessage(data.colors.GRAY, `${Lang(player, `Ai primit interdictie de la Admin {00BBF6}${player.GetPlayerName(24)} {CEC8C8}pentru {FF0000}${params[1]} {CEC8C8}zile!`, `You have been banned by Admin {00BBF6}${player.GetPlayerName(24)} {CEC8C8}for {FF0000}${params[1]} {CEC8C8}days!`)}`);
+    target.SendClientMessage(data.colors.GRAY, `${Lang(player, "Motiv", "Reason")}: {00BBF6}${params.slice(2).join(" ")}`);
+    target.SendClientMessage(data.colors.LIGHT_BLUE, "=======================================");
+    SendACMD(player, "Ban");
+    con.query("SELECT * FROM bans WHERE acc_id = ?", [Player.Info[target.playerid].AccID], function(err, result) {
+        if(!err && result != 0) con.query("INSERT INTO bans (acc_id, ip, admin_acc_id, from_timestamp, to_timestamp, reason) VALUES(?, ?, ?, ?, ?, ?)", [Player.Info[target.playerid].AccID, target.GetPlayerIp(16), Player.Info[player.playerid].AccID, getTimestamp(), getTimestamp(params[1]), params.slice(2).join(" ")]);
+        else con.query("UPDATE bans SET ip = ?, admin_acc_id = ?, from_timestamp = ?, to_timestamp = ?, reason = ?", [target.GetPlayerIp(16), Player.Info[player.playerid].AccID, getTimestamp(), getTimestamp(params[1]), params.slice(2).join(" ")]);
+    });
+    kickPlayer(target);
 });
 
 CMD.on("starevent", (player) => {
@@ -1887,6 +1908,63 @@ CMD.on("saveall", (player) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function checkPlayerBanStatus(player, check_acc_id=true) {
+    return new Promise((resolve, reject) => {
+        con.query(`SELECT * FROM bans WHERE ${check_acc_id ? `acc_id = '${Player.Info[player.playerid].AccID}' OR ip = '${player.GetPlayerIp(16)}'` : `ip = '${player.GetPlayerIp(16)}'`}`, async function(err, result) {
+            if(getTimestamp() < result[0].to_timestamp) {
+                HideConnectTextDraw(player);
+                player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "", "", "", "");
+                let difference = timeDifference(result[0].to_timestamp);
+                player.SendClientMessage(data.colors.LIGHT_BLUE, "================(Ban Details)================");
+                player.SendClientMessage(data.colors.GRAY, `Sorry, but {FF0000}${await getNameByAccID(result[0].acc_id)} {CEC8C8}is banned on our server!`);
+                player.SendClientMessage(data.colors.GRAY, `By Admin {00BBF6}${await getNameByAccID(result[0].admin_acc_id)}. {CEC8C8}Reason: {00BBF6}${result[0].reason}`);
+                player.SendClientMessage(data.colors.GRAY, `This ban will expire in {FF0000}${difference.value} {CEC8C8}${difference.type}!`);
+                player.SendClientMessage(data.colors.LIGHT_BLUE, "==========================================");
+                resolve(true);
+            }
+            else {
+                con.query("DELETE FROM bans WHERE acc_id = ?", [Player.Info[player.playerid].AccID]);
+                resolve(false);
+            }
+        });
+    });
+}
+
+function timeDifference(timestamp) {
+    let dateFuture = new Date(timestamp * 1000);
+    let dateNow = new Date(Date.now());
+    let diffInMilliSeconds = Math.abs(dateFuture - dateNow) / 1000;
+    let days = Math.floor(diffInMilliSeconds / 86400);
+    diffInMilliSeconds -= days * 86400;
+    let hours = Math.floor(diffInMilliSeconds / 3600) % 24;
+    diffInMilliSeconds -= hours * 3600;
+    let minutes = Math.floor(diffInMilliSeconds / 60) % 60;
+    diffInMilliSeconds -= minutes * 60;
+    let seconds = Math.trunc(diffInMilliSeconds);
+    let difference = {value: 0, type: ""};
+    if(days != 0) { 
+        difference.value = days; 
+        difference.type = "Days(s)";
+    }
+    else if(days == 0 && hours != 0) { 
+        difference.value = hours;
+        difference.type = "Hour(s)";
+    }
+    else if(hours == 0 && minutes != 0) { 
+        difference.value = minutes;
+        difference.type = "Minute(s)";
+    }
+    else if(minutes == 0 && seconds != 0) { 
+        difference.value = seconds;
+        difference.type = "Second(s)";
+    }
+    return difference;
+}
+
+function getTimestamp(days=0) {
+    return days == 0 ? Math.round(new Date() / 1000) : Math.round(new Date() / 1000) + (days * 86400);
+}
+
 function CheckPlayerAka(player) {
     con.query("SELECT * FROM akas WHERE ip = ?", [player.GetPlayerIp(16)], function(err, result) {
         if(err) return;
@@ -2529,68 +2607,71 @@ function Call_NewName(player) {
 }
 
 function LoadPlayerStats(player) {
-    con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
+    con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], async function(err, result) {
         if(!err && result) {  
             Player.Info[player.playerid].LoggedIn = true;
-
-            player.SpawnPlayer();
-
             Player.Info[player.playerid].AccID = result[0].ID;
-            Player.Info[player.playerid].Mail = result[0].mail;
-            Player.Info[player.playerid].Money = result[0].money;
-            Player.Info[player.playerid].Coins = result[0].coins;
-            Player.Info[player.playerid].Respect.Positive = result[0].respect_positive;
-            Player.Info[player.playerid].Respect.Negative = result[0].respect_negative;
-            Player.Info[player.playerid].OnlineTime.Hours = result[0].hours;
-            Player.Info[player.playerid].OnlineTime.Minutes = result[0].minutes;
-            Player.Info[player.playerid].OnlineTime.Seconds = result[0].seconds;
-            Player.Info[player.playerid].Admin = result[0].admin;
-            Player.Info[player.playerid].VIP = result[0].VIP;
-            Player.Info[player.playerid].VIP_Expire = result[0].VIP_Expire;
-            Player.Info[player.playerid].Clan = result[0].clan;
-            Player.Info[player.playerid].Clan_Rank = result[0].clan_rank;
-            Player.Info[player.playerid].Gang = result[0].gang;
-            Player.Info[player.playerid].Kills_Data.Kills = result[0].kills; 
-            Player.Info[player.playerid].Kills_Data.HeadShots = result[0].headshots;
-            Player.Info[player.playerid].Kills_Data.KillingSpree = result[0].killingspree;
-            Player.Info[player.playerid].Kills_Data.BestKillingSpree = result[0].bestkillingspree;
-            Player.Info[player.playerid].Kills_Data.Deaths = result[0].deaths;
-            Player.Info[player.playerid].Driving_Data.DriftPoints = result[0].driftpoints;
-            Player.Info[player.playerid].Driving_Data.StuntPoints = result[0].stuntpoints;
-            Player.Info[player.playerid].Driving_Data.RacePoints = result[0].racepoints;
-            Player.Info[player.playerid].AdminPoints = result[0].adminpoints;
-            Player.Info[player.playerid].Month.OnlineTime.Hours = result[0].month_hours;
-            Player.Info[player.playerid].Month.OnlineTime.Minutes = result[0].month_minutes;
-            Player.Info[player.playerid].Month.OnlineTime.Seconds = result[0].month_seconds;
-            Player.Info[player.playerid].Month.Kills_Data.Kills = result[0].month_kills;
-            Player.Info[player.playerid].Month.Kills_Data.HeadShots = result[0].month_headshots;
-            Player.Info[player.playerid].Month.Kills_Data.KillingSpree = result[0].month_killingspree;
-            Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree = result[0].month_bestkillingspree;
-            Player.Info[player.playerid].Month.Kills_Data.Deaths = result[0].month_deaths;
-            Player.Info[player.playerid].Driving_Data.DriftPoints = result[0].month_driftpoints;
-            Player.Info[player.playerid].Driving_Data.StuntPoints = result[0].month_stuntpoints;
-            Player.Info[player.playerid].Driving_Data.RacePoints = result[0].month_racepoints;
-            Player.Info[player.playerid].Jailed = result[0].jailed;
 
-            player.GivePlayerMoney(Player.Info[player.playerid].Money);
+            if(await checkPlayerBanStatus(player)) kickPlayer(player);
+            else {
+                Player.Info[player.playerid].Mail = result[0].mail;
+                Player.Info[player.playerid].Money = result[0].money;
+                Player.Info[player.playerid].Coins = result[0].coins;
+                Player.Info[player.playerid].Respect.Positive = result[0].respect_positive;
+                Player.Info[player.playerid].Respect.Negative = result[0].respect_negative;
+                Player.Info[player.playerid].OnlineTime.Hours = result[0].hours;
+                Player.Info[player.playerid].OnlineTime.Minutes = result[0].minutes;
+                Player.Info[player.playerid].OnlineTime.Seconds = result[0].seconds;
+                Player.Info[player.playerid].Admin = result[0].admin;
+                Player.Info[player.playerid].VIP = result[0].VIP;
+                Player.Info[player.playerid].VIP_Expire = result[0].VIP_Expire;
+                Player.Info[player.playerid].Clan = result[0].clan;
+                Player.Info[player.playerid].Clan_Rank = result[0].clan_rank;
+                Player.Info[player.playerid].Gang = result[0].gang;
+                Player.Info[player.playerid].Kills_Data.Kills = result[0].kills; 
+                Player.Info[player.playerid].Kills_Data.HeadShots = result[0].headshots;
+                Player.Info[player.playerid].Kills_Data.KillingSpree = result[0].killingspree;
+                Player.Info[player.playerid].Kills_Data.BestKillingSpree = result[0].bestkillingspree;
+                Player.Info[player.playerid].Kills_Data.Deaths = result[0].deaths;
+                Player.Info[player.playerid].Driving_Data.DriftPoints = result[0].driftpoints;
+                Player.Info[player.playerid].Driving_Data.StuntPoints = result[0].stuntpoints;
+                Player.Info[player.playerid].Driving_Data.RacePoints = result[0].racepoints;
+                Player.Info[player.playerid].AdminPoints = result[0].adminpoints;
+                Player.Info[player.playerid].Month.OnlineTime.Hours = result[0].month_hours;
+                Player.Info[player.playerid].Month.OnlineTime.Minutes = result[0].month_minutes;
+                Player.Info[player.playerid].Month.OnlineTime.Seconds = result[0].month_seconds;
+                Player.Info[player.playerid].Month.Kills_Data.Kills = result[0].month_kills;
+                Player.Info[player.playerid].Month.Kills_Data.HeadShots = result[0].month_headshots;
+                Player.Info[player.playerid].Month.Kills_Data.KillingSpree = result[0].month_killingspree;
+                Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree = result[0].month_bestkillingspree;
+                Player.Info[player.playerid].Month.Kills_Data.Deaths = result[0].month_deaths;
+                Player.Info[player.playerid].Driving_Data.DriftPoints = result[0].month_driftpoints;
+                Player.Info[player.playerid].Driving_Data.StuntPoints = result[0].month_stuntpoints;
+                Player.Info[player.playerid].Driving_Data.RacePoints = result[0].month_racepoints;
+                Player.Info[player.playerid].Jailed = result[0].jailed;
 
-            let info = "";
-            info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
-            info += "{BBFF00}Ai fost autentificat cu succes!\n";
-            info += "\n";
-            info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
-            info += `{BBFF00}VIP: ${Player.Info[player.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
-            info += "{BBFF00}Nota Statistici: {FF0000}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob\n";
-            info += "\n";
-            info += "{BBFF00}Pentru mai multe statistici, foloseste {FF0000}/stats{BBFF00}.\n";
-            if(result[0].spassword == "null") {
+                player.GivePlayerMoney(Player.Info[player.playerid].Money);
+
+                let info = "";
+                info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
+                info += "{BBFF00}Ai fost autentificat cu succes!\n";
                 info += "\n";
-                info += "{FF0000}Mesaj {FF9900}URGENT {FF0000}pentru siguranta contului tau:\n";
-                info += "{FFFFFF}In contul tau nu exista o parola secundara!\n";
-                info += "{FFFFFF}Pentru a evita pierderea contului tau,\n";
-                info += "{FFFFFF}Adauga o parola secundara folosind comanda {FF0000}/Spassword{FFFFFF}!";
+                info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
+                info += `{BBFF00}VIP: ${Player.Info[player.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
+                info += "{BBFF00}Nota Statistici: {FF0000}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob\n";
+                info += "\n";
+                info += "{BBFF00}Pentru mai multe statistici, foloseste {FF0000}/stats{BBFF00}.\n";
+                if(result[0].spassword == "null") {
+                    info += "\n";
+                    info += "{FF0000}Mesaj {FF9900}URGENT {FF0000}pentru siguranta contului tau:\n";
+                    info += "{FFFFFF}In contul tau nu exista o parola secundara!\n";
+                    info += "{FFFFFF}Pentru a evita pierderea contului tau,\n";
+                    info += "{FFFFFF}Adauga o parola secundara folosind comanda {FF0000}/Spassword{FFFFFF}!";
+                }
+                player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
+
+                player.SpawnPlayer();
             }
-            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
         }
         else player.Kick();
     });
@@ -2640,11 +2721,11 @@ samp.OnPlayerClickPlayer((player, clickedplayer) => {
 
     let info = "";
     info += `{0072FF}${Lang(player, "Vezi statistici", "Show Stats")} - {00FF00}/stats\n`;
-    info += `{0072FF}${Lang(player, "Vezi statistici gang", "Show Gang Stats")} - {00FF00}/stats\n`;
-    info += `{0072FF}${Lang(player, "Vezi statistici clan", "Show Clan Stats")} - {00FF00}/stats\n`;
-    info += `{0072FF}${Lang(player, "Vezi statistici admin", "Show Admin Stats")} - {00FF00}/stats\n`;
-    info += `{0072FF}${Lang(player, "Trimite PM", "Send PM")}\n`;
-    info += `{0072FF}${Lang(player, "Urmareste jucator", "Spectate him")}\n`;
+    info += `{0072FF}${Lang(player, "Vezi statistici gang", "Show Gang Stats")} - {00FF00}/gstats\n`;
+    info += `{0072FF}${Lang(player, "Vezi statistici clan", "Show Clan Stats")} - {00FF00}/cinfo\n`;
+    info += `{0072FF}${Lang(player, "Vezi statistici admin", "Show Admin Stats")} - {00FF00}/astats\n`;
+    info += `{0072FF}${Lang(player, "Trimite PM", "Send PM")} - {00FF00}/PM\n`;
+    info += `{0072FF}${Lang(player, "Urmareste jucator", "Spectate him")} - {00FF00}/spec`;
     player.ShowPlayerDialog(Dialog.PLAYER_CLICK, samp.DIALOG_STYLE.LIST, Lang(player, `{AAAAAA}Ai dat click pe {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`, `{AAAAAA}You have clicked {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`), info, "Select", "Close");
 });
 
@@ -2665,18 +2746,21 @@ samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
     return true;
 });
 
-samp.OnPlayerConnect((player) => {
-    ShowConnectTextDraw(player); 
+samp.OnPlayerConnect(async(player) => {
     Player.ResetVariables(player);
+    if(await checkPlayerBanStatus(player, false)) kickPlayer(player);
+    else {
+        ShowConnectTextDraw(player); 
 
-    /* Language Select */
-    player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English");
-    
-    Maps.RemoveBuildings(player); /* Remove Player GTA:SA Objects */
-    TextDraws.player.Load(player); /* Load Player TextDraws */
-    CheckPlayerAka(player);
+        /* Language Select */
+        player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English");
+        
+        Maps.RemoveBuildings(player); /* Remove Player GTA:SA Objects */
+        TextDraws.player.Load(player); /* Load Player TextDraws */
+        CheckPlayerAka(player);
 
-    AddToTDLogs(`~r~~h~${player.GetPlayerName(24)}(${player.playerid}) ~y~~h~joined the server!`);
+        AddToTDLogs(`~r~~h~${player.GetPlayerName(24)}(${player.playerid}) ~y~~h~joined the server!`);
+    }
     return true;
 });
 

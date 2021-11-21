@@ -5,6 +5,7 @@ module.exports = {
     },
     NOT_MEMBER_OF_ANY_CLAN: "You are not a member in any clan!",
     PLAYER_NOT_CONNECTED: "Player is not connected!",
+    PLAYER_NOT_LOGGED: "Player is not Logged In!",
     PLAYER_NOT_IN_ANY_CLAN: "Player is not in any clan.",
     NOT_ENOUGH_VIP: {
         RO: "Nu ai un rank de V.I.P. indeajuns de mare! Scrie /vCmds pentru detalii!",
