@@ -7,6 +7,7 @@ const {
     TextDrawUseBox, TextDrawBoxColor, TextDrawSetShadow, TextDrawSetOutline,
     TextDrawBackgroundColor, TextDrawFont, TextDrawSetProportional, TextDrawSetSelectable
 } = require("samp-node-lib");
+const { SV_NAME, SERVER_WEB } = require("../data/settings");
 
 module.exports = {
     logs: null,
@@ -29,7 +30,7 @@ module.exports = {
         TextDrawSetSelectable(this.logs, 0);
 
         /* Spanw TextDraw */
-        this.spawn[0] = TextDrawCreate(8.000000, 422.000000, "Romania");
+        this.spawn[0] = TextDrawCreate(8.000000, 422.000000, SV_NAME[1]);
         TextDrawLetterSize(this.spawn[0], 0.379996, 1.499992);
         TextDrawTextSize(this.spawn[0], 1280.000000, 1280.000000);
         TextDrawAlignment(this.spawn[0], 0);
@@ -43,7 +44,7 @@ module.exports = {
         TextDrawSetProportional(this.spawn[0], 1);
         TextDrawSetSelectable(this.spawn[0], 0);
 
-        this.spawn[1] = TextDrawCreate(64.000000, 424.000000, "HarD");
+        this.spawn[1] = TextDrawCreate(64.000000, 424.000000, SV_NAME[2]);
         TextDrawLetterSize(this.spawn[1], 0.449995, 1.299993);
         TextDrawTextSize(this.spawn[1], 1280.000000, 1280.000000);
         TextDrawAlignment(this.spawn[1], 0);
@@ -57,7 +58,7 @@ module.exports = {
         TextDrawSetProportional(this.spawn[1], 1);
         TextDrawSetSelectable(this.spawn[1], 0);
 
-        this.spawn[2] = TextDrawCreate(103.000000, 423.000000, "Stunt");
+        this.spawn[2] = TextDrawCreate(103.000000, 423.000000, SV_NAME[3]);
         TextDrawLetterSize(this.spawn[2], 0.379999, 1.399997);
         TextDrawTextSize(this.spawn[2], 1280.000000, 1280.000000);
         TextDrawAlignment(this.spawn[2], 0);
@@ -86,7 +87,7 @@ module.exports = {
         TextDrawSetSelectable(this.spawn[3], 0);
 
         /* Connect TextDraw */
-        this.connect[0] = TextDrawCreate(8.000000, 346.000000, "Romania");
+        this.connect[0] = TextDrawCreate(8.000000, 346.000000, SV_NAME[1]);
         TextDrawLetterSize(this.connect[0], 0.449999, 2.199994);
         TextDrawTextSize(this.connect[0], 1280.000000, 1280.000000);
         TextDrawAlignment(this.connect[0], 0);
@@ -100,7 +101,7 @@ module.exports = {
         TextDrawSetProportional(this.connect[0], 1);
         TextDrawSetSelectable(this.connect[0], 0);
 
-        this.connect[1] = TextDrawCreate(75.000000, 347.000000, "hard");
+        this.connect[1] = TextDrawCreate(75.000000, 347.000000, SV_NAME[2]);
         TextDrawLetterSize(this.connect[1], 0.469996, 2.099994);
         TextDrawTextSize(this.connect[1], 1280.000000, 1280.000000);
         TextDrawAlignment(this.connect[1], 0);
@@ -114,7 +115,7 @@ module.exports = {
         TextDrawSetProportional(this.connect[1], 1);
         TextDrawSetSelectable(this.connect[1], 0);
 
-        this.connect[2] = TextDrawCreate(117.000000, 347.000000, "Stunt");
+        this.connect[2] = TextDrawCreate(117.000000, 347.000000, SV_NAME[3]);
         TextDrawLetterSize(this.connect[2], 0.459996, 2.099992);
         TextDrawTextSize(this.connect[2], 1280.000000, 1280.000000);
         TextDrawAlignment(this.connect[2], 0);
@@ -212,7 +213,7 @@ module.exports = {
         TextDrawSetProportional(this.connect[8], 1);
         TextDrawSetSelectable(this.connect[8], 0);
 
-        this.connect[9] = TextDrawCreate(34.000000, 422.000000, "www.rhs-samp.com");
+        this.connect[9] = TextDrawCreate(34.000000, 422.000000, SERVER_WEB);
         TextDrawLetterSize(this.connect[9], 0.299998, 1.899997);
         TextDrawTextSize(this.connect[9], 1280.000000, 1280.000000);
         TextDrawAlignment(this.connect[9], 0);

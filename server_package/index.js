@@ -1487,6 +1487,11 @@ CMD.on("ip", (player, params) => {
 
 CMD.on("aka", (player, params) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(params[0]) {
+        let target = getPlayer(params[0]);
+        if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    }
+    else SendUsage(player, "/Aka [ID/Name]");
 });
 
 CMD.on("givecar", (player, params) => {
@@ -1911,6 +1916,11 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function Updater() {
+    /* Server HostName Changer */
+    samp.SendRconCommand(`hostname ${data.settings.RANDOM_SERVER_NAMES[getRandomInt(0, data.settings.RANDOM_SERVER_NAMES.length)]}`)
+}
+
 function banPlayer(player, admin, days, reason) {
     samp.SendClientMessageToAll(data.colors.LIGHT_BLUE, "================(Ban Details)================");
     samp.SendClientMessageToAll(data.colors.RED, `${player.GetPlayerName(24)} {CEC8C8}has been banned by Admin {00BBF6}${admin.GetPlayerName(24)} {CEC8C8}for {FF0000}${days} {CEC8C8}day(s)!`);
@@ -2725,6 +2735,8 @@ samp.OnGameModeInit(() => {
     Maps.Load(); /* Load Server Maps */
     TextDraws.server.Load(); /* Load Server TextDraws */
     Minigames.Load(); /* Load Server Minigames */
+
+    setInterval(Updater, 10000); /* An interval */
 
     samp.AddPlayerClass(0, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0);
 
