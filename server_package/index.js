@@ -479,35 +479,35 @@ CMD.on("stats", (player, params) => {
         let target = player;
         if(params[0]) target = getPlayer(params[0]);
         if(target) {
-            let OnlineTime = TotalGameTime(player);
+            let OnlineTime = TotalGameTime(target);
 
             let info = "";
             info += "{FF4800}General statistics\n";
-            info += `{BBFF00}Money: {49FFFF}$${Player.Info[player.playerid].Money}\n`;
-            info += `{BBFF00}Coins: {49FFFF}${Player.Info[player.playerid].Money}\n`;
-            info += `{BBFF00}Respect: {49FFFF}+${Player.Info[player.playerid].Respect.Positive} {BBFF00}/ {49FFFF}-${Player.Info[player.playerid].Respect.Negative}\n`;
+            info += `{BBFF00}Money: {49FFFF}$${Player.Info[target.playerid].Money}\n`;
+            info += `{BBFF00}Coins: {49FFFF}${Player.Info[target.playerid].Money}\n`;
+            info += `{BBFF00}Respect: {49FFFF}+${Player.Info[target.playerid].Respect.Positive} {BBFF00}/ {49FFFF}-${Player.Info[player.playerid].Respect.Negative}\n`;
             info += `{BBFF00}Online time: {49FFFF}${OnlineTime.hours} {BBFF00}hrs, {49FFFF}${OnlineTime.minutes} {BBFF00}mins, {49FFFF}${OnlineTime.seconds} {BBFF00}secs\n`;
-            info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
-            info += `{BBFF00}VIP: ${Player.Info[player.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
+            info += `{BBFF00}Admin: ${Player.Info[target.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
+            info += `{BBFF00}VIP: ${Player.Info[target.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
             info += "\n";
             info += "{FF4800}Killer statistics\n";
-            info += `{BBFF00}Kills: {49FFFF}${Player.Info[player.playerid].Kills_Data.Kills} {BBFF00}| Headshots: {49FFFF}${Player.Info[player.playerid].Kills_Data.HeadShots}\n`;
-            info += `{BBFF00}Killing Spree: {49FFFF}${Player.Info[player.playerid].Kills_Data.KillingSpree} {BBFF00}| Best Killing Spree: {49FFFF}${Player.Info[player.playerid].Kills_Data.BestKillingSpree}\n`;
-            info += `{BBFF00}Deaths: {49FFFF}${Player.Info[player.playerid].Kills_Data.Deaths}\n`;
-            info += `{BBFF00}Killer Rank: ${getRanksRankName("kills", Player.Info[player.playerid].Kills_Data.Kills)}\n`;
+            info += `{BBFF00}Kills: {49FFFF}${Player.Info[target.playerid].Kills_Data.Kills} {BBFF00}| Headshots: {49FFFF}${Player.Info[player.playerid].Kills_Data.HeadShots}\n`;
+            info += `{BBFF00}Killing Spree: {49FFFF}${Player.Info[target.playerid].Kills_Data.KillingSpree} {BBFF00}| Best Killing Spree: {49FFFF}${Player.Info[player.playerid].Kills_Data.BestKillingSpree}\n`;
+            info += `{BBFF00}Deaths: {49FFFF}${Player.Info[target.playerid].Kills_Data.Deaths}\n`;
+            info += `{BBFF00}Killer Rank: ${getRanksRankName("kills", Player.Info[target.playerid].Kills_Data.Kills)}\n`;
             info += "\n";
             info += `{FF4800}Driving skills\n`;
-            info += `{BBFF00}Drift Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.DriftPoints} {BBFF00}(${getRanksRankName("drift", Player.Info[player.playerid].Driving_Data.DriftPoints)}{BBFF00})\n`;
-            info += `{BBFF00}Stunt Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.StuntPoints} {BBFF00}(${getRanksRankName("stunt", Player.Info[player.playerid].Driving_Data.StuntPoints)}{BBFF00})\n`;
-            info += `{BBFF00}Race Points: {49FFFF}${Player.Info[player.playerid].Driving_Data.RacePoints} {BBFF00}(${getRanksRankName("race", Player.Info[player.playerid].Driving_Data.RacePoints)}{BBFF00})\n`;
+            info += `{BBFF00}Drift Points: {49FFFF}${Player.Info[target.playerid].Driving_Data.DriftPoints} {BBFF00}(${getRanksRankName("drift", Player.Info[player.playerid].Driving_Data.DriftPoints)}{BBFF00})\n`;
+            info += `{BBFF00}Stunt Points: {49FFFF}${Player.Info[target.playerid].Driving_Data.StuntPoints} {BBFF00}(${getRanksRankName("stunt", Player.Info[player.playerid].Driving_Data.StuntPoints)}{BBFF00})\n`;
+            info += `{BBFF00}Race Points: {49FFFF}${Player.Info[target.playerid].Driving_Data.RacePoints} {BBFF00}(${getRanksRankName("race", Player.Info[player.playerid].Driving_Data.RacePoints)}{BBFF00})\n`;
             info += "\n";
             info += "{FF4800}Properties\n";
             info += `{BBFF00}Business: {FF0000}No\n`;
             info += `{BBFF00}House: {FF0000}No\n`;
             info += `{BBFF00}Personal Vehicle: {FF0000}No\n`;
             info += "\n";
-            info += `{FF4800}Statistics note: {49FFFF}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob`
-            player.ShowPlayerDialog(Dialog.STATS, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${player.GetPlayerName(24)}{BBFF00}'s stats!`, info, "Ok", `${target == player ? "Description" : ""}`);
+            info += `{FF4800}Statistics note: {49FFFF}${getPlayerStatsNote(target)}{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob`
+            player.ShowPlayerDialog(Dialog.STATS, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s stats!`, info, "Ok", `${target == player ? "Description" : ""}`);
         }
         else SendError(player, Errors.PLAYER_NOT_CONNECTED);
     }
@@ -1581,7 +1581,11 @@ CMD.on("set", (player, params) => {
                 SendACMD(player, "Set Respect-");
             }
             else if(params[0] == "online") {
-
+                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid online (0-999999999)!");
+                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Online Hours to {FF0000}${params[2]}{FFFF00}!`);
+                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Online Hours to {FF0000}${params[2]}{FFFF00}!`);
+                Player.Info[target.playerid].OnlineTime.Hours = params[2];
             }
             else if(params[0] == "money") {
                 if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
@@ -1819,10 +1823,22 @@ CMD.on("setall", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function getPlayerStatsNote(player) {
+    let note = 0;
+    if(Player.Info[player.playerid].Driving_Data.StuntPoints >= 1000) note += 1;
+    if(Player.Info[player.playerid].Driving_Data.DriftPoints >= 1000) note += 1;
+    if(Player.Info[player.playerid].Driving_Data.RacePoints >= 100) note += 1;
+    if(Player.Info[player.playerid].Kills_Data.BestKillingSpree >= 100) note += 1;
+    if(TotalGameTime(player).hours >= 100) note += 1;
+    if(Player.Info[player.playerid].Respect.Positive >= 50) note += 1;
+    if(Player.Info[player.playerid].Coins >= 25000) note += 1;
+    return note;
+}
+
 function TotalGameTime(player) {
     let total_time = ((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].ConnectTime) + (Player.Info[player.playerid].OnlineTime.Hours*60*60) + (Player.Info[player.playerid].OnlineTime.Minutes*60) + (Player.Info[player.playerid].OnlineTime.Seconds));
     let hours = Math.floor(total_time / 3600);
-    let minutes = Math.floor(total_time / 60);
+    let minutes = Math.floor(total_time / 60) % 60;
     let seconds = Math.floor(total_time % 60);
     return {hours: hours, minutes: minutes, seconds: seconds};
 }
