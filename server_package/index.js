@@ -454,7 +454,10 @@ CMD.on("report", (player, params) => {
 });
 
 CMD.on("up", (player, params) => {
-
+    if(isNaN(params[0])) return SendUsage(player, "");
+    params[0] = parseInt(params[0]);
+    player.SetPlayerPos(player.position.x, player.position.y, player.position.z + params[1]);
+    player.SendClientMessage(data.colors.GREEN, Lang(player, `Te-ai teleportat la {00BBF6}${params[0]} metri {00FF00}altitudine!`, `You have been teleported to {00BBF6}${params[0]} meters {00FF00}altitude!`));
 });
 
 CMD.on("dive", (player) => {
