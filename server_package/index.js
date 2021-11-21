@@ -237,7 +237,8 @@ CMD.on("kill", (player) => {
 });
 
 CMD.on("jetpack", (player) => {
-
+    player.SetPlayerSpecialAction(2);
+    player.GameTextForPlayer("~b~~h~JetPack Spawned!", 1000, 6);
 });
 
 CMD.on("myint", (player, params) => {
