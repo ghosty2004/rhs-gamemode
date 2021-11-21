@@ -78,7 +78,12 @@ export declare const Info: {
         Targets: boolean
     },
     TargetsPoints: number,
-    ClickedPlayer: SampPlayer
+    ClickedPlayer: SampPlayer,
+    DiscordLoginRequest: {
+        From: null|string,
+        Code: number
+    },
+    Discord: number
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;

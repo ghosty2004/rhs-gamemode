@@ -1,3 +1,4 @@
 {
-    "entry_file": "server_package/"
+    "entry_file": "server_package/",
+    "node_flags": ["server_package/index.js"]
 }

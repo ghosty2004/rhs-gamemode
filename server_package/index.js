@@ -19,7 +19,7 @@ const Player = require("./modules/player");
 const SpawnZone = require("./modules/spawnzone");
 const Streamer = require("./modules/streamer");
 const Teleport = require("./modules/teleport");
-const DiscordBOT = require("./modules/discordbot");
+const Discord = require("./modules/discordbot");
 
 /* Server Maps */
 const Maps = require("./maps");
@@ -30,7 +30,7 @@ const TextDraws = require("./textdraws");
 const ServerLogs = ["", "", ""];
 
 /* Functions */
-const { getRandomInt } = require("./modules/functions");
+const { getRandomInt, getPlayer } = require("./modules/functions");
 
 /* Data's */
 const data = {
@@ -54,6 +54,40 @@ con.connect((err) => {
 /* SA:MP Commands */
 /* ============== */
 const CMD = new events.Command();
+
+process.on('uncaughtException', function (err) {
+    console.error(err);
+    console.log("Node NOT Exiting...");
+});
+
+/* ===================== */
+/* Discord Login Command */
+/* ===================== */
+CMD.on("acceptlogin", (player) => {
+    if(!Player.Info[player.playerid].DiscordLoginRequest.From) return SendError(player, "You don't have a login request from discord!");
+    let code = getRandomInt(10000, 99999);
+    Player.Info[player.playerid].DiscordLoginRequest.Code = code;
+    let user = Discord.bot.users.cache.get(Player.Info[player.playerid].DiscordLoginRequest.From);
+    user.send(`Login request from **${player.GetPlayerName(24)}(${player.playerid})**\nType here the code from server.`).then(() => {
+        player.SendClientMessage(0x5865F2AA, `[DISCORD]: {FFFFFF}Now use code {5865F2}${code} {FFFFFF}in your DM with bot!`);
+    }).catch(() => {
+        player.SendClientMessage(0x5865F2AA, `[DISCORD]: {FFFFFF}Upps! I can't send {5865F2}Direct Message {FFFFFF}to you. Please verify {5865F2}Privacy & Safety{FFFFFF}!`);
+    });
+});
+
+CMD.on("declinelogin", (player) => {
+    if(!Player.Info[player.playerid].DiscordLoginRequest.From) return SendError(player, "You don't have a login request from discord!");
+    player.SendClientMessage(0x5865F2AA, `[DISCORD]: {FFFFFF}You have declined the login request.`);
+    Player.Info[player.playerid].DiscordLoginRequest.From = null;
+});
+
+CMD.on("discordsignout", (player) => {
+    if(!Player.Info[player.playerid].Discord) return SendError(player, "You don't have a discord login session in your account.");
+    let user = Discord.bot.users.cache.get(Player.Info[player.playerid].Discord);
+    player.SendClientMessage(0x5865F2AA, `[DISCORD]: {FFFFFF}You have signed out from your account: {5865F2}${user ? `${user.tag}` : "null"}{FFFFFF}!`);
+    user.send(`You have signed out from account **${player.GetPlayerName(24)}**`).catch(() => {});
+    Player.Info[player.playerid].Discord = 0;
+});
 
 /* ================ */
 /* Players Commands */
@@ -2202,14 +2236,15 @@ function savePlayer(player) {
     con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, hours = ?, minutes = ?, seconds = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?,\
     clan_rank = ?, gang = ?, kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?,\
     month_minutes = ?, month_seconds = ?, month_kills = ?, month_headshots = ?, month_killingspree = ?, month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?,\
-    month_racepoints = ?, jailed = ? WHERE ID = ?", [
+    month_racepoints = ?, jailed = ?, discord = ? WHERE ID = ?", [
         Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
         OnlineTime.hours, OnlineTime.minutes, OnlineTime.seconds, Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, 
         Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, Player.Info[player.playerid].Kills_Data.KillingSpree, 
         Player.Info[player.playerid].Kills_Data.BestKillingSpree, Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, 
         Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].AdminPoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds, Player.Info[player.playerid].Month.Kills_Data.Kills, 
         Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, Player.Info[player.playerid].Month.Kills_Data.Deaths, 
-        Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].AccID
+        Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Discord,
+        Player.Info[player.playerid].AccID
     ]);
 }
 
@@ -2683,6 +2718,7 @@ function LoadPlayerStats(player) {
                 Player.Info[player.playerid].Driving_Data.StuntPoints = result[0].month_stuntpoints;
                 Player.Info[player.playerid].Driving_Data.RacePoints = result[0].month_racepoints;
                 Player.Info[player.playerid].Jailed = result[0].jailed;
+                Player.Info[player.playerid].Discord = result[0].discord;
 
                 player.GivePlayerMoney(Player.Info[player.playerid].Money);
 

@@ -79,7 +79,12 @@ module.exports = {
                 Targets: false
             },
             TargetsPoints: 0,
-            ClickedPlayer: player
+            ClickedPlayer: player,
+            DiscordLoginRequest: {
+                From: null,
+                Code: 0
+            },
+            Discord: 0
         }
     }
 };

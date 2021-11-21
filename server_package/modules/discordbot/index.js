@@ -1,5 +1,4 @@
 const Discord = require("discord.js");
-const { DISCORD_BOT } = require("../../data/settings");
 const con = require("../mysql");
 const bot = new Discord.Client({
     intents: [
@@ -21,12 +20,19 @@ const bot = new Discord.Client({
     ]
 });
 
+const { DISCORD_BOT } = require("../../data/settings");
+
 bot.login(DISCORD_BOT.TOKEN).catch((error) => {
     console.log(error);
 });
 
 /* Custom Modules */
 const { DiscordCommand } = require("../events");
+const { getPlayer } = require("../functions");
+
+const Errors = require("../errors");
+const Player = require("../player");
+const { getPlayers } = require("samp-node-lib");
 
 /* ========= */
 /* Functions */
@@ -75,6 +81,17 @@ CMD.on("stats", async (message, params) => {
     else SendUsage(message, "stats [ID/Name]");
 });
 
+CMD.on("login", (message, params) => {
+    if(!params[0]) return SendUsage(message, "login [Server ID]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(message, Errors.PLAYER_NOT_CONNECTED);
+    if(!Player.Info[target.playerid].LoggedIn) return SendError(message, Errors.PLAYER_NOT_LOGGED);
+    if(Player.Info[target.playerid].Discord) return SendError(message, "This player already logged in to a discord account. Use /discordsignout for logout.");
+    message.channel.send(`Login request have been sent to **${target.GetPlayerName(24)}(${target.playerid})**!`);
+    target.SendClientMessage(0x5865F2AA, `[DISCORD]: {FFFFFF}${message.author.tag} {5865F2}has sent a login request. Use {FFFFFF}/acceptlogin {5865F2}or {FFFFFF}/declinelogin {5865F2}for response!`);
+    Player.Info[target.playerid].DiscordLoginRequest.From = message.author.id;
+});
+
 CMD.on("users", (message) => {
     con.query("SELECT * FROM users", function(err, result) {
         const row = new Discord.MessageActionRow();
@@ -104,28 +121,47 @@ CMD.on("users", (message) => {
     });
 });
 
-CMD.on("stats", (message, params) => {
-
-});
-
 /* ========== */
 /* Bot Events */
 /* ========== */
-bot.on("ready", () => {
+bot.once("ready", () => {
     console.log(`Discord BOT: ${bot.user.tag} is ready.`);
 });
 
 bot.on("messageCreate", (message) => {
-    if(message.author.bot) return;
-    let params = message.content.substring().split(" ");
-    params[0] = params[0].toLowerCase();
+    try {
+        if(message.author.bot) return;
 
-    if(params[0].startsWith(DISCORD_BOT.PREFIX)) {
-        params[0] = params[0].replace(DISCORD_BOT.PREFIX, "");
-        if(CMD.eventNames().some(s => s == params[0])) {
-            CMD.emit(params[0], message, parseArgs());
-            function parseArgs() { params.splice(0, 1); return params; }
-        }  
+        if(message.channel.type == "DM") {
+            let player = getPlayers().filter(f => Player.Info[f.playerid].DiscordLoginRequest.From == message.author.id);
+            if(player) {
+                if(message.content == Player.Info[player[0].playerid].DiscordLoginRequest.Code) {
+                    message.channel.send(`You have logged in with **${player[0].GetPlayerName(24)}**!`);
+                    player[0].SendClientMessage(0x5865F2AA, `[DISCORD]: {FFFFFF}You have successfully logged in with your discord account {5865F2}${message.author.tag}{FFFFFF}!`)
+                    Player.Info[player[0].playerid].DiscordLoginRequest.From = null;
+                    Player.Info[player[0].playerid].DiscordLoginRequest.Code = 0;
+                    Player.Info[player[0].playerid].Discord = message.author.id;
+                }
+                else {
+                    message.channel.send("Invalid code provided.");
+                }
+            }
+        }
+        else if(message.channel.type == "GUILD_TEXT") {
+            let params = message.content.substring().split(" ");
+            params[0] = params[0].toLowerCase();
+
+            if(params[0].startsWith(DISCORD_BOT.PREFIX)) {
+                params[0] = params[0].replace(DISCORD_BOT.PREFIX, "");
+                if(CMD.eventNames().some(s => s == params[0])) {
+                    CMD.emit(params[0], message, parseArgs());
+                    function parseArgs() { params.splice(0, 1); return params; }
+                }  
+            }
+        }
+    }
+    catch(e) {
+        console.log(e.stack);
     }
 });
 
