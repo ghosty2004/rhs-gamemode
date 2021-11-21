@@ -71,14 +71,7 @@ module.exports = {
                     leader: 0
                 },
                 color: 0xFFFFFFAA,
-                weapon: {
-                    "1": 0,
-                    "2": 0,
-                    "3": 0,
-                    "4": 0,
-                    "5": 0,
-                    "6": 0
-                }
+                weapons: [0, 0, 0, 0, 0, 0]
             },
             Jailed: 0,
             Last_Chat_Message: Math.floor(Date.now() / 1000),

@@ -1259,6 +1259,7 @@ CMD.on("chelp", (player) => {
 CMD.on("clan", (player) => { CMD.emit("chelp", player); });
 
 CMD.on("setrank", (player, params) => {
+    if(!Player.Info[player.playerid].Clan) return SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
     if(Player.Info[player.playerid].Clan_Rank < 3) return SendError(player, "You need to be Gang Owner or Clan Founder to use this command!");
     if(params[0] && !isNaN(params[1])) {
         let target = getPlayer(params[0]);
@@ -1272,61 +1273,99 @@ CMD.on("setrank", (player, params) => {
     else SendUsage(player, "/SetRank [ID/Name] [Rank: 1-3]");
 });
 
-CMD.on("cm", (player) => {
-    if(Player.Info[player.playerid].Clan) {
-        let info = "Name\tRank\n";
-        let result = samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan);
-        result.forEach((i) => {
-            info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t{00BBF6}${getClanRank(Player.Info[i.playerid].Clan_Rank)}\n`;
-        });
-        player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Clan Members: {FF0000}${result.length}{AFAFAF} online - {FF0000}${Clan.Info[Player.Info[player.playerid].Clan].name}`, info, "Close", "");
+CMD.on("setspawn", (player, params) => {
+    if(!Player.Info[player.playerid].Clan) return SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
+    if(Player.Info[player.playerid].Clan_Rank < 3) return SendError(player, "You need to be Gang Owner or Clan Founder to use this command!");
+    if(!params[0]) return SendUsage(player, "/SetSpawn [Off/On]");
+    switch(params[0]) {
+        case "off": {
+            player.GameTextForPlayer("~w~~h~Clan spawn have been ~n~~g~~h~resetted~w~~h~!", 3000, 4);
+            Clan.Info[Player.Info[player.playerid].Clan].position[0] = 0;
+            Clan.Info[Player.Info[player.playerid].Clan].position[1] = 0;
+            Clan.Info[Player.Info[player.playerid].Clan].position[2] = 0;
+            Clan.Info[Player.Info[player.playerid].Clan].position[3] = 0;
+            break;
+        }
+        case "on": {
+            player.GameTextForPlayer("~w~~h~Clan spawn have been ~n~~g~~h~setted~w~~h~!", 3000, 4);
+            Clan.Info[Player.Info[player.playerid].Clan].position[0] = player.position.x;
+            Clan.Info[Player.Info[player.playerid].Clan].position[1] = player.position.y;
+            Clan.Info[Player.Info[player.playerid].Clan].position[2] = player.position.z;
+            Clan.Info[Player.Info[player.playerid].Clan].position[3] = player.position.angle;
+            break;
+        }
     }
-    else SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
+});
+
+CMD.on("setcskin", (player, params) => {
+    if(!Player.Info[player.playerid].Clan) return SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
+    if(Player.Info[player.playerid].Clan_Rank < 3) return SendError(player, "You need to be Gang Owner or Clan Founder to use this command!");
+});
+
+CMD.on("mkick", (player, params) => {
+    if(!Player.Info[player.playerid].Clan) return SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
+    if(Player.Info[player.playerid].Clan_Rank < 2) return SendError(player, "You need to be Gang Owner or Clan Founder to use this command!");
+    if(!params[0]) return SendUsage(player, "/MKick [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+});
+
+CMD.on("invite", (player, params) => {
+    if(!Player.Info[player.playerid].Clan) return SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
+    if(!params[0]) return SendUsage(player, "/Invite [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+});
+
+CMD.on("cm", (player) => {
+    if(!Player.Info[player.playerid].Clan) return SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
+    let info = "Name\tRank\n";
+    let result = samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan);
+    result.forEach((i) => {
+        info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t{00BBF6}${getClanRank(Player.Info[i.playerid].Clan_Rank)}\n`;
+    });
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Clan Members: {FF0000}${result.length}{AFAFAF} online - {FF0000}${Clan.Info[Player.Info[player.playerid].Clan].name}`, info, "Close", "");
 });
 
 CMD.on("cinfo", async (player, params) => {
     let target = player;
     if(params[0]) target = getPlayer(params[0]);
-    if(target) {
-        if(Player.Info[target.playerid].Clan) {
-            let info = "";
-            info += `{FF0000}${Clan.Info[Player.Info[target.playerid].Clan].name}{FFFF00}'s clan informations\n`;
-            info += "\n";
-            info += "{FFFF00}Informations\n";
-            info += "{BBFF00}Total kills: {49FFFF}0\n";
-            info += "{BBFF00}Total deaths: {49FFFF}0\n";
-            info += `{BBFF00}Leaders skin: {49FFFF}${Clan.Info[Player.Info[target.playerid].Clan].skin.leader}\n`;
-            info += `{BBFF00}Members skin: {49FFFF}${Clan.Info[Player.Info[target.playerid].Clan].skin.member}\n`;
-            info += `{BBFF00}Creator: {33FFFF}${await getNameByAccID(Clan.Info[Player.Info[target.playerid].Clan].owner)}\n`;
-            info += `{BBFF00}${player.GetPlayerName(24)}'s Rank: {33FFFF}${getClanRank(Player.Info[target.playerid].Clan_Rank)}\n`;
-            info += "{BBFF00}Weapons:\n";
-            info += "{FFFFFF}none, none, none, none, none, none\n";
-            info += "\n";
-            info += "{FFFF00}Type {FF0000}/cinfo [ID/Name]{FFFF00} to see others Clan Stats!";
-            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Clan Info", info, "Ok", "");
-        }
-        else SendError(player, "Acest jucator nu are clan.", "This player don't have a clan.");
-    }
-    else SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    if(!Player.Info[target.playerid].Clan) return SendError(player, Errors.PLAYER_NOT_IN_ANY_CLAN);
+    let info = "";
+    info += `{FF0000}${Clan.Info[Player.Info[target.playerid].Clan].name}{FFFF00}'s clan informations\n`;
+    info += "\n";
+    info += "{FFFF00}Informations\n";
+    info += "{BBFF00}Total kills: {49FFFF}0\n";
+    info += "{BBFF00}Total deaths: {49FFFF}0\n";
+    info += `{BBFF00}Leaders skin: {49FFFF}${Clan.Info[Player.Info[target.playerid].Clan].skin.leader}\n`;
+    info += `{BBFF00}Members skin: {49FFFF}${Clan.Info[Player.Info[target.playerid].Clan].skin.member}\n`;
+    info += `{BBFF00}Creator: {33FFFF}${await getNameByAccID(Clan.Info[Player.Info[target.playerid].Clan].owner)}\n`;
+    info += `{BBFF00}${player.GetPlayerName(24)}'s Rank: {33FFFF}${getClanRank(Player.Info[target.playerid].Clan_Rank)}\n`;
+    info += "{BBFF00}Weapons:\n";
+    info += "{FFFFFF}none, none, none, none, none, none\n";
+    info += "\n";
+    info += "{FFFF00}Type {FF0000}/cinfo [ID/Name]{FFFF00} to see others Clan Stats!";
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Clan Info", info, "Ok", "");
 });
 
 CMD.on("lclan", (player) => {
-    if(Player.Info[player.playerid].Clan) {
-        if(Clan.Info[Player.Info[player.playerid].Clan].owner == Player.Info[player.playerid].AccID) {
-            con.query("DELETE FROM clans WHERE ID = ?", [Player.Info[player.playerid].Clan]);
-            con.query("UPDATE users SET clan = 0 WHERE clan = ?", [Player.Info[player.playerid].Clan]);
-            Clan.Delete(Player.Info[player.playerid].Clan);
-            samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan).forEach((i) => {
-                Player.Info[i.playerid].Clan = 0;
-                SetupPlayerForSpawn(i);
-            });
-        } 
-        else {
+    if(!Player.Info[player.playerid].Clan) return SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
+    SendMessageToClan(Player.Info[player.playerid].Clan, data.colors.YELLOW, `${player.GetPlayerName(24)}(${player.playerid}) has left the clan!`);
+    if(Clan.Info[Player.Info[player.playerid].Clan].owner == Player.Info[player.playerid].AccID) {
+        con.query("DELETE FROM clans WHERE ID = ?", [Player.Info[player.playerid].Clan]);
+        con.query("UPDATE users SET clan = 0 WHERE clan = ?", [Player.Info[player.playerid].Clan]);
+        Clan.Delete(Player.Info[player.playerid].Clan);
+        samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan).forEach((i) => {
             Player.Info[i.playerid].Clan = 0;
-            SetupPlayerForSpawn(player);
-        }  
-    }
-    else SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
+            SetupPlayerForSpawn(i);
+            i.SendClientMessage(data.colors.LIGHT_BLUE, "INFO: The Our Clan has been deleted by Creator!");
+        });
+    } 
+    else {
+        Player.Info[i.playerid].Clan = 0;
+        SetupPlayerForSpawn(player);
+    }  
 });
 
 /* =============== */
@@ -1862,6 +1901,12 @@ function CheckPlayerAka(player) {
     });
 }
 
+function SendMessageToClan(clanId, color, message) {
+    samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == clanId).forEach((i) => {
+        i.SendClientMessage(color, message);
+    });
+}
+
 function SendMessageToAdmins(color, message) {
     samp.getPlayers().filter(f => Player.Info[f.playerid].Admin).forEach((i) => {
         i.SendClientMessage(color, message);
@@ -2030,24 +2075,30 @@ function getNameByAccID(AccID) {
     });
 }
 
-function savePlayer(player) {
-    if(Player.Info[player.playerid].LoggedIn) {
-        let OnlineTime = TotalGameTime(player);
-        let OnlineTimeMonth = TotalGameTimeMonth(player);
+function saveClan(clanId) {
+    if(!Clan.Exists(clanId)) return;
+    con.query("UPDATE clans SET name = ?, owner = ?, position = ?, weapon = ?, color = ?, member_skin = ?, leader_skin = ?, kills = ?, deaths = ?", [
+        Clan.Info[clanId].name, Clan.Info[clanId].owner, JSON.stringify(Clan.Info[clanId].position), JSON.stringify()
+    ]);
+}
 
-        con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, hours = ?, minutes = ?, seconds = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?,\
-        clan_rank = ?, gang = ?, kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?,\
-        month_minutes = ?, month_seconds = ?, month_kills = ?, month_headshots = ?, month_killingspree = ?, month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?,\
-        month_racepoints = ?, jailed = ? WHERE ID = ?", [
-            Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
-            OnlineTime.hours, OnlineTime.minutes, OnlineTime.seconds, Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, 
-            Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, Player.Info[player.playerid].Kills_Data.KillingSpree, 
-            Player.Info[player.playerid].Kills_Data.BestKillingSpree, Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, 
-            Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].AdminPoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds, Player.Info[player.playerid].Month.Kills_Data.Kills, 
-            Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, Player.Info[player.playerid].Month.Kills_Data.Deaths, 
-            Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].AccID
-        ]);
-    }
+function savePlayer(player) {
+    if(!Player.Info[player.playerid].LoggedIn) return;
+    let OnlineTime = TotalGameTime(player);
+    let OnlineTimeMonth = TotalGameTimeMonth(player);
+
+    con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, hours = ?, minutes = ?, seconds = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?,\
+    clan_rank = ?, gang = ?, kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?,\
+    month_minutes = ?, month_seconds = ?, month_kills = ?, month_headshots = ?, month_killingspree = ?, month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?,\
+    month_racepoints = ?, jailed = ? WHERE ID = ?", [
+        Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
+        OnlineTime.hours, OnlineTime.minutes, OnlineTime.seconds, Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, 
+        Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, Player.Info[player.playerid].Kills_Data.KillingSpree, 
+        Player.Info[player.playerid].Kills_Data.BestKillingSpree, Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, 
+        Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].AdminPoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds, Player.Info[player.playerid].Month.Kills_Data.Kills, 
+        Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, Player.Info[player.playerid].Month.Kills_Data.Deaths, 
+        Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].AccID
+    ]);
 }
 
 function ResetPlayerClanCreateVariables(player) {
@@ -2055,8 +2106,8 @@ function ResetPlayerClanCreateVariables(player) {
     Player.Info[player.playerid].Creating_Clan.skin.member = 0;
     Player.Info[player.playerid].Creating_Clan.skin.leader = 0;
     Player.Info[player.playerid].Creating_Clan.color = 0xFFFFFFAA;
-    for(let i = 1; i <= 6; i++) {
-        Player.Info[player.playerid].Creating_Clan.weapon[i] = 0;
+    for(let i = 0; i < 6; i++) {
+        Player.Info[player.playerid].Creating_Clan.weapons[i] = 0;
     }
 }
 
@@ -2076,12 +2127,14 @@ function SetupPlayerForSpawn(player, type=0) {
     /* Type else = Set auto random spawn position */
     if(type == 0) {
         if(Player.Info[player.playerid].Clan) { /* Clan Spawn */
-            player.SetPlayerPos(Clan.Info[Player.Info[player.playerid].Clan].position.x, Clan.Info[Player.Info[player.playerid].Clan].position.y, Clan.Info[Player.Info[player.playerid].Clan].position.z);
-            player.SetPlayerFacingAngle(Clan.Info[Player.Info[player.playerid].Clan].position.angle);
+            let position = Clan.Info[Player.Info[player.playerid].Clan].position;
+            if(position[0] == 0 && position[1] == 0 && position[2] == 0 && position[3] == 0) return SetupPlayerForSpawn(player, 1);
+            player.SetPlayerPos(position[0], position[1], position[2]);
+            player.SetPlayerFacingAngle(position[3]);
             player.SetPlayerColor(Clan.Info[Player.Info[player.playerid].Clan].color);
             player.SetPlayerSkin(Player.Info[player.playerid].Clan_Rank == 3 || Player.Info[player.playerid].Clan_Rank == 2 ? Clan.Info[Player.Info[player.playerid].Clan].skin.leader : Clan.Info[Player.Info[player.playerid].Clan].skin.member);
-            for(let i = 1; i <= 6; i++) {
-                player.GivePlayerWeapon(Clan.Info[Player.Info[player.playerid].Clan].weapon[i], 9999);
+            for(let i = 0; i < 6; i++) {
+                player.GivePlayerWeapon(Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
             }
         }
         else if(Player.Info[player.playerid].Gang) { /* Gang Spawn */
@@ -2124,8 +2177,8 @@ function LoadClans() {
     con.query("SELECT * FROM clans", function(err, result) {
         for(let i = 0; i < result.length; i++) {
             let position = JSON.parse(result[i].position);
-            let weapon = JSON.parse(result[i].weapon);
-            Clan.Create(result[i].ID, result[i].name, result[i].owner, {x: position.x, y: position.y, z: position.z}, {"1": weapon[0], "2": weapon[1], "3": weapon[2], "4": weapon[3], "5": weapon[4], "6": weapon[5]}, parseInt(result[i].color), {member: result[i].member_skin, leader: result[i].leader_skin}, result[i].kills, result[i].deaths);
+            let weapons = JSON.parse(result[i].weapon);
+            Clan.Create(result[i].ID, result[i].name, result[i].owner, position, weapons, parseInt(result[i].color), {member: result[i].member_skin, leader: result[i].leader_skin}, result[i].kills, result[i].deaths);
         }
         console.log(`Loaded ${result.length} clans.`);
     });
@@ -2582,6 +2635,10 @@ samp.OnRconLoginAttempt((ip, password, success) => {
     }
 });
 
+samp.OnPlayerClickPlayer((player, clickedplayer) => {
+
+});
+
 samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
     /* Targets Minigame */
     if(Player.Info[player.playerid].SpecialZone.Targets) {
@@ -2936,7 +2993,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.CREATE_CLAN_WEAPON_1: {
             if(response) {
                 let start = 1;
-                Player.Info[player.playerid].Creating_Clan.weapon[1] = start + listitem;
+                Player.Info[player.playerid].Creating_Clan.weapons[0] = start + listitem;
             }
 
             let info = "";
@@ -2949,7 +3006,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.CREATE_CLAN_WEAPON_2: {
             if(response) {
                 let start = 22;
-                Player.Info[player.playerid].Creating_Clan.weapon[2] = start + listitem;
+                Player.Info[player.playerid].Creating_Clan.weapons[1] = start + listitem;
             }
 
             let info = "";
@@ -2957,11 +3014,12 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             info += "{0072FF}Sawn-Off-Shotgune\n";
             info += "{0072FF}SPAZ-12";
             player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_3, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
+            break;
         }
         case Dialog.CREATE_CLAN_WEAPON_3: {
             if(response) {
                 let start = 25;
-                Player.Info[player.playerid].Creating_Clan.weapon[3] = start + listitem;
+                Player.Info[player.playerid].Creating_Clan.weapons[2] = start + listitem;
             }
 
             let info = "";
@@ -2974,9 +3032,9 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.CREATE_CLAN_WEAPON_4: {
             if(response) {
                 switch(listitem) {
-                    case 0: Player.Info[player.playerid].Creating_Clan.weapon[4] = 28; break;
-                    case 1: Player.Info[player.playerid].Creating_Clan.weapon[4] = 29; break;
-                    case 2: Player.Info[player.playerid].Creating_Clan.weapon[4] = 32; break;
+                    case 0: Player.Info[player.playerid].Creating_Clan.weapons[3] = 28; break;
+                    case 1: Player.Info[player.playerid].Creating_Clan.weapons[3] = 29; break;
+                    case 2: Player.Info[player.playerid].Creating_Clan.weapons[3] = 32; break;
                 }
             }
 
@@ -2989,7 +3047,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.CREATE_CLAN_WEAPON_5: {
             if(response) {
                 let start = 30;
-                Player.Info[player.playerid].Creating_Clan.weapon[5] = start + listitem; 
+                Player.Info[player.playerid].Creating_Clan.weapons[4] = start + listitem; 
             }
 
             let info = "";
@@ -3001,7 +3059,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.CREATE_CLAN_WEAPON_6: {
             if(response) {
                 let start = 33;
-                Player.Info[player.playerid].Creating_Clan.weapon[6] = start + listitem; 
+                Player.Info[player.playerid].Creating_Clan.weapons[5] = start + listitem; 
             }
 
             /* Send Informations in Dialog */
@@ -3011,17 +3069,17 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "{00FF00}Clan Created!", info, "Close", "");
 
             /* Create row in SQL */
-            con.query("INSERT INTO clans (name, owner, position, weapon, color, member_skin, leader_skin) VALUES(?, ?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, JSON.stringify({x: player.position.x, y: player.position.y, z: player.position.z, angle: player.position.angle}), JSON.stringify(Object.values(Player.Info[player.playerid].Creating_Clan.weapon)), `${Player.Info[player.playerid].Creating_Clan.color}`, Player.Info[player.playerid].Creating_Clan.skin.member, Player.Info[player.playerid].Creating_Clan.skin.leader], function(err, result) {
+            con.query("INSERT INTO clans (name, owner, position, weapon, color, member_skin, leader_skin) VALUES(?, ?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, JSON.stringify([0, 0, 0, 0]), JSON.stringify(Object.values(Player.Info[player.playerid].Creating_Clan.weapons)), `${Player.Info[player.playerid].Creating_Clan.color}`, Player.Info[player.playerid].Creating_Clan.skin.member, Player.Info[player.playerid].Creating_Clan.skin.leader], function(err, result) {
                 if(!err) {
-                    Clan.Create(result.insertId, Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, {x: player.position.x, y: player.position.y, z: player.position.z, angle: player.position.angle}, {"1": Player.Info[player.playerid].Creating_Clan.weapon[1], "2": Player.Info[player.playerid].Creating_Clan.weapon[2], "3": Player.Info[player.playerid].Creating_Clan.weapon[3], "4": Player.Info[player.playerid].Creating_Clan.weapon[4], "5": Player.Info[player.playerid].Creating_Clan.weapon[5], "6": Player.Info[player.playerid].Creating_Clan.weapon[6]}, Player.Info[player.playerid].Creating_Clan.color, {member: Player.Info[player.playerid].Creating_Clan.skin.member, leader: Player.Info[player.playerid].Creating_Clan.skin.leader}, 0, 0);
+                    Clan.Create(result.insertId, Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, [0, 0, 0, 0], [Player.Info[player.playerid].Creating_Clan.weapons[0], Player.Info[player.playerid].Creating_Clan.weapons[1], Player.Info[player.playerid].Creating_Clan.weapons[2], Player.Info[player.playerid].Creating_Clan.weapons[3], Player.Info[player.playerid].Creating_Clan.weapons[4], Player.Info[player.playerid].Creating_Clan.weapons[5]], Player.Info[player.playerid].Creating_Clan.color, {member: Player.Info[player.playerid].Creating_Clan.skin.member, leader: Player.Info[player.playerid].Creating_Clan.skin.leader}, 0, 0);
                     Player.Info[player.playerid].Clan = result.insertId;
                     Player.Info[player.playerid].Clan_Rank = 3;
                     UpdatePlayerDB(player, "clan", Player.Info[player.playerid].Clan);
                     UpdatePlayerDB(player, "clan_rank", Player.Info[player.playerid].Clan_Rank);
                     player.SetPlayerColor(Player.Info[player.playerid].Creating_Clan.color);
                     player.SetPlayerSkin(Player.Info[player.playerid].Creating_Clan.skin.leader);
-                    for(let i = 1; i <= 6; i++) {
-                        player.GivePlayerWeapon(Clan.Info[Player.Info[player.playerid].Clan].weapon[i], 9999);
+                    for(let i = 0; i < 6; i++) {
+                        player.GivePlayerWeapon(Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
                     }
                     ResetPlayerClanCreateVariables(player);
                 }

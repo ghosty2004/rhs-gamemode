@@ -70,14 +70,7 @@ export declare const Info: {
             leader: number
         },
         color: number,
-        weapon: {
-            "1": number,
-            "2": number,
-            "3": number,
-            "4": number,
-            "5": number,
-            "6": number
-        }
+        weapons: Array<number>
     },
     Jailed: number,
     Last_Chat_Message: number,
