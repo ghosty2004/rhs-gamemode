@@ -35,7 +35,6 @@ const { getRandomInt } = require("./modules/functions");
 /* Data's */
 const data = {
     colors: require("./data/colors"),
-    mysql: require("./data/mysql"),
     position: require("./data/positions"),
     settings: require("./data/settings"),
 }
