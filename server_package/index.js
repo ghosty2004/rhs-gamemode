@@ -1729,21 +1729,7 @@ CMD.on("ban", (player, params) => {
     if(!Player.Info[target.playerid].LoggedIn) return SendError(player, Errors.PLAYER_NOT_LOGGED);
     params[1] = parseInt(params[1]);
     if(params[1] < 1 || params[1] > 99) return SendError(player, "Invalid day(s) (1-99)!");
-    samp.SendClientMessageToAll(data.colors.LIGHT_BLUE, "================(Ban Details)================");
-    samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {CEC8C8}has been banned by Admin {00BBF6}${player.GetPlayerName(24)} {CEC8C8}for {FF0000}${params[1]} {CEC8C8}day(s)!`);
-    samp.SendClientMessageToAll(data.colors.GRAY, `Reason: {00BBF6}${params.slice(2).join(" ")}`);
-    samp.SendClientMessageToAll(data.colors.LIGHT_BLUE, "==========================================");
-    for(let i = 0; i < 30; i++) target.SendClientMessage(-1, "");
-    target.SendClientMessage(data.colors.LIGHT_BLUE, `============(${Lang(target, "Detalii Ban", "Ban Details")})============`);
-    target.SendClientMessage(data.colors.GRAY, `${Lang(player, `Ai primit interdictie de la Admin {00BBF6}${player.GetPlayerName(24)} {CEC8C8}pentru {FF0000}${params[1]} {CEC8C8}zile!`, `You have been banned by Admin {00BBF6}${player.GetPlayerName(24)} {CEC8C8}for {FF0000}${params[1]} {CEC8C8}days!`)}`);
-    target.SendClientMessage(data.colors.GRAY, `${Lang(player, "Motiv", "Reason")}: {00BBF6}${params.slice(2).join(" ")}`);
-    target.SendClientMessage(data.colors.LIGHT_BLUE, "=======================================");
-    SendACMD(player, "Ban");
-    con.query("SELECT * FROM bans WHERE acc_id = ?", [Player.Info[target.playerid].AccID], function(err, result) {
-        if(!err && result != 0) con.query("INSERT INTO bans (acc_id, ip, admin_acc_id, from_timestamp, to_timestamp, reason) VALUES(?, ?, ?, ?, ?, ?)", [Player.Info[target.playerid].AccID, target.GetPlayerIp(16), Player.Info[player.playerid].AccID, getTimestamp(), getTimestamp(params[1]), params.slice(2).join(" ")]);
-        else con.query("UPDATE bans SET ip = ?, admin_acc_id = ?, from_timestamp = ?, to_timestamp = ?, reason = ?", [target.GetPlayerIp(16), Player.Info[player.playerid].AccID, getTimestamp(), getTimestamp(params[1]), params.slice(2).join(" ")]);
-    });
-    kickPlayer(target);
+    banPlayer(target, player, params[1], params.slice(1).join(" "));
 });
 
 CMD.on("starevent", (player) => {
@@ -1908,6 +1894,28 @@ CMD.on("saveall", (player) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function banPlayer(player, admin, days, reason) {
+    samp.SendClientMessageToAll(data.colors.LIGHT_BLUE, "================(Ban Details)================");
+    samp.SendClientMessageToAll(data.colors.RED, `${player.GetPlayerName(24)} {CEC8C8}has been banned by Admin {00BBF6}${admin.GetPlayerName(24)} {CEC8C8}for {FF0000}${days} {CEC8C8}day(s)!`);
+    samp.SendClientMessageToAll(data.colors.GRAY, `Reason: {00BBF6}${reason}`);
+    samp.SendClientMessageToAll(data.colors.LIGHT_BLUE, "==========================================");
+
+    for(let i = 0; i < 30; i++) player.SendClientMessage(-1, "");
+    player.SendClientMessage(data.colors.LIGHT_BLUE, `============(${Lang(player, "Detalii Ban", "Ban Details")})============`);
+    player.SendClientMessage(data.colors.GRAY, `${Lang(player, `Ai primit interdictie de la Admin {00BBF6}${admin.GetPlayerName(24)} {CEC8C8}pentru {FF0000}${days} {CEC8C8}zile!`, `You have been banned by Admin {00BBF6}${admin.GetPlayerName(24)} {CEC8C8}for {FF0000}${days} {CEC8C8}days!`)}`);
+    player.SendClientMessage(data.colors.GRAY, `${Lang(player, "Motiv", "Reason")}: {00BBF6}${reason}`);
+    player.SendClientMessage(data.colors.LIGHT_BLUE, "=======================================");
+    
+    SendACMD(admin, "Ban");
+
+    con.query("SELECT * FROM bans WHERE acc_id = ?", [Player.Info[player.playerid].AccID], function(err, result) {
+        if(!err && result != 0) con.query("INSERT INTO bans (acc_id, ip, admin_acc_id, from_timestamp, to_timestamp, reason) VALUES(?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].AccID, player.GetPlayerIp(16), Player.Info[admin.playerid].AccID, getTimestamp(), getTimestamp(days), reason]);
+        else con.query("UPDATE bans SET ip = ?, admin_acc_id = ?, from_timestamp = ?, to_timestamp = ?, reason = ?", [player.GetPlayerIp(16), Player.Info[admin.playerid].AccID, getTimestamp(), getTimestamp(days), reason]);
+    });
+
+    kickPlayer(player);
+}
+
 function checkPlayerBanStatus(player, check_acc_id=true) {
     return new Promise((resolve, reject) => {
         con.query(`SELECT * FROM bans WHERE ${check_acc_id ? `acc_id = '${Player.Info[player.playerid].AccID}' OR ip = '${player.GetPlayerIp(16)}'` : `ip = '${player.GetPlayerIp(16)}'`}`, async function(err, result) {
