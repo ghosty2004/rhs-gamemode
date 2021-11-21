@@ -249,8 +249,21 @@ CMD.on("myint", (player, params) => {
 });
 
 CMD.on("vworld", (player, params) => {
-
+    if(isNaN(params[0])) return SendUsage(player, "/vworld [WorldID]");
+    params[0] = parseInt(params[0]);
+    player.SetPlayerVirtualWorld(params[0]);
+    player.SendClientMessage(data.colors.LIGHT_BLUE, `You have setted your virtual world to ${params[0]}.`);
+    let info = "";
+    info += `${Lang(player, "Commanda /vw te ajuta sa schimbi lumea in care te joci!", "Command /vw help you to change the world where you play!")}\n`;
+    info += `${Lang(player, "In aceasta lume esti singur! Toate vehiculele au disparut de pe harta!", "In this new world you are alone! All vehicles have disappeared off the map!")}\n`;
+    info += `${Lang(player, "Pentru alte vehicule foloseste /car <numele masini>!", "For other vehicle use the command /car <car name>!")}\n`;
+    info += "\n";
+    info += `${Lang(player, "Iti poti invita prietenii in aceasta lume folosind /pm pentru a avea un duel sau o cursa!", "You can invite your friends with /pm in this world for have a duel or a race!")}\n`;
+    info += "\n";
+    info += `${Lang(player, "Pentru a te intoarce inapoi in lumea normala cu toti jucatori foloseste /vw 0 sau teleporteazate! Exemplu /lv", "To return to the normal world with other players use /vw 0 or teleport in one place! For example /lv")}`;
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Lumea mea virtuala", "My Virutal World"), info, "Ok", "");
 });
+CMD.on("vw", (player, params) => { CMD.emit("vworld", player, params); });
 
 CMD.on("godp", (player) => {
 
