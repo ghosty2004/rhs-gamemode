@@ -2587,11 +2587,100 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.TOP_MONTH: {
+            if(response) {
+                switch(listitem) {
+                    case 0: {
+                        con.query("SELECT name, month_hours FROM users ORDER BY month_hours DESC LIMIT 10", function(err, result) {
+                            let info = "{FFFFFF}Our best Most active players are here!\n";
+                            if(!err && result) {
+                                info += "\n";
+                                for(let i = 0; i < result.length; i++) {
+                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}.: {00BBF6}${result[i].month_hours} {BBFF00}Hours\n`;
+                                }
+                            }
+                            info += "\n";
+                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Most active players", info, "Ok", "");
+                        });
+                        break;
+                    }
+                    case 1: {
+                        con.query("SELECT name, month_kills FROM users ORDER BY month_kills DESC LIMIT 10", function(err, result) {
+                            let info = "{FFFFFF}Our best Killers are here!\n";
+                            if(!err && result) {
+                                info += "\n";
+                                for(let i = 0; i < result.length; i++) {
+                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[0].month_kills} {BBFF00}Kills\n`;
+                                }
+                            }
+                            info += "\n";
+                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Killers", info, "Ok", "");
+                        });
+                        break;
+                    }
+                    case 2: {
+                        con.query("SELECT name, month_stuntpoints FROM users ORDER BY month_stuntpoints DESC LIMIT 10", function(err, result) {
+                            let info = "{FFFFFF}Our best Stunters are here!\n";
+                            if(!err && result) {
+                                info += "\n";
+                                for(let i = 0; i < result.length; i++) {
+                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].month_stuntpoints} {BBFF00}Stunt Points\n`;
+                                }
+                            }
+                            info += "\n";
+                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Stunters", info, "Ok", "");
+                        });
+                        break;
+                    }
+                    case 3: {
+                        con.query("SELECT name, month_driftpoints FROM users ORDER BY month_driftpoints DESC LIMIT 10", function(err, result) {
+                            let info = "{FFFFFF}Our best Drifters are here!\n";
+                            if(!err && result) {
+                                info += "\n";
+                                for(let i = 0; i < result.length; i++) {
+                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].month_driftpoints} {BBFF00}Drift Points\n`;
+                                }
+                            }
+                            info += "\n";
+                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Drifters", info, "Ok", "");
+                        });
+                        break;
+                    }
+                    case 4: {
+                        con.query("SELECT name, month_racepoints FROM users ORDER BY month_racepoints DESC LIMIT 10", function(err, result) {
+                            let info = "{FFFFFF}Our best Racers are here!\n";
+                            if(!err && result) {
+                                info += "\n";
+                                for(let i = 0; i < result.length; i++) {
+                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].month_racepoints} {BBFF00}Race Points\n`;
+                                }
+                            }
+                            info += "\n";
+                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Racers", info, "Ok", "");
+                        });
+                        break;
+                    }
+                    case 5: {
+                        break;
+                    }
+                    case 6: {
+                        player.GameTextForPlayer("~w~~h~you need to ~g~~h~/quit~n~~w~~h~the~r~~h~ server~w~~h~ in order to~n~~y~~h~update tops with your stats!", 4000, 3);
+                        break;
+                    }
+                }
+            }
+            break;
+        }
         case Dialog.TOP: {
             if(response) {
                 switch(listitem) {
                     case 0: {
-                        con.query("SELECT * FROM gangs ORDER BY kills DESC LIMIT 10", function(err, result) {
+                        con.query("SELECT name, kills FROM gangs ORDER BY kills DESC LIMIT 10", function(err, result) {
                             let info = "{FFFFFF}Our best Gangs are here!\n";
                             if(!err && result) {
                                 info += "\n";
@@ -2606,7 +2695,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         break;
                     }
                     case 1: {
-                        con.query("SELECT * FROM clans ORDER BY kills DESC LIMIT 10", function(err, result) {
+                        con.query("SELECT name, kills FROM clans ORDER BY kills DESC LIMIT 10", function(err, result) {
                             let info = "{FFFFFF}Our best Clans are here!\n";
                             if(!err && result) {
                                 info += "\n";
@@ -2621,7 +2710,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         break;
                     }
                     case 2: {
-                        con.query("SELECT * FROM users WHERE admin >= 1 ORDER BY adminpoints DESC LIMIT 10", function(err, result) {
+                        con.query("SELECT name, adminpoints FROM users WHERE admin >= 1 ORDER BY adminpoints DESC LIMIT 10", function(err, result) {
                             let info = "{FFFFFF}Our best Admins are here!\n";
                             if(!err && result) {
                                 info += "\n";
@@ -2633,6 +2722,22 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                             info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
                             player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Admins", info, "Ok", "");
                         });
+                        break;
+                    }
+                    case 3: {
+                        let info = "";
+                        info += "{BBFF00}Top Online\n";
+                        info += "{BBFF00}Top Killers\n";
+                        info += "{BBFF00}Top Stunters\n";
+                        info += "{BBFF00}Top Drifters\n";
+                        info += "{BBFF00}Top Racers\n";
+                        info += "{BBFF00}Top Gang Members\n";
+                        info += "{FFEB7B}Your stats will be updated after each {FF0000}disconnect";
+                        player.ShowPlayerDialog(Dialog.TOP_MONTH, samp.DIALOG_STYLE.LIST, "Top 10 players in this month", info, "Select", "Close");
+                        break;
+                    }
+                    case 4: {
+                        player.GameTextForPlayer("~w~~h~visit ~g~~h~now~n~~w~~h~www.~r~~h~RHS-Server.~w~~h~com/top~n~~y~~h~to more tops and others!", 4000, 3);
                         break;
                     }
                 }
