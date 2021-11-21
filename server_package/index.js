@@ -2636,7 +2636,16 @@ samp.OnRconLoginAttempt((ip, password, success) => {
 });
 
 samp.OnPlayerClickPlayer((player, clickedplayer) => {
+    Player.Info[player.playerid].ClickedPlayer = clickedplayer;
 
+    let info = "";
+    info += `{0072FF}${Lang(player, "Vezi statistici", "Show Stats")} - {00FF00}/stats\n`;
+    info += `{0072FF}${Lang(player, "Vezi statistici gang", "Show Gang Stats")} - {00FF00}/stats\n`;
+    info += `{0072FF}${Lang(player, "Vezi statistici clan", "Show Clan Stats")} - {00FF00}/stats\n`;
+    info += `{0072FF}${Lang(player, "Vezi statistici admin", "Show Admin Stats")} - {00FF00}/stats\n`;
+    info += `{0072FF}${Lang(player, "Trimite PM", "Send PM")}\n`;
+    info += `{0072FF}${Lang(player, "Urmareste jucator", "Spectate him")}\n`;
+    player.ShowPlayerDialog(Dialog.PLAYER_CLICK, samp.DIALOG_STYLE.LIST, Lang(player, `{AAAAAA}Ai dat click pe {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`, `{AAAAAA}You have clicked {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`), info, "Select", "Close");
 });
 
 samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
@@ -2693,6 +2702,19 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.PLAYER_CLICK: {
+            if(response) {
+                switch(listitem) {
+                    case 0: CMD.emit("stats", player, Player.Info[player.playerid].ClickedPlayer.playerid); break;
+                    case 1: CMD.emit("gstats", player, Player.Info[player.playerid].ClickedPlayer.playerid); break;
+                    case 2: CMD.emit("cinfo", player, Player.Info[player.playerid].ClickedPlayer.playerid); break;
+                    case 3: CMD.emit("astats", player, Player.Info[player.playerid].ClickedPlayer.playerid); break;
+                    case 4: CMD.emit("pm", player, Player.Info[player.playerid].ClickedPlayer.playerid); break;
+                    case 5: CMD.emit("spec", player, Player.Info[player.playerid].ClickedPlayer.playerid); break;
+                }
+            }
+            break;
+        }
         case Dialog.TOP_MONTH: {
             if(response) {
                 switch(listitem) {

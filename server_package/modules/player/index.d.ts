@@ -77,7 +77,8 @@ export declare const Info: {
     SpecialZone: {
         Targets: boolean
     },
-    TargetsPoints: number
+    TargetsPoints: number,
+    ClickedPlayer: SampPlayer
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;

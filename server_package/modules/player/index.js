@@ -78,7 +78,8 @@ module.exports = {
             SpecialZone: {
                 Targets: false
             },
-            TargetsPoints: 0
+            TargetsPoints: 0,
+            ClickedPlayer: player
         }
     }
 };

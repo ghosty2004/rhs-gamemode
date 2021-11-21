@@ -46,5 +46,6 @@ module.exports = {
     LOGIN_SPASSWORD: 44,
     BUYVIP_AFTER: 45,
     TOP: 46,
-    TOP_MONTH: 47
+    TOP_MONTH: 47,
+    PLAYER_CLICK: 48
 }
