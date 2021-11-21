@@ -205,8 +205,8 @@ CMD.on("leave", (player) => {
         if(Player.Info[player.playerid].SpecialZone.Targets) {
             player.PlayerTextDrawHide(TextDraws.player.targets_points);
             player.PlayerTextDrawSetString(TextDraws.player.targets_points, "~r~~h~Points: ~w~~h~0");
-            let coins = Math.floor(Player.Info[player.playerid].TargetsPoints / 1000);
-            let money = Math.floor(Player.Info[player.playerid].TargetsPoints / 500);
+            let coins = Math.round(Player.Info[player.playerid].TargetsPoints / 2);
+            let money = Math.round(Player.Info[player.playerid].TargetsPoints * 50);
             player.GameTextForPlayer(`~r~~h~you won ${coins} coins and $${money}~n~~w~~h~for making ~g~~h~${Player.Info[player.playerid].TargetsPoints} ~w~~h~points`, 5000, 3);
             Player.Info[player.playerid].SpecialZone.Targets = false;
             Player.Info[player.playerid].TargetsPoints = 0;
@@ -1848,6 +1848,20 @@ CMD.on("saveall", (player) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function CheckPlayerAka(player) {
+    con.query("SELECT * FROM akas WHERE ip = ?", [player.GetPlayerIp(16)], function(err, result) {
+        if(err) return;
+        if(result != 0) {
+            let names = JSON.parse(result[0].names);
+            if(!names.some(s => s == player.GetPlayerName(24))) {
+                names.push(player.GetPlayerName(24));
+            }
+            con.query("UPDATE akas SET names = ? WHERE ip = ?", [JSON.stringify(names), player.GetPlayerIp(16)]);
+        }
+        else con.query("INSERT INTO akas (names, ip) VALUES(?, ?)", [JSON.stringify([player.GetPlayerName(24)]), player.GetPlayerIp(16)]);
+    });
+}
+
 function SendMessageToAdmins(color, message) {
     samp.getPlayers().filter(f => Player.Info[f.playerid].Admin).forEach((i) => {
         i.SendClientMessage(color, message);
@@ -2588,10 +2602,13 @@ samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
 samp.OnPlayerConnect((player) => {
     ShowConnectTextDraw(player); 
     Player.ResetVariables(player);
+
+    /* Language Select */
     player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English");
     
-    Maps.RemoveBuildings(player);
+    Maps.RemoveBuildings(player); /* Remove Player GTA:SA Objects */
     TextDraws.player.Load(player); /* Load Player TextDraws */
+    CheckPlayerAka(player);
 
     AddToTDLogs(`~r~~h~${player.GetPlayerName(24)}(${player.playerid}) ~y~~h~joined the server!`);
     return true;
