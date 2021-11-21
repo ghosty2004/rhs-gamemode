@@ -840,13 +840,11 @@ CMD.on("splaces", (player) => {
 });
 
 CMD.on("others", (player) => {
-    con.query("SELECT * FROM teleports WHERE type = ?", ["others"], function(err, result) {
-        let info = "Command\tDescription\n";
-        for(let i = 0; i < result.length; i++) {
-            info += `{49FFFF}/${capitalizeFirstLetter(result[i].command)}\t{BBFF00}${result[i].name}\n`;
-        }
-        player.ShowPlayerDialog(Dialog.TELES_OTHERS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Other Teleports", info, "Teleport", "Back");
+    let info = "Command\tDescription\n";
+    Teleport.Get().filter(f => f.type == "others").forEach((i) => {
+        info += `{49FFFF}/${capitalizeFirstLetter(i.command)}\t{BBFF00}${i.name}\n`;
     });
+    player.ShowPlayerDialog(Dialog.TELES_OTHERS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Other Teleports", info, "Teleport", "Back");
 });
 
 CMD.on("sstunts", (player) => {
@@ -1505,7 +1503,12 @@ CMD.on("set", (player, params) => {
                 SendACMD(player, "Set Admin");
             }
             else if(params[0] == "vip") {
-
+                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                if(params[2] < 0 || params[2] > 4) return SendError(player, "Invalid vip level (0-3)!");
+                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Vip level to {FF0000}${getVIPRank(params[2], false)}{FFFF00}!`);
+                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Vip level to {FF0000}${getVIPRank(params[2], false)}{FFFF00}!`);
+                Player.Info[target.playerid].VIP = params[2];
+                SendACMD(player, "Set Vip");
             }
             else if(params[0] == "health") {
                 if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
@@ -1810,6 +1813,15 @@ CMD.on("setall", (player, params) => {
 /* ============== */
 /* Rcons Commands */
 /* ============== */
+CMD.on("saveall", (player) => {
+    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
+        savePlayer(i);
+        i.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has saved your {FF0000}account{FFFF00}!`);
+    });
+    SendACMD(player, "SaveAll");
+});
+
 /*CMD.on("createteleport", (player, params) => {
     if(params[0] && params.slice(1).join(" ")) {
         if(!Teleport.Exists(params[0])) {
@@ -2075,8 +2087,8 @@ function LoadSpawnZones() {
 function LoadTeleports() {
     con.query("SELECT * FROM teleports", function(err, result) {
         for(let i = 0; i < result.length; i++) {
-            Teleport.Create(result[i].ID, result[i].command, result[i].name, JSON.parse(result[i].position));
-        }
+            Teleport.Create(result[i].ID, result[i].type, result[i].command, result[i].name, JSON.parse(result[i].position));
+        } 
         console.log(`Loaded ${result.length} teleports.`);
     });
 }
@@ -2160,6 +2172,7 @@ function getRconRank(rank) {
 function getAdminRank(rank, hex=true) {
     let string = "";
     switch(rank) {
+        case 0: string = `Demote`; break;
         case 1: string = `${hex ? "{FF0000}" : ""}Junior`; break;
         case 2: string = `${hex ? "{FFFF00}" : ""}Senior`; break;
         case 3: string = `${hex ? "{0072FF}" : ""}Master`; break;
@@ -2167,20 +2180,23 @@ function getAdminRank(rank, hex=true) {
     return string;
 }
 
-function getVIPRank(rank) {
+function getVIPRank(rank, hex=true) {
     let string = "";
     switch(rank) {
-        case 1: string = "{FF0000}Red"; break;
-        case 2: string = "{FFFF00}Yellow"; break;
-        case 3: string = "{0077FF}Blue"; break;
-        case 4: string = "{FFFFFF}White"; break;
+        case 1: string = `${hex ? "{FF0000}" : ""}Red`; break;
+        case 2: string = `${hex ? "{FFFF00}" : ""}Yellow`; break;
+        case 3: string = `${hex ? "{0077FF}" : ""}Blue`; break;
+        case 4: string = `${hex ? "{FFFFFF}" : ""}White`; break;
     }
     return string;
 }
 
 function getPlayerRankInChat(player) {
     let tag = "";
-    if(Player.Info[player.playerid].Admin == 3) tag = "{0072FF}(Master)";
+    if(Player.Info[player.playerid].RconType == 3) tag = `{FF0000}({FFFFFF}${getRconRank(3)}{FF0000})`;
+    else if(Player.Info[player.playerid].RconType == 2) tag = `{FF0000}({FFFFFF}${getRconRank(2)}{FF0000})`;
+    else if(Player.Info[player.playerid].RconType == 1) tag = `{FF0000}({FFFFFF}${getRconRank(1)}{FF0000})`;
+    else if(Player.Info[player.playerid].Admin == 3) tag = "{0072FF}(Master)";
     else if(Player.Info[player.playerid].Admin == 2) tag = "{FFFF00}(Senior)";
     else if(Player.Info[player.playerid].Admin == 1) tag = "{FF0000}(Junior)";
     else if(Player.Info[player.playerid].VIP == 4) tag = "{FF0000}({FFFFFF}VIP{FF0000})";
@@ -3115,15 +3131,13 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.TELES_OTHERS: {
             if(response) {
-                con.query("SELECT * FROM teleports WHERE type = ?", ["others"], function(err, result) {
-                    for(let i = 0; i < result.length; i++) {
-                        if(i == listitem) {
-                            let position = JSON.parse(result[i].position);
-                            TelePlayer(player, result[i].command, result[i].name, position[0], position[1], position[2], position[3]);
-                            break;
-                        }
+                let result = Teleport.Get().filter(f => f.type == "others");
+                for(let i = 0; i < result.length; i++) {
+                    if(i == listitem) {
+                        TelePlayer(player, result[i].command, result[i].name, result[i].position[0], result[i].position[1], result[i].position[2], result[i].position[3]);  
+                        break;
                     }
-                });
+                }
             }
             else CMD.emit("teles", player);
             break;
