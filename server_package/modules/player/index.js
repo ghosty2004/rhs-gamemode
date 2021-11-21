@@ -85,7 +85,9 @@ module.exports = {
                 Code: 0
             },
             Discord: 0,
-            HideTextDraws: false
+            HideTextDraws: false,
+            GodMode: false,
+            GodCar: false
         }
     }
 };

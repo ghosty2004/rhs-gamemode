@@ -84,7 +84,9 @@ export declare const Info: {
         Code: number
     },
     Discord: number,
-    HideTextDraws: boolean
+    HideTextDraws: boolean,
+    GodMode: boolean,
+    GodCar: boolean
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;

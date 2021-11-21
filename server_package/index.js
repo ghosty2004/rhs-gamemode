@@ -266,7 +266,12 @@ CMD.on("vworld", (player, params) => {
 CMD.on("vw", (player, params) => { CMD.emit("vworld", player, params); });
 
 CMD.on("godp", (player) => {
-
+    let info = "";
+    let result = samp.getPlayers().filter(f => Player.Info[f.playerid].GodMode);
+    result.forEach((i) => {
+        info += `{00FF00}${i.GetPlayerName(24)} {00BBF6}(ID:${i.playerid}) {00FF00}- GodMode`;
+    });
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.LIST, `{00FF00}There are {00BBF6}${result.length} {00FF00}players with God Mode On!`, info, "Close", "");
 });
 
 CMD.on("house", (player) => {
