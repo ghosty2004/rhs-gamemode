@@ -315,7 +315,8 @@ CMD.on("bweapons", (player) => {
 });
 
 CMD.on("para", (player) => {
-
+    player.GivePlayerWeapon(46, 1);
+    player.SendClientMessage(data.colors.GREEN, Lang(player, "Ai primit o {00BBF6}Parasuta{00FF00}!", "You took a {00BBF6}Parachute{00FF00}!"));
 });
 
 CMD.on("camera", (player) => {
