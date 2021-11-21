@@ -123,7 +123,20 @@ CMD.on("eng", (player) => {
 });
 
 CMD.on("htds", (player) => {
-
+    Player.Info[player.playerid].HideTextDraws =! Player.Info[player.playerid].HideTextDraws;
+    player.GameTextForPlayer(`~w~~h~Hide Textdraws ${Player.Info[player.playerid].HideTextDraws ? "~g~~h~~h~On" : "~r~~h~Off"}`, 4000, 4);
+    switch(Player.Info[player.playerid].HideTextDraws) {
+        case false: {
+            player.TextDrawHideForPlayer(TextDraws.server.spawn[3]);
+            player.PlayerTextDrawHide(TextDraws.player.date);
+            break;
+        }
+        case true: {
+            player.TextDrawShowForPlayer(TextDraws.server.spawn[3]);
+            player.PlayerTextDrawShow(TextDraws.player.date);
+            break;
+        }
+    }
 });
 
 CMD.on("spassword", (player) => {
@@ -147,11 +160,11 @@ CMD.on("spassword", (player) => {
 });
 
 CMD.on("skin", (player, params) => {
-    if(params[0]) {
-        params[0] = parseInt(params[0]);
-        player.SetPlayerSkin(params[0]);
-    }   
-    else SendUsage(player, "/skin [ID]");
+    if(!params[0]) return player.SendClientMessage(data.colors.RED, `Your current Skin ID is: ${player.GetPlayerSkin()}`);
+    params[0] = parseInt(params[0]);
+    if(params[0] < 0 || params[0] > 311) SendError(player, "Skin invalid!", "Invalid Skin!");
+    player.SendClientMessage(data.colors.GREEN, `Ti-ai schimbat {00BBF6}Skin-ul {00FF00}cu succes! ({00BBF6}Skin: ${params[0]}{00FF00})`);
+    player.SetPlayerSkin(params[0]);
 });
 
 CMD.on("anim", (player, params) => {

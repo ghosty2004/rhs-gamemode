@@ -83,7 +83,8 @@ export declare const Info: {
         From: null|string,
         Code: number
     },
-    Discord: number
+    Discord: number,
+    HideTextDraws: boolean
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;

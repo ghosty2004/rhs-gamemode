@@ -84,7 +84,8 @@ module.exports = {
                 From: null,
                 Code: 0
             },
-            Discord: 0
+            Discord: 0,
+            HideTextDraws: false
         }
     }
 };
