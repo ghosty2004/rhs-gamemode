@@ -1557,7 +1557,7 @@ CMD.on("set", (player, params) => {
                 SendACMD(player, "Set Vip");
             }
             else if(params[0] == "health") {
-                if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                if(Player.Info[player.playerid].Admin < 2 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
                 if(params[2] < 0 || params[2] > 100) return SendError(player, "Invalid health (0-100)!");
                 target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Health to {FF0000}${params[2]}{FFFF00}!`);
                 player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Health to {FF0000}${params[2]}{FFFF00}!`);
@@ -1565,7 +1565,7 @@ CMD.on("set", (player, params) => {
                 SendACMD(player, "Set Health");
             }
             else if(params[0] == "armour") {
-                if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                if(Player.Info[player.playerid].Admin < 2 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
                 if(params[2] < 0 || params[2] > 100) return SendError(player, "Invalid armour (0-100)!");
                 target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Armour to {FF0000}${params[2]}{FFFF00}!`);
                 player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Armour to {FF0000}${params[2]}{FFFF00}!`);
@@ -1597,7 +1597,7 @@ CMD.on("set", (player, params) => {
                 SendACMD(player, "Set Deaths");
             }
             else if(params[0] == "color") {
-                if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                if(Player.Info[player.playerid].Admin < 2 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
             }
             else if(params[0] == "skin") {
                 target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Skin to {FF0000}${params[2]}{FFFF00}!`);
@@ -1612,7 +1612,7 @@ CMD.on("set", (player, params) => {
                 SendACMD(player, "Set Interior");
             }
             else if(params[0] == "wanted") {
-                if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                if(Player.Info[player.playerid].Admin < 2 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
                 if(params[2] < 0 || params[2] > 6) return SendError(player, "Invalid wanted level (0-6)!");
                 target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Wanted level to {FF0000}${params[2]}{FFFF00}!`);
                 player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Wanted level to {FF0000}${params[2]}{FFFF00}!`);
@@ -1643,7 +1643,7 @@ CMD.on("set", (player, params) => {
                 Player.Info[target.playerid].OnlineTime.Hours = params[2];
             }
             else if(params[0] == "money") {
-                if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                if(Player.Info[player.playerid].Admin < 3 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
                 if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid money (0-999999999)!");
                 Player.Info[target.playerid].Money = params[2];
                 target.ResetPlayerMoney();
@@ -1919,21 +1919,24 @@ function banPlayer(player, admin, days, reason) {
 function checkPlayerBanStatus(player, check_acc_id=true) {
     return new Promise((resolve, reject) => {
         con.query(`SELECT * FROM bans WHERE ${check_acc_id ? `acc_id = '${Player.Info[player.playerid].AccID}' OR ip = '${player.GetPlayerIp(16)}'` : `ip = '${player.GetPlayerIp(16)}'`}`, async function(err, result) {
-            if(getTimestamp() < result[0].to_timestamp) {
-                HideConnectTextDraw(player);
-                player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "", "", "", "");
-                let difference = timeDifference(result[0].to_timestamp);
-                player.SendClientMessage(data.colors.LIGHT_BLUE, "================(Ban Details)================");
-                player.SendClientMessage(data.colors.GRAY, `Sorry, but {FF0000}${await getNameByAccID(result[0].acc_id)} {CEC8C8}is banned on our server!`);
-                player.SendClientMessage(data.colors.GRAY, `By Admin {00BBF6}${await getNameByAccID(result[0].admin_acc_id)}. {CEC8C8}Reason: {00BBF6}${result[0].reason}`);
-                player.SendClientMessage(data.colors.GRAY, `This ban will expire in {FF0000}${difference.value} {CEC8C8}${difference.type}!`);
-                player.SendClientMessage(data.colors.LIGHT_BLUE, "==========================================");
-                resolve(true);
+            if(!err && result != 0) {
+                if(getTimestamp() < result[0].to_timestamp) {
+                    HideConnectTextDraw(player);
+                    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "", "", "", "");
+                    let difference = timeDifference(result[0].to_timestamp);
+                    player.SendClientMessage(data.colors.LIGHT_BLUE, "================(Ban Details)================");
+                    player.SendClientMessage(data.colors.GRAY, `Sorry, but {FF0000}${await getNameByAccID(result[0].acc_id)} {CEC8C8}is banned on our server!`);
+                    player.SendClientMessage(data.colors.GRAY, `By Admin {00BBF6}${await getNameByAccID(result[0].admin_acc_id)}. {CEC8C8}Reason: {00BBF6}${result[0].reason}`);
+                    player.SendClientMessage(data.colors.GRAY, `This ban will expire in {FF0000}${difference.value} {CEC8C8}${difference.type}!`);
+                    player.SendClientMessage(data.colors.LIGHT_BLUE, "==========================================");
+                    resolve(true);
+                }
+                else {
+                    con.query("DELETE FROM bans WHERE acc_id = ?", [Player.Info[player.playerid].AccID]);
+                    resolve(false);
+                }
             }
-            else {
-                con.query("DELETE FROM bans WHERE acc_id = ?", [Player.Info[player.playerid].AccID]);
-                resolve(false);
-            }
+            else resolve(false);
         });
     });
 }
