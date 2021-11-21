@@ -528,7 +528,7 @@ CMD.on("ramp", (player) => {
 });
 
 CMD.on("statsserver", async (player) => {
-    let OnlineTime = secondsToHms(Server.Info.StartTime);
+    let OnlineTime = timestampToHMS(Server.Info.StartTime);
 
     let info = "";
     info += `{BBFF00}Server has been started for{00BBF6} ${OnlineTime.hours} {BBFF00}hours, {00BBF6}${OnlineTime.minutes} {BBFF00}minutes {00BBF6}${OnlineTime.seconds} {BBFF00}seconds\n`;

@@ -11,11 +11,11 @@ module.exports = {
         if(result) return result;
         else return 0;
     },
-    secondsToHms: function(d) {
-        d = Number(d);
-        let hours = Math.floor(d / 3600);
-        let minutes = Math.floor(d % 3600 / 60);
-        let seconds = Math.floor(d % 3600 % 60);
+    timestampToHMS: function(d) {
+        let time = Math.floor(Date.now() / 1000) - d;
+        let hours = Math.floor(time / 3600);
+        let minutes = Math.floor(time / 60) % 60;
+        let seconds = Math.floor(time % 60);
         return {hours: hours, minutes: minutes, seconds: seconds};
     }
 }
