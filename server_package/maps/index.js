@@ -52,6 +52,7 @@ module.exports = {
 
         /* Others */
         Beach.Load();
+        Chilliad.Load();
         Jail.Load();
         LS.Load();
         LV.Load();
@@ -78,6 +79,7 @@ module.exports = {
 
         /* Others */
         Beach.RemoveBuilding(player);
+        Chilliad.RemoveBuilding(player);
         LS.RemoveBuilding(player);
         LV.RemoveBuilding(player);
         LVTrans.RemoveBuilding(player);
