@@ -242,7 +242,10 @@ CMD.on("jetpack", (player) => {
 });
 
 CMD.on("myint", (player, params) => {
-
+    if(isNaN(params[0])) return SendUsage(player, "/myint [InteriorID]");
+    params[0] = parseInt(params[0]);
+    player.SetPlayerInterior(params[0]);
+    player.SendClientMessage(data.colors.LIGHT_BLUE, `You have setted your interior to ${params[0]}.`);
 });
 
 CMD.on("vworld", (player, params) => {
