@@ -31,7 +31,7 @@ const TextDraws = require("./textdraws");
 const ServerLogs = ["", "", ""];
 
 /* Functions */
-const { getRandomInt, getPlayer, secondsToHms } = require("./modules/functions");
+const { getRandomInt, getPlayer, timestampToHMS } = require("./modules/functions");
 
 /* Data's */
 const data = {
