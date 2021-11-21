@@ -1875,6 +1875,23 @@ CMD.on("saveall", (player) => {
     SendACMD(player, "SaveAll");
 });
 
+CMD.on("unban", async (player, params) => {
+    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0]) return SendUsage(player, "/UnBan [Name]");
+    let acc_id = await getIDByAccName(params[0]);
+    if(acc_id) {
+        con.query("SELECT ID FROM bans WHERE acc_id = ?", [acc_id], function(err, result) {
+            if(!err && result != 0) {
+                con.query("DELETE FROM bans WHERE ID = ?", [result[0].ID]);
+                player.SendClientMessage(data.colors.YELLOW, `Player {FF0000}${params[0]} {FFFF00}was successfully unbanned!`);
+                SendACMD(player, "UnBan");
+            }
+            else player.SendClientMessage(data.colors.YELLOW, `Player {FF0000}${params[0]} {FFFF00}is not banneed!`);
+        });
+    }
+    else player.SendClientMessage(data.colors.YELLOW, `Player {FF0000}${params[0]} {FFFF00}is not exists in database!`);
+});
+
 /*CMD.on("createteleport", (player, params) => {
     if(params[0] && params.slice(1).join(" ")) {
         if(!Teleport.Exists(params[0])) {
@@ -2160,6 +2177,15 @@ function getNameByAccID(AccID) {
         con.query("SELECT * FROM users WHERE ID = ?", [AccID], function(err, result) {
             if(err || !result) return resolve("none");
             resolve(result[0].name);
+        });
+    });
+}
+
+function getIDByAccName(AccName) {
+    return new Promise((resolve, reject) => {
+        con.query("SELECT ID FROM users WHERE name = ?", [AccName], function(err, result) {
+            if(!err && result != 0) resolve(result[0].ID);
+            else resolve(null);
         });
     });
 }
