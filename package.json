@@ -18,6 +18,7 @@
   "homepage": "https://github.com/Ghosty2004/rhs-gamemode#readme",
   "dependencies": {
     "colors": "^1.4.0",
+    "discord.js": "^13.0.0",
     "events": "^3.3.0",
     "md5": "^2.3.0",
     "mysql": "^2.18.1",

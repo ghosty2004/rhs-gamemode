@@ -5,7 +5,6 @@
 
 /* Modules */
 const samp = require("samp-node-lib");
-const mysql = require("mysql");
 const colors = require("colors");
 const md5 = require("md5");
 
@@ -14,11 +13,13 @@ const Clan = require("./modules/clan");
 const Dialog = require("./modules/dialog");
 const Errors = require("./modules/errors");
 const events = require("./modules/events");
+const con = require("./modules/mysql"); 
 const Minigames = require("./modules/minigames");
 const Player = require("./modules/player");
 const SpawnZone = require("./modules/spawnzone");
 const Streamer = require("./modules/streamer");
 const Teleport = require("./modules/teleport");
+const DiscordBOT = require("./modules/discordbot");
 
 /* Server Maps */
 const Maps = require("./maps");
@@ -39,13 +40,6 @@ const data = {
     settings: require("./data/settings"),
 }
 
-/* Create MYSQL Connection */
-const con = mysql.createConnection({
-    host: data.mysql.host,
-    user: data.mysql.user,
-    password: data.mysql.password,
-    database: data.mysql.database
-});
 con.connect((err) => {
     if(!err) {
         console.log("MYSQL:".yellow + ` Connection successfully established.`.green);
@@ -1734,7 +1728,7 @@ CMD.on("ban", (player, params) => {
     if(!Player.Info[target.playerid].LoggedIn) return SendError(player, Errors.PLAYER_NOT_LOGGED);
     params[1] = parseInt(params[1]);
     if(params[1] < 1 || params[1] > 99) return SendError(player, "Invalid day(s) (1-99)!");
-    banPlayer(target, player, params[1], params.slice(1).join(" "));
+    banPlayer(target, player, params[1], params.slice(2).join(" "));
 });
 
 CMD.on("starevent", (player) => {
@@ -1936,7 +1930,7 @@ function banPlayer(player, admin, days, reason) {
     SendACMD(admin, "Ban");
 
     con.query("SELECT * FROM bans WHERE acc_id = ?", [Player.Info[player.playerid].AccID], function(err, result) {
-        if(!err && result != 0) con.query("INSERT INTO bans (acc_id, ip, admin_acc_id, from_timestamp, to_timestamp, reason) VALUES(?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].AccID, player.GetPlayerIp(16), Player.Info[admin.playerid].AccID, getTimestamp(), getTimestamp(days), reason]);
+        if(!err && result == 0) con.query("INSERT INTO bans (acc_id, ip, admin_acc_id, from_timestamp, to_timestamp, reason) VALUES(?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].AccID, player.GetPlayerIp(16), Player.Info[admin.playerid].AccID, getTimestamp(), getTimestamp(days), reason]);
         else con.query("UPDATE bans SET ip = ?, admin_acc_id = ?, from_timestamp = ?, to_timestamp = ?, reason = ?", [player.GetPlayerIp(16), Player.Info[admin.playerid].AccID, getTimestamp(), getTimestamp(days), reason]);
     });
 
@@ -2174,12 +2168,6 @@ function getClanRank(RankID) {
         case 3: string = "Founder"; break;
     }
     return string;
-}
-
-function getPlayer(IDOrName) {
-    let result = samp.getPlayers().filter(f => f.GetPlayerName(24).toLowerCase().includes(`${IDOrName}`.toLowerCase()) || f.playerid == IDOrName)[0];
-    if(result) return result;
-    else return 0;
 }
 
 function getNameByAccID(AccID) {

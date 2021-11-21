@@ -1,3 +1,4 @@
+import { Message } from "discord.js";
 import { EventEmitter } from "events";
 import { SampPlayer } from "samp-node-lib";
 
@@ -15,4 +16,20 @@ export class Command extends EventEmitter {
     public constructor() {
       super();
     }
+}
+
+declare interface DiscordCommand {
+    on<U>(
+      event: U, listener: (message: Message, params: Array[]) => void
+    ): this;
+
+    emit<U>(
+      event: U, ...args: Parameters<(message: Message, params: Array[]) => void>
+    )
+}
+
+export class DiscordCommand extends EventEmitter {
+  public constructor() {
+    super();
+  }
 }

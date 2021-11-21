@@ -6,4 +6,10 @@ class Command {
     }
 }
 
-module.exports = {Command}
+class DiscordCommand {
+    constructor() {
+        return new EventEmitter();
+    }
+}
+
+module.exports = {Command, DiscordCommand}

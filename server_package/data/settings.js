@@ -11,5 +11,9 @@ module.exports = {
         "Romania HarD Stunt - Join Us!",
         "Romania HarD Stunt - /BuyVIP: It's free!",
         "Romania HarD Stunt - Copy Version"
-    ]
+    ],
+    DISCORD_BOT: {
+        TOKEN: "OTEyMDA0MDY4MjIwNzQ3ODA2.YZpn-g.J2dGV_Y_vNRC6mu9qIXJ3VPbzac",
+        PREFIX: "rhs!"
+    }
 }
