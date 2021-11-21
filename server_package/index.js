@@ -203,6 +203,11 @@ CMD.on("business", (player) => {
 CMD.on("leave", (player) => {
     if(isPlayerInSpecialZone(player)) {
         if(Player.Info[player.playerid].SpecialZone.Targets) {
+            player.PlayerTextDrawHide(TextDraws.player.targets_points);
+            player.PlayerTextDrawSetString(TextDraws.player.targets_points, "~r~~h~Points: ~w~~h~0");
+            let coins = Math.floor(Player.Info[player.playerid].TargetsPoints / 1000);
+            let money = Math.floor(Player.Info[player.playerid].TargetsPoints / 500);
+            player.GameTextForPlayer(`~r~~h~you won ${coins} coins and $${money}~n~~w~~h~for making ~g~~h~${Player.Info[player.playerid].TargetsPoints} ~w~~h~points`, 5000, 3);
             Player.Info[player.playerid].SpecialZone.Targets = false;
             Player.Info[player.playerid].TargetsPoints = 0;
         }
@@ -765,9 +770,11 @@ CMD.on("sfparkour", (player) => {
 
 CMD.on("targets", (player) => {
     Player.Info[player.playerid].SpecialZone.Targets = true;
+    player.ResetPlayerWeapons();
     player.GivePlayerWeapon(Minigames.Targets.Weapon, 9999);
     player.SetPlayerVirtualWorld(1000);
     TelePlayer(player, "targets", "Targets", -498.7933, -2675.3245, 1081.9259, 271.9457);
+    player.PlayerTextDrawShow(TextDraws.player.targets_points);
 });
 
 CMD.on("skyclimb", (player) => {
@@ -1841,6 +1848,12 @@ CMD.on("saveall", (player) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function SendMessageToAdmins(color, message) {
+    samp.getPlayers().filter(f => Player.Info[f.playerid].Admin).forEach((i) => {
+        i.SendClientMessage(color, message);
+    });
+}
+
 function getPlayerStatsNote(player) {
     let note = 0;
     if(Player.Info[player.playerid].Driving_Data.StuntPoints >= 1000) note += 1;
@@ -2544,11 +2557,11 @@ samp.OnRconLoginAttempt((ip, password, success) => {
                 if(err) return i.Kick();
                 Player.Info[i.playerid].RconType = result[0].rcontype;
                 if(Player.Info[i.playerid].RconType == 0) {
-                    i.SendClientMessage(data.colors.RED, "Missing permission{FFFF00}!");
+                    SendMessageToAdmins(-1, `RCON LOGIN: ${i.GetPlayerName(24)}(${i.playerid}) has tried to login without RCON PERMISSION!`);
                     kickPlayer(i);
                 }
                 else {
-                    i.SendClientMessage(data.colors.YELLOW, `Logged in as {FF0000}${getRconRank(Player.Info[i.playerid].RconType)}{FFFF00}!`);
+                    SendMessageToAdmins(-1, `RCON LOGIN: ${i.GetPlayerName(24)}(${i.playerid}) has logged in as a ${getRconRank(Player.Info[i.playerid].RconType)} successfully with permission enabled!`);
                 }
             });
         });
@@ -2561,7 +2574,10 @@ samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
         if(weaponid == Minigames.Targets.Weapon) {
             if(hittype == samp.BULLET_HIT_TYPE.OBJECT) {
                 if(hitid == Minigames.Targets.HitObject) {
+                    Player.Info[player.playerid].TargetsPoints++;
                     Minigames.Targets.Hit(player);
+                    player.GameTextForPlayer("~h~~h~+1 Point!", 1000, 3);
+                    player.PlayerTextDrawSetString(TextDraws.player.targets_points, `~r~~h~Points: ~w~~h~${Player.Info[player.playerid].TargetsPoints}`);
                 }
             }
         }
@@ -3362,6 +3378,7 @@ samp.OnPlayerSpawn((player) => {
     if(!Player.Info[player.playerid].LoggedIn) return player.Kick();
     HideConnectTextDraw(player);
     ShowSpawnTextDraw(player);
+    player.SetPlayerVirtualWorld(0);
     if(Player.Info[player.playerid].Mail == "none") {
         player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
     }
