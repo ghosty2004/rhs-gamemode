@@ -232,7 +232,8 @@ CMD.on("mp3", (player) => {
 });
 
 CMD.on("kill", (player) => {
-
+    player.SetPlayerHealth(0);
+    player.SetPlayerArmour(0);
 });
 
 CMD.on("jetpack", (player) => {
@@ -2831,6 +2832,10 @@ samp.OnPlayerClickPlayer((player, clickedplayer) => {
     info += `{0072FF}${Lang(player, "Trimite PM", "Send PM")} - {00FF00}/PM\n`;
     info += `{0072FF}${Lang(player, "Urmareste jucator", "Spectate him")} - {00FF00}/spec`;
     player.ShowPlayerDialog(Dialog.PLAYER_CLICK, samp.DIALOG_STYLE.LIST, Lang(player, `{AAAAAA}Ai dat click pe {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`, `{AAAAAA}You have clicked {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`), info, "Select", "Close");
+});
+
+samp.OnPlayerDeath((player, killer) => {
+    player.GameTextForPlayer("~r~~h~You Died", 2, 2000);
 });
 
 samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
