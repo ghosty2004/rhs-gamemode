@@ -44,5 +44,6 @@ module.exports = {
     SPASSWORD: 42,
     SPASSWORD_OPTIONS: 43,
     LOGIN_SPASSWORD: 44,
-    BUYVIP_AFTER: 45
+    BUYVIP_AFTER: 45,
+    TOP: 46
 }

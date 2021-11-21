@@ -36,7 +36,26 @@ export declare const Info: {
         DriftPoints: number,
         StuntPoints: number,
         RacePoints: number,
-
+    },
+    AdminPoints: number,
+    Month: {
+        OnlineTime: {
+            Hours: number,
+            Minutes: number,
+            Seconds: number
+        },
+        Kills_Data: {
+            Kills: number,
+            HeadShots: number,
+            KillingSpree: number,
+            BestKillingSpree: number,
+            Deaths: number
+        },
+        Driving_Data: {
+            DriftPoints: number,
+            StuntPoints: number,
+            RacePoints: number,
+        }
     },
     Description: {
         "1": string,

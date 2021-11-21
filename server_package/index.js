@@ -405,7 +405,13 @@ CMD.on("c4", (player) => {
 });
 
 CMD.on("top", (player) => {
-
+    let info = "";
+    info += "{BBFF00}Top Gangs\n";
+    info += "{BBFF00}Top Clans\n";
+    info += "{BBFF00}Top Admins\n";
+    info += "{BBFF00}Top 10 players in this month\n";
+    info += `{FFEB7B}Top 100 and many more, only on{FF0000} ${data.settings.SERVER_WEB}`;
+    player.ShowPlayerDialog(Dialog.TOP, samp.DIALOG_STYLE.LIST, "Top 10", info, "Select", "Close");
 });
 
 CMD.on("holdoff", (player) => {
@@ -1835,6 +1841,14 @@ function getPlayerStatsNote(player) {
     return note;
 }
 
+function TotalGameTimeMonth(player) {
+    let total_time = ((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].ConnectTime) + (Player.Info[player.playerid].Month.OnlineTime.Hours*60*60) + (Player.Info[player.playerid].Month.OnlineTime.Minutes*60) + (Player.Info[player.playerid].Month.OnlineTime.Seconds));
+    let hours = Math.floor(total_time / 3600);
+    let minutes = Math.floor(total_time / 60) % 60;
+    let seconds = Math.floor(total_time % 60);
+    return {hours: hours, minutes: minutes, seconds: seconds};
+}
+
 function TotalGameTime(player) {
     let total_time = ((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].ConnectTime) + (Player.Info[player.playerid].OnlineTime.Hours*60*60) + (Player.Info[player.playerid].OnlineTime.Minutes*60) + (Player.Info[player.playerid].OnlineTime.Seconds));
     let hours = Math.floor(total_time / 3600);
@@ -1980,14 +1994,19 @@ function getNameByAccID(AccID) {
 function savePlayer(player) {
     if(Player.Info[player.playerid].LoggedIn) {
         let OnlineTime = TotalGameTime(player);
+        let OnlineTimeMonth = TotalGameTimeMonth(player);
 
         con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, hours = ?, minutes = ?, seconds = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?,\
-        clan_rank = ?, gang = ?, kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, jailed = ? WHERE ID = ?", [
+        clan_rank = ?, gang = ?, kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?,\
+        month_minutes = ?, month_seconds = ?, month_kills = ?, month_headshots = ?, month_killingspree = ?, month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?,\
+        month_racepoints = ?, jailed = ? WHERE ID = ?", [
             Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
             OnlineTime.hours, OnlineTime.minutes, OnlineTime.seconds, Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, 
             Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, Player.Info[player.playerid].Kills_Data.KillingSpree, 
             Player.Info[player.playerid].Kills_Data.BestKillingSpree, Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, 
-            Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].AccID
+            Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].AdminPoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds, Player.Info[player.playerid].Month.Kills_Data.Kills, 
+            Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, Player.Info[player.playerid].Month.Kills_Data.Deaths, 
+            Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].AccID
         ]);
     }
 }
@@ -2443,6 +2462,18 @@ function LoadPlayerStats(player) {
             Player.Info[player.playerid].Driving_Data.DriftPoints = result[0].driftpoints;
             Player.Info[player.playerid].Driving_Data.StuntPoints = result[0].stuntpoints;
             Player.Info[player.playerid].Driving_Data.RacePoints = result[0].racepoints;
+            Player.Info[player.playerid].AdminPoints = result[0].adminpoints;
+            Player.Info[player.playerid].Month.OnlineTime.Hours = result[0].month_hours;
+            Player.Info[player.playerid].Month.OnlineTime.Minutes = result[0].month_minutes;
+            Player.Info[player.playerid].Month.OnlineTime.Seconds = result[0].month_seconds;
+            Player.Info[player.playerid].Month.Kills_Data.Kills = result[0].month_kills;
+            Player.Info[player.playerid].Month.Kills_Data.HeadShots = result[0].month_headshots;
+            Player.Info[player.playerid].Month.Kills_Data.KillingSpree = result[0].month_killingspree;
+            Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree = result[0].month_bestkillingspree;
+            Player.Info[player.playerid].Month.Kills_Data.Deaths = result[0].month_deaths;
+            Player.Info[player.playerid].Driving_Data.DriftPoints = result[0].month_driftpoints;
+            Player.Info[player.playerid].Driving_Data.StuntPoints = result[0].month_stuntpoints;
+            Player.Info[player.playerid].Driving_Data.RacePoints = result[0].month_racepoints;
             Player.Info[player.playerid].Jailed = result[0].jailed;
 
             player.GivePlayerMoney(Player.Info[player.playerid].Money);
@@ -2556,6 +2587,58 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.TOP: {
+            if(response) {
+                switch(listitem) {
+                    case 0: {
+                        con.query("SELECT * FROM gangs ORDER BY kills DESC LIMIT 10", function(err, result) {
+                            let info = "{FFFFFF}Our best Gangs are here!\n";
+                            if(!err && result) {
+                                info += "\n";
+                                for(let i = 0; i < result.length; i++) {
+                                    info += `{FF0000}${i+1}. {FF0000}${result[i].name}: {00BBF6}${result[i].kills} {BBFF00}Points\n`;
+                                }
+                            }
+                            info += "\n";
+                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Gangs", info, "Ok", "");
+                        });
+                        break;
+                    }
+                    case 1: {
+                        con.query("SELECT * FROM clans ORDER BY kills DESC LIMIT 10", function(err, result) {
+                            let info = "{FFFFFF}Our best Clans are here!\n";
+                            if(!err && result) {
+                                info += "\n";
+                                for(let i = 0; i < result.length; i++) {
+                                    info += `{FF0000}1. {BBFF00}${result[i].name}: {00BBF6}${result[i].kills} {BBFF00}Kills\n`;
+                                }
+                            }
+                            info += "\n";
+                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Clans", info, "Ok", "");
+                        });
+                        break;
+                    }
+                    case 2: {
+                        con.query("SELECT * FROM users WHERE admin >= 1 ORDER BY adminpoints DESC LIMIT 10", function(err, result) {
+                            let info = "{FFFFFF}Our best Admins are here!\n";
+                            if(!err && result) {
+                                info += "\n";
+                                for(let i = 0; i < result.length; i++) {
+                                    info += `{FF0000}1. {BBFF00}${result[i].name}: {00BBF6}${result[i].adminpoints} {BBFF00}Activity Points\n`;
+                                }
+                            }
+                            info += "\n";
+                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Admins", info, "Ok", "");
+                        });
+                        break;
+                    }
+                }
+            }
+            break;
+        }
         case Dialog.BUYVIP_AFTER: {
             if(!response) CMD.emit("vcmds", player);
             break;

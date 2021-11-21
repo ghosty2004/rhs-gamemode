@@ -37,7 +37,26 @@ module.exports = {
                 DriftPoints: 0,
                 StuntPoints: 0,
                 RacePoints: 0,
-
+            },
+            AdminPoints: 0,
+            Month: {
+                OnlineTime: {
+                    Hours: 0,
+                    Minutes: 0,
+                    Seconds: 0
+                },
+                Kills_Data: {
+                    Kills: 0,
+                    HeadShots: 0,
+                    KillingSpree: 0,
+                    BestKillingSpree: 0,
+                    Deaths: 0
+                },
+                Driving_Data: {
+                    DriftPoints: 0,
+                    StuntPoints: 0,
+                    RacePoints: 0,
+                }
             },
             Description: {
                 "1": "",
