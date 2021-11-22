@@ -200,7 +200,7 @@ CMD.on("atrade", (player, params) => {
 });
 
 CMD.on("trade", (player) => {
-
+    
 });
 
 CMD.on("brb", (player) => {
@@ -1100,6 +1100,7 @@ CMD.on("vad", (player, params) => {
 
 CMD.on("goto", (player, params) => {
     if(Player.Info[player.playerid].VIP < 1 && Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    if(!params[0]) return SendUsage(player, "/Goto [ID/Name]");
 });
 
 CMD.on("spawnme", (player) => {
@@ -1993,6 +1994,11 @@ CMD.on("unban", async (player, params) => {
     else player.SendClientMessage(data.colors.YELLOW, `Player {FF0000}${params[0]} {FFFF00}is not exists in database!`);
 });
 
+CMD.on("ticks", (player) => {
+    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    player.SendClientMessage(data.colors.LIGHT_BLUE, `Server Ticks: ${samp.GetServerTickRate()}`);
+});
+
 /*CMD.on("createteleport", (player, params) => {
     if(params[0] && params.slice(1).join(" ")) {
         if(!Teleport.Exists(params[0])) {
@@ -2023,7 +2029,8 @@ function getRegistredPlayersCount() {
 
 function Updater() {
     /* Server HostName Changer */
-    samp.SendRconCommand(`hostname ${data.settings.RANDOM_SERVER_NAMES[getRandomInt(0, data.settings.RANDOM_SERVER_NAMES.length)]}`)
+    samp.SendRconCommand(`hostname ${data.settings.RANDOM_SERVER_NAMES[getRandomInt(0, data.settings.RANDOM_SERVER_NAMES.length)]}`);
+    //samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => { savePlayer(i); });
 }
 
 function banPlayer(player, admin, days, reason) {
@@ -3630,7 +3637,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                                 let info = "";
                                 info += `{FF0000}${Lang(player, `Autentificare nereusita (${Player.Info[player.playerid].Fail_Logins}/4)!`, `Login failed (${Player.Info[player.playerid].Fail_Logins}/4)!`)}\n`;
                                 info += "\n";
-                                info += `{FF0000}${Lang(player, "Ai introdus parola gresita. Te rugam sa incerci din nou!", "You entered the wrong password. Please try again!")}\n`;
+                                info += `{FFFF00}${Lang(player, "Ai introdus parola gresita. Te rugam sa incerci din nou!", "You entered the wrong password. Please try again!")}\n`;
                                 info += `{00FF00}${Lang(player, `Daca ti-ai uitat parola intra pe {FF0000}${data.settings.SERVER_WEB}{00FF00} pentru a o reseta!`, `If you forgot your password enter the {FF0000}${data.settings.SERVER_WEB} {00FF00}to reset it!`)}`
                                 player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Autentificare {FF0000}Nereusita", "Login {FF0000}Failed"), info, Lang(player, "Autentificare", "Login"), Lang(player, "Nume Nou", "New Name"));
                             }

@@ -9,7 +9,7 @@ module.exports = {
             this.Update(player.playerid);
         });
     },
-    CreateDynamicObject: function(modelid, x, y, z, rx, ry, rz, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 1000, drawdistance = 1000, areaid = -1, priority = 0) {
+    CreateDynamicObject: function(modelid, x, y, z, rx, ry, rz, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 350, drawdistance = 400, areaid = -1, priority = 0) {
         return callPublic("_CreateDynamicObject", "iffffffiiiffii", modelid, x, y, z, rx, ry, rz, worldid, interiorid, playerid, streamdistance, drawdistance, areaid, priority);
     },
     DestroyDynamicObject: function(objectid) {

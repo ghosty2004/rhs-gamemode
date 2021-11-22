@@ -86,7 +86,7 @@ CMD.on("login", (message, params) => {
     let target = getPlayer(params[0]);
     if(!target) return SendError(message, Errors.PLAYER_NOT_CONNECTED);
     if(!Player.Info[target.playerid].LoggedIn) return SendError(message, Errors.PLAYER_NOT_LOGGED);
-    if(Player.Info[target.playerid].Discord) return SendError(message, "This player already logged in to a discord account. Use /discordsignout for logout.");
+    if(Player.Info[target.playerid].Discord != "0") return SendError(message, "This player already logged in to a discord account. Use /discordsignout for logout.");
     message.channel.send(`Login request have been sent to **${target.GetPlayerName(24)}(${target.playerid})**!`);
     target.SendClientMessage(0x5865F2AA, `[DISCORD]: {FFFFFF}${message.author.tag} {5865F2}has sent a login request. Use {FFFFFF}/acceptlogin {5865F2}or {FFFFFF}/declinelogin {5865F2}for response!`);
     Player.Info[target.playerid].DiscordLoginRequest.From = message.author.id;
