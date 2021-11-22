@@ -601,45 +601,39 @@ CMD.on("buyvip", (player) => {
 });
 
 CMD.on("stats", (player, params) => {
-    try {
-        let target = player;
-        if(params[0]) target = getPlayer(params[0]);
-        if(target) {
-            let OnlineTime = TotalGameTime(target);
-
-            let info = "";
-            info += "{FF4800}General statistics\n";
-            info += `{BBFF00}Money: {49FFFF}$${Player.Info[target.playerid].Money}\n`;
-            info += `{BBFF00}Coins: {49FFFF}${Player.Info[target.playerid].Money}\n`;
-            info += `{BBFF00}Respect: {49FFFF}+${Player.Info[target.playerid].Respect.Positive} {BBFF00}/ {49FFFF}-${Player.Info[player.playerid].Respect.Negative}\n`;
-            info += `{BBFF00}Online time: {49FFFF}${OnlineTime.hours} {BBFF00}hrs, {49FFFF}${OnlineTime.minutes} {BBFF00}mins, {49FFFF}${OnlineTime.seconds} {BBFF00}secs\n`;
-            info += `{BBFF00}Admin: ${Player.Info[target.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
-            info += `{BBFF00}VIP: ${Player.Info[target.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
-            info += "\n";
-            info += "{FF4800}Killer statistics\n";
-            info += `{BBFF00}Kills: {49FFFF}${Player.Info[target.playerid].Kills_Data.Kills} {BBFF00}| Headshots: {49FFFF}${Player.Info[player.playerid].Kills_Data.HeadShots}\n`;
-            info += `{BBFF00}Killing Spree: {49FFFF}${Player.Info[target.playerid].Kills_Data.KillingSpree} {BBFF00}| Best Killing Spree: {49FFFF}${Player.Info[player.playerid].Kills_Data.BestKillingSpree}\n`;
-            info += `{BBFF00}Deaths: {49FFFF}${Player.Info[target.playerid].Kills_Data.Deaths}\n`;
-            info += `{BBFF00}Killer Rank: ${getRanksRankName("kills", Player.Info[target.playerid].Kills_Data.Kills)}\n`;
-            info += "\n";
-            info += `{FF4800}Driving skills\n`;
-            info += `{BBFF00}Drift Points: {49FFFF}${Player.Info[target.playerid].Driving_Data.DriftPoints} {BBFF00}(${getRanksRankName("drift", Player.Info[player.playerid].Driving_Data.DriftPoints)}{BBFF00})\n`;
-            info += `{BBFF00}Stunt Points: {49FFFF}${Player.Info[target.playerid].Driving_Data.StuntPoints} {BBFF00}(${getRanksRankName("stunt", Player.Info[player.playerid].Driving_Data.StuntPoints)}{BBFF00})\n`;
-            info += `{BBFF00}Race Points: {49FFFF}${Player.Info[target.playerid].Driving_Data.RacePoints} {BBFF00}(${getRanksRankName("race", Player.Info[player.playerid].Driving_Data.RacePoints)}{BBFF00})\n`;
-            info += "\n";
-            info += "{FF4800}Properties\n";
-            info += `{BBFF00}Business: {FF0000}No\n`;
-            info += `{BBFF00}House: {FF0000}No\n`;
-            info += `{BBFF00}Personal Vehicle: {FF0000}No\n`;
-            info += "\n";
-            info += `{FF4800}Statistics note: {49FFFF}${getPlayerStatsNote(target)}{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob`
-            player.ShowPlayerDialog(Dialog.STATS, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s stats!`, info, "Ok", `${target == player ? "Description" : ""}`);
-        }
-        else SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    let target = player;
+    if(params[0]) target = getPlayer(params[0]);
+    if(target) {
+        let OnlineTime = TotalGameTime(target);
+        let info = "";
+        info += "{FF4800}General statistics\n";
+        info += `{BBFF00}Money: {49FFFF}$${Player.Info[target.playerid].Money}\n`;
+        info += `{BBFF00}Coins: {49FFFF}${Player.Info[target.playerid].Coins}\n`;
+        info += `{BBFF00}Respect: {49FFFF}+${Player.Info[target.playerid].Respect.Positive} {BBFF00}/ {49FFFF}-${Player.Info[player.playerid].Respect.Negative}\n`;
+        info += `{BBFF00}Online time: {49FFFF}${OnlineTime.hours} {BBFF00}hrs, {49FFFF}${OnlineTime.minutes} {BBFF00}mins, {49FFFF}${OnlineTime.seconds} {BBFF00}secs\n`;
+        info += `{BBFF00}Admin: ${Player.Info[target.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
+        info += `{BBFF00}VIP: ${Player.Info[target.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
+        info += "\n";
+        info += "{FF4800}Killer statistics\n";
+        info += `{BBFF00}Kills: {49FFFF}${Player.Info[target.playerid].Kills_Data.Kills} {BBFF00}| Headshots: {49FFFF}${Player.Info[player.target].Kills_Data.HeadShots}\n`;
+        info += `{BBFF00}Killing Spree: {49FFFF}${Player.Info[target.playerid].Kills_Data.KillingSpree} {BBFF00}| Best Killing Spree: {49FFFF}${Player.Info[player.target].Kills_Data.BestKillingSpree}\n`;
+        info += `{BBFF00}Deaths: {49FFFF}${Player.Info[target.playerid].Kills_Data.Deaths}\n`;
+        info += `{BBFF00}Killer Rank: ${getRanksRankName("kills", Player.Info[target.playerid].Kills_Data.Kills)}\n`;
+        info += "\n";
+        info += `{FF4800}Driving skills\n`;
+        info += `{BBFF00}Drift Points: {49FFFF}${Player.Info[target.playerid].Driving_Data.DriftPoints} {BBFF00}(${getRanksRankName("drift", Player.Info[player.target].Driving_Data.DriftPoints)}{BBFF00})\n`;
+        info += `{BBFF00}Stunt Points: {49FFFF}${Player.Info[target.playerid].Driving_Data.StuntPoints} {BBFF00}(${getRanksRankName("stunt", Player.Info[player.target].Driving_Data.StuntPoints)}{BBFF00})\n`;
+        info += `{BBFF00}Race Points: {49FFFF}${Player.Info[target.playerid].Driving_Data.RacePoints} {BBFF00}(${getRanksRankName("race", Player.Info[player.target].Driving_Data.RacePoints)}{BBFF00})\n`;
+        info += "\n";
+        info += "{FF4800}Properties\n";
+        info += `{BBFF00}Business: {FF0000}No\n`;
+        info += `{BBFF00}House: {FF0000}No\n`;
+        info += `{BBFF00}Personal Vehicle: {FF0000}No\n`;
+        info += "\n";
+        info += `{FF4800}Statistics note: {49FFFF}${getPlayerStatsNote(target)}{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob`
+        player.ShowPlayerDialog(Dialog.STATS, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s stats!`, info, "Ok", `${target == player ? "Description" : ""}`);
     }
-    catch(e) {
-        console.log(e.stack)
-    }
+    else SendError(player, Errors.PLAYER_NOT_CONNECTED);
 });
 
 CMD.on("help", (player) => {
@@ -1766,6 +1760,8 @@ CMD.on("set", (player, params) => {
             else if(params[0] == "money") {
                 if(Player.Info[player.playerid].Admin < 3 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
                 if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid money (0-999999999)!");
+                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Money to {FF0000}${params[2]}{FFFF00}!`);
+                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Money to {FF0000}${params[2]}{FFFF00}!`);
                 Player.Info[target.playerid].Money = params[2];
                 target.ResetPlayerMoney();
                 target.GivePlayerMoney(Player.Info[target.playerid].Money);
@@ -2865,6 +2861,7 @@ function LoadPlayerStats(player) {
                 Player.Info[player.playerid].Discord = result[0].discord;
 
                 player.GivePlayerMoney(Player.Info[player.playerid].Money);
+                player.SetPlayerScore(getPlayerStatsNote(player));
 
                 let info = "";
                 info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
@@ -3012,7 +3009,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.TRADE: {
             if(response) {
                 let target = getPlayer(inputtext);
-                if(target == -1 || target == player.playerid) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+                if(!target || target.playerid == player.playerid) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
                 if(Player.Info[target.playerid].Atrade != player.playerid) return SendError(player, "That player has no Trade activated on you!");
                 let info = "";
                 info += "{00FF00}Sell {FF0000}Money\n";
@@ -3024,13 +3021,12 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                 info += "{00FF00}Sell {FF0000}Race Points";
                 player.ShowPlayerDialog(Dialog.TRADE_SELL, samp.DIALOG_STYLE.LIST, "Trade", info, "Select", "Cancel");
             }
-            else resetTradeVariables(player);
             break;
         }
         case Dialog.TRADE_SELL: {
             if(response) {
                 Player.Info[player.playerid].Trade.Sell.Item = listitem;
-                player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_SELL_ITEM, isTradeItemNeedValue(listitem) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(listitem)}`, `{FFFF94}You have selected to sell {11FF00}${getTradeItemName(listitem)}{FF9900}!${isTradeItemNeedValue(listitem) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(listitem)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
+                player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_SELL_ITEM, isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}`, `{FFFF94}You have selected to sell {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FF9900}!${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
             }
             else resetTradeVariables(player);
             break;
@@ -3038,17 +3034,19 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.TRADE_VALIDATE_SELL_ITEM: {
             if(response) {
                 inputtext = parseInt(inputtext);
-                if(inputtext < getTradeItemAmount(player, Player.Info[player.playerid].Trade.Sell.Item) && isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item)) return player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_SELL_ITEM, isTradeItemNeedValue(listitem) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(listitem)}`, `{FFFF94}You have selected to sell {11FF00}${getTradeItemName(listitem)}{FF9900}!${isTradeItemNeedValue(listitem) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(listitem)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
-                Player.Info[player.playerid].Trade.Sell.Value = inputtext;
-                let info = "";
-                info += "{00FF00}Buy {FF0000}Money\n";
-                info += "{00FF00}Buy {FF0000}Hours\n";
-                info += "{00FF00}Buy {FF0000}Coins\n";
-                info += "{00FF00}Buy {FF0000}Kills & Deaths\n";
-                info += "{00FF00}Buy {FF0000}Stunt Points\n";
-                info += "{00FF00}Buy {FF0000}Drift Points\n";
-                info += "{00FF00}Buy {FF0000}Race Points";
-                player.ShowPlayerDialog(Dialog.TRADE_BUY, samp.DIALOG_STYLE.LIST, "Trade", info, "Select", "Cancel");
+                if(getTradeItemAmount(player, Player.Info[player.playerid].Trade.Sell.Item) >= inputtext || !isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item)) {
+                    Player.Info[player.playerid].Trade.Sell.Value = inputtext;
+                    let info = "";
+                    info += "{00FF00}Buy {FF0000}Money\n";
+                    info += "{00FF00}Buy {FF0000}Hours\n";
+                    info += "{00FF00}Buy {FF0000}Coins\n";
+                    info += "{00FF00}Buy {FF0000}Kills & Deaths\n";
+                    info += "{00FF00}Buy {FF0000}Stunt Points\n";
+                    info += "{00FF00}Buy {FF0000}Drift Points\n";
+                    info += "{00FF00}Buy {FF0000}Race Points";
+                    player.ShowPlayerDialog(Dialog.TRADE_BUY, samp.DIALOG_STYLE.LIST, "Trade", info, "Select", "Cancel");
+                }
+                else player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_SELL_ITEM, isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}`, `{FFFF94}You have selected to sell {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FF9900}!${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
             }
             else resetTradeVariables(player);
             break;
@@ -3056,7 +3054,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.TRADE_BUY: {
             if(response) {
                 Player.Info[player.playerid].Trade.Buy.Item = listitem;
-                player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_BUY_ITEM, isTradeItemNeedValue(listitem) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(listitem)}`, `{FFFF94}You have selected to buy {11FF00}${getTradeItemName(listitem)}{FF9900}!${isTradeItemNeedValue(listitem) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(listitem)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
+                player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_BUY_ITEM, isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}`, `{FFFF94}You have selected to buy {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FF9900}!${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
             }
             else resetTradeVariables(player);
             break;
@@ -3067,12 +3065,14 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                 let target = samp.getPlayers().filter(f => Player.Info[f.playerid].Atrade == player.playerid)[0];
                 if(!target) return SendError(player, Errors.UNEXPECTED);
                 inputtext = parseInt(inputtext);
-                if(inputtext < getTradeItemAmount(target, Player.Info[player.playerid].Trade.Buy.Item) && isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item)) return player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_SELL_ITEM, isTradeItemNeedValue(listitem) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(listitem)}`, `{FFFF94}You have selected to buy {11FF00}${getTradeItemName(listitem)}{FF9900}!${isTradeItemNeedValue(listitem) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(listitem)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
-                Player.Info[player.playerid].Trade.Buy.Value = inputtext;
-                let info = "";
-                info += `{FFFF94}You have completed all the steps before sending a{FF0000} Trade Request{FFFF94} to {FF0000}${target.GetPlayerName(24)} (ID:${target.playerid}){FFFF94}!\n`;
-                info += `{FFFF94}Are you sure ? You want to send a {FF0000}Trade Request{FFFF94} to {FF0000}${target.GetPlayerName(24)} (ID:${target.playerid}){FFFF94} ?`;
-                player.ShowPlayerDialog(Dialog.TRADE_SEND, samp.DIALOG_STYLE.MSGBOX, "Trade {FF0000}completed", info, "Continue", "Close");
+                if(getTradeItemAmount(target, Player.Info[player.playerid].Trade.Buy.Item) >= inputtext || !isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item)) {
+                    Player.Info[player.playerid].Trade.Buy.Value = inputtext;
+                    let info = "";
+                    info += `{FFFF94}You have completed all the steps before sending a{FF0000} Trade Request{FFFF94} to {FF0000}${target.GetPlayerName(24)} (ID:${target.playerid}){FFFF94}!\n`;
+                    info += `{FFFF94}Are you sure ? You want to send a {FF0000}Trade Request{FFFF94} to {FF0000}${target.GetPlayerName(24)} (ID:${target.playerid}){FFFF94} ?`;
+                    player.ShowPlayerDialog(Dialog.TRADE_SEND, samp.DIALOG_STYLE.MSGBOX, "Trade {FF0000}completed", info, "Continue", "Close");
+                }
+                else player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_BUY_ITEM, isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}`, `{FFFF94}You have selected to buy {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FF9900}!${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
             }
             else resetTradeVariables(player);
             break;
@@ -3100,83 +3100,87 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                 resetTradeVariables(player);
             }
             else {
+                /* ========== */
                 /* Target Buy */
+                /* ========== */
                 switch(getTradeItemName(Player.Info[target.playerid].Trade.Buy.Item)) {
                     case "Money": {
-                        Player.Info[player.playerid].Money -= Player.Info[target.playerid].Trade.Buy.Value;
                         Player.Info[target.playerid].Money += Player.Info[target.playerid].Trade.Buy.Value;
+                        Player.Info[player.playerid].Money -= Player.Info[target.playerid].Trade.Buy.Value;
                         break;
                     }
                     case "Hours": {
-                        Player.Info[player.playerid].OnlineTime.Hours -= Player.Info[target.playerid].Trade.Buy.Value;
                         Player.Info[target.playerid].OnlineTime.Hours += Player.Info[target.playerid].Trade.Buy.Value;
+                        Player.Info[player.playerid].OnlineTime.Hours -= Player.Info[target.playerid].Trade.Buy.Value;
                         break;
                     }
                     case "Coins": {
-                        Player.Info[player.playerid].Coins -= Player.Info[target.playerid].Trade.Buy.Value;
                         Player.Info[target.playerid].Coins += Player.Info[target.playerid].Trade.Buy.Value;
+                        Player.Info[player.playerid].Coins -= Player.Info[target.playerid].Trade.Buy.Value;
                         break;
                     }
                     case "Kills & Deaths": {
                         Player.Info[target.playerid].Kills_Data.Kills += Player.Info[player.playerid].Kills_Data.Kills;
-                        Player.Info[player.playerid].Kills_Data.Kills = 0;
                         Player.Info[target.playerid].Kills_Data.Deaths += Player.Info[player.playerid].Kills_Data.Deaths;
+                        Player.Info[player.playerid].Kills_Data.Kills = 0;
                         Player.Info[player.playerid].Kills_Data.Deaths = 0;
                         break;
                     }
                     case "Stunt Points": {
-                        Player.Info[player.playerid].Driving_Data.StuntPoints -= Player.Info[target.playerid].Trade.Buy.Value;
                         Player.Info[target.playerid].Driving_Data.StuntPoints += Player.Info[target.playerid].Trade.Buy.Value;
+                        Player.Info[player.playerid].Driving_Data.StuntPoints -= Player.Info[target.playerid].Trade.Buy.Value;
                         break;
                     }
                     case "Drift Points": {
-                        Player.Info[player.playerid].Driving_Data.DriftPoints -= Player.Info[target.playerid].Trade.Buy.Value;
                         Player.Info[target.playerid].Driving_Data.DriftPoints += Player.Info[target.playerid].Trade.Buy.Value;
+                        Player.Info[player.playerid].Driving_Data.DriftPoints -= Player.Info[target.playerid].Trade.Buy.Value;
                         break;
                     }
                     case "Race Points": {
-                        Player.Info[player.playerid].Driving_Data.RacePoints -= Player.Info[target.playerid].Trade.Buy.Value;
                         Player.Info[target.playerid].Driving_Data.RacePoints += Player.Info[target.playerid].Trade.Buy.Value;
+                        Player.Info[player.playerid].Driving_Data.RacePoints -= Player.Info[target.playerid].Trade.Buy.Value;
                         break;
                     }
                 }
+                /* =========== */
                 /* Target Sell */
+                /* =========== */
                 switch(getTradeItemName(Player.Info[target.playerid].Trade.Sell.Item)) {
                     case "Money": {
-                        Player.Info[target.playerid].Money -= Player.Info[target.playerid].Trade.Sell.Value;
                         Player.Info[player.playerid].Money += Player.Info[target.playerid].Trade.Sell.Value;
+                        Player.Info[target.playerid].Money -= Player.Info[target.playerid].Trade.Sell.Value;
                         break;
                     }
                     case "Hours": {
-                        Player.Info[target.playerid].OnlineTime.Hours -= Player.Info[target.playerid].Trade.Sell.Value;
                         Player.Info[player.playerid].OnlineTime.Hours += Player.Info[target.playerid].Trade.Sell.Value;
+                        Player.Info[target.playerid].OnlineTime.Hours -= Player.Info[target.playerid].Trade.Sell.Value;
                         break;
                     }
                     case "Coins": {
-                        Player.Info[target.playerid].Coins -= Player.Info[target.playerid].Trade.Sell.Value;
                         Player.Info[player.playerid].Coins += Player.Info[target.playerid].Trade.Sell.Value;
+                        Player.Info[target.playerid].Coins -= Player.Info[target.playerid].Trade.Sell.Value;
                         break;
                     }
                     case "Kills & Deaths": {
-                        Player.Info[player.playerid].Kills_Data.Kills += Player.Info[player.playerid].Kills_Data.Kills;
+                        Player.Info[player.playerid].Kills_Data.Kills += Player.Info[target.playerid].Kills_Data.Kills;
+                        Player.Info[player.playerid].Kills_Data.Deaths += Player.Info[target.playerid].Kills_Data.Deaths;
                         Player.Info[target.playerid].Kills_Data.Kills = 0;
-                        Player.Info[player.playerid].Kills_Data.Deaths += Player.Info[player.playerid].Kills_Data.Deaths;
                         Player.Info[target.playerid].Kills_Data.Deaths = 0;
                         break;
                     }
                     case "Stunt Points": {
-                        Player.Info[target.playerid].Driving_Data.StuntPoints -= Player.Info[target.playerid].Trade.Sell.Value;
                         Player.Info[player.playerid].Driving_Data.StuntPoints += Player.Info[target.playerid].Trade.Sell.Value;
+                        Player.Info[target.playerid].Driving_Data.StuntPoints -= Player.Info[target.playerid].Trade.Sell.Value;
                         break;
                     }
                     case "Drift Points": {
-                        Player.Info[target.playerid].Driving_Data.DriftPoints -= Player.Info[target.playerid].Trade.Sell.Value;
                         Player.Info[player.playerid].Driving_Data.DriftPoints += Player.Info[target.playerid].Trade.Sell.Value;
+                        Player.Info[target.playerid].Driving_Data.DriftPoints -= Player.Info[target.playerid].Trade.Sell.Value;
                         break;
                     }
                     case "Race Points": {
-                        Player.Info[target.playerid].Driving_Data.RacePoints -= Player.Info[target.playerid].Trade.Sell.Value;
                         Player.Info[player.playerid].Driving_Data.RacePoints += Player.Info[target.playerid].Trade.Sell.Value;
+                        Player.Info[target.playerid].Driving_Data.RacePoints -= Player.Info[target.playerid].Trade.Sell.Value;
                         break;
                     }
                 }
