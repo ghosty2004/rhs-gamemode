@@ -11,5 +11,6 @@ module.exports = {
         RO: "Nu ai un rank de V.I.P. indeajuns de mare! Scrie /vCmds pentru detalii!",
         ENG: "You are not a high enough V.I.P. Rank. Type /vCmds for details!"
     },
-    NEED_CLAN_OR_GANG: "You need to be in a Clan or Gang to use this command!"
+    NEED_CLAN_OR_GANG: "You need to be in a Clan or Gang to use this command!",
+    UNEXPECTED: "An unexpected error occurred."
 }

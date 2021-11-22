@@ -1,6 +1,15 @@
+const { getPlayers } = require("samp-node-lib");
+
 module.exports = {
     Info: {},
+    Check: function(player) {
+        /* Reset Trade Reuqest if player Disconnect */
+        getPlayers().filter(f => this.Info[f.playerid].TradeRequestFrom == player.playerid).forEach((i) => {
+            this.Info[i.playerid].TradeRequestFrom = -1;
+        });
+    },
     ResetVariables: function(player) {
+        this.Check(player);
         this.Info[player.playerid] = {
             LoggedIn: false,
             Language: 0,
@@ -87,7 +96,19 @@ module.exports = {
             Discord: 0,
             HideTextDraws: false,
             GodMode: false,
-            GodCar: false
+            GodCar: false,
+            Atrade: -1,
+            Trade: {
+                Sell: {
+                    Item: -1,
+                    Value: 0
+                },
+                Buy: {
+                    Item: -1,
+                    Value: 0
+                }
+            },
+            TradeRequestFrom: -1
         }
     }
 };

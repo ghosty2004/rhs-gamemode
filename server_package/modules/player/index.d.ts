@@ -86,7 +86,19 @@ export declare const Info: {
     Discord: number,
     HideTextDraws: boolean,
     GodMode: boolean,
-    GodCar: boolean
+    GodCar: boolean,
+    Atrade: number,
+    Trade: {
+        Sell: {
+            Item: number,
+            Value: number
+        },
+        Buy: {
+            Item: number,
+            Value: number
+        }
+    },
+    TradeRequestFrom: number
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;

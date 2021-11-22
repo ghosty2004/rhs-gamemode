@@ -196,10 +196,29 @@ CMD.on("changename", (player) => {
 });
 
 CMD.on("atrade", (player, params) => {
-
+    if(!params[0]) return SendUsage(player, "/aTrade [Off/ID]");
+    if(params[0] == "off") {
+        player.SendClientMessage(data.colors.YELLOW, `Trade succesfully {FF0000}Disabled{FFFF00}!`);
+        Player.Info[player.playerid].Atrade = -1;
+    }
+    else {
+        let target = getPlayer(params[0]);
+        if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+        player.SendClientMessage(data.colors.YELLOW, `Trade succesfully {FF0000}Enabled{FFFF00} on {FF0000}${target.GetPlayerName(24)}(${target.playerid}){FFFF00}!`);
+        Player.Info[player.playerid] = target.playerid;
+    }
 });
 
 CMD.on("trade", (player) => {
+    let info = "";
+    info += "{BBFF00}Using this command you will be able to exchange things from /stats with other players!\n";
+    info += "{BBFF00}Please enter below {FF0000}Name/ID {BBFF00}of the player you want to trade with.\n";
+    info += "\n";
+    info += "{BBFF00}Use {FF0000}/Market{BBFF00} to see prices for trade.";
+    player.ShowPlayerDialog(Dialog.TRADE, samp.DIALOG_STYLE.INPUT, "Trade", info, "Next", "Cancel");
+});
+
+CMD.on("market", (player) => {
     
 });
 
@@ -1994,11 +2013,6 @@ CMD.on("unban", async (player, params) => {
     else player.SendClientMessage(data.colors.YELLOW, `Player {FF0000}${params[0]} {FFFF00}is not exists in database!`);
 });
 
-CMD.on("ticks", (player) => {
-    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-    player.SendClientMessage(data.colors.LIGHT_BLUE, `Server Ticks: ${samp.GetServerTickRate()}`);
-});
-
 /*CMD.on("createteleport", (player, params) => {
     if(params[0] && params.slice(1).join(" ")) {
         if(!Teleport.Exists(params[0])) {
@@ -2018,6 +2032,41 @@ CMD.on("ticks", (player) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function getTradeItemAmount(player, item) {
+    let amount = 0;
+    switch(item) {
+        case 0: amount = Player.Info[player.playerid].Money; break;
+        case 1: amount = Player.Info[player.playerid].OnlineTime.Hours; break;
+        case 2: amount = Player.Info[player.playerid].Coins; break;
+        case 4: amount = Player.Info[player.playerid].Driving_Data.StuntPoints; break;
+        case 5: amount = Player.Info[player.playerid].Driving_Data.DriftPoints; break;
+        case 6: amount = Player.Info[player.playerid].Driving_Data.RacePoints; break;
+    }
+    return amount;
+}
+
+function getTradeItemName(item) {
+    let name = "";
+    switch(item) {
+        case 0: name = "Money"; break;
+        case 1: name = "Hours"; break;
+        case 2: name = "Coins"; break;
+        case 3: name = "Kills & Deaths"; break;
+        case 4: name = "Stunt Points"; break;
+        case 5: name = "Drift Points"; break;
+        case 6: name = "Race Points"; break;
+    }
+    return name;
+}
+
+function isTradeItemNeedValue(item) {
+    let need = true;
+    switch(item) {
+        case 3: need = false; break;
+    }
+    return need;
+}
+
 function getRegistredPlayersCount() {
     return new Promise((resolve, reject) => {
         con.query("SELECT COUNT(*) AS count FROM users", function(err, result) {
@@ -2949,6 +2998,95 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.TRADE: {
+            if(response) {
+                let target = getPlayer(inputtext);
+                if(target == -1 || target == player.playerid) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+                if(Player.Info[target.playerid].Atrade != player.playerid) return SendError(player, "That player has no Trade activated on you!");
+                let info = "";
+                info += "{00FF00}Sell {FF0000}Money\n";
+                info += "{00FF00}Sell {FF0000}Hours\n";
+                info += "{00FF00}Sell {FF0000}Coins\n";
+                info += "{00FF00}Sell {FF0000}Kills & Deaths\n";
+                info += "{00FF00}Sell {FF0000}Stunt Points\n";
+                info += "{00FF00}Sell {FF0000}Drift Points\n";
+                info += "{00FF00}Sell {FF0000}Race Points";
+                player.ShowPlayerDialog(Dialog.TRADE_SELL, samp.DIALOG_STYLE.LIST, "Trade", info, "Select", "Cancel");
+            }
+            break;
+        }
+        case Dialog.TRADE_SELL: {
+            if(response) {
+                Player.Info[player.playerid].Trade.Sell.Item = listitem;
+                player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_SELL_ITEM, isTradeItemNeedValue(listitem) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(listitem)}`, `{FFFF94}You have selected to sell {11FF00}${getTradeItemName(listitem)}{FF9900}!${isTradeItemNeedValue(listitem) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(listitem)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
+            }
+            break;
+        }
+        case Dialog.TRADE_VALIDATE_SELL_ITEM: {
+            if(response) {
+                inputtext = parseInt(inputtext);
+                if(inputtext < getTradeItemAmount(player, Player.Info[player.playerid].Trade.Sell.Item) && isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item)) return player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_SELL_ITEM, isTradeItemNeedValue(listitem) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(listitem)}`, `{FFFF94}You have selected to sell {11FF00}${getTradeItemName(listitem)}{FF9900}!${isTradeItemNeedValue(listitem) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(listitem)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
+                
+                let info = "";
+                info += "{00FF00}Buy {FF0000}Money\n";
+                info += "{00FF00}Buy {FF0000}Hours\n";
+                info += "{00FF00}Buy {FF0000}Coins\n";
+                info += "{00FF00}Buy {FF0000}Kills & Deaths\n";
+                info += "{00FF00}Buy {FF0000}Stunt Points\n";
+                info += "{00FF00}Buy {FF0000}Drift Points\n";
+                info += "{00FF00}Buy {FF0000}Race Points";
+                player.ShowPlayerDialog(Dialog.TRADE_BUY, samp.DIALOG_STYLE.LIST, "Trade", info, "Select", "Cancel");
+            }
+            break;
+        }
+        case Dialog.TRADE_BUY: {
+            if(response) {
+                Player.Info[player.playerid].Trade.Buy.Item = listitem;
+                player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_SELL_ITEM, isTradeItemNeedValue(listitem) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(listitem)}`, `{FFFF94}You have selected to buy {11FF00}${getTradeItemName(listitem)}{FF9900}!${isTradeItemNeedValue(listitem) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(listitem)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
+            }
+            break;
+        }
+        case Dialog.TRADE_VALIDATE_BUY_ITEM: {
+            if(response) {
+                inputtext = parseInt(inputtext);
+                if(inputtext < getTradeItemAmount(player, Player.Info[player.playerid].Trade.Buy.Item) && isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item)) return player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_SELL_ITEM, isTradeItemNeedValue(listitem) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(listitem)}`, `{FFFF94}You have selected to buy {11FF00}${getTradeItemName(listitem)}{FF9900}!${isTradeItemNeedValue(listitem) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(listitem)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
+                let target = samp.getPlayers().filter(f => Player.Info[f.playerid].Atrade == player.playerid)[0];
+                if(!target) return SendError(player, Errors.UNEXPECTED);
+                let info = "";
+                info += `{FFFF94}You have completed all the steps before sending a{FF0000} Trade Request{FFFF94} to {FF0000}${target.GetPlayerName(24)} (ID:${target.playerid}){FFFF94}!\n`;
+                info += `{FFFF94}Are you sure ? You want to send a {FF0000}Trade Request{FFFF94} to {FF0000}${target.GetPlayerName(24)} (ID:${target.playerid}){FFFF94} ?`;
+                player.ShowPlayerDialog(Dialog.TRADE_SEND, samp.DIALOG_STYLE.MSGBOX, "Trade {FF0000}completed", info, "Send", "Cancel");
+            }
+            break;
+        }
+        case Dialog.TRADE_SEND: {
+            if(response) {
+                let target = samp.getPlayers().filter(f => Player.Info[f.playerid].Atrade == player.playerid)[0];
+                if(!target) return SendError(player, Errors.UNEXPECTED);
+                player.SendClientMessage(data.colors.YELLOW, "Trade request was sent successfully! Please wait while player Accepts or Rejects the Trade Request!");
+                Player.Info[target.playerid].TradeRequestFrom = player.playerid;
+                let info = "";
+                info += `{FFFF00}Hi {11FF00}${target.GetPlayerName(24)}{FFFF00}!\n`;
+                info += `{11FF00}${player.GetPlayerName(24)}{FFFF00} wants to sell you {11FF00}${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? `${Player.Info[player.playerid].Trade.Sell.Value} ` : ""}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FFFF00} for your {11FF00}${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? `${Player.Info[player.playerid].Trade.Buy.Value} ` : ""}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FFFF00}!`;
+                target.ShowPlayerDialog(Dialog.TRADE_REQUEST, samp.DIALOG_STYLE.MSGBOX, info, "Trade {FF0000}Request", "Decline", "Accept");
+            }
+            break;
+        }
+        case Dialog.TRADE_REQUEST: {
+            let target = samp.getPlayers().filter(f => f.playerid == Player.Info[target.playerid].TradeRequestFrom)[0];
+            if(!target) return SendError(player, Errors.UNEXPECTED);
+            switch(response) {
+                case true: {
+                    player.SendClientMessage(data.colors.YELLOW, "You have successfully accepted the Trade Request!");
+                    break;
+                }
+                case false: {
+                    player.SendClientMessage(data.colors.YELLOW, "You have successfully declined the Trade Request!");
+                    break;
+                }
+            }
+            break;
+        }
         case Dialog.PLAYER_CLICK: {
             if(response) {
                 switch(listitem) {
