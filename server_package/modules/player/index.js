@@ -105,7 +105,9 @@ module.exports = {
             Reported: {
                 By: -1,
                 Reason: ""
-            }
+            },
+            SpawnedCar: -1,
+            Spectating: -1
         }
     }
 };

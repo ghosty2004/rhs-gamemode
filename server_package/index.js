@@ -104,7 +104,17 @@ CMD.on("createclan", (player) => {
 });
 
 CMD.on("car", (player, params) => {
-
+    if(params[0]) {
+        try {
+            let index = samp.vehicleNames.findIndex(f => f.toUpperCase() == params[0].toUpperCase());
+            if(index == -1) return SendError(player, "Invalid vehicle name!");
+            SpawnCar(player, (400+index), 0, 0);
+        }
+        catch(e) {
+            console.log(e.stack)
+        }
+    }
+    else SendUsage(player, "/Car [ID/Name]");
 });
 
 CMD.on("v", (player, params) => { CMD.emit("car", player, params); });
@@ -468,8 +478,8 @@ CMD.on("report", (player, params) => {
         if(target) {
             if(Player.Info[target.playerid].Reported.By != -1) return SendError(player, "This player already have been reported!");
             player.SendClientMessage(data.colors.RED, `/REPORT: {BBFF00}${target.GetPlayerName(24)}(${target.playerid}) was reported at administrators online. Reason: ${params.slice(1).join(" ")}`);
-            Player.Info[player.playerid].Reported.By = player.playerid;
-            Player.Info[player.playerid].Reported.Reason = params.slice(1).join(" ");
+            Player.Info[target.playerid].Reported.By = player.playerid;
+            Player.Info[target.playerid].Reported.Reason = params.slice(1).join(" ");
             checkReportsTD();
         }
         else SendError(player, Errors.PLAYER_NOT_CONNECTED);
@@ -1274,10 +1284,21 @@ CMD.on("writecolor", (player, params) => {
 
 CMD.on("spec", (player, params) => {
     if(Player.Info[player.playerid].VIP < 3 && Player.Info[player.playerid].Admin < 1) return SendError(player, "You must have VIP Blue or Admin Junior to use this command!");
+    if(!params[0]) return SendUsage(player, "/Spec [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    if(target.GetPlayerState() == samp.PLAYER_STATE.SPECTATING) return SendError(player, "Player spectating someone else!");
+    player.GameTextForPlayer("~w~now~g~~h~ spectating~n~~w~type~r~~h~ /spec off~w~ to stop", 4000, 3);
+    if(Player.Info[player.playerid].Admin) SendMessageToAdmins(data.colors.BLUE, `Admin: {FFFF00}${player.GetPlayerName(24)} {0000FF}has started spectating player {FFFF00}#${target.playerid}`);
+    StartSpectate(player, target);
 });
 
 CMD.on("specoff", (player) => {
     if(Player.Info[player.playerid].VIP < 3 && Player.Info[player.playerid].Admin < 1) return SendError(player, "You must have VIP Blue or Admin Junior to use this command!");
+    if(Player.Info[player.playerid].Spectating == -1) return SendError(player, "You are not spectating!");
+    player.GameTextForPlayer("~w~spectate~r~~h~ off", 1000, 4);
+    if(Player.Info[player.playerid].Admin) SendMessageToAdmins(data.colors.BLUE, `Admin: {FFFF00}${player.GetPlayerName(24)} {0000FF}has stopped spectating player {FFFF00}#${Player.Info[player.playerid].Spectating}`);
+    StopSpectate(player);
 });
 
 CMD.on("vheli", (player) => {
@@ -1528,18 +1549,25 @@ CMD.on("gotop", (player, params) => {
 
 CMD.on("reports", (player) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(getReportsCount() == 0) return SendError(player, "No available reports!");
+    let info = "Reported ID\tPlayer who reported\tPlayer reported\tReason\n";
+    samp.getPlayers().filter(f => Player.Info[f.playerid].Reported.By != -1).forEach((i) => {
+        let reporter = samp.IsPlayerConnected(Player.Info[i.playerid].Reported.By) ? samp.GetPlayerName(Player.Info[i.playerid].Reported.By, 24) : "Server";
+        info += `{0072FF}#${i.playerid}\t{FF0000}${reporter}\t{FF0000}${i.GetPlayerName(24)}\t{FFFF00}${Player.Info[i.playerid].Reported.Reason}\n`;
+    });
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{FF0000}Active reports {FFFFFF}- Use {00FF00}/res [id] [Checked]`, info, "Close", "");
 });
 
 CMD.on("res", (player, params) => {
     if(!isNaN(params[0]) && !isNaN(params[1])) {
         params[0] = parseInt(params[0]);
         params[1] = parseInt(params[1]);
-        if(Player.Info[params[0]].Reported.By == -1) return SendError(player, "This report ID not exists!");
+        if(!isReportIdExists(params[1])) return SendError(player, "This report ID not exists!");
         if(params[1] != 1 && params[1] != 0) return SendError(player, "Invalid hack check value!");
         Player.Info[params[0]].Reported.By = -1;
         checkReportsTD();
     }
-    else SendUsage(player, "/Res [ID] [1/0]");
+    else SendUsage(player, "/Res [ID] [Checked(1/0)]");
 }); 
 
 CMD.on("muted", (player) => {
@@ -1773,6 +1801,7 @@ CMD.on("set", (player, params) => {
                 target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Online Hours to {FF0000}${params[2]}{FFFF00}!`);
                 player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Online Hours to {FF0000}${params[2]}{FFFF00}!`);
                 Player.Info[target.playerid].OnlineTime.Hours = params[2];
+                SendACMD(player, "Set Online");
             }
             else if(params[0] == "money") {
                 if(Player.Info[player.playerid].Admin < 3 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
@@ -2045,18 +2074,68 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function StartSpectate(player, target) {
+    Player.Info[player.playerid].Spectating = target.playerid;
+    player.TogglePlayerSpectating(true);
+    player.SetPlayerVirtualWorld(target.GetPlayerVirtualWorld());
+    player.SetPlayerInterior(target.GetPlayerInterior());
+    if(target.IsPlayerInAnyVehicle()) player.PlayerSpectateVehicle(target.vehicleId);
+    else player.PlayerSpectatePlayer(target.playerid);
+    CheckSpecTextDraw(player);
+}
+
+function StopSpectate(player) {
+    player.TogglePlayerSpectating(false);
+    Player.Info[player.playerid].Spectating = -1;
+    player.SpawnPlayer();
+    CheckSpecTextDraw(player);
+}
+
+function CheckSpecTextDraw(player) {
+    if(Player.Info[player.playerid].Spectating != -1) {
+        let target = samp.getPlayers().filter(f => f.playerid == Player.Info[player.playerid].Spectating)[0];
+        if(target) {
+            player.PlayerTextDrawSetString(TextDraws.player.spec, `Spectating~g~~h~ ${target.GetPlayerName(24)}~n~HP: ~r~~h~${target.GetPlayerHealth()}~w~~h~ - AR: ~r~~h~${target.GetPlayerArmour()}~w~~h~ - ID: ~r~~h~${target.playerid}~n~~y~~h~<~w~~h~ SPACE~y~~h~ - ~w~~h~LSHIFT~y~~h~ >`);
+            player.PlayerTextDrawShow(TextDraws.player.spec);
+        }
+    }
+    else {
+        player.PlayerTextDrawHide(TextDraws.player.spec);
+    }
+}
+
+function SpawnCar(player, model, color1, color2) {
+    if(Player.Info[player.playerid].SpawnedCar) {
+        samp.DestroyVehicle(Player.Info[player.playerid].SpawnedCar);
+        Player.Info[player.playerid].SpawnedCar = null;
+    }
+    Player.Info[player.playerid].SpawnedCar = samp.CreateVehicle(model, player.position.x, player.position.y, player.position.z, player.position.angle, color1, color2);
+    player.PutPlayerInVehicle(Player.Info[player.playerid].SpawnedCar, 0);
+}
+
+function isReportIdExists(id) {
+    let value;
+    if(!Player.Info[id]) value = false;
+    else if(Player.Info[id].Reported.By == -1) value = false;
+    else value = true;
+    return value;
+}
+
+function getReportsCount() {
+    return samp.getPlayers().filter(f => Player.Info[f.playerid].Reported.By != -1).length;
+}
+
 function checkReportsTD(player=false) {
-    let count = samp.getPlayers().filter(f => Player.Info[f.playerid].Reported.By != -1).length;
-    samp.TextDrawSetString(TextDraws.server.reports, `/reports: ~w~~h~${count}`);
+    samp.TextDrawSetString(TextDraws.server.reports, `/reports: ~w~~h~${getReportsCount()}`);
 
     if(!player) {
         samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
-            if(Player.Info[i.playerid].Admin && count != 0) i.TextDrawShowForPlayer(TextDraws.server.reports);
+            if(Player.Info[i.playerid].Admin && getReportsCount() != 0) i.TextDrawShowForPlayer(TextDraws.server.reports);
             else i.TextDrawHideForPlayer(TextDraws.server.reports);
         });
     }
     else {
-        if(Player.Info[player.playerid].Admin && count != 0) player.TextDrawShowForPlayer(TextDraws.server.reports);
+        if(Player.Info[player.playerid].Admin && getReportsCount() != 0) player.TextDrawShowForPlayer(TextDraws.server.reports);
         else player.TextDrawHideForPlayer(TextDraws.server.reports);
     }
 }
@@ -2262,9 +2341,11 @@ function kickPlayer(player) {
 }
 
 function SendACMD(player, cmdtext) {
-    samp.getPlayers().filter(f => Player.Info[f.playerid].Admin).forEach((i) => {
-        i.SendClientMessage(data.colors.BLUE, `Admin: {FFFF00}${player.GetPlayerName(24)} {0000FF}has used the command: {FFFF00}${cmdtext}`);
-    });
+    if(Player.Info[player.playerid].Admin >= 1) {
+        samp.getPlayers().filter(f => Player.Info[f.playerid].Admin).forEach((i) => {
+            i.SendClientMessage(data.colors.BLUE, `Admin: {FFFF00}${player.GetPlayerName(24)} {0000FF}has used the command: {FFFF00}${cmdtext}`);
+        });
+    }
 }
 
 function isPlayerInSpecialZone(player) {
@@ -2438,6 +2519,8 @@ function UpdatePlayerDB(player, column, value) {
 function SetupPlayerForSpawn(player, type=0) { 
     player.SetPlayerColor(0xFFFFFFAA);
     player.SetPlayerSkin(0);
+    player.SetPlayerVirtualWorld(0);
+    player.SetPlayerInterior(0);
     player.ResetPlayerWeapons();
 
     /* Check if the player is jailed */
@@ -2937,8 +3020,7 @@ samp.OnGameModeInit(() => {
 
     setInterval(Updater, 10000); /* An interval */
 
-    samp.AddPlayerClass(0, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0);
-
+    samp.AddPlayerClass(0, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); /* Player Class */
     return true;
 });
 
@@ -3022,6 +3104,8 @@ samp.OnPlayerDisconnect((player, reason) => {
     savePlayer(player);
 
     Player.ResetVariables(player);
+    checkReportsTD();
+
     HideConnectTextDraw(player);
     HideSpawnTextDraw(player);
 
@@ -3800,7 +3884,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                 Player.Info[player.playerid].Editing_Stats_Description_Line = listitem + 1;
                 player.ShowPlayerDialog(Dialog.STATS_DESCRIPTION_INPUT, samp.DIALOG_STYLE.INPUT, Lang(player, "Descriere", "Description"), "", Lang(player, "Ok", "Update"), Lang(player, "Renunta", "Cancel"));
             }
-            else CMD.emit("stats", player);
+            else CMD.emit("stats", player, []);
             break;
         }
         case Dialog.STATS_DESCRIPTION_INPUT: {

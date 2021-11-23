@@ -102,7 +102,9 @@ export declare const Info: {
     Reported: {
         By: number,
         Reason: string
-    }
+    },
+    SpawnedCar: number,
+    Spectating: number
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;
