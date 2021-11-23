@@ -1509,14 +1509,14 @@ CMD.on("lclan", (player) => {
 CMD.on("acmds", (player) => {
     let info = "";
     info += "{FF0000}Junior:\n";
-    info += "{FF0000}/Reports, /Muted, /Mute, /UnMute, /Kick, /Warn, /Jailed, /GetInfo\n";
+    info += "{FF0000}/Reports, /Res, /Muted, /Mute, /UnMute, /Kick, /Warn, /Jailed, /GetInfo\n";
     info += "{FF0000}/Jail, /UnJail, /Explode, /IP, /Aka, /GiveCar, /AdminLand\n";
     info += "{FF0000}/Goto, /Get, /God, /GodCar, /ASay, /Weaps, /Spec(Off), /Caps\n";
     info += "{FF0000}/Disarm, /Set [Interior / Weather / Time / World / Skin], /LastOn\n";
     info += "{FF0000}/Spawn, /Question, /Reaction, /Eject, /Clearchat(/Cc)\n";
     info += "\n";
     info += "{FFFF00}Senior:\n";
-    info += "{FFFF00}/Ban, /StarEvent, /EndStarEvent, /GiveWeapon, /Write, /AHAll\n";
+    info += "{FFFF00}/Ban, /Event, /StarEvent, /EndStarEvent, /GiveWeapon, /Write, /AHAll\n";
     info += "{FFFF00}/Slap, /Freeze, /UnFreeze, /Frozen, /Announce, /Read, /Rac\n";
     info += "{FFFF00}/DMEvent, /StopDMEvent, /AnnounceDMEvent, /SongForAllOff, /Teleplayer\n";
     info += "{FFFF00}/Set [Wanted / Health / Armour / Color], /CarHealth, /Screen\n";
@@ -1878,6 +1878,8 @@ CMD.on("reaction", (player) => {
 
 CMD.on("clearchat", (player) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    for(let i = 0; i < 30; i++) samp.SendClientMessageToAll("");
+    SendACMD(player, "ClearChat");
 });
 CMD.on("cc", (player) => { CMD.emit("clearchat", player); });
 
@@ -1893,6 +1895,17 @@ CMD.on("ban", (player, params) => {
     params[1] = parseInt(params[1]);
     if(params[1] < 1 || params[1] > 99) return SendError(player, "Invalid day(s) (1-99)!");
     banPlayer(target, player, params[1], params.slice(2).join(" "));
+});
+
+CMD.on("event", (player) => {
+    if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    let info = "";
+    info += "{0077FF}Star Event\n";
+    info += "{FF0000}Death Match Events\n";
+    info += "{FFFF00}Reaction Test\n";
+    info += "{00FF00}Reaction Maths\n";
+    info += "{00BBF6}Question";
+    player.ShowPlayerDialog(Dialog.EVENT, samp.DIALOG_STYLE.LIST, "Events", info, "Select", "Cancel");
 });
 
 CMD.on("starevent", (player) => {
@@ -3125,6 +3138,27 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.EVENT: {
+            switch(listitem) {
+                case 0: { /* Star Event */
+                    CMD.emit("starevent", player); 
+                    break;
+                }
+                case 1: { /* Death Math Events */
+                    break;
+                }
+                case 2: { /* Reaction Test */
+                    break;
+                }
+                case 3: { /* Reaction Maths */
+                    break;
+                }
+                case 4: { /* Question */
+                    break;
+                }
+            }
+            break;
+        }
         case Dialog.TRADE: {
             if(response) {
                 let target = getPlayer(inputtext);

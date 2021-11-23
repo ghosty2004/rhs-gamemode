@@ -54,5 +54,6 @@ module.exports = {
     TRADE_BUY: 52,
     TRADE_VALIDATE_BUY_ITEM: 53,
     TRADE_SEND: 54,
-    TRADE_REQUEST: 55
+    TRADE_REQUEST: 55,
+    EVENT: 56
 }
