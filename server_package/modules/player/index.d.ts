@@ -98,7 +98,11 @@ export declare const Info: {
             Value: number
         }
     },
-    TradeRequestFrom: number
+    TradeRequestFrom: number,
+    Reported: {
+        By: number,
+        Reason: string
+    }
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;

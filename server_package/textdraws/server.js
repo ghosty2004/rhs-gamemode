@@ -10,10 +10,26 @@ const {
 const { SV_NAME, SERVER_WEB } = require("../data/settings");
 
 module.exports = {
+    reports: null,
     logs: null,
     spawn: {},
     connect: {},
     Load: function() {
+        /* Reports TextDraw */
+        this.reports = TextDrawCreate(546.000000, 30.000000, "");
+        TextDrawLetterSize(this.reports, 0.299997, 1.100000);
+        TextDrawTextSize(this.reports, 1280.000000, 1280.000000);
+        TextDrawAlignment(this.reports, 0);
+        TextDrawColor(this.reports, 0xFF0000FF);
+        TextDrawUseBox(this.reports, 0);
+        TextDrawBoxColor(this.reports, 0x80808080);
+        TextDrawSetShadow(this.reports, 1);
+        TextDrawSetOutline(this.reports, 0);
+        TextDrawBackgroundColor(this.reports, 0x000000FF);
+        TextDrawFont(this.reports, 3);
+        TextDrawSetProportional(this.reports, 1);
+        TextDrawSetSelectable(this.reports, 0);
+
         /* Logs TextDraw */
         this.logs = TextDrawCreate(252.000000, 408.000000, "");
         TextDrawLetterSize(this.logs, 0.199994, 1.300000);

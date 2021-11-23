@@ -101,7 +101,11 @@ module.exports = {
                     Value: 0
                 }
             },
-            TradeRequestFrom: -1
+            TradeRequestFrom: -1,
+            Reported: {
+                By: -1,
+                Reason: ""
+            }
         }
     }
 };

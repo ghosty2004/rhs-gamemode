@@ -466,7 +466,11 @@ CMD.on("report", (player, params) => {
     if(params[0] && params.slice(1).join(" ")) {
         let target = getPlayer(params[0]);
         if(target) {
-            
+            if(Player.Info[target.playerid].Reported.By != -1) return SendError(player, "This player already have been reported!");
+            player.SendClientMessage(data.colors.RED, `/REPORT: {BBFF00}${target.GetPlayerName(24)}(${target.playerid}) was reported at administrators online. Reason: ${params.slice(1).join(" ")}`);
+            Player.Info[player.playerid].Reported.By = player.playerid;
+            Player.Info[player.playerid].Reported.Reason = params.slice(1).join(" ");
+            checkReportsTD();
         }
         else SendError(player, Errors.PLAYER_NOT_CONNECTED);
     }
@@ -1526,6 +1530,18 @@ CMD.on("reports", (player) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
 });
 
+CMD.on("res", (player, params) => {
+    if(!isNaN(params[0]) && !isNaN(params[1])) {
+        params[0] = parseInt(params[0]);
+        params[1] = parseInt(params[1]);
+        if(Player.Info[params[0]].Reported.By == -1) return SendError(player, "This report ID not exists!");
+        if(params[1] != 1 && params[1] != 0) return SendError(player, "Invalid hack check value!");
+        Player.Info[params[0]].Reported.By = -1;
+        checkReportsTD();
+    }
+    else SendUsage(player, "/Res [ID] [1/0]");
+}); 
+
 CMD.on("muted", (player) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
 });
@@ -1661,6 +1677,7 @@ CMD.on("set", (player, params) => {
                 target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Admin level to {FF0000}${getAdminRank(params[2], false)}{FFFF00}!`);
                 player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Admin level to {FF0000}${getAdminRank(params[2], false)}{FFFF00}!`);
                 Player.Info[target.playerid].Admin = params[2];
+                checkReportsTD(target);
                 SendACMD(player, "Set Admin");
             }
             else if(params[0] == "vip") {
@@ -2028,6 +2045,22 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function checkReportsTD(player=false) {
+    let count = samp.getPlayers().filter(f => Player.Info[f.playerid].Reported.By != -1).length;
+    samp.TextDrawSetString(TextDraws.server.reports, `/reports: ~w~~h~${count}`);
+
+    if(!player) {
+        samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
+            if(Player.Info[i.playerid].Admin && count != 0) i.TextDrawShowForPlayer(TextDraws.server.reports);
+            else i.TextDrawHideForPlayer(TextDraws.server.reports);
+        });
+    }
+    else {
+        if(Player.Info[player.playerid].Admin && count != 0) player.TextDrawShowForPlayer(TextDraws.server.reports);
+        else player.TextDrawHideForPlayer(TextDraws.server.reports);
+    }
+}
+
 function resetTradeVariables(player) {
     Player.Info[player.playerid].Trade.Sell.Item = -1;
     Player.Info[player.playerid].Trade.Sell.Value = 0;
@@ -2862,6 +2895,8 @@ function LoadPlayerStats(player) {
 
                 player.GivePlayerMoney(Player.Info[player.playerid].Money);
                 player.SetPlayerScore(getPlayerStatsNote(player));
+
+                checkReportsTD(player);
 
                 let info = "";
                 info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
