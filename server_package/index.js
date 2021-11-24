@@ -1927,7 +1927,7 @@ CMD.on("reaction", (player) => {
 
 CMD.on("clearchat", (player) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-    for(let i = 0; i < 30; i++) samp.SendClientMessageToAll("");
+    for(let i = 0; i < 30; i++) samp.SendClientMessageToAll(-1, "");
     SendACMD(player, "ClearChat");
 });
 CMD.on("cc", (player) => { CMD.emit("clearchat", player); });
@@ -1979,6 +1979,14 @@ CMD.on("ahall", (player) => {
 
 CMD.on("slap", (player, params) => {
     if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0]) return SendUsage(player, "/Slap [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    target.SetPlayerPos(target.position.x, target.position.y, target.position.z+2);
+    target.SetPlayerHealth(target.GetPlayerHealth() - 10);
+    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has slapped you{FFFF00}!`);
+    player.SendClientMessage(data.colors.YELLOW, `You have slapped {FF0000}${target.GetPlayerName(24)}{FFFF00}!`);
+    SendACMD(player, "Slap");
 });
 
 CMD.on("freeze", (player, params) => {
