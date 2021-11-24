@@ -1398,6 +1398,21 @@ CMD.on("gcmds", (player) => {
     if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
+CMD.on("gtop", (player) => {
+    con.query("SELECT name, kills FROM gangs ORDER BY kills DESC LIMIT 10", function(err, result) {
+        let info = "{FFFFFF}Our best Gangs are here!\n";
+        if(!err && result) {
+            info += "\n";
+            for(let i = 0; i < result.length; i++) {
+                info += `{FF0000}${i+1}. {FF0000}${result[i].name}: {00BBF6}${result[i].kills} {BBFF00}Points\n`;
+            }
+        }
+        info += "\n";
+        info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+        player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Gangs", info, "Ok", "");
+    });
+});
+
 /* ============== */
 /* Clans Commands */
 /* ============== */
@@ -3498,21 +3513,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.TOP: {
             if(response) {
                 switch(listitem) {
-                    case 0: {
-                        con.query("SELECT name, kills FROM gangs ORDER BY kills DESC LIMIT 10", function(err, result) {
-                            let info = "{FFFFFF}Our best Gangs are here!\n";
-                            if(!err && result) {
-                                info += "\n";
-                                for(let i = 0; i < result.length; i++) {
-                                    info += `{FF0000}${i+1}. {FF0000}${result[i].name}: {00BBF6}${result[i].kills} {BBFF00}Points\n`;
-                                }
-                            }
-                            info += "\n";
-                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
-                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Gangs", info, "Ok", "");
-                        });
-                        break;
-                    }
+                    case 0: CMD.emit("gtop", player); break;
                     case 1: {
                         con.query("SELECT name, kills FROM clans ORDER BY kills DESC LIMIT 10", function(err, result) {
                             let info = "{FFFFFF}Our best Clans are here!\n";
