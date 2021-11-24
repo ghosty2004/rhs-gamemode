@@ -123,7 +123,11 @@ CMD.on("car", (player, params) => {
 CMD.on("v", (player, params) => { CMD.emit("car", player, params); });
 
 CMD.on("nrg", (player) => {
-
+    if(player.IsPlayerInAnyVehicle()) return SendError(player, "Ai deja un vehicul!", "You are already in a vehicle!");
+    let color1 = getRandomInt(0, 255);
+    let color2 = getRandomInt(0, 255);
+    player.SendClientMessage(data.colors.LIGHT_YELLOW, `You have spawned a NRG-500 (ID: 522) with colors: ${color1} & ${color2}!`);
+    SpawnCar(player, 522, color1, color2);
 });
 
 CMD.on("ro", (player) => {
