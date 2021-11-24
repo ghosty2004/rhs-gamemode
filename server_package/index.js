@@ -1380,6 +1380,24 @@ CMD.on("gang", (player) => {
     player.ShowPlayerDialog(Dialog.GANG, samp.DIALOG_STYLE.LIST, "{FF0000}My Gang", info, "Select", "");
 });
 
+CMD.on("ginfo", (player) => {
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+});
+
+CMD.on("gstats", (player, params) => {
+    let target = player;
+    if(params[0]) target = getPlayer(params[0]);
+    if(!Player.Info[target.playerid].Gang) return SendError(player, target == player ? Errors.NOT_MEMBER_OF_ANY_GANG : Errors.PLAYER_NOT_IN_ANY_GANG);
+});
+
+CMD.on("gm", (player) => {
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+});
+
+CMD.on("gcmds", (player) => {
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+});
+
 /* ============== */
 /* Clans Commands */
 /* ============== */
@@ -3090,6 +3108,10 @@ samp.OnPlayerClickPlayer((player, clickedplayer) => {
 
 samp.OnPlayerDeath((player, killer) => {
     player.GameTextForPlayer("~r~~h~You Died", 2, 2000);
+});
+
+samp.OnPlayerEnterVehicle((player, vehicleid, ispassenger) => {
+    player.GameTextForPlayer(`${samp.vehicleNames[samp.GetVehicleModel(vehicleid)-400]}`)
 });
 
 samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
