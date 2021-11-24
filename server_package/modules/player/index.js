@@ -28,6 +28,7 @@ module.exports = {
             Clan: 0,
             Clan_Rank: 0,
             Gang: 0,
+            Gang_Rank: 0,
             Kills_Data: {
                 Kills: 0,
                 HeadShots: 0,

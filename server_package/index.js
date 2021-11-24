@@ -13,6 +13,7 @@ const Clan = require("./modules/clan");
 const Dialog = require("./modules/dialog");
 const Errors = require("./modules/errors");
 const events = require("./modules/events");
+const Gang = require("./modules/gang");
 const Minigames = require("./modules/minigames");
 const con = require("./modules/mysql"); 
 const Player = require("./modules/player");
@@ -146,12 +147,12 @@ CMD.on("htds", (player) => {
     switch(Player.Info[player.playerid].HideTextDraws) {
         case false: {
             player.TextDrawHideForPlayer(TextDraws.server.spawn[3]);
-            player.PlayerTextDrawHide(TextDraws.player.date);
+            player.PlayerTextDrawHide(TextDraws.player.date[player.playerid]);
             break;
         }
         case true: {
             player.TextDrawShowForPlayer(TextDraws.server.spawn[3]);
-            player.PlayerTextDrawShow(TextDraws.player.date);
+            player.PlayerTextDrawShow(TextDraws.player.date[player.playerid]);
             break;
         }
     }
@@ -322,8 +323,8 @@ CMD.on("business", (player) => {
 CMD.on("leave", (player) => {
     if(isPlayerInSpecialZone(player)) {
         if(Player.Info[player.playerid].SpecialZone.Targets) {
-            player.PlayerTextDrawHide(TextDraws.player.targets_points);
-            player.PlayerTextDrawSetString(TextDraws.player.targets_points, "~r~~h~Points: ~w~~h~0");
+            player.PlayerTextDrawHide(TextDraws.player.targets_points[player.playerid]);
+            player.PlayerTextDrawSetString(TextDraws.player.targets_points[player.playerid], "~r~~h~Points: ~w~~h~0");
             let coins = Math.round(Player.Info[player.playerid].TargetsPoints / 2);
             let money = Math.round(Player.Info[player.playerid].TargetsPoints * 50);
             player.GameTextForPlayer(`~r~~h~you won ${coins} coins and $${money}~n~~w~~h~for making ~g~~h~${Player.Info[player.playerid].TargetsPoints} ~w~~h~points`, 5000, 3);
@@ -904,7 +905,7 @@ CMD.on("targets", (player) => {
     player.GivePlayerWeapon(Minigames.Targets.Weapon, 9999);
     player.SetPlayerVirtualWorld(1000);
     TelePlayer(player, "targets", "Targets", -498.7933, -2675.3245, 1081.9259, 271.9457);
-    player.PlayerTextDrawShow(TextDraws.player.targets_points);
+    player.PlayerTextDrawShow(TextDraws.player.targets_points[player.playerid]);
 });
 
 CMD.on("skyclimb", (player) => {
@@ -1374,18 +1375,102 @@ CMD.on("songforall", (player) => {
 /* ============== */
 /* Gangs Commands */
 /* ============== */
-CMD.on("gang", (player) => {
+CMD.on("gcmds", (player) => {
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
     let info = "";
-    info += "{49FFFF}Gang Info - {BBFF00}/ginfo\n";
-    info += "{49FFFF}My Gang Stats - {BBFF00}/gstats\n";
-    info += "{49FFFF}Online Members - {BBFF00}/gm\n";
-    info += "{49FFFF}Gang Commands - {BBFF00}/gcmds\n";
-    info += "{49FFFF}Top Gang - {BBFF00}/gtop";
-    player.ShowPlayerDialog(Dialog.GANG, samp.DIALOG_STYLE.LIST, "{FF0000}My Gang", info, "Select", "");
+    info += "{BBFF00}OWNER Commands:\n";
+    info += "{FFFFFF}/settings /setrank /alliance /stopalliance /refreshall\n";
+    info += "\n";
+    info += "{BBFF00}Leader Commands:\n";
+    info += "{FFFFFF}/gwarn /gwar /gresetwarns\n";
+    info += "\n";
+    info += "{BBFF00}Co-Leader Commands:\n";
+    info += "{FFFFFF}/invite /gangkick /gscreen /refresh /setgskin /giveacces\n";
+    info += "\n";
+    info += "{BBFF00}All members:\n";
+    info += "{FFFFFF}/gm /gstats /lgang /c4 /garena /capture /refreshme /gtank /base\n";
+    info += "\n";
+    info += "{FFFF00}Type !text in chat for gang chat!\n";
+    info += "{FFFF00}Type &text in chat for ally gang chat!";
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `Gang - ${Gang.Info[Player.Info[player.playerid].Gang].name} ({FFFF00}${getGangRank(Player.Info[player.playerid].Gang_Rank)}{AAAAAA})`, info, "Close", "");
 });
 
-CMD.on("ginfo", (player) => {
+/* =================== */
+/* Gang Owner Commands */
+/* =================== */
+CMD.on("settings", (player) => {
+
+});
+
+CMD.on("setrank", (player, params) => {
+
+});
+
+CMD.on("alliance", (player, params) => {
+
+});
+
+CMD.on("stopalliance", (player) => {
+
+});
+
+CMD.on("refreshall", (player) => {
+
+});
+
+/* ==================== */
+/* Gang Leader Commands */
+/* ==================== */
+CMD.on("gwarn", (player, params) => {
+
+});
+
+CMD.on("gwar", (player) => {
+
+});
+
+CMD.on("gresetwarns", (player, params) => {
+
+});
+
+/* ======================= */
+/* Gang Co-Leader Commands */
+/* ======================= */
+CMD.on("invite", (player, params) => {
+
+});
+
+CMD.on("gangkick", (player, params) => {
+
+});
+
+CMD.on("gscreen", (player, params) => {
+
+});
+
+CMD.on("refresh", (player, params) => {
+    
+});
+
+CMD.on("setgskin", (player, params) => {
+
+});
+
+CMD.on("giveacces", (player, params) => {
+
+});
+
+/* ===================== */
+/* Gang Members Commands */
+/* ===================== */
+CMD.on("gm", (player) => {
     if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+    let info = "Name\tRank\n";
+    let result = samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == Player.Info[player.playerid].Gang);
+    result.forEach((i) => {
+        info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t{00BBF6}${getGangRank(Player.Info[i.playerid].Gang_Rank)}\n`;
+    });
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Clan Members: {FF0000}${result.length}{AFAFAF} online - {FF0000}${Gang.Info[Player.Info[player.playerid].Gang].name}`, info, "Close", "");
 });
 
 CMD.on("gstats", (player, params) => {
@@ -1406,13 +1491,46 @@ CMD.on("gstats", (player, params) => {
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `{FF0000}pascariugabriel{BBFF00}'s Gang Stats!`, info, "Ok", "");
 });
 
-CMD.on("gm", (player) => {
-    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+CMD.on("lgang", (player) => {
+
 });
 
-CMD.on("gcmds", (player) => {
-    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+CMD.on("c4", (player) => {
+
+});
+
+CMD.on("garena", (player) => {
+
+});
+
+CMD.on("capture", (player, params) => {
+
+});
+
+CMD.on("refreshme", (player) => {
+
+});
+
+CMD.on("gtank", (player) => {
+
+});
+
+CMD.on("base", (player) => {
+
+});
+
+CMD.on("gang", (player) => {
     let info = "";
+    info += "{49FFFF}Gang Info - {BBFF00}/ginfo\n";
+    info += "{49FFFF}My Gang Stats - {BBFF00}/gstats\n";
+    info += "{49FFFF}Online Members - {BBFF00}/gm\n";
+    info += "{49FFFF}Gang Commands - {BBFF00}/gcmds\n";
+    info += "{49FFFF}Top Gang - {BBFF00}/gtop";
+    player.ShowPlayerDialog(Dialog.GANG, samp.DIALOG_STYLE.LIST, "{FF0000}My Gang", info, "Select", "");
+});
+
+CMD.on("ginfo", (player) => {
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("gtop", (player) => {
@@ -2186,6 +2304,18 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function getGangRank(RankID) {
+    let string = "";
+    switch(RankID) {
+        case 1: string = "Member"; break;
+        case 2: string = "Co-Leader"; break;
+        case 3: string = "Leader"; break;
+        case 4: string = "Owner"; break;
+        case 5: string = "Founder"; break;
+    }
+    return string;
+}
+
 function StartSpectate(player, target) {
     Player.Info[player.playerid].Spectating = target.playerid;
     player.TogglePlayerSpectating(true);
@@ -2207,12 +2337,12 @@ function CheckSpecTextDraw(player) {
     if(Player.Info[player.playerid].Spectating != -1) {
         let target = samp.getPlayers().filter(f => f.playerid == Player.Info[player.playerid].Spectating)[0];
         if(target) {
-            player.PlayerTextDrawSetString(TextDraws.player.spec, `Spectating~g~~h~ ${target.GetPlayerName(24)}~n~HP: ~r~~h~${target.GetPlayerHealth()}~w~~h~ - AR: ~r~~h~${target.GetPlayerArmour()}~w~~h~ - ID: ~r~~h~${target.playerid}~n~~y~~h~<~w~~h~ SPACE~y~~h~ - ~w~~h~LSHIFT~y~~h~ >`);
-            player.PlayerTextDrawShow(TextDraws.player.spec);
+            player.PlayerTextDrawSetString(TextDraws.player.spec[player.playerid], `Spectating~g~~h~ ${target.GetPlayerName(24)}~n~HP: ~r~~h~${target.GetPlayerHealth()}~w~~h~ - AR: ~r~~h~${target.GetPlayerArmour()}~w~~h~ - ID: ~r~~h~${target.playerid}~n~~y~~h~<~w~~h~ SPACE~y~~h~ - ~w~~h~LSHIFT~y~~h~ >`);
+            player.PlayerTextDrawShow(TextDraws.player.spec[player.playerid]);
         }
     }
     else {
-        player.PlayerTextDrawHide(TextDraws.player.spec);
+        player.PlayerTextDrawHide(TextDraws.player.spec[player.playerid]);
     }
 }
 
@@ -2490,6 +2620,13 @@ function CheckCustomChat(player, text) {
             text = text.replace("!", "");
             samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan).forEach((i) => {
                 i.SendClientMessage(data.colors.ORANGE, `Clan Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
+            });
+            return false;
+        }
+        if(Player.Info[player.playerid].Gang) {
+            text = text.replace("!", "");
+            samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == Player.Info[player.playerid].Gang).forEach((i) => {
+                i.SendClientMessage(data.colors.ORANGE, `Gang Chat: {FF4400}${player.GetPlayerName(24)}(${player.playerid}): {15FF00}${text}`);
             });
             return false;
         }
@@ -2810,7 +2947,7 @@ function getPlayerRankInChat(player) {
 
 function ShowSpawnTextDraw(player) {
     for(let i = 0; i <= 3; i++) player.TextDrawShowForPlayer(TextDraws.server.spawn[i]);
-    player.PlayerTextDrawShow(TextDraws.player.date);
+    player.PlayerTextDrawShow(TextDraws.player.date[player.playerid]);
     player.TextDrawShowForPlayer(TextDraws.server.logs);
 }
 
@@ -3072,6 +3209,7 @@ function LoadPlayerStats(player) {
                 Player.Info[player.playerid].Clan = result[0].clan;
                 Player.Info[player.playerid].Clan_Rank = result[0].clan_rank;
                 Player.Info[player.playerid].Gang = result[0].gang;
+                Player.Info[player.playerid].Gang_Rank = result[0].gang_rank;
                 Player.Info[player.playerid].Kills_Data.Kills = result[0].kills; 
                 Player.Info[player.playerid].Kills_Data.HeadShots = result[0].headshots;
                 Player.Info[player.playerid].Kills_Data.KillingSpree = result[0].killingspree;
@@ -3142,6 +3280,7 @@ samp.OnGameModeInit(() => {
     samp.AddPlayerClass(0, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); /* Player Class */
     
     samp.DisableInteriorEnterExits();
+    samp.UsePlayerPedAnims();
     samp.EnableStuntBonusForAll(false);
     return true;
 });
@@ -3198,7 +3337,7 @@ samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
                     Player.Info[player.playerid].TargetsPoints++;
                     Minigames.Targets.Hit(player);
                     player.GameTextForPlayer("~h~~h~+1 Point!", 1000, 3);
-                    player.PlayerTextDrawSetString(TextDraws.player.targets_points, `~r~~h~Points: ~w~~h~${Player.Info[player.playerid].TargetsPoints}`);
+                    player.PlayerTextDrawSetString(TextDraws.player.targets_points[player.playerid], `~r~~h~Points: ~w~~h~${Player.Info[player.playerid].TargetsPoints}`);
                 }
             }
         }

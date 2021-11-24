@@ -25,6 +25,7 @@ export declare const Info: {
     Clan: number,
     Clan_Rank: number,
     Gang: number,
+    Gang_Rank: number,
     Kills_Data: {
         Kills: number,
         HeadShots: number,
