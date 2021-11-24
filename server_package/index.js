@@ -1716,6 +1716,13 @@ CMD.on("aka", (player, params) => {
     if(params[0]) {
         let target = getPlayer(params[0]);
         if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+        con.query("SELECT * FROM akas WHERE ip = ?", [target.GetPlayerIp(16)], function(err, result) {
+            if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+            let names = JSON.parse(result[0].names);
+            player.SendClientMessage(data.colors.LIGHT_BLUE, `${target.GetPlayerName(24)}'s aka:`);
+            player.SendClientMessage(data.colors.LIGHT_BLUE, `${replaceAll(names.toString(), ",", ", ")}`);
+            SendACMD(player, "Aka");
+        });
     }
     else SendUsage(player, "/Aka [ID/Name]");
 });
