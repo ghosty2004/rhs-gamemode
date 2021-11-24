@@ -1391,7 +1391,19 @@ CMD.on("ginfo", (player) => {
 CMD.on("gstats", (player, params) => {
     let target = player;
     if(params[0]) target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
     if(!Player.Info[target.playerid].Gang) return SendError(player, target == player ? Errors.NOT_MEMBER_OF_ANY_GANG : Errors.PLAYER_NOT_IN_ANY_GANG);
+    info += `{BBFF00}Gang: {49FFFF}string\n`;
+    info += `{BBFF00}Kills: {49FFFF}number\n`;
+    info += `{BBFF00}Deaths: {49FFFF}number\n`;
+    info += `{BBFF00}Captures: {49FFFF}number\n`;
+    info += `{BBFF00}Points: {49FFFF}number\n`;
+    info += `{BBFF00}Warnings: {49FFFF}number/3\n`;
+    info += `{BBFF00}Rank: {49FFFF}string\n`;
+    info += `{BBFF00}Time: {49FFFF}number {BBFF00}hrs, {49FFFF}number {BBFF00}mins, {49FFFF}number {BBFF00}secs\n`;
+    info += "\n";
+    info += `{FFFF99}Gang member since, {49FFFF}day month_name, year{FFFF99}!`;
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `{FF0000}pascariugabriel{BBFF00}'s Gang Stats!`, info, "Ok", "");
 });
 
 CMD.on("gm", (player) => {
@@ -1400,6 +1412,7 @@ CMD.on("gm", (player) => {
 
 CMD.on("gcmds", (player) => {
     if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+    let info = "";
 });
 
 CMD.on("gtop", (player) => {
@@ -1483,6 +1496,7 @@ CMD.on("setspawn", (player, params) => {
             break;
         }
     }
+    saveClan(Player.Info[player.playerid].Clan);
 });
 
 CMD.on("setcskin", (player, params) => {
@@ -2568,8 +2582,9 @@ function getIDByAccName(AccName) {
 
 function saveClan(clanId) {
     if(!Clan.Exists(clanId)) return;
-    con.query("UPDATE clans SET name = ?, owner = ?, position = ?, weapon = ?, color = ?, member_skin = ?, leader_skin = ?, kills = ?, deaths = ?", [
-        Clan.Info[clanId].name, Clan.Info[clanId].owner, JSON.stringify(Clan.Info[clanId].position), JSON.stringify()
+    con.query("UPDATE clans SET name = ?, owner = ?, position = ?, weapon = ?, color = ?, member_skin = ?, leader_skin = ?, kills = ?, deaths = ? WHERE ID = ?", [
+        Clan.Info[clanId].name, Clan.Info[clanId].owner, JSON.stringify(Clan.Info[clanId].position), JSON.stringify(Clan.Info[clanId].weapons), Clan.Info[clanId].color,
+        Clan.Info[clanId].skin.member, Clan.Info[clanId].skin.leader, Clan.Info[clanId].kills, Clan.Info[clanId].deaths, clanId
     ]);
 }
 
@@ -2622,9 +2637,15 @@ function SetupPlayerForSpawn(player, type=0) {
     if(type == 0) {
         if(Player.Info[player.playerid].Clan) { /* Clan Spawn */
             let position = Clan.Info[Player.Info[player.playerid].Clan].position;
-            if(position[0] == 0 && position[1] == 0 && position[2] == 0 && position[3] == 0) return SetupPlayerForSpawn(player, 1);
-            player.SetPlayerPos(position[0], position[1], position[2]);
-            player.SetPlayerFacingAngle(position[3]);
+            if(position[0] == 0 && position[1] == 0 && position[2] == 0 && position[3] == 0) {
+                let position = SpawnZone.Random();
+                player.SetPlayerPos(position[0], position[1], position[2]);
+                player.SetPlayerFacingAngle(position[3]);
+            }
+            else {
+                player.SetPlayerPos(position[0], position[1], position[2]);
+                player.SetPlayerFacingAngle(position[3]);
+            }
             player.SetPlayerColor(Clan.Info[Player.Info[player.playerid].Clan].color);
             player.SetPlayerSkin(Player.Info[player.playerid].Clan_Rank == 3 || Player.Info[player.playerid].Clan_Rank == 2 ? Clan.Info[Player.Info[player.playerid].Clan].skin.leader : Clan.Info[Player.Info[player.playerid].Clan].skin.member);
             for(let i = 0; i < 6; i++) {
