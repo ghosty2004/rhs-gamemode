@@ -3140,6 +3140,9 @@ samp.OnGameModeInit(() => {
     setInterval(Updater, 10000); /* An interval */
 
     samp.AddPlayerClass(0, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); /* Player Class */
+    
+    samp.DisableInteriorEnterExits();
+    samp.EnableStuntBonusForAll(false);
     return true;
 });
 
