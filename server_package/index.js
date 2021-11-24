@@ -1686,6 +1686,11 @@ CMD.on("explode", (player, params) => {
 
 CMD.on("ip", (player, params) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0]) return SendUsage(player, "/Ip [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    player.SendClientMessage(data.colors.YELLOW, `Player {FF0000}${target.GetPlayerName(24)}{FFFF00}'s IP: {FF0000}${target.GetPlayerIp(16)}{FFFF00}.`);
+    SendACMD(player, "Ip");
 });
 
 CMD.on("aka", (player, params) => {
