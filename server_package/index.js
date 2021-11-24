@@ -1995,6 +1995,12 @@ CMD.on("frozen", (player) => {
 
 CMD.on("announce", (player, params) => {
     if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(isNaN(params[0]) && isNaN(params[1]) && !params.slice(2).join(" ")) return SendUsage(player, "/Announce [Style(0-6)] [Seconds] [Text]");
+    params[0] = parseInt(params[0]);
+    params[1] = parseInt(params[1]);
+    if(params[0] < 0 || params[0] > 6) return SendError(player, "Invalid style (0-6)!");
+    samp.GameTextForAll(params.slice(2).join(" "), params[1]*60, params[0]);
+    SendACMD(player, "Announce");
 });
 
 CMD.on("read", (player, params) => {
@@ -3126,7 +3132,7 @@ samp.OnPlayerDeath((player, killer) => {
 });
 
 samp.OnPlayerEnterVehicle((player, vehicleid, ispassenger) => {
-    player.GameTextForPlayer(`${samp.vehicleNames[samp.GetVehicleModel(vehicleid)-400]}`)
+    player.GameTextForPlayer(`${samp.vehicleNames[samp.GetVehicleModel(vehicleid)-400]}`, 500, 1);
 });
 
 samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
