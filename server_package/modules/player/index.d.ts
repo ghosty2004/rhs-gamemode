@@ -105,7 +105,8 @@ export declare const Info: {
         Reason: string
     },
     SpawnedCar: number,
-    Spectating: number
+    Spectating: number,
+    YouTubeSearchResults: Array<any>
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;

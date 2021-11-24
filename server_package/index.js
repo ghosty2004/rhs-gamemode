@@ -7,6 +7,8 @@
 const samp = require("samp-node-lib");
 const colors = require("colors");
 const md5 = require("md5");
+const YouTubeAudio = require("youtube-audio-server").listen(7777);
+const YouTubeSearch = require("youtube-search-without-api-key");
 
 /* Custom Modules */
 const Clan = require("./modules/clan");
@@ -146,13 +148,13 @@ CMD.on("htds", (player) => {
     player.GameTextForPlayer(`~w~~h~Hide Textdraws ${Player.Info[player.playerid].HideTextDraws ? "~g~~h~~h~On" : "~r~~h~Off"}`, 4000, 4);
     switch(Player.Info[player.playerid].HideTextDraws) {
         case false: {
-            player.TextDrawHideForPlayer(TextDraws.server.spawn[3]);
-            player.PlayerTextDrawHide(TextDraws.player.date[player.playerid]);
+            player.TextDrawShowForPlayer(TextDraws.server.spawn[3]);
+            player.PlayerTextDrawShow(TextDraws.player.date[player.playerid]);
             break;
         }
         case true: {
-            player.TextDrawShowForPlayer(TextDraws.server.spawn[3]);
-            player.PlayerTextDrawShow(TextDraws.player.date[player.playerid]);
+            player.TextDrawHideForPlayer(TextDraws.server.spawn[3]);
+            player.PlayerTextDrawHide(TextDraws.player.date[player.playerid]);
             break;
         }
     }
@@ -1368,8 +1370,19 @@ CMD.on("tags", (player) => {
     if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
 });
 
-CMD.on("songforall", (player) => {
+CMD.on("songforall", (player, params) => {
     if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    if(!params.slice(0).join(" ")) return SendUsage(player, "/SongForAll [YouTube Title]");
+    player.SendClientMessage(-1, "Searching for YouTube results...");
+    Player.Info[player.playerid].YouTubeSearchResults = [];
+    YouTubeSearch.search(params.slice(0).join(" ")).then((result) => {
+        let info = "Title\tTime\n";
+        for(let i = 0; i < result.length; i++) {
+            info += `${result[i].snippet.title}\t${result[i].snippet.duration}\n`;
+            Player.Info[player.playerid].YouTubeSearchResults.push(result[i].id.videoId);
+        }
+        player.ShowPlayerDialog(Dialog.YOUTUBE_SEARCH, samp.DIALOG_STYLE.TABLIST_HEADERS, `{FFFFFF}YouTube Search - found {FF0000}${result.length} {FFFFFF}results`, info, "Play", "Close");
+    });
 });
 
 /* ============== */
@@ -3390,6 +3403,20 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.YOUTUBE_SEARCH: {
+            if(response) {
+                for(let i = 0; i < Player.Info[player.playerid].YouTubeSearchResults.length; i++) {
+                    if(i == listitem) {
+                        samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((players) => {
+                            players.PlayAudioStreamForPlayer(`http://45.14.236.12:7777/${Player.Info[player.playerid].YouTubeSearchResults[i]}`);
+                            players.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has started an audio stream.`);
+                        });
+                        break;
+                    }
+                }
+            }
+            break;
+        }
         case Dialog.GANG: {
             if(response) {
                 switch(listitem) {
@@ -4348,10 +4375,9 @@ samp.OnPlayerText((player, text) => {
 
 samp.OnPlayerCommandText((player, cmdtext) => {
     if(Player.Info[player.playerid].LoggedIn) {
-        cmdtext = cmdtext.toLowerCase(); 
-        cmdtext = replaceAll(cmdtext, "/", ""); 
+        cmdtext = cmdtext.replace("/", "");
         let params = cmdtext.split(/[ ]+/);
-        cmdtext = params[0];
+        cmdtext = params[0].toLowerCase();
         params.shift();
         if(isPlayerInSpecialZone(player) && cmdtext != "leave") return player.GameTextForPlayer("~w~~h~Use ~r~~h~/Leave ~w~~h~to ~r~~h~Leave~w~~h~!", 4000, 4);
         if(CMD.eventNames().some(s => s == cmdtext)) {

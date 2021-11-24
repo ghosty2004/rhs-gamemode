@@ -56,5 +56,6 @@ module.exports = {
     TRADE_SEND: 54,
     TRADE_REQUEST: 55,
     EVENT: 56,
-    GANG: 57
+    GANG: 57,
+    YOUTUBE_SEARCH: 58
 }

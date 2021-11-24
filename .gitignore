@@ -1,5 +1,6 @@
 *node_modules/
 !node_modules/samp-node-lib
+!node_modules/youtube-audio-server
 
 server_package/data/mysql.js
 server_package/modules/mysql

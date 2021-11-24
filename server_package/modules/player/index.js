@@ -108,7 +108,8 @@ module.exports = {
                 Reason: ""
             },
             SpawnedCar: -1,
-            Spectating: -1
+            Spectating: -1,
+            YouTubeSearchResults: []
         }
     }
 };

@@ -22,6 +22,8 @@
     "events": "^3.3.0",
     "md5": "^2.3.0",
     "mysql": "^2.18.1",
-    "samp-node-lib": "^1.0.5"
+    "samp-node-lib": "^1.0.5",
+    "youtube-audio-server": "^2.8.2",
+    "youtube-search-without-api-key": "^1.0.6"
   }
 }
