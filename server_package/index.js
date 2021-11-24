@@ -1368,6 +1368,19 @@ CMD.on("songforall", (player) => {
 });
 
 /* ============== */
+/* Gangs Commands */
+/* ============== */
+CMD.on("gang", (player) => {
+    let info = "";
+    info += "{49FFFF}Gang Info - {BBFF00}/ginfo\n";
+    info += "{49FFFF}My Gang Stats - {BBFF00}/gstats\n";
+    info += "{49FFFF}Online Members - {BBFF00}/gm\n";
+    info += "{49FFFF}Gang Commands - {BBFF00}/gcmds\n";
+    info += "{49FFFF}Top Gang - {BBFF00}/gtop";
+    player.ShowPlayerDialog(Dialog.GANG, samp.DIALOG_STYLE.LIST, "{FF0000}My Gang", info, "Select", "");
+});
+
+/* ============== */
 /* Clans Commands */
 /* ============== */
 CMD.on("chelp", (player) => {
@@ -3141,6 +3154,18 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.GANG: {
+            if(response) {
+                switch(listitem) {
+                    case 0: CMD.emit("ginfo", player); break;
+                    case 1: CMD.emit("gstats", player, []); break;
+                    case 2: CMD.emit("gm", player); break;
+                    case 3: CMD.emit("gcmds", player); break;
+                    case 4: CMD.emit("gtop", player); break;
+                }
+            }
+            break;
+        }
         case Dialog.EVENT: {
             switch(listitem) {
                 case 0: { /* Star Event */
