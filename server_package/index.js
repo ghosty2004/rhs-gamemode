@@ -40,6 +40,9 @@ const data = {
     settings: require("./data/settings"),
 }
 
+/* ============= */
+/* MYSQL Connect */
+/* ============= */
 con.connect((err) => {
     if(!err) {
         console.log("MYSQL:".yellow + ` Connection successfully established.`.green);

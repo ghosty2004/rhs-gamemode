@@ -1,5 +1,4 @@
 const Discord = require("discord.js");
-const con = require("../mysql");
 const bot = new Discord.Client({
     intents: [
         Discord.Intents.FLAGS.GUILDS,
@@ -28,15 +27,32 @@ bot.login(DISCORD_BOT.TOKEN).catch((error) => {
 
 /* Custom Modules */
 const { DiscordCommand } = require("../events");
+const con = require("../mysql");
 const { getPlayer } = require("../functions");
 
 const Errors = require("../errors");
 const Player = require("../player");
 const { getPlayers } = require("samp-node-lib");
 
+/* ============ */
+/* MYSQL Events */
+/* ============ */
+con.on("error", (error) => {
+    bot.users.cache.get("334979056095199233").send(`sql:${error}`);
+});
+
 /* ========= */
 /* Functions */
 /* ========= */
+function getUserLoginSession(userId) {
+    return new Promise((resolve, reject) => {
+        con.query("SELECT * FROM users WHERE discord = ?", [userId], function(err, result) {
+            if(err || result == 0) resolve(false);
+            else resolve(result[0].ID);
+        });
+    });
+}
+
 function SendUsage(message, text) {
     message.channel.send("```" + `USAGE: ${DISCORD_BOT.PREFIX}${text}` + "```");
 }
@@ -71,14 +87,12 @@ function getStatsEmbed(user) {
 const CMD = new DiscordCommand();
 
 CMD.on("stats", async (message, params) => {
-    if(params[0]) {
-        const embed = await getStatsEmbed(params[0]);
-        if(embed) {
-            message.channel.send({embeds: [embed]});
-        }
-        else SendError(message, "This user not exists in our database.");
-    }
-    else SendUsage(message, "stats [ID/Name]");
+    let user = await getUserLoginSession(message.author.id);
+    if(params[0]) user = params[0];
+    if(!user) return SendUsage(message, "stats [ID/Name]");
+    const embed = await getStatsEmbed(user);
+    if(!embed) return SendError(message, "This user not exists in our database.");
+    message.channel.send({embeds: [embed]});
 });
 
 CMD.on("login", (message, params) => {
