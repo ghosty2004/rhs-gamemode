@@ -7,8 +7,10 @@
 const samp = require("samp-node-lib");
 const colors = require("colors");
 const md5 = require("md5");
-const YouTubeAudio = require("youtube-audio-server").listen(7777);
 const YouTubeSearch = require("youtube-search-without-api-key");
+
+/* YouTube Audio Stream Module */
+require("youtube-audio-server").listen(7777);
 
 /* Custom Modules */
 const Clan = require("./modules/clan");
@@ -112,7 +114,7 @@ CMD.on("createclan", (player) => {
 CMD.on("car", (player, params) => {
     if(params[0]) {
         try {
-            let index = samp.vehicleNames.findIndex(f => f.toUpperCase() == params[0].toUpperCase());
+            let index = samp.vehicleNames.findIndex(f => f.toLowerCase().includes(params[0].toLowerCase()));
             if(index == -1) return SendError(player, "Invalid vehicle name!");
             SpawnCar(player, (400+index), 0, 0);
         }
@@ -827,7 +829,7 @@ CMD.on("dm", (player) => {
     info += `{49FFFF}/Sniper\t{BBFF00}Sniper DeathMatch\t{00BBF6}0 Players\n`;
     info += `{49FFFF}/Mrf\t{BBFF00}Minigun-Rocket-Flame\t{00BBF6}0 Players\n`;
     info += `{49FFFF}/GArena\t{BBFF00}Gang Arena DeathMatch\t{00BBF6}0 Players\n`;
-    info += `{49FFFF}/Oh\t{BBFF00}One Hit DeathMatch\t{00BBF6}1 Players\n`;
+    info += `{49FFFF}/Oh\t{BBFF00}One Hit DeathMatch\t{00BBF6}0 Players\n`;
     info += `{49FFFF}/Prodm\t{BBFF00}Pro DeathMatch\t{00BBF6}0 Players\n`;
     info += `{49FFFF}/Helldm\t{BBFF00}Hell DeathMatch\t{00BBF6}0 Players\n`;
     info += `{49FFFF}/GunWar\t{BBFF00}Gun War DeathMatch\t{00BBF6}0 Players`;
@@ -1851,8 +1853,7 @@ CMD.on("uncage", (player, params) => {
     if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
     if(!Player.Info[target.playerid].Caged) return SendError(player, "This player is not in cage.");
     samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been removed from cage by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
-    Player.Info[target.playerid].Caged = 0;
-    Player.Info[target.playerid].CageObjects.forEach((object) => { samp.DestroyObject(object); });
+    UnCagePlayer(target);
 });
 
 CMD.on("explode", (player, params) => {
@@ -2345,6 +2346,15 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function IsNosVehicle(vehicleid) {
+    let array = [
+        581,523,462,521,463,522,461,448,468,586,
+     	509,481,510,472,473,493,595,484,430,453,
+   		452,446,454,590,569,537,538,570,449
+    ];
+    return !array.some(s => s == vehicleid);
+}
+
 function CagePlayer(player) {
     Player.Info[player.playerid].CageObjects.forEach((object) => { samp.DestroyObject(object); });
     Player.Info[player.playerid].CageObjects = [];
@@ -2354,6 +2364,13 @@ function CagePlayer(player) {
         samp.CreateObject(985, player.position.x+4, player.position.y, player.position.z, 0.000000, 0.000000, 90.000000),  // Front
         samp.CreateObject(985, player.position.x-4, player.position.y, player.position.z, 0.000000, 0.000000, 270.000000) // Back
     ]
+    player.TogglePlayerControllable(false);
+}
+
+function UnCagePlayer(player) {
+    Player.Info[player.playerid].Caged = 0;
+    Player.Info[player.playerid].CageObjects.forEach((object) => { samp.DestroyObject(object); });
+    Player.Info[player.playerid].CageObjects = [];
 }
 
 function getGangRank(RankID) {
@@ -2911,7 +2928,7 @@ function CheckPlayers() {
             if(Player.Info[i.playerid].Caged) {
                 Player.Info[i.playerid].Caged--;
                 if(Player.Info[i.playerid].Caged == 0) {
-                    Player.Info[i.playerid].CageObjects.forEach((object) => { samp.DestroyObject(object); });
+                    UnCagePlayer(i);
                 }
             }
         });
@@ -3395,6 +3412,12 @@ samp.OnRconLoginAttempt((ip, password, success) => {
             });
         });
     }
+});
+
+samp.OnPlayerKeyStateChange((player, newkeys, oldkeys) => {
+    if(newkeys & samp.KEY.FIRE && player.IsPlayerInAnyVehicle()) {
+	    if(IsNosVehicle(player.vehicleId)) samp.AddVehicleComponent(player.vehicleId, 1010);
+	} 
 });
 
 samp.OnPlayerClickPlayer((player, clickedplayer) => {
@@ -4446,11 +4469,11 @@ samp.OnPlayerText((player, text) => {
     
     if(!CheckCustomChat(player, text)) return false;
 
+    samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}${getPlayerRankInChat(player)}{00CCFF}(${player.playerid}):{FFFFFF} ${text}`);
+
     if(text.toLowerCase().startsWith(data.settings.BUSTER_PREFIX.toLowerCase())) {
         samp.SendClientMessageToAll(data.colors.RED, `${data.settings.BUSTER_PREFIX}: ${data.settings.BUSTER_RESPONSES[getRandomInt(0, data.settings.BUSTER_RESPONSES.length)]}`);
     }
-
-    samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}${getPlayerRankInChat(player)}{00CCFF}(${player.playerid}):{FFFFFF} ${text}`);
     return false;
 });
 
