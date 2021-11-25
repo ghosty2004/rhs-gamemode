@@ -15,6 +15,11 @@ const Drift1 = require("./drifts/1");
 
 /* Gangs */
 const Gang1 = require("./gangs/1");
+const Gang2 = require("./gangs/2");
+const Gang3 = require("./gangs/3");
+const Gang4 = require("./gangs/4");
+const Gang5 = require("./gangs/5");
+const Gang6 = require("./gangs/6");
 
 /* Minigames */
 const Targets = require("./minigames/targets");
@@ -46,6 +51,11 @@ module.exports = {
 
         /* Gangs */
         Gang1.Load();
+        Gang2.Load();
+        Gang3.Load();
+        Gang4.Load();
+        Gang5.Load();
+        Gang6.Load();
 
         /* Minigames */
         Targets.Load();
@@ -75,7 +85,10 @@ module.exports = {
         Drift1.RemoveBuilding(player);
 
         /* Gangs */
-        // null..
+        Gang1.RemoveBuilding(player);
+        Gang2.RemoveBuilding(player);
+        Gang3.RemoveBuilding(player);
+        Gang4.RemoveBuilding(player);
 
         /* Others */
         Beach.RemoveBuilding(player);
