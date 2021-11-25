@@ -2371,6 +2371,7 @@ function UnCagePlayer(player) {
     Player.Info[player.playerid].Caged = 0;
     Player.Info[player.playerid].CageObjects.forEach((object) => { samp.DestroyObject(object); });
     Player.Info[player.playerid].CageObjects = [];
+    player.TogglePlayerControllable(true);
 }
 
 function getGangRank(RankID) {
