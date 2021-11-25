@@ -34,13 +34,6 @@ const Errors = require("../errors");
 const Player = require("../player");
 const { getPlayers } = require("samp-node-lib");
 
-/* ============ */
-/* MYSQL Events */
-/* ============ */
-con.on("error", (error) => {
-    bot.users.cache.get("334979056095199233").send(`sql:${error}`);
-});
-
 /* ========= */
 /* Functions */
 /* ========= */
