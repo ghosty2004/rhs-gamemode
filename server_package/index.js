@@ -657,7 +657,7 @@ CMD.on("stats", (player, params) => {
         info += `{BBFF00}Personal Vehicle: {FF0000}No\n`;
         info += "\n";
         info += `{FF4800}Statistics note: {49FFFF}${getPlayerStatsNote(target)}{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob`
-        player.ShowPlayerDialog(Dialog.STATS, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s stats!`, info, "Ok", `${target == player ? "Description" : ""}`);
+        player.ShowPlayerDialog(Dialog.STATS, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s stats!${Player.Info[target.playerid].Kicks ? ` - {FF0000}${Player.Info[target.playerid].Kicks}/3 {BBFF00}kicks` : ""}`, info, "Ok", `${target == player ? "Description" : ""}`);
     }
     else SendError(player, Errors.PLAYER_NOT_CONNECTED);
 });
@@ -1784,6 +1784,19 @@ CMD.on("unmute", (player, params) => {
 
 CMD.on("kick", (player, params) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0] && !params.slice(1).join(" ")) return SendUsage(player, "/Kick [ID/Name] [Reason]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    Player.Info[target.playerid].Kicks++;
+    if(Player.Info[target.playerid].Kicks < 3) {
+        samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been kicked by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
+        samp.SendClientMessageToAll(0x00A6FFAA, `Reason: {D1D1D1}${params.slice(1).join(" ")} {FF0000}(Kicks: ${Player.Info[target.playerid].Kicks}/3)`);
+        kickPlayer(target);
+    }
+    else {
+        Player.Info[target.playerid].Kicks = 0;
+        banPlayer(target, player, 5, "3/3 Kicks");
+    }
 });
 
 CMD.on("warn", (player, params) => {
@@ -2810,7 +2823,7 @@ function savePlayer(player) {
     con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, hours = ?, minutes = ?, seconds = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?,\
     clan_rank = ?, gang = ?, kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?,\
     month_minutes = ?, month_seconds = ?, month_kills = ?, month_headshots = ?, month_killingspree = ?, month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?,\
-    month_racepoints = ?, jailed = ?, caged = ?, discord = ? WHERE ID = ?", [
+    month_racepoints = ?, jailed = ?, caged = ?, kicks = ?, discord = ? WHERE ID = ?", [
         Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
         OnlineTime.hours, OnlineTime.minutes, OnlineTime.seconds, Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, 
         Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, Player.Info[player.playerid].Kills_Data.KillingSpree, 
@@ -2818,7 +2831,7 @@ function savePlayer(player) {
         Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].AdminPoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds, Player.Info[player.playerid].Month.Kills_Data.Kills, 
         Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, Player.Info[player.playerid].Month.Kills_Data.Deaths, 
         Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Caged,
-        Player.Info[player.playerid].Discord, Player.Info[player.playerid].AccID
+        Player.Info[player.playerid].Kicks, Player.Info[player.playerid].Discord, Player.Info[player.playerid].AccID
     ]);
 }
 
@@ -3314,6 +3327,7 @@ function LoadPlayerStats(player) {
                 Player.Info[player.playerid].Driving_Data.RacePoints = result[0].month_racepoints;
                 Player.Info[player.playerid].Jailed = result[0].jailed;
                 Player.Info[player.playerid].Caged = result[0].caged;
+                Player.Info[player.playerid].Kicks = result[0].kicks;
                 Player.Info[player.playerid].Discord = result[0].discord;
 
                 player.GivePlayerMoney(Player.Info[player.playerid].Money);

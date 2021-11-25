@@ -75,6 +75,7 @@ export declare const Info: {
     },
     Jailed: number,
     Caged: number,
+    Kicks: number,
     Last_Chat_Message: number,
     SpecialZone: {
         Targets: boolean
