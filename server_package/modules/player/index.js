@@ -77,6 +77,7 @@ module.exports = {
                 weapons: [0, 0, 0, 0, 0, 0]
             },
             Jailed: 0,
+            Caged: 0,
             Last_Chat_Message: Math.floor(Date.now() / 1000),
             SpecialZone: {
                 Targets: false
@@ -109,7 +110,8 @@ module.exports = {
             },
             SpawnedCar: -1,
             Spectating: -1,
-            YouTubeSearchResults: []
+            YouTubeSearchResults: [],
+            CageObjects: []
         }
     }
 };

@@ -2,8 +2,18 @@
 #include <samp-node>
 #include <map-zones>
 #include <streamer>
+#include <mapandreas>
 
 main() {}
+
+forward findPositionZ(RequestID[], Float:x, Float:y);
+public findPositionZ(RequestID[], Float:x, Float:y) {
+	new Float:z;
+    MapAndreas_Init(1);
+	MapAndreas_FindZ_For2DCoord(x, y, z);
+	SAMPNode_CallEvent("findPositionZResponse", RequestID, x, y, z);
+	return true;
+}
 
 forward getLocationData(RequestID[], Float:x, Float:y, Float:z);
 public getLocationData(RequestID[], Float:x, Float:y, Float:z) {

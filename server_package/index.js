@@ -1829,6 +1829,39 @@ CMD.on("unjail", (player, params) => {
     else SendUsage(player, "/UnJail [ID/Name]");
 });
 
+CMD.on("cage", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(params[0] && !isNaN(params[1]) && params.slice(2).join(" ")) {
+        let target = getPlayer(params[0]);
+        if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+        if(Player.Info[target.playerid].Caged) return SendError(player, "This player is already in cage.");
+        params[1] = parseInt(params[1]);
+        samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been put in the cage for ${params[1]} minutes by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
+        samp.SendClientMessageToAll(0x00A6FFAA, `Reason: {D1D1D1}${params.slice(2).join(" ")}`);
+        Player.Info[target.playerid].Caged = params[1] * 60;
+        Player.Info[target.playerid].CageObjects.forEach((object) => { samp.DestroyObject(object); });
+        Player.Info[target.playerid].CageObjects = [];
+        Player.Info[target.playerid].CageObjects = [
+            samp.CreateObject(985, target.position.x, target.position.y-4, target.position.z, 0.000000, 0.000000, 0.000000), // Left
+            samp.CreateObject(985, target.position.x, target.position.y+4, target.position.z, 0.000000, 0.000000, 180.000000), // Right
+            samp.CreateObject(985, target.position.x+4, target.position.y, target.position.z, 0.000000, 0.000000, 90.000000),  // Front
+            samp.CreateObject(985, target.position.x-4, target.position.y, target.position.z, 0.000000, 0.000000, 270.000000) // Back
+        ]
+    }
+    else SendUsage(player, "/Cage [ID/Name] [Minutes] [Reason]");
+});
+
+CMD.on("uncage", (player, params) => {
+    if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0]) return SendUsage(player, "/UnCage [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    if(!Player.Info[target.playerid].Caged) return SendError(player, "This player is not in cage.");
+    samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been removed from cage by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
+    Player.Info[target.playerid].Caged = 0;
+    Player.Info[target.playerid].CageObjects.forEach((object) => { samp.DestroyObject(object); });
+});
+
 CMD.on("explode", (player, params) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
 });
@@ -2104,13 +2137,15 @@ CMD.on("cc", (player) => { CMD.emit("clearchat", player); });
 /* ===================== */
 CMD.on("ban", (player, params) => {
     if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-    if(!params[0] && isNaN(params[1]) && !params.slice(2).join(" ")) return SendUsage(player, "/Ban [ID/Name] [Day(s)] [Reason]");
-    let target = getPlayer(params[0]);
-    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
-    if(!Player.Info[target.playerid].LoggedIn) return SendError(player, Errors.PLAYER_NOT_LOGGED);
-    params[1] = parseInt(params[1]);
-    if(params[1] < 1 || params[1] > 99) return SendError(player, "Invalid day(s) (1-99)!");
-    banPlayer(target, player, params[1], params.slice(2).join(" "));
+    if(params[0] && !isNaN(params[1]) && params.slice(2).join(" ")) {
+        let target = getPlayer(params[0]);
+        if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+        if(!Player.Info[target.playerid].LoggedIn) return SendError(player, Errors.PLAYER_NOT_LOGGED);
+        params[1] = parseInt(params[1]);
+        if(params[1] < 1 || params[1] > 99) return SendError(player, "Invalid day(s) (1-99)!");
+        banPlayer(target, player, params[1], params.slice(2).join(" "));
+    }
+    else SendUsage(player, "/Ban [ID/Name] [Day(s)] [Reason]");
 });
 
 CMD.on("event", (player) => {
@@ -2753,15 +2788,15 @@ function savePlayer(player) {
     con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, hours = ?, minutes = ?, seconds = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?,\
     clan_rank = ?, gang = ?, kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?,\
     month_minutes = ?, month_seconds = ?, month_kills = ?, month_headshots = ?, month_killingspree = ?, month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?,\
-    month_racepoints = ?, jailed = ?, discord = ? WHERE ID = ?", [
+    month_racepoints = ?, jailed = ?, caged = ?, discord = ? WHERE ID = ?", [
         Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
         OnlineTime.hours, OnlineTime.minutes, OnlineTime.seconds, Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, 
         Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, Player.Info[player.playerid].Kills_Data.KillingSpree, 
         Player.Info[player.playerid].Kills_Data.BestKillingSpree, Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, 
         Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].AdminPoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds, Player.Info[player.playerid].Month.Kills_Data.Kills, 
         Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, Player.Info[player.playerid].Month.Kills_Data.Deaths, 
-        Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Discord,
-        Player.Info[player.playerid].AccID
+        Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Caged,
+        Player.Info[player.playerid].Discord, Player.Info[player.playerid].AccID
     ]);
 }
 
@@ -2858,14 +2893,23 @@ function LoadClans() {
 
 setInterval(CheckPlayers, 1000);
 function CheckPlayers() {
-    samp.getPlayers().forEach((i) => {
-        if(Player.Info[i.playerid].Jailed) {
-            Player.Info[i.playerid].Jailed--; 
-            if(Player.Info[i.playerid].Jailed == 0) {
-                SetupPlayerForSpawn(i);
+    try {
+        samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
+            if(Player.Info[i.playerid].Jailed) {
+                Player.Info[i.playerid].Jailed--; 
+                if(Player.Info[i.playerid].Jailed == 0) {
+                    SetupPlayerForSpawn(i);
+                }
             }
-        }
-    });
+            if(Player.Info[i.playerid].Caged) {
+                Player.Info[i.playerid].Caged--;
+                if(Player.Info[i.playerid].Caged == 0) {
+                    Player.Info[i.playerid].CageObjects.forEach((object) => { samp.DestroyObject(object); });
+                }
+            }
+        });
+    }
+    catch {}
 }
 
 function getRanksRankName(rank_name, rank) {
@@ -3244,6 +3288,7 @@ function LoadPlayerStats(player) {
                 Player.Info[player.playerid].Driving_Data.StuntPoints = result[0].month_stuntpoints;
                 Player.Info[player.playerid].Driving_Data.RacePoints = result[0].month_racepoints;
                 Player.Info[player.playerid].Jailed = result[0].jailed;
+                Player.Info[player.playerid].Caged = result[0].caged;
                 Player.Info[player.playerid].Discord = result[0].discord;
 
                 player.GivePlayerMoney(Player.Info[player.playerid].Money);
@@ -3276,6 +3321,25 @@ function LoadPlayerStats(player) {
     });
 }
 
+/* SA:MP Custom Events */
+/*samp.registerEvent("findPositionZResponse", "sfff");
+samp.on("findPositionZResponse", (RequestID, x, y, z) => {
+    Server.Info.Reuqest.FindPosZ[`${RequestID}`] = {x: x, y: y, z: z};
+});
+function getPositionZ(x, y) {
+    let RequestID = `${x},${y}`;
+    samp.callPublic("findPositionZ", "sff", RequestID, x, y);
+    return new Promise((resolve, reject) => {
+        let temp_interval = setInterval(() => {
+            if(Server.Info.Reuqest.FindPosZ[`${RequestID}`]) {
+                resolve(Server.Info.Reuqest.FindPosZ[`${RequestID}`]);
+                clearInterval(temp_interval);
+                delete Server.Info.Reuqest.FindPosZ[`${RequestID}`];
+            }
+        }, 1);
+    });
+}*/
+
 /* SA:MP Events */
 samp.OnGameModeInit(() => {
     console.log("\n");
@@ -3295,6 +3359,12 @@ samp.OnGameModeInit(() => {
     samp.DisableInteriorEnterExits();
     samp.UsePlayerPedAnims();
     samp.EnableStuntBonusForAll(false);
+
+    /*setTimeout(() => {
+        getPositionZ(69, 69, 1000).then((result) => {
+            console.log(result);
+        });
+    }, 3000);*/
     return true;
 });
 

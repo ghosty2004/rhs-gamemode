@@ -74,6 +74,7 @@ export declare const Info: {
         weapons: Array<number>
     },
     Jailed: number,
+    Caged: number,
     Last_Chat_Message: number,
     SpecialZone: {
         Targets: boolean
@@ -106,7 +107,8 @@ export declare const Info: {
     },
     SpawnedCar: number,
     Spectating: number,
-    YouTubeSearchResults: Array<any>
+    YouTubeSearchResults: Array<any>,
+    CageObjects: Array<any>
 }[]
 
 export declare function ResetVariables(player: SampPlayer): void;
