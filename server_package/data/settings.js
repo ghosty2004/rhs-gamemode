@@ -15,5 +15,23 @@ module.exports = {
     DISCORD_BOT: {
         TOKEN: "OTEyMDA0MDY4MjIwNzQ3ODA2.YZpn-g.J2dGV_Y_vNRC6mu9qIXJ3VPbzac",
         PREFIX: "rhs!"
-    }
+    },
+    BUSTER_PREFIX: "RHSBuster",
+    BUSTER_RESPONSES: [
+        "I have no way of knowing.", 
+        "Better now that you asked.",
+        "Yes.",
+        "It's a secret.",
+        "I'd say I'm a 10 out of 10.",
+        "I don't know, you tell me. How am I right now?",
+        "If I were any better, I'd be illegal.",
+        "Zzzz..",
+        "Quite how, thank you.",
+        "Under renovation.",
+        "Holy sh*t, you can see me?!",
+        "I am blessed!",
+        "If I were doing any better, I'd hire you to enjoy it with me.",
+        "Yes?",
+        "What?"
+    ]
 }

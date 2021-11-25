@@ -1839,14 +1839,7 @@ CMD.on("cage", (player, params) => {
         samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been put in the cage for ${params[1]} minutes by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
         samp.SendClientMessageToAll(0x00A6FFAA, `Reason: {D1D1D1}${params.slice(2).join(" ")}`);
         Player.Info[target.playerid].Caged = params[1] * 60;
-        Player.Info[target.playerid].CageObjects.forEach((object) => { samp.DestroyObject(object); });
-        Player.Info[target.playerid].CageObjects = [];
-        Player.Info[target.playerid].CageObjects = [
-            samp.CreateObject(985, target.position.x, target.position.y-4, target.position.z, 0.000000, 0.000000, 0.000000), // Left
-            samp.CreateObject(985, target.position.x, target.position.y+4, target.position.z, 0.000000, 0.000000, 180.000000), // Right
-            samp.CreateObject(985, target.position.x+4, target.position.y, target.position.z, 0.000000, 0.000000, 90.000000),  // Front
-            samp.CreateObject(985, target.position.x-4, target.position.y, target.position.z, 0.000000, 0.000000, 270.000000) // Back
-        ]
+        CagePlayer(target);
     }
     else SendUsage(player, "/Cage [ID/Name] [Minutes] [Reason]");
 });
@@ -2352,6 +2345,17 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function CagePlayer(player) {
+    Player.Info[player.playerid].CageObjects.forEach((object) => { samp.DestroyObject(object); });
+    Player.Info[player.playerid].CageObjects = [];
+    Player.Info[player.playerid].CageObjects = [
+        samp.CreateObject(985, player.position.x, player.position.y-4, player.position.z, 0.000000, 0.000000, 0.000000), // Left
+        samp.CreateObject(985, player.position.x, player.position.y+4, player.position.z, 0.000000, 0.000000, 180.000000), // Right
+        samp.CreateObject(985, player.position.x+4, player.position.y, player.position.z, 0.000000, 0.000000, 90.000000),  // Front
+        samp.CreateObject(985, player.position.x-4, player.position.y, player.position.z, 0.000000, 0.000000, 270.000000) // Back
+    ]
+}
+
 function getGangRank(RankID) {
     let string = "";
     switch(RankID) {
@@ -2854,6 +2858,9 @@ function SetupPlayerForSpawn(player, type=0) {
         player.SetPlayerPos(position[0], position[1], position[2]);
         player.SetPlayerFacingAngle(position[3]);
     }
+
+    /* Check if the players is Caged */
+    if(Player.Info[player.playerid].Caged) CagePlayer(player);
 }
 
 function LoadFromDB() {
@@ -4438,6 +4445,10 @@ samp.OnPlayerText((player, text) => {
     Server.Info.Messages++;
     
     if(!CheckCustomChat(player, text)) return false;
+
+    if(text.toLowerCase().startsWith(data.settings.BUSTER_PREFIX.toLowerCase())) {
+        samp.SendClientMessageToAll(data.colors.RED, `${data.settings.BUSTER_PREFIX}: ${data.settings.BUSTER_RESPONSES[getRandomInt(0, data.settings.BUSTER_RESPONSES.length)]}`);
+    }
 
     samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}${getPlayerRankInChat(player)}{00CCFF}(${player.playerid}):{FFFFFF} ${text}`);
     return false;
