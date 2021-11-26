@@ -1786,7 +1786,7 @@ CMD.on("res", (player, params) => {
     if(!isNaN(params[0]) && !isNaN(params[1])) {
         params[0] = parseInt(params[0]);
         params[1] = parseInt(params[1]);
-        if(!isReportIdExists(params[1])) return SendError(player, "This report ID not exists!");
+        if(!isReportIdExists(params[0])) return SendError(player, "This report ID not exists!");
         if(params[1] != 1 && params[1] != 0) return SendError(player, "Invalid hack check value!");
         Player.Info[params[0]].Reported.By = -1;
         checkReportsTD();
@@ -2521,10 +2521,9 @@ function SpawnCar(player, model, color1, color2) {
 }
 
 function isReportIdExists(id) {
-    let value;
+    let value = true;
     if(!Player.Info[id]) value = false;
     else if(Player.Info[id].Reported.By == -1) value = false;
-    else value = true;
     return value;
 }
 
