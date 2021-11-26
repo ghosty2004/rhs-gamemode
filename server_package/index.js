@@ -2359,6 +2359,11 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function IsPlayerInTerritory(player, iMinX, iMinY, iMaxX, iMaxY) {
+    if(player.position.x >= iMinX && player.position.x <= iMaxX && player.position.y >= iMinY && player.position.y <= iMaxY) return true;
+    else return false;
+}
+
 function IsNosVehicle(vehicleid) {
     let array = [
         581,523,462,521,463,522,461,448,468,586,
