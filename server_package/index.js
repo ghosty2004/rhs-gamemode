@@ -1525,7 +1525,25 @@ CMD.on("garena", (player) => {
 });
 
 CMD.on("capture", (player, params) => {
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.PLAYER_NOT_IN_ANY_GANG);
+    switch(params[0]) {
+        case "start": {
+            if(Player.Info[player.playerid].Gang_Rank < 3) return SendError(player, "You need to be leader to use this command!");
+            if(Gang.Info[Player.Info[player.playerid].Gang].In_Capture) return SendError(player, "Your gang already capturing a territory!");
+            //if(!Gang.Get().some(s => IsPlayerInTerritory(player, s.territory.MinX, s.territory.MinY, s.territory.MaxX, s.territory.MaxY))) return SendError(player, "You are not in a gang territory!");
+            if(!IsPlayerInAnyTerritory(player)) return SendError(player, "You are not in a gang territory!");
+            break;
+        }
+        case "info": {
 
+            break;
+        }
+        case "stop": {
+
+            break;
+        }
+        default: SendUsage(player, "/Capture [Start/Info/Stop]"); break;
+    }
 });
 
 CMD.on("refreshme", (player) => {
@@ -2404,6 +2422,10 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function startCapture(gangid, turfid) {
+
+}
+
 function ShowGangZonesForPlayer(player) {
     Gang.Get().forEach((i) => {
         player.GangZoneShowForPlayer(i.territory.GangZone, i.color);
@@ -2414,6 +2436,10 @@ function IsPlayerInTerritory(player, iMinX, iMinY, iMaxX, iMaxY) {
     if(player.position.x >= iMinX && player.position.x <= iMaxX && player.position.y >= iMinY && player.position.y <= iMaxY) return true;
     else return false;
 }
+
+function IsPlayerInAnyTerritory(player) {
+    
+} 
 
 function IsNosVehicle(vehicleid) {
     let array = [
@@ -3498,12 +3524,14 @@ samp.OnRconLoginAttempt((ip, password, success) => {
             });
         });
     }
+    return true;
 });
 
 samp.OnPlayerKeyStateChange((player, newkeys, oldkeys) => {
     if(newkeys & samp.KEY.FIRE && player.IsPlayerInAnyVehicle()) {
 	    if(IsNosVehicle(player.vehicleId)) samp.AddVehicleComponent(player.vehicleId, 1010);
 	} 
+    return true;
 });
 
 samp.OnPlayerClickPlayer((player, clickedplayer) => {
@@ -3517,14 +3545,20 @@ samp.OnPlayerClickPlayer((player, clickedplayer) => {
     info += `{0072FF}${Lang(player, "Trimite PM", "Send PM")} - {00FF00}/PM\n`;
     info += `{0072FF}${Lang(player, "Urmareste jucator", "Spectate him")} - {00FF00}/spec`;
     player.ShowPlayerDialog(Dialog.PLAYER_CLICK, samp.DIALOG_STYLE.LIST, Lang(player, `{AAAAAA}Ai dat click pe {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`, `{AAAAAA}You have clicked {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`), info, "Select", "Close");
+    return true;
 });
 
-samp.OnPlayerDeath((player, killer) => {
-    player.GameTextForPlayer("~r~~h~You Died", 2, 2000);
+samp.OnPlayerDeath((player, killerid, reason) => {
+    return true;
+});
+
+samp.OnPlayerTakeDamage((player, issuerid, amount, weaponid, bodypart) => {
+    return true;
 });
 
 samp.OnPlayerEnterVehicle((player, vehicleid, ispassenger) => {
     player.GameTextForPlayer(`${samp.vehicleNames[samp.GetVehicleModel(vehicleid)-400]}`, 500, 1);
+    return true;
 });
 
 samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
@@ -3533,7 +3567,9 @@ samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
         if(weaponid == Minigames.Targets.Weapon) {
             if(hittype == samp.BULLET_HIT_TYPE.OBJECT) {
                 if(hitid == Minigames.Targets.HitObject) {
+                    if((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].TargetsLastShot) < 0.5) return player.Kick();
                     Player.Info[player.playerid].TargetsPoints++;
+                    Player.Info[player.playerid].TargetsLastShot = Math.floor(Date.now() / 1000);
                     Minigames.Targets.Hit(player);
                     player.GameTextForPlayer("~h~~h~+1 Point!", 1000, 3);
                     player.PlayerTextDrawSetString(TextDraws.player.targets_points[player.playerid], `~r~~h~Points: ~w~~h~${Player.Info[player.playerid].TargetsPoints}`);

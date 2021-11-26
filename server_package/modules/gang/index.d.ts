@@ -11,7 +11,8 @@ declare interface Info {
         MaxX: number,
         MaxY: number,
         GangZone: number
-    }
+    },
+    In_Capture: number
 }
 export declare const Info: Info[];
 export declare function Create(id: number, name: string, position: Array<number>, color: number, kills: number, deaths: number, territory_owner: number, territory_position: Array<number>): boolean;

@@ -17,7 +17,8 @@ module.exports = {
                     MaxX: territory_position[2],
                     MaxY: territory_position[3],
                     GangZone: GangZoneCreate(territory_position[0], territory_position[1], territory_position[2], territory_position[3])
-                }
+                },
+                In_Capture: 0
             }
             return true;
         }

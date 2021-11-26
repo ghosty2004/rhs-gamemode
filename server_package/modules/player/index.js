@@ -84,6 +84,7 @@ module.exports = {
                 Targets: false
             },
             TargetsPoints: 0,
+            TargetsLastShot: Math.floor(Date.now() / 1000),
             ClickedPlayer: player,
             DiscordLoginRequest: {
                 From: null,

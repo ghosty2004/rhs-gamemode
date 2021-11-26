@@ -81,6 +81,7 @@ export declare const Info: {
         Targets: boolean
     },
     TargetsPoints: number,
+    TargetsLastShot: number,
     ClickedPlayer: SampPlayer,
     DiscordLoginRequest: {
         From: null|string,
