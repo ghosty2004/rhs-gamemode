@@ -25,7 +25,6 @@ const Server = require("./modules/server");
 const SpawnZone = require("./modules/spawnzone");
 const Streamer = require("./modules/streamer");
 const Teleport = require("./modules/teleport");
-const Territory = require("./modules/territory");
 const Discord = require("./modules/discordbot");
 
 /* Server Maps */
@@ -1141,6 +1140,12 @@ CMD.on("vad", (player, params) => {
 CMD.on("goto", (player, params) => {
     if(Player.Info[player.playerid].VIP < 1 && Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
     if(!params[0]) return SendUsage(player, "/Goto [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    player.SendClientMessage(data.colors.LIGHT_BLUE, `You have teleported to player ${target.GetPlayerName(24)}.`);
+    target.SendClientMessage(data.colors.LIGHT_BLUE, `${player.GetPlayerName(24)} have been teleported to you.`);
+    SendACMD(player, "Goto");
+    player.SetPlayerPos(target.position.x, target.position.y, target.position.z);
 });
 
 CMD.on("spawnme", (player) => {
@@ -1694,13 +1699,13 @@ CMD.on("lclan", (player) => {
         Clan.Delete(Player.Info[player.playerid].Clan);
         samp.getPlayers().filter(f => Player.Info[f.playerid].Clan == Player.Info[player.playerid].Clan).forEach((i) => {
             Player.Info[i.playerid].Clan = 0;
-            SetupPlayerForSpawn(i);
+            i.SpawnPlayer();
             i.SendClientMessage(data.colors.LIGHT_BLUE, "INFO: The Our Clan has been deleted by Creator!");
         });
     } 
     else {
         Player.Info[i.playerid].Clan = 0;
-        SetupPlayerForSpawn(player);
+        player.SpawnPlayer();
     }  
 });
 
@@ -1838,7 +1843,7 @@ CMD.on("unjail", (player, params) => {
             if(!Player.Info[target.playerid].Jailed) return SendError(player, "Jucatorul respectiv nu este in inchisoare.", "The specific player is not in jail.");
             samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been unjailed by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
             Player.Info[target.playerid].Jailed = 0;
-            SetupPlayerForSpawn(target);
+            target.SpawnPlayer();
         }
         else SendError(player, Errors.PLAYER_NOT_CONNECTED);
     }
@@ -1929,182 +1934,221 @@ CMD.on("set", (player, params) => {
         let target = getPlayer(params[1]);
         if(target) {
             params[2] = parseInt(params[2]);
-
-            if(params[0] == "time") {
-                if(params[2] < 0 || params[2] > 23) return SendError(player, "Invalid time (0-23)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Time to {FF0000}${params[2]}:00{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Time to {FF0000}${params[2]}:00{FFFF00}!`);
-                target.SetPlayerTime(params[2], 0);
-                SendACMD(player, "Set Time");
+            switch(params[0]) {
+                case "time": {
+                    if(params[2] < 0 || params[2] > 23) return SendError(player, "Invalid time (0-23)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Time to {FF0000}${params[2]}:00{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Time to {FF0000}${params[2]}:00{FFFF00}!`);
+                    target.SetPlayerTime(params[2], 0);
+                    SendACMD(player, "Set Time");
+                    break;
+                }
+                case "weather": {
+                    if(params[2] < 0 || params[2] > 20) return SendError(player, "Invalid weather (0-20)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Weather to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Weather to {FF0000}${params[2]}{FFFF00}!`);
+                    target.SetPlayerWeather(params[2]);
+                    SendACMD(player, "Set Weather");
+                    break;
+                }
+                case "world": {
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your World to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s World to {FF0000}${params[2]}{FFFF00}!`);
+                    target.SetPlayerVirtualWorld(params[2]);
+                    SendACMD(player, "Set World");
+                    break;
+                }
+                case "admin": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 3) return SendError(player, "Invalid admin level (0-3)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Admin level to {FF0000}${getAdminRank(params[2], false)}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Admin level to {FF0000}${getAdminRank(params[2], false)}{FFFF00}!`);
+                    Player.Info[target.playerid].Admin = params[2];
+                    checkReportsTD(target);
+                    SendACMD(player, "Set Admin");
+                    break;
+                }
+                case "vip": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 4) return SendError(player, "Invalid vip level (0-3)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Vip level to {FF0000}${getVIPRank(params[2], false)}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Vip level to {FF0000}${getVIPRank(params[2], false)}{FFFF00}!`);
+                    Player.Info[target.playerid].VIP = params[2];
+                    SendACMD(player, "Set Vip");
+                    break;
+                }
+                case "health": {
+                    if(Player.Info[player.playerid].Admin < 2 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 100) return SendError(player, "Invalid health (0-100)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Health to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Health to {FF0000}${params[2]}{FFFF00}!`);
+                    target.SetPlayerHealth(params[2]);
+                    SendACMD(player, "Set Health");
+                    break;
+                }
+                case "armour": {
+                    if(Player.Info[player.playerid].Admin < 2 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 100) return SendError(player, "Invalid armour (0-100)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Armour to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Armour to {FF0000}${params[2]}{FFFF00}!`);
+                    target.SetPlayerArmour(params[2]);
+                    SendACMD(player, "Set Armour");
+                    break;
+                }
+                case "coins": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid coins (0-999999999)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Coins to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Coins to {FF0000}${params[2]}{FFFF00}!`);
+                    Player.Info[target.playerid].Coins = params[2];
+                    SendACMD(player, "Set Coins");
+                    break;
+                }
+                case "kills": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid kills (0-999999999)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Kills to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Kills to {FF0000}${params[2]}{FFFF00}!`);
+                    Player.Info[target.playerid].Kills_Data.Kills = params[2];
+                    SendACMD(player, "Set Kills");
+                    break;
+                }
+                case "deaths": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid deaths (0-999999999)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Deaths to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Deaths to {FF0000}${params[2]}{FFFF00}!`);
+                    Player.Info[target.playerid].Kills_Data.Deaths = params[2];
+                    SendACMD(player, "Set Deaths");
+                    break;
+                }
+                case "color": {
+                    if(Player.Info[player.playerid].Admin < 2 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    break;
+                }
+                case "skin": {
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Skin to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Skin to {FF0000}${params[2]}{FFFF00}!`);
+                    target.SetPlayerSkin(params[2]);
+                    SendACMD(player, "Set Skin");
+                    break;
+                }
+                case "interior": {
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Interior to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Interior to {FF0000}${params[2]}{FFFF00}!`);
+                    target.SetPlayerInterior(params[2]);
+                    SendACMD(player, "Set Interior");
+                    break;
+                }
+                case "wanted": {
+                    if(Player.Info[player.playerid].Admin < 2 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 6) return SendError(player, "Invalid wanted level (0-6)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Wanted level to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Wanted level to {FF0000}${params[2]}{FFFF00}!`);
+                    target.SetPlayerWantedLevel(params[2]);
+                    SendACMD(player, "Set Wanted");
+                    break;
+                }
+                case "respect+": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid respect+ (0-999999999)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Respect+ to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Respect+ to {FF0000}${params[2]}{FFFF00}!`);
+                    Player.Info[target.playerid].Respect.Positive = params[2];
+                    SendACMD(player, "Set Respect+");
+                    break;
+                }
+                case "respect-": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid respect- (0-999999999)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Respect- to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Respect- to {FF0000}${params[2]}{FFFF00}!`);
+                    Player.Info[target.playerid].Respect.Negative = params[2];
+                    SendACMD(player, "Set Respect-");
+                    break;
+                }
+                case "online": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid online (0-999999999)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Online Hours to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Online Hours to {FF0000}${params[2]}{FFFF00}!`);
+                    Player.Info[target.playerid].OnlineTime.Hours = params[2];
+                    SendACMD(player, "Set Online");
+                    break;
+                }
+                case "money": {
+                    if(Player.Info[player.playerid].Admin < 3 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid money (0-999999999)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Money to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Money to {FF0000}${params[2]}{FFFF00}!`);
+                    Player.Info[target.playerid].Money = params[2];
+                    target.ResetPlayerMoney();
+                    target.GivePlayerMoney(Player.Info[target.playerid].Money);
+                    SendACMD(player, "Set Money");
+                    break;
+                }
+                case "drifts": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid drift (0-999999999)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Drift to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Drift to {FF0000}${params[2]}{FFFF00}!`);
+                    Player.Info[target.playerid].Driving_Data.DriftPoints = params[2];
+                    SendACMD(player, "Set Drift");
+                    break;
+                }
+                case "race": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid race (0-999999999)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Race to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Race to {FF0000}${params[2]}{FFFF00}!`);
+                    Player.Info[target.playerid].Driving_Data.RacePoints = params[2];
+                    SendACMD(player, "Set Race");
+                    break;
+                }
+                case "stunt": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid stunt (0-999999999)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Stunt to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Stunt to {FF0000}${params[2]}{FFFF00}!`);
+                    Player.Info[target.playerid].Driving_Data.StuntPoints = params[2];
+                    SendACMD(player, "Set Stunt");
+                    break;
+                }
+                case "bestkilling": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid best killing (0-999999999)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Best Killing to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Best Killing to {FF0000}${params[2]}{FFFF00}!`);
+                    Player.Info[target.playerid].Kills_Data.BestKillingSpree = params[2];
+                    SendACMD(player, "Set BestKilling");
+                    break;
+                }
+                case "kicks": {
+                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 0 || params[2] > 2) return SendError(player, "Invalid kicks (0-2)!");
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Kicks to {FF0000}${params[2]}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Kicks to {FF0000}${params[2]}{FFFF00}!`);
+                    Player.Info[target.playerid].Kicks = params[2];
+                    SendACMD(player, "Set Kicks");
+                    break;
+                }
+                case "founder": {
+                    if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(params[2] < 1 || params[2] > Gang.Get().length) return SendError(player, `Invalid Gang ID (1-${Gang.Get().length})!`);
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set you Founder in gang {FF0000}${Gang.Info[params[2]].name}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Founder in gang {FF0000}${Gang.Info[params[2]].name}{FFFF00}!`); 
+                    Player.Info[target.playerid].Gang = params[2];
+                    Player.Info[target.playerid].Gang_Rank = 5;
+                    target.SpawnPlayer();
+                    SendACMD(player, "Set Founder");
+                    break;
+                }
+                default: SendError(player, "Invalid item!"); break;
             }
-            else if(params[0] == "weather") {
-                if(params[2] < 0 || params[2] > 20) return SendError(player, "Invalid weather (0-20)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Weather to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Weather to {FF0000}${params[2]}{FFFF00}!`);
-                target.SetPlayerWeather(params[2]);
-                SendACMD(player, "Set Weather");
-            }
-            else if(params[0] == "world") {
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your World to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s World to {FF0000}${params[2]}{FFFF00}!`);
-                target.SetPlayerVirtualWorld(params[2]);
-                SendACMD(player, "Set World");
-            }
-            else if(params[0] == "admin") {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 3) return SendError(player, "Invalid admin level (0-3)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Admin level to {FF0000}${getAdminRank(params[2], false)}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Admin level to {FF0000}${getAdminRank(params[2], false)}{FFFF00}!`);
-                Player.Info[target.playerid].Admin = params[2];
-                checkReportsTD(target);
-                SendACMD(player, "Set Admin");
-            }
-            else if(params[0] == "vip") {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 4) return SendError(player, "Invalid vip level (0-3)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Vip level to {FF0000}${getVIPRank(params[2], false)}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Vip level to {FF0000}${getVIPRank(params[2], false)}{FFFF00}!`);
-                Player.Info[target.playerid].VIP = params[2];
-                SendACMD(player, "Set Vip");
-            }
-            else if(params[0] == "health") {
-                if(Player.Info[player.playerid].Admin < 2 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 100) return SendError(player, "Invalid health (0-100)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Health to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Health to {FF0000}${params[2]}{FFFF00}!`);
-                target.SetPlayerHealth(params[2]);
-                SendACMD(player, "Set Health");
-            }
-            else if(params[0] == "armour") {
-                if(Player.Info[player.playerid].Admin < 2 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 100) return SendError(player, "Invalid armour (0-100)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Armour to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Armour to {FF0000}${params[2]}{FFFF00}!`);
-                target.SetPlayerArmour(params[2]);
-                SendACMD(player, "Set Armour");
-            }
-            else if(params[0] == "coins") {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid coins (0-999999999)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Coins to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Coins to {FF0000}${params[2]}{FFFF00}!`);
-                Player.Info[target.playerid].Coins = params[2];
-                SendACMD(player, "Set Coins");
-            }
-            else if(params[0] == "kills") {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid kills (0-999999999)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Kills to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Kills to {FF0000}${params[2]}{FFFF00}!`);
-                Player.Info[target.playerid].Kills_Data.Kills = params[2];
-                SendACMD(player, "Set Kills");
-            }
-            else if(params[0] == "deaths") {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid deaths (0-999999999)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Deaths to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Deaths to {FF0000}${params[2]}{FFFF00}!`);
-                Player.Info[target.playerid].Kills_Data.Deaths = params[2];
-                SendACMD(player, "Set Deaths");
-            }
-            else if(params[0] == "color") {
-                if(Player.Info[player.playerid].Admin < 2 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-            }
-            else if(params[0] == "skin") {
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Skin to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Skin to {FF0000}${params[2]}{FFFF00}!`);
-                target.SetPlayerSkin(params[2]);
-                SendACMD(player, "Set Color");
-            }
-            else if(params[0] == "interior") {
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Interior to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Interior to {FF0000}${params[2]}{FFFF00}!`);
-                target.SetPlayerInterior(params[2]);
-                SendACMD(player, "Set Interior");
-            }
-            else if(params[0] == "wanted") {
-                if(Player.Info[player.playerid].Admin < 2 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 6) return SendError(player, "Invalid wanted level (0-6)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Wanted level to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Wanted level to {FF0000}${params[2]}{FFFF00}!`);
-                target.SetPlayerWantedLevel(params[2]);
-                SendACMD(player, "Set Wanted");
-            }
-            else if(params[0] == "respect+") {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid respect+ (0-999999999)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Respect+ to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Respect+ to {FF0000}${params[2]}{FFFF00}!`);
-                Player.Info[target.playerid].Respect.Positive = params[2];
-                SendACMD(player, "Set Respect+");
-            }
-            else if(params[0] == "respect-") {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid respect- (0-999999999)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Respect- to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Respect- to {FF0000}${params[2]}{FFFF00}!`);
-                Player.Info[target.playerid].Respect.Negative = params[2];
-                SendACMD(player, "Set Respect-");
-            }
-            else if(params[0] == "online") {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid online (0-999999999)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Online Hours to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Online Hours to {FF0000}${params[2]}{FFFF00}!`);
-                Player.Info[target.playerid].OnlineTime.Hours = params[2];
-                SendACMD(player, "Set Online");
-            }
-            else if(params[0] == "money") {
-                if(Player.Info[player.playerid].Admin < 3 && Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid money (0-999999999)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Money to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Money to {FF0000}${params[2]}{FFFF00}!`);
-                Player.Info[target.playerid].Money = params[2];
-                target.ResetPlayerMoney();
-                target.GivePlayerMoney(Player.Info[target.playerid].Money);
-                SendACMD(player, "Set Money");
-            }
-            else if(params[0] == "drift") {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid drift (0-999999999)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Drift to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Drift to {FF0000}${params[2]}{FFFF00}!`);
-                Player.Info[target.playerid].Driving_Data.DriftPoints = params[2];
-                SendACMD(player, "Set Drift");
-            }
-            else if(params[0] == "race") {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid race (0-999999999)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Race to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Race to {FF0000}${params[2]}{FFFF00}!`);
-                Player.Info[target.playerid].Driving_Data.RacePoints = params[2];
-                SendACMD(player, "Set Race");
-            }
-            else if(params[0] == "stunt") {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid stunt (0-999999999)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Stunt to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Stunt to {FF0000}${params[2]}{FFFF00}!`);
-                Player.Info[target.playerid].Driving_Data.StuntPoints = params[2];
-                SendACMD(player, "Set Stunt");
-            }
-            else if(params[0] == "bestkilling") {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid best killing (0-999999999)!");
-                target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Best Killing to {FF0000}${params[2]}{FFFF00}!`);
-                player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Best Killing to {FF0000}${params[2]}{FFFF00}!`);
-                Player.Info[target.playerid].Kills_Data.BestKillingSpree = params[2];
-                SendACMD(player, "Set BestKilling");
-            }
-            else if(params[0] == "kicks") {
-
-            }
-            else Usage();
         }
         else SendError(player, Errors.PLAYER_NOT_CONNECTED);
     }
-    else Usage();
-    function Usage() {
+    else {
         SendUsage(player, "/Set [Option] [ID/Name] [Amount]");
         player.SendClientMessage(data.colors.RED, "Options: {FFFFFF}Time, Weather, World, Admin, VIP, Health, Armour, Coins, Kills, Deaths, Color");
         player.SendClientMessage(data.colors.RED, "Options: {FFFFFF}Skin, Interior, Wanted, Respect(-/+), Online, Money, Drift, Race, Stunt, BestKilling, Kicks");
@@ -2361,10 +2405,9 @@ CMD.on("unban", async (player, params) => {
 /* SA:MP Functions */
 /* =============== */
 function ShowGangZonesForPlayer(player) {
-    Territory.Get().forEach((i) => {
-        player.GangZoneShowForPlayer(i.GangZone, )
+    Gang.Get().forEach((i) => {
+        player.GangZoneShowForPlayer(i.territory.GangZone, i.color);
     });
-	//for(let i = 0; i < MAX_GANGS; i++) GangZoneShowForPlayer(playerid, Teritories[i][ID], GangInfo[Teritories[i][owner]][pGangColor]);
 }
 
 function IsPlayerInTerritory(player, iMinX, iMinY, iMaxX, iMaxY) {
@@ -2893,7 +2936,10 @@ function SetupPlayerForSpawn(player, type=0) {
             }
         }
         else if(Player.Info[player.playerid].Gang) { /* Gang Spawn */
-            player.SetPlayerPos(0, 0, 0);
+            let position = Gang.Info[Player.Info[player.playerid].Gang].position;
+            player.SetPlayerPos(position[0], position[1], position[2]);
+            player.SetPlayerFacingAngle(position[3]);
+            player.SetPlayerColor(Gang.Info[Player.Info[player.playerid].Gang].color);
         }
         else SetupPlayerForSpawn(player, 1);
     }
@@ -2909,7 +2955,6 @@ function SetupPlayerForSpawn(player, type=0) {
 
 function LoadFromDB() {
     LoadGangs();
-    LoadTerritories();
     LoadSpawnZones();
     LoadTeleports();
     LoadClans();
@@ -2919,19 +2964,10 @@ function LoadGangs() {
     con.query("SELECT * FROM gangs", function(err, result) {
         for(let i = 0; i < result.length; i++) {
             let position = JSON.parse(result[i].position);
-            Gang.Create(result[i].ID, result[i].name, [position[0], position[1], position[2]], result[i].color, result[i].kills, result[i].deaths);
+            let territory_position = JSON.parse(result[i].territory_position);
+            Gang.Create(result[i].ID, result[i].name, [position[0], position[1], position[2], position[3]], result[i].color, result[i].kills, result[i].deaths, result[i].territory_owner, [territory_position[0], territory_position[1], territory_position[2], territory_position[3]]);  
         }
         console.log(`Loaded ${result.length} gangs.`);
-    });
-}
-
-function LoadTerritories() {
-    con.query("SELECT * FROM territories", function(err, result) {
-        for(let i = 0; i < result.length; i++) {
-            let position = JSON.parse(result[i].position); /* [0] = minX, [1] = minY, [2] = maxX, [3] = maxY */
-            Territory.Create(result[i].ID, result[i].owner, position[0], position[1], position[2], position[3]);
-        }   
-        console.log(`Loaded ${result.length} territories.`);
     });
 }
 
@@ -2971,7 +3007,7 @@ function CheckPlayers() {
             if(Player.Info[i.playerid].Jailed) {
                 Player.Info[i.playerid].Jailed--; 
                 if(Player.Info[i.playerid].Jailed == 0) {
-                    SetupPlayerForSpawn(i);
+                    i.SpawnPlayer();
                 }
             }
             if(Player.Info[i.playerid].Caged) {
@@ -4554,5 +4590,6 @@ samp.OnPlayerSpawn((player) => {
         player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
     }
     SetupPlayerForSpawn(player);
+    ShowGangZonesForPlayer(player);
     return true;
 });
