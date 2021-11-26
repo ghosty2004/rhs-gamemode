@@ -25,6 +25,7 @@ const Server = require("./modules/server");
 const SpawnZone = require("./modules/spawnzone");
 const Streamer = require("./modules/streamer");
 const Teleport = require("./modules/teleport");
+const Territory = require("./modules/territory");
 const Discord = require("./modules/discordbot");
 
 /* Server Maps */
@@ -2359,6 +2360,13 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function ShowGangZonesForPlayer(player) {
+    Territory.Get().forEach((i) => {
+        player.GangZoneShowForPlayer(i.GangZone, )
+    });
+	//for(let i = 0; i < MAX_GANGS; i++) GangZoneShowForPlayer(playerid, Teritories[i][ID], GangInfo[Teritories[i][owner]][pGangColor]);
+}
+
 function IsPlayerInTerritory(player, iMinX, iMinY, iMaxX, iMaxY) {
     if(player.position.x >= iMinX && player.position.x <= iMaxX && player.position.y >= iMinY && player.position.y <= iMaxY) return true;
     else return false;
@@ -2900,9 +2908,31 @@ function SetupPlayerForSpawn(player, type=0) {
 }
 
 function LoadFromDB() {
+    LoadGangs();
+    LoadTerritories();
     LoadSpawnZones();
     LoadTeleports();
     LoadClans();
+}
+
+function LoadGangs() {
+    con.query("SELECT * FROM gangs", function(err, result) {
+        for(let i = 0; i < result.length; i++) {
+            let position = JSON.parse(result[i].position);
+            Gang.Create(result[i].ID, result[i].name, [position[0], position[1], position[2]], result[i].color, result[i].kills, result[i].deaths);
+        }
+        console.log(`Loaded ${result.length} gangs.`);
+    });
+}
+
+function LoadTerritories() {
+    con.query("SELECT * FROM territories", function(err, result) {
+        for(let i = 0; i < result.length; i++) {
+            let position = JSON.parse(result[i].position); /* [0] = minX, [1] = minY, [2] = maxX, [3] = maxY */
+            Territory.Create(result[i].ID, result[i].owner, position[0], position[1], position[2], position[3]);
+        }   
+        console.log(`Loaded ${result.length} territories.`);
+    });
 }
 
 function LoadSpawnZones() {

@@ -27,5 +27,11 @@ module.exports = {
     Exists: function(id) {
         if(this.Info[id]) return true;
         else return false;
+    },
+    Get: function() {
+        let data = Object.entries(this.Info);
+        let value = [];
+        for(let i = 0; i < data.length; i++) { value.push(data[i][1]); }
+        return value;
     }
 }
