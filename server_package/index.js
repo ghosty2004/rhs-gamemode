@@ -1143,8 +1143,8 @@ CMD.on("goto", (player, params) => {
     if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
     player.SendClientMessage(data.colors.LIGHT_BLUE, `You have teleported to player ${target.GetPlayerName(24)}.`);
     target.SendClientMessage(data.colors.LIGHT_BLUE, `${player.GetPlayerName(24)} have been teleported to you.`);
-    SendACMD(player, "Goto");
     player.SetPlayerPos(target.position.x, target.position.y, target.position.z);
+    SendACMD(player, "Goto");
 });
 
 CMD.on("spawnme", (player) => {
@@ -1163,8 +1163,15 @@ CMD.on("fire", (player) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
 });
 
-CMD.on("get", (player) => {
+CMD.on("get", (player, params) => {
     if(Player.Info[player.playerid].VIP < 1 && Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    if(!params[0]) return SendUsage(player, "/Get [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    player.SendClientMessage(data.colors.LIGHT_BLUE, `You have teleported player ${target.GetPlayerName(24)} to your location.`);
+    target.SendClientMessage(data.colors.LIGHT_BLUE, `${player.GetPlayerName(24)} have teleported you to his location.`);
+    target.SetPlayerPos(player.position.x, player.position.y, player.position.z);
+    SendACMD(player, "Get");
 });
 
 CMD.on("carcolor", (player, params) => {
@@ -1525,30 +1532,45 @@ CMD.on("garena", (player) => {
 
 });
 
-CMD.on("debugterr", (player) => {
-    console.log(Gang.Get());
-});
-
 CMD.on("capture", (player, params) => {
     if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.PLAYER_NOT_IN_ANY_GANG);
     switch(params[0]) {
         case "start": {
             if(Player.Info[player.playerid].Gang_Data.Rank < 3) return SendError(player, "You need to be leader to use this command!");
-            if(Gang.Info[Player.Info[player.playerid].Gang].In_Capture) return SendError(player, "Your gang already capturing a territory!");
+            if(Gang.Info[Player.Info[player.playerid].Gang].capturing.turf != -1) return SendError(player, "Your gang is already capturing a territory!");
             let zone = GetPlayerGangZone(player);
-            //if(!zone) return SendError(player, "You are not in a gang territory!");
-            player.SendClientMessage(data.colors.YELLOW, `You are in territory {FF0000}${JSON.stringify(zone)}{FFFF00}!`);
-            break;
-        }
-        case "info": {
-
+            if(!zone) return SendError(player, "You are not in a Gang Territory!");
+            if(zone.owner == Player.Info[player.playerid].Gang) return SendError(player, "This Territory is already owned by your Gang!");
+            startCapture(player, zone.GangZone);
             break;
         }
         case "stop": {
-
             break;
         }
-        default: SendUsage(player, "/Capture [Start/Info/Stop]"); break;
+        case "join": {
+            break;
+        }
+        case "leave": {
+            break;
+        }
+        case "info": {
+            let AttackGangZone = Gang.Get().filter(f => f.territory.GangZone == Gang.Info[Player.Info[player.playerid].Gang].capturing.turf)[0];
+            let DefendGangZone = Gang.Get().filter(f => Gang.GetOwnedGangZones(Player.Info[player.playerid].Gang).some(s => s == f.capturing.turf) && f.capturing)[0];
+
+            if(AttackGangZone) { 
+                player.SendClientMessage(0x00BBF6AA, `Gang-ul tau ataca un teritoriu al gang-ului: {FFFFFF}${Gang.Info[AttackGangZone.territory.owner].name}`); 
+                player.SendClientMessage(0x00BBF6AA, "Daca gang-ul inamic alunga membrii alaturati de pe teritoriu si foloseste /capture stop, gang-ul tau va esua in a captura teritoriul!");
+                player.SendClientMessage(0x00BBF6AA, `Timp ramas: {FF0000}${Function.secondsToMinutesAndSeconds(Gang.Info[Player.Info[player.playerid].Gang].capturing.time)}`);
+            }
+            else if(DefendGangZone) {
+                player.SendClientMessage(0x00BBF6AA, `Un teritoriu al gangului tau este in curs de capturare de catre: {FFFFFF}${DefendGangZone.name}`);
+                player.SendClientMessage(0x00BBF6AA, "Alunga inamicii de pe teritoriu si foloseste /capture stop pentru a nu pierde teritoriul!");
+                player.SendClientMessage(0x00BBF6AA, `Timp ramas: {FF0000}${Function.secondsToMinutesAndSeconds(DefendGangZone.capturing.time)}`);
+            }
+            else SendError(player, "There is no capture in progress!");
+            break;
+        }
+        default: SendUsage(player, "/Capture [Start/Stop/Join/Leave/Info]"); break;
     }
 });
 
@@ -2478,13 +2500,83 @@ function AfkBrb(player, type) {
     Player.Info[player.playerid].AFK = true;
 }
 
-function startCapture(gangid, turfid) {
+function startCapture(player, zone) {
+    let GangID = Player.Info[player.playerid].Gang;
+    let PlayerID = player.playerid;
 
+    samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == GangID).forEach((i) => {
+        i.GameTextForPlayer(`~h~~h~Territory war started by~n~~r~~h~${player.GetPlayerName(24)}~n~~y~~h~/capture join~n~~y~~h~/capture info`, 4000, 3);
+        i.TextDrawShowForPlayer(TextDraws.server.attack_territory);
+    });
+
+    samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == Gang.Get().filter(f => f.territory.GangZone == zone)[0].id).forEach((i) => {
+        i.GameTextForPlayer(`~g~~h~Your territory~n~~g~~h~is under attack by~n~~r~~h~${Gang.Info[GangID].name}~n~~y~~h~/capture info`, 4000, 3);
+        i.TextDrawShowForPlayer(TextDraws.server.under_attack_territory);
+    });
+
+    Gang.Info[GangID].capturing.turf = zone;
+    samp.GangZoneFlashForAll(zone, Gang.Info[GangID].color);
+
+    Gang.Info[GangID].capturing.interval = setInterval(() => {
+        if(!samp.IsPlayerConnected(PlayerID)) return loseCapture(GangID);
+        if(Player.Info[PlayerID].Gang != GangID) return loseCapture(GangID);
+        if(Gang.Info[GangID].capturing.time == 0) winCapture(GangID);
+        else Gang.Info[GangID].capturing.time--;
+    }, 1000);
+}
+
+function winCapture(GangID) {
+    let zone = Gang.Info[GangID].capturing.turf;
+    samp.GangZoneStopFlashForAll(zone);
+    samp.GangZoneShowForAll(zone, Gang.Info[GangID].color);
+
+    Gang.Info[GangID].capturing.time = 30;
+    Gang.Info[GangID].capturing.turf = -1;
+    clearInterval(Gang.Info[GangID].capturing.interval);
+    Gang.Info[GangID].capturing.interval = null;
+
+    let turf_owner = Gang.Get().filter(f => f.territory.GangZone == zone)[0];
+    if(turf_owner) {
+        samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == turf_owner.territory.owner).forEach((i) => {
+            i.GameTextForPlayer("~g~~h~Your gang has~n~~r~~h~lost the territory!", 4000, 3);
+            i.TextDrawHideForPlayer(TextDraws.server.under_attack_territory);
+        });
+        turf_owner.territory.owner = GangID;  
+    }
+
+    samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == GangID).forEach((i) => {
+        i.GameTextForPlayer("~g~~h~Your Gang has~n~~r~~h~succesfully captured~n~~w~~h~the territory!~n~~y~~h~+10 gang points", 4000, 3);
+        i.TextDrawHideForPlayer(TextDraws.server.attack_territory);
+    }); 
+}
+
+function loseCapture(GangID) {
+    let zone = Gang.Info[GangID].capturing.turf;
+    samp.GangZoneStopFlashForAll(zone);
+    samp.GangZoneShowForAll(zone, Gang.Get().filter(f => f.territory.GangZone == zone)[0].color);
+
+    Gang.Info[GangID].capturing.time = 30;
+    Gang.Info[GangID].capturing.turf = -1;
+    clearInterval(Gang.Info[GangID].capturing.interval);
+    Gang.Info[GangID].capturing.interval = null;
+
+    let turf_owner = Gang.Get().filter(f => f.territory.GangZone == zone)[0];
+    if(turf_owner) {
+        samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == turf_owner.territory.owner).forEach((i) => {
+            i.GameTextForPlayer("~w~~h~Your gang protected~n~~r~~h~the territory succesfully!", 4000, 3);
+            i.TextDrawHideForPlayer(TextDraws.server.under_attack_territory);
+        });
+    }
+
+    samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == GangID).forEach((i) => {
+        i.GameTextForPlayer("~w~~h~Your Gang has~n~~r~~h~failed capturing~n~~w~~h~the territory!", 4000, 3);
+        i.TextDrawHideForPlayer(TextDraws.server.attack_territory);
+    });
 }
 
 function ShowGangZonesForPlayer(player) {
     Gang.Get().forEach((i) => {
-        player.GangZoneShowForPlayer(i.territory.GangZone, i.color);
+        player.GangZoneShowForPlayer(i.territory.GangZone, Gang.Get().filter(f => f.territory.owner == i.territory.owner)[0].color);
     });
 }
 
@@ -3113,7 +3205,7 @@ function LoadGangs() {
             let position = JSON.parse(result[i].position);
             let weapons = JSON.parse(result[i].weapon);
             let territory_position = JSON.parse(result[i].territory_position);
-            Gang.Create(result[i].ID, result[i].name, [position[0], position[1], position[2], position[3]], weapons, result[i].color, result[i].alliance, result[i].points, result[i].captures, result[i].kills, result[i].deaths, result[i].territory_owner, [territory_position[0], territory_position[1], territory_position[2], territory_position[3]]);  
+            Gang.Create(result[i].ID, result[i].name, [position[0], position[1], position[2], position[3]], weapons, result[i].color, result[i].alliance, result[i].points, result[i].captures, result[i].kills, result[i].deaths, [territory_position[0], territory_position[1], territory_position[2], territory_position[3]]);  
         }
         console.log(`Loaded ${result.length} gangs.`);
     });
@@ -3712,6 +3804,7 @@ samp.OnPlayerClickPlayer((player, clickedplayer) => {
 });
 
 samp.OnPlayerDeath((player, killerid, reason) => {
+    if(killerid) samp.SendDeathMessage(killerid.playerid, player.playerid, killerid.GetPlayerWeapon());
     return true;
 });
 
@@ -4750,6 +4843,8 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
 });
 
 samp.OnPlayerText((player, text) => { 
+    if(Player.Info[player.playerid].AFK) return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use the~n~~r~~h~Chat~w~~h~!", 4000, 4);
+
     if(!checkAntiSpam(player)) return false;
 
     Player.Info[player.playerid].Last_Chat_Message = Math.floor(Date.now() / 1000);

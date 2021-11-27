@@ -32,5 +32,10 @@ module.exports = {
             hex += `${number.toString(16)[i]}`;
         }
         return hex;
+    },
+    secondsToMinutesAndSeconds: function(time) {
+        let mins = ~~((time % 3600) / 60);
+        let secs = ~~time % 60;
+        return `${mins}:${secs}`;
     }
 }

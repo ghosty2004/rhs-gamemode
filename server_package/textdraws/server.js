@@ -10,12 +10,44 @@ const {
 const { SV_NAME, SERVER_WEB } = require("../data/settings");
 
 module.exports = {
+    attack_territory: null,
+    under_attack_territory: null,
     afk_brb: {},
     reports: null,
     logs: null,
     spawn: {},
     connect: {},
     Load: function() {
+        /* Attack Territory TextDraw */
+        this.attack_territory = TextDrawCreate(502.000000, 409.000000, "Your gang attack a territory!~n~~w~~h~                 /capture info!");
+        TextDrawLetterSize(this.attack_territory, 0.279998, 1.899998);
+        TextDrawTextSize(this.attack_territory, 1280.000000, 1280.000000);
+        TextDrawAlignment(this.attack_territory, 0);
+        TextDrawColor(this.attack_territory, 0xFFFF00FF);
+        TextDrawUseBox(this.attack_territory, 0);
+        TextDrawBoxColor(this.attack_territory, 0x80808080);
+        TextDrawSetShadow(this.attack_territory, 1);
+        TextDrawSetOutline(this.attack_territory, 0);
+        TextDrawBackgroundColor(this.attack_territory, 0x000000FF);
+        TextDrawFont(this.attack_territory, 1);
+        TextDrawSetProportional(this.attack_territory, 1);
+        TextDrawSetSelectable(this.attack_territory, 0);
+
+        /* Under Attack Territory TextDraw */
+        this.under_attack_territory = TextDrawCreate(502.000000, 409.000000, "Your territory is under attack!~n~~w~~h~                 /capture info!");
+        TextDrawLetterSize(this.under_attack_territory, 0.279998, 1.899998);
+        TextDrawTextSize(this.under_attack_territory, 1280.000000, 1280.000000);
+        TextDrawAlignment(this.under_attack_territory, 0);
+        TextDrawColor(this.under_attack_territory, 0xFF0000FF);
+        TextDrawUseBox(this.under_attack_territory, 0);
+        TextDrawBoxColor(this.under_attack_territory, 0x80808080);
+        TextDrawSetShadow(this.under_attack_territory, 1);
+        TextDrawSetOutline(this.under_attack_territory, 0);
+        TextDrawBackgroundColor(this.under_attack_territory, 0x000000FF);
+        TextDrawFont(this.under_attack_territory, 1);
+        TextDrawSetProportional(this.under_attack_territory, 1);
+        TextDrawSetSelectable(this.under_attack_territory, 0);
+
         /* AFK/Brb TextDraw */
         this.afk_brb[0] = TextDrawCreate(153.000000, 306.000000, "~g~~h~]                ]");
         TextDrawLetterSize(this.afk_brb[0], 0.509999, 1.700000);
