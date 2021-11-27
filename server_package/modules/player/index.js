@@ -1,4 +1,5 @@
-const { getPlayers } = require("samp-node-lib");
+const { getBeatifulDate } = require("../functions");
+
 
 module.exports = {
     Info: {},
@@ -28,7 +29,21 @@ module.exports = {
             Clan: 0,
             Clan_Rank: 0,
             Gang: 0,
-            Gang_Rank: 0,
+            Gang_Data: {
+                Rank: 0,
+                Kills: 0,
+                Deaths: 0,
+                Captures: 0,
+                Points: 0,
+                Warns: 0,
+                OnlineTime: {
+                    Hours: 0,
+                    Minutes: 0,
+                    Seconds: 0
+                },
+                MemberSince: getBeatifulDate(),
+                ConnectTime: Math.floor(Date.now() / 1000)
+            },
             Kills_Data: {
                 Kills: 0,
                 HeadShots: 0,

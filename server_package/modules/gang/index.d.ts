@@ -1,7 +1,11 @@
 declare interface Info {
     name: string,
     position: Array<number>,
-    color: number
+    weapons: Array<number>,
+    color: number,
+    alliance: number,
+    points: number,
+    captures: number,
     kills: number,
     deaths: number,
     territory: {
@@ -15,7 +19,7 @@ declare interface Info {
     In_Capture: number
 }
 export declare const Info: Info[];
-export declare function Create(id: number, name: string, position: Array<number>, color: number, kills: number, deaths: number, territory_owner: number, territory_position: Array<number>): boolean;
+export declare function Create(id: number, name: string, position: Array<number>, weapons: Array<number>, color: number, alliance: number, points: number, captures: number, kills: number, deaths: number, territory_owner: number, territory_position: Array<number>): boolean;
 export declare function Delete(id: number): boolean;
 export declare function Exists(id: number): boolean;
 export declare function Get(): Info[];

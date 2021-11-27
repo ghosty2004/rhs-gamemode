@@ -17,5 +17,10 @@ module.exports = {
         let minutes = Math.floor(time / 60) % 60;
         let seconds = Math.floor(time % 60);
         return {hours: hours, minutes: minutes, seconds: seconds};
+    },
+    getBeatifulDate: function() { 
+        const d = new Date();
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        return `${("0" + d.getDate()).slice(-2)} ${monthNames[d.getMonth()]}, ${d.getFullYear()}`;
     }
 }

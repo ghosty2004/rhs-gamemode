@@ -2,12 +2,16 @@ const { GangZoneCreate, GangZoneDestroy } = require("samp-node-lib");
 
 module.exports = {
     Info: {},
-    Create: function(id, name, position, color, kills, deaths, territory_owner, territory_position) {
+    Create: function(id, name, position, weapons, color, alliance, points, captures, kills, deaths, territory_owner, territory_position) {
         if(!this.Info[id]) {
             this.Info[id] = {
                 name: name,
                 position: position,
+                weapons: weapons,
                 color: color,
+                alliance: alliance,
+                points: points,
+                captures: captures,
                 kills: kills,
                 deaths: deaths,
                 territory: {

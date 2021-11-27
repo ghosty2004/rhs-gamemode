@@ -25,7 +25,21 @@ export declare const Info: {
     Clan: number,
     Clan_Rank: number,
     Gang: number,
-    Gang_Rank: number,
+    Gang_Data: {
+        Rank: number,
+        Kills: number,
+        Deaths: number,
+        Captures: number,
+        Points: number,
+        Warns: number,
+        OnlineTime: {
+            Hours: number,
+            Minutes: number,
+            Seconds: number
+        },
+        MemberSince: string,
+        ConnectTime: number
+    },
     Kills_Data: {
         Kills: number,
         HeadShots: number,
