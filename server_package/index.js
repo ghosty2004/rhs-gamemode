@@ -3971,7 +3971,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                             if(!err && result) {
                                 info += "\n";
                                 for(let i = 0; i < result.length; i++) {
-                                    info += `{FF0000}1. {BBFF00}${result[i].name}: {00BBF6}${result[i].kills} {BBFF00}Kills\n`;
+                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].kills} {BBFF00}Kills\n`;
                                 }
                             }
                             info += "\n";
