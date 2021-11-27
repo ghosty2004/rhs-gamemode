@@ -82,7 +82,7 @@ export declare const Info: {
     },
     TargetsPoints: number,
     TargetsLastShot: number,
-    ClickedPlayer: SampPlayer,
+    ClickedPlayer: number,
     DiscordLoginRequest: {
         From: null|string,
         Code: number
@@ -113,4 +113,4 @@ export declare const Info: {
     CageObjects: Array<any>
 }[]
 
-export declare function ResetVariables(player: SampPlayer): void;
+export declare function ResetVariables(playerid: number): void;

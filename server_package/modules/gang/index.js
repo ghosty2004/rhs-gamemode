@@ -26,6 +26,7 @@ module.exports = {
     },
     Delete: function(id) {
         if(this.Info[id]) {
+            GangZoneDestroy(this.Info[id].territory.GangZone);
             delete this.Info[id];
             return true;
         }

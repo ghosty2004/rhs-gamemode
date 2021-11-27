@@ -1524,14 +1524,19 @@ CMD.on("garena", (player) => {
 
 });
 
+CMD.on("debugterr", (player) => {
+    console.log(Gang.Get());
+});
+
 CMD.on("capture", (player, params) => {
     if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.PLAYER_NOT_IN_ANY_GANG);
     switch(params[0]) {
         case "start": {
             if(Player.Info[player.playerid].Gang_Rank < 3) return SendError(player, "You need to be leader to use this command!");
             if(Gang.Info[Player.Info[player.playerid].Gang].In_Capture) return SendError(player, "Your gang already capturing a territory!");
-            //if(!Gang.Get().some(s => IsPlayerInTerritory(player, s.territory.MinX, s.territory.MinY, s.territory.MaxX, s.territory.MaxY))) return SendError(player, "You are not in a gang territory!");
-            if(!IsPlayerInAnyTerritory(player)) return SendError(player, "You are not in a gang territory!");
+            let zone = GetPlayerGangZone(player);
+            //if(!zone) return SendError(player, "You are not in a gang territory!");
+            player.SendClientMessage(data.colors.YELLOW, `You are in territory {FF0000}${JSON.stringify(zone)}{FFFF00}!`);
             break;
         }
         case "info": {
@@ -2437,8 +2442,10 @@ function IsPlayerInTerritory(player, iMinX, iMinY, iMaxX, iMaxY) {
     else return false;
 }
 
-function IsPlayerInAnyTerritory(player) {
-    
+function GetPlayerGangZone(player) {
+    const data = Gang.Get().filter(f => player.position.x >= f.territory.MinX && player.position.x <= f.territory.MaxX && player.position.y >= f.territory.MinY && player.position.y <= f.territory.MaxY)[0];
+    if(data) return data.territory;
+    else return null;
 } 
 
 function IsNosVehicle(vehicleid) {
@@ -2902,17 +2909,17 @@ function savePlayer(player) {
     let OnlineTimeMonth = TotalGameTimeMonth(player);
 
     con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, hours = ?, minutes = ?, seconds = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?,\
-    clan_rank = ?, gang = ?, kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?,\
+    clan_rank = ?, gang = ?, gang_rank = ?, kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?,\
     month_minutes = ?, month_seconds = ?, month_kills = ?, month_headshots = ?, month_killingspree = ?, month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?,\
     month_racepoints = ?, jailed = ?, caged = ?, kicks = ?, discord = ? WHERE ID = ?", [
         Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
         OnlineTime.hours, OnlineTime.minutes, OnlineTime.seconds, Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, 
-        Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, Player.Info[player.playerid].Kills_Data.KillingSpree, 
-        Player.Info[player.playerid].Kills_Data.BestKillingSpree, Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, 
-        Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].AdminPoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds, Player.Info[player.playerid].Month.Kills_Data.Kills, 
-        Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, Player.Info[player.playerid].Month.Kills_Data.Deaths, 
-        Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Caged,
-        Player.Info[player.playerid].Kicks, Player.Info[player.playerid].Discord, Player.Info[player.playerid].AccID
+        Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Gang_Rank, Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, 
+        Player.Info[player.playerid].Kills_Data.KillingSpree, Player.Info[player.playerid].Kills_Data.BestKillingSpree, Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, 
+        Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].AdminPoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds, 
+        Player.Info[player.playerid].Month.Kills_Data.Kills, Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, 
+        Player.Info[player.playerid].Month.Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, 
+        Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Caged, Player.Info[player.playerid].Kicks, Player.Info[player.playerid].Discord, Player.Info[player.playerid].AccID
     ]);
 }
 
@@ -3495,11 +3502,8 @@ samp.OnGameModeInit(() => {
     samp.UsePlayerPedAnims();
     samp.EnableStuntBonusForAll(false);
 
-    /*setTimeout(() => {
-        getPositionZ(69, 69, 1000).then((result) => {
-            console.log(result);
-        });
-    }, 3000);*/
+    for(let i = 0; i < 1000; i++) Player.ResetVariables(i);
+
     return true;
 });
 
@@ -3534,7 +3538,7 @@ samp.OnPlayerKeyStateChange((player, newkeys, oldkeys) => {
 });
 
 samp.OnPlayerClickPlayer((player, clickedplayer) => {
-    Player.Info[player.playerid].ClickedPlayer = clickedplayer;
+    Player.Info[player.playerid].ClickedPlayer = clickedplayer.playerid;
 
     let info = "";
     info += `{0072FF}${Lang(player, "Vezi statistici", "Show Stats")} - {00FF00}/stats\n`;
@@ -3580,7 +3584,7 @@ samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
 });
 
 samp.OnPlayerConnect(async(player) => {
-    Player.ResetVariables(player);
+    Player.ResetVariables(player.playerid);
     if(await checkPlayerBanStatus(player, false)) kickPlayer(player);
     else {
         ShowConnectTextDraw(player); 
@@ -3602,7 +3606,7 @@ samp.OnPlayerConnect(async(player) => {
 samp.OnPlayerDisconnect((player, reason) => {
     savePlayer(player);
 
-    Player.ResetVariables(player);
+    Player.ResetVariables(player.playerid);
     checkReportsTD();
 
     HideConnectTextDraw(player);
@@ -3858,12 +3862,12 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.PLAYER_CLICK: {
             if(response) {
                 switch(listitem) {
-                    case 0: CMD.emit("stats", player, Player.Info[player.playerid].ClickedPlayer.playerid); break;
-                    case 1: CMD.emit("gstats", player, Player.Info[player.playerid].ClickedPlayer.playerid); break;
-                    case 2: CMD.emit("cinfo", player, Player.Info[player.playerid].ClickedPlayer.playerid); break;
-                    case 3: CMD.emit("astats", player, Player.Info[player.playerid].ClickedPlayer.playerid); break;
-                    case 4: CMD.emit("pm", player, Player.Info[player.playerid].ClickedPlayer.playerid); break;
-                    case 5: CMD.emit("spec", player, Player.Info[player.playerid].ClickedPlayer.playerid); break;
+                    case 0: CMD.emit("stats", player, Player.Info[player.playerid].ClickedPlayer); break;
+                    case 1: CMD.emit("gstats", player, Player.Info[player.playerid].ClickedPlayer); break;
+                    case 2: CMD.emit("cinfo", player, Player.Info[player.playerid].ClickedPlayer); break;
+                    case 3: CMD.emit("astats", player, Player.Info[player.playerid].ClickedPlayer); break;
+                    case 4: CMD.emit("pm", player, Player.Info[player.playerid].ClickedPlayer); break;
+                    case 5: CMD.emit("spec", player, Player.Info[player.playerid].ClickedPlayer); break;
                 }
             }
             break;

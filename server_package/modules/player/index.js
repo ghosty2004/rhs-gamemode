@@ -2,8 +2,8 @@ const { getPlayers } = require("samp-node-lib");
 
 module.exports = {
     Info: {},
-    ResetVariables: function(player) {
-        this.Info[player.playerid] = {
+    ResetVariables: function(playerid) {
+        this.Info[playerid] = {
             LoggedIn: false,
             Language: 0,
             Fail_Logins: 0,
@@ -85,7 +85,7 @@ module.exports = {
             },
             TargetsPoints: 0,
             TargetsLastShot: Math.floor(Date.now() / 1000),
-            ClickedPlayer: player,
+            ClickedPlayer: playerid,
             DiscordLoginRequest: {
                 From: null,
                 Code: 0
