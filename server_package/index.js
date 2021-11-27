@@ -1839,7 +1839,7 @@ CMD.on("kick", (player, params) => {
     }
     else {
         Player.Info[target.playerid].Kicks = 0;
-        banPlayer(target, player, 5, "3/3 Kicks");
+        banPlayer(target, player, 1, "3/3 Kicks");
     }
 });
 
@@ -2624,7 +2624,7 @@ function SpawnCar(player, model, color1=Function.getRandomInt(0, 255), color2=Fu
     }
     Player.Info[player.playerid].SpawnedCar = samp.CreateVehicle(model, player.position.x, player.position.y, player.position.z, player.position.angle, color1, color2);
     player.PutPlayerInVehicle(Player.Info[player.playerid].SpawnedCar, 0);
-    player.SendClientMessage(data.colors.LIGHT_YELLOW, `You have spawned a {00BBF6}${samp.vehicleNames(model-400)} (ID: ${model}){BBFF00} with colors: {00BBF6}${color1} & ${color2}{BBFF00}!`);
+    player.SendClientMessage(data.colors.LIGHT_YELLOW, `You have spawned a {00BBF6}${samp.vehicleNames[model-400]} (ID: ${model}){BBFF00} with colors: {00BBF6}${color1} & ${color2}{BBFF00}!`);
 }
 
 function isReportIdExists(id) {
@@ -3677,9 +3677,23 @@ samp.OnRconLoginAttempt((ip, password, success) => {
 });
 
 samp.OnPlayerKeyStateChange((player, newkeys, oldkeys) => {
-    if(newkeys & samp.KEY.FIRE && player.IsPlayerInAnyVehicle()) {
-	    if(IsNosVehicle(player.vehicleId)) samp.AddVehicleComponent(player.vehicleId, 1010);
-	} 
+    if(newkeys & samp.KEY.FIRE) {
+        if(!player.IsPlayerInAnyVehicle()) return;
+        if(IsNosVehicle(player.vehicleId)) samp.AddVehicleComponent(player.vehicleId, 1010);
+    }
+    if(newkeys & samp.KEY.YES) {
+        if(!player.IsPlayerInAnyVehicle()) return;
+        if(player.GetPlayerState() != samp.PLAYER_STATE.DRIVER) return;
+        let angle = samp.GetVehicleZAngle(player.vehicleId);
+        samp.SetVehiclePos(player.vehicleId, player.position.x, player.position.y, player.position.z);
+        samp.SetVehicleZAngle(player.vehicleId, angle);
+        player.GameTextForPlayer("~n~~n~~n~~n~~n~~n~~n~~n~~y~~h~Vehicle Flipped", 2000, 3);
+    }
+    if(newkeys & samp.KEY.SUBMISSION) {
+        if(!player.IsPlayerInAnyVehicle()) return;
+        samp.RepairVehicle(player.vehicleId);
+        player.PlayerPlaySound(1133, 0.0, 0.0, 0.0);
+    }
     return true;
 });
 
