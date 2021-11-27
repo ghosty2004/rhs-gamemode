@@ -17,6 +17,7 @@ const Clan = require("./modules/clan");
 const Dialog = require("./modules/dialog");
 const Errors = require("./modules/errors");
 const events = require("./modules/events");
+const Function = require("./modules/functions");
 const Gang = require("./modules/gang");
 const Minigames = require("./modules/minigames");
 const con = require("./modules/mysql"); 
@@ -36,8 +37,7 @@ const TextDraws = require("./textdraws");
 const ServerLogs = ["", "", ""];
 
 /* Functions */
-const { getRandomInt, getPlayer, timestampToHMS } = require("./modules/functions");
-const functions = require("./modules/functions");
+const { getPlayer } = require("./modules/functions");
 
 /* Data's */
 const data = {
@@ -75,7 +75,7 @@ process.on('uncaughtException', function (err) {
 /* ===================== */
 CMD.on("acceptlogin", (player) => {
     if(!Player.Info[player.playerid].DiscordLoginRequest.From) return SendError(player, "You don't have a login request from discord!");
-    let code = getRandomInt(10000, 99999);
+    let code = Function.getRandomInt(10000, 99999);
     Player.Info[player.playerid].DiscordLoginRequest.Code = code;
     let user = Discord.bot.users.cache.get(Player.Info[player.playerid].DiscordLoginRequest.From);
     user.send(`Login request from **${player.GetPlayerName(24)}(${player.playerid})**\nType here the code from server.`).then(() => {
@@ -113,28 +113,21 @@ CMD.on("createclan", (player) => {
 });
 
 CMD.on("car", (player, params) => {
-    if(params[0]) {
-        try {
-            let index = samp.vehicleNames.findIndex(f => f.toLowerCase().includes(params[0].toLowerCase()));
-            if(index == -1) return SendError(player, "Invalid vehicle name!");
-            SpawnCar(player, (400+index), 0, 0);
-        }
-        catch(e) {
-            console.log(e.stack)
-        }
-    }
-    else SendUsage(player, "/Car [ID/Name]");
+    if(!params[0]) return SendUsage(player, "/car [Name/Model] [Color1] [Color2]");
+    let index, color1 = Function.getRandomInt(0, 255), color2 = Function.getRandomInt(0, 255);
+    if(isNaN(params[0])) index = samp.vehicleNames.findIndex(f => f.toLowerCase().includes(params[0].toLowerCase()));
+    else index = parseInt(params[0]) - 400;
+    if(index <= -1) return SendError(player, "Invalid vehicle name!");
+    if(!isNaN(params[1])) color1 = parseInt(params[1]);
+    if(!isNaN(params[2])) color2 = parseInt(params[2]);
+    SpawnCar(player, (400+index), color1, color2);
 });
 
-CMD.on("v", (player, params) => { CMD.emit("car", player, params); });
+CMD.on("v", (player, params) => { 
 
-CMD.on("nrg", (player) => {
-    if(player.IsPlayerInAnyVehicle()) return SendError(player, "Ai deja un vehicul!", "You are already in a vehicle!");
-    let color1 = getRandomInt(0, 255);
-    let color2 = getRandomInt(0, 255);
-    player.SendClientMessage(data.colors.LIGHT_YELLOW, `You have spawned a NRG-500 (ID: 522) with colors: ${color1} & ${color2}!`);
-    SpawnCar(player, 522, color1, color2);
 });
+
+CMD.on("nrg", (player) => { SpawnCar(player, 522); });
 
 CMD.on("ro", (player) => {
     player.SendClientMessage(data.colors.YELLOW, "Ti-ai schimbat limba in {FF0000}Romana{FFFF00}!");
@@ -245,12 +238,17 @@ CMD.on("market", (player) => {
     
 });
 
-CMD.on("brb", (player) => {
+CMD.on("brb", (player) => { AfkBrb(player, 0); });
 
-});
+CMD.on("afk", (player) => { AfkBrb(player, 1); });
 
 CMD.on("back", (player) => {
-
+    if(!Player.Info[player.playerid].AFK) return;
+    samp.GameTextForAll(`~n~~n~~n~~n~~n~~n~~r~~h~${player.GetPlayerName(24)} ~w~~h~is ~g~~h~Back`, 5000, 5);
+    player.SetPlayerVirtualWorld(0);
+    player.SetCameraBehindPlayer();
+    for(let i = 0; i < 4; i++) player.TextDrawHideForPlayer(TextDraws.server.afk_brb[i]);
+    Player.Info[player.playerid].AFK = false;
 });
 
 CMD.on("accept", (player) => {
@@ -574,7 +572,7 @@ CMD.on("ramp", (player) => {
 });
 
 CMD.on("statsserver", async (player) => {
-    let OnlineTime = timestampToHMS(Server.Info.StartTime);
+    let OnlineTime = Function.timestampToHMS(Server.Info.StartTime);
 
     let info = "";
     info += `{BBFF00}Server has been started for{00BBF6} ${OnlineTime.hours} {BBFF00}hours, {00BBF6}${OnlineTime.minutes} {BBFF00}minutes {00BBF6}${OnlineTime.seconds} {BBFF00}seconds\n`;
@@ -1492,7 +1490,7 @@ CMD.on("gm", (player) => {
     result.forEach((i) => {
         info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t{00BBF6}${getGangRank(Player.Info[i.playerid].Gang_Data.Rank)}\n`;
     });
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Clan Members: {FF0000}${result.length}{AFAFAF} online - {FF0000}${Gang.Info[Player.Info[player.playerid].Gang].name}`, info, "Close", "");
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Gang Members: {FF0000}${result.length}{AFAFAF} online - {FF0000}${Gang.Info[Player.Info[player.playerid].Gang].name}`, info, "Close", "");
 });
 
 CMD.on("gstats", (player, params) => {
@@ -1597,18 +1595,16 @@ CMD.on("ginfo", async (player, params) => {
 });
 
 CMD.on("gtop", (player) => {
-    con.query("SELECT name, kills FROM gangs ORDER BY kills DESC LIMIT 10", function(err, result) {
-        let info = "{FFFFFF}Our best Gangs are here!\n";
-        if(!err && result) {
-            info += "\n";
-            for(let i = 0; i < result.length; i++) {
-                info += `{FF0000}${i+1}. {FF0000}${result[i].name}: {00BBF6}${result[i].kills} {BBFF00}Points\n`;
-            }
-        }
-        info += "\n";
-        info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
-        player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Gangs", info, "Ok", "");
+    let info = "{FFFFFF}Our best Gangs are here!\n";
+    info += "\n";
+    let count = 0;
+    Gang.Get().sort(function(a, b){return b.points-a.points}).forEach((i) => {
+        count++;
+        info += `{FF0000}${count}. {${Function.decimalToHexString(i.color)}}${i.name}: {00BBF6}${i.points} {BBFF00}Points\n`;
     });
+    info += "\n";
+    info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Gangs", info, "Ok", "");
 });
 
 /* ============== */
@@ -2007,6 +2003,7 @@ CMD.on("set", (player, params) => {
                     player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Admin level to {FF0000}${getAdminRank(params[2], false)}{FFFF00}!`);
                     Player.Info[target.playerid].Admin = params[2];
                     checkReportsTD(target);
+                    UpdateRankLabelFor(target);
                     SendACMD(player, "Set Admin");
                     break;
                 }
@@ -2016,6 +2013,7 @@ CMD.on("set", (player, params) => {
                     target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Vip level to {FF0000}${getVIPRank(params[2], false)}{FFFF00}!`);
                     player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Vip level to {FF0000}${getVIPRank(params[2], false)}{FFFF00}!`);
                     Player.Info[target.playerid].VIP = params[2];
+                    UpdateRankLabelFor(target);
                     SendACMD(player, "Set Vip");
                     break;
                 }
@@ -2452,6 +2450,34 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function ShowRankLabelFor(player) {
+    if(!Player.Info[player.playerid].Rank_Label) {
+        Player.Info[player.playerid].Rank_Label = Streamer.CreateDynamic3DTextLabel(getPlayerRankInLabel(player), -1, 0, 0, 0.40000000596046, 50, player.playerid);
+    }
+}
+
+function HideRankLabelFor(player) {
+    if(Player.Info[player.playerid].Rank_Label) {
+        Streamer.DestroyDynamic3DTextLabel(Player.Info[player.playerid].Rank_Label);
+    }
+}
+
+function UpdateRankLabelFor(player) {
+    if(Player.Info[player.playerid].Rank_Label) {
+        Streamer.UpdateDynamic3DTextLabelText(Player.Info[player.playerid].Rank_Label, -1, getPlayerRankInLabel(player));
+    }
+}
+
+function AfkBrb(player, type) {
+    /* Types: 0 = brb | 1 = afk */
+    samp.GameTextForAll(`~n~~n~~n~~n~~n~~n~~r~~h~${player.GetPlayerName(24)} ~w~~h~will ~y~~h~${type == 0 ? "BRB" : "AFK"}`, 5000, 5);
+    player.SetPlayerVirtualWorld(player.playerid);
+    player.SetPlayerCameraPos(320.22311401367, -1874.7312011719, 63.627601623535);
+    player.SetPlayerCameraLookAt(319.22338867188, -1874.7430419922, 63.60758972168);
+    for(let i = 0; i < 4; i++) player.TextDrawShowForPlayer(TextDraws.server.afk_brb[i]);
+    Player.Info[player.playerid].AFK = true;
+}
+
 function startCapture(gangid, turfid) {
 
 }
@@ -2499,7 +2525,7 @@ function getTotalUsersInThisGang(GangID) {
 function JoinGang(player, GangID, Rank) {
     Player.Info[player.playerid].Gang = GangID;
     Player.Info[player.playerid].Gang_Data.Rank = Rank;
-    Player.Info[player.playerid].Gang_Data.MemberSince = functions.getBeatifulDate();
+    Player.Info[player.playerid].Gang_Data.MemberSince = Function.getBeatifulDate();
     Player.Info[player.playerid].Gang_Data.ConnectTime = Math.floor(Date.now() / 1000);
     player.SpawnPlayer();
 }
@@ -2515,7 +2541,7 @@ function LeaveGang(player) {
     Player.Info[player.playerid].Gang_Data.OnlineTime.Hours = 0;
     Player.Info[player.playerid].Gang_Data.OnlineTime.Minutes = 0;
     Player.Info[player.playerid].Gang_Data.OnlineTime.Seconds = 0;
-    Player.Info[player.playerid].Gang_Data.MemberSince = functions.getBeatifulDate();
+    Player.Info[player.playerid].Gang_Data.MemberSince = Function.getBeatifulDate();
     Player.Info[player.playerid].Gang_Data.ConnectTime = Math.floor(Date.now() / 1000);
     player.SpawnPlayer();
 }
@@ -2590,13 +2616,15 @@ function CheckSpecTextDraw(player) {
     }
 }
 
-function SpawnCar(player, model, color1, color2) {
+function SpawnCar(player, model, color1=Function.getRandomInt(0, 255), color2=Function.getRandomInt(0, 255)) {
+    if(player.IsPlayerInAnyVehicle()) return SendError(player, "Ai deja un vehicul!", "You are already in a vehicle!");
     if(Player.Info[player.playerid].SpawnedCar) {
         samp.DestroyVehicle(Player.Info[player.playerid].SpawnedCar);
         Player.Info[player.playerid].SpawnedCar = null;
     }
     Player.Info[player.playerid].SpawnedCar = samp.CreateVehicle(model, player.position.x, player.position.y, player.position.z, player.position.angle, color1, color2);
     player.PutPlayerInVehicle(Player.Info[player.playerid].SpawnedCar, 0);
+    player.SendClientMessage(data.colors.LIGHT_YELLOW, `You have spawned a {00BBF6}${samp.vehicleNames(model-400)} (ID: ${model}){BBFF00} with colors: {00BBF6}${color1} & ${color2}{BBFF00}!`);
 }
 
 function isReportIdExists(id) {
@@ -2681,7 +2709,7 @@ function getRegistredPlayersCount() {
 
 function Updater() {
     /* Server HostName Changer */
-    samp.SendRconCommand(`hostname ${data.settings.RANDOM_SERVER_NAMES[getRandomInt(0, data.settings.RANDOM_SERVER_NAMES.length)]}`);
+    samp.SendRconCommand(`hostname ${data.settings.RANDOM_SERVER_NAMES[Function.getRandomInt(0, data.settings.RANDOM_SERVER_NAMES.length)]}`);
     //samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => { savePlayer(i); });
 }
 
@@ -3047,15 +3075,18 @@ function SetupPlayerForSpawn(player, type=0) {
             }
             player.SetPlayerColor(Clan.Info[Player.Info[player.playerid].Clan].color);
             player.SetPlayerSkin(Player.Info[player.playerid].Clan_Rank == 3 || Player.Info[player.playerid].Clan_Rank == 2 ? Clan.Info[Player.Info[player.playerid].Clan].skin.leader : Clan.Info[Player.Info[player.playerid].Clan].skin.member);
-            for(let i = 0; i < 6; i++) {
-                player.GivePlayerWeapon(Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
-            }
+            Clan.Info[Player.Info[player.playerid].Clan].weapons.forEach((i) => {
+                player.GivePlayerWeapon(i, 9999);
+            });
         }
         else if(Player.Info[player.playerid].Gang) { /* Gang Spawn */
             let position = Gang.Info[Player.Info[player.playerid].Gang].position;
             player.SetPlayerPos(position[0], position[1], position[2]);
             player.SetPlayerFacingAngle(position[3]);
             player.SetPlayerColor(Gang.Info[Player.Info[player.playerid].Gang].color);
+            Gang.Info[Player.Info[player.playerid].Gang].weapons.forEach((i) => {
+                player.GivePlayerWeapon(i, 9999);
+            });
         }
         else SetupPlayerForSpawn(player, 1);
     }
@@ -3211,6 +3242,21 @@ function getVIPRank(rank, hex=true) {
         case 4: string = `${hex ? "{FFFFFF}" : ""}White`; break;
     }
     return string;
+}
+
+function getPlayerRankInLabel(player) {
+    let tag = "";
+    if(Player.Info[player.playerid].RconType == 3) tag = `{FFFFFF}${getRconRank(3)}`;
+    else if(Player.Info[player.playerid].RconType == 2) tag = `{FFFFFF}${getRconRank(2)}`;
+    else if(Player.Info[player.playerid].RconType == 1) tag = `{FFFFFF}${getRconRank(1)}`;
+    else if(Player.Info[player.playerid].Admin == 3) tag = "{0072FF}Master";
+    else if(Player.Info[player.playerid].Admin == 2) tag = "{FFFF00}Senior";
+    else if(Player.Info[player.playerid].Admin == 1) tag = "{FF0000}Junior";
+    else if(Player.Info[player.playerid].VIP == 4) tag = "{FFFFFF}VIP";
+    else if(Player.Info[player.playerid].VIP == 3) tag = "{0077FF}VIP";
+    else if(Player.Info[player.playerid].VIP == 2) tag = "{FFFF00}VIP";
+    else if(Player.Info[player.playerid].VIP == 1) tag = "{FF0000}VIP";
+    return tag;
 }
 
 function getPlayerRankInChat(player) {
@@ -3622,6 +3668,7 @@ samp.OnRconLoginAttempt((ip, password, success) => {
                 }
                 else {
                     SendMessageToAdmins(-1, `RCON LOGIN: ${i.GetPlayerName(24)}(${i.playerid}) has logged in as a ${getRconRank(Player.Info[i.playerid].RconType)} successfully with permission enabled!`);
+                    UpdateRankLabelFor(i);
                 }
             });
         });
@@ -3705,6 +3752,8 @@ samp.OnPlayerConnect(async(player) => {
 samp.OnPlayerDisconnect((player, reason) => {
     savePlayer(player);
 
+    HideRankLabelFor(player);
+
     Player.ResetVariables(player.playerid);
     checkReportsTD();
 
@@ -3744,7 +3793,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.GANG: {
             if(response) {
                 switch(listitem) {
-                    case 0: CMD.emit("ginfo", player); break;
+                    case 0: CMD.emit("ginfo", player, []); break;
                     case 1: CMD.emit("gstats", player, []); break;
                     case 2: CMD.emit("gm", player); break;
                     case 3: CMD.emit("gcmds", player); break;
@@ -4536,6 +4585,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                     case 0: {
                         if(Player.Info[player.playerid].VIP >= 1) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
                         Player.Info[player.playerid].VIP = 1;
+                        UpdateRankLabelFor(player);
                         samp.SendClientMessageToAll(data.colors.LIGHT_YELLOW, `INFO:{00BBF6} ${player.GetPlayerName(24)}(${player.playerid}){BBFF00} a cumparat{FF0000} VIP Rosu{BBFF00} Gratis, Pentru a cumpara VIP, scrie /BuyVIP!`);
                         let info = "";
                         info += "{00FF00}Ai cumparat cu succes {FF0000}VIP Red{00FF00} Gratis!\n";
@@ -4615,7 +4665,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                 PreparatePlayerLogin(player);
             }
             else {
-                let tag = getRandomInt(1, 99999);
+                let tag = Function.getRandomInt(1, 99999);
                 player.SetPlayerName(`[${tag}]TempName`);
                 PreparatePlayerLogin(player);
             }
@@ -4696,7 +4746,7 @@ samp.OnPlayerText((player, text) => {
     samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}${getPlayerRankInChat(player)}{00CCFF}(${player.playerid}):{FFFFFF} ${text}`);
 
     if(text.toLowerCase().startsWith(data.settings.BUSTER_PREFIX.toLowerCase())) {
-        samp.SendClientMessageToAll(data.colors.RED, `${data.settings.BUSTER_PREFIX}: ${data.settings.BUSTER_RESPONSES[getRandomInt(0, data.settings.BUSTER_RESPONSES.length)]}`);
+        samp.SendClientMessageToAll(data.colors.RED, `${data.settings.BUSTER_PREFIX}: ${data.settings.BUSTER_RESPONSES[Function.getRandomInt(0, data.settings.BUSTER_RESPONSES.length)]}`);
     }
     return false;
 });
@@ -4708,6 +4758,7 @@ samp.OnPlayerCommandText((player, cmdtext) => {
         cmdtext = params[0].toLowerCase();
         params.shift();
         if(isPlayerInSpecialZone(player) && cmdtext != "leave") return player.GameTextForPlayer("~w~~h~Use ~r~~h~/Leave ~w~~h~to ~r~~h~Leave~w~~h~!", 4000, 4);
+        if(Player.Info[player.playerid].AFK && cmdtext != "back") return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use~n~~r~~h~Commands~w~~h~!", 3000, 4);
         if(CMD.eventNames().some(s => s == cmdtext)) {
             CMD.emit(cmdtext, player, params);
         }
@@ -4724,10 +4775,12 @@ samp.OnPlayerSpawn((player) => {
     HideConnectTextDraw(player);
     ShowSpawnTextDraw(player);
     player.SetPlayerVirtualWorld(0);
-    if(Player.Info[player.playerid].Mail == "none") {
+    if(Player.Info[player.playerid].Mail == "none" && Player.Info[player.playerid].Need_Mail_Showed == false) {
         player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
+        Player.Info[player.playerid].Need_Mail_Showed = true;
     }
     SetupPlayerForSpawn(player);
     ShowGangZonesForPlayer(player);
+    ShowRankLabelFor(player);
     return true;
 });

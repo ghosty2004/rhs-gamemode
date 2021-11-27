@@ -10,11 +10,69 @@ const {
 const { SV_NAME, SERVER_WEB } = require("../data/settings");
 
 module.exports = {
+    afk_brb: {},
     reports: null,
     logs: null,
     spawn: {},
     connect: {},
     Load: function() {
+        /* AFK/Brb TextDraw */
+        this.afk_brb[0] = TextDrawCreate(153.000000, 306.000000, "~g~~h~]                ]");
+        TextDrawLetterSize(this.afk_brb[0], 0.509999, 1.700000);
+        TextDrawTextSize(this.afk_brb[0], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.afk_brb[0], 0);
+        TextDrawColor(this.afk_brb[0], 0xFFFFFFFF);
+        TextDrawUseBox(this.afk_brb[0], 0);
+        TextDrawBoxColor(this.afk_brb[0], 0x80808080);
+        TextDrawSetShadow(this.afk_brb[0], 1);
+        TextDrawSetOutline(this.afk_brb[0], 0);
+        TextDrawBackgroundColor(this.afk_brb[0], 0x000000FF);
+        TextDrawFont(this.afk_brb[0], 0);
+        TextDrawSetProportional(this.afk_brb[0], 1);
+        TextDrawSetSelectable(this.afk_brb[0], 0);
+        
+        this.afk_brb[1] = TextDrawCreate(131.000000, 324.000000, "Type ~g~~h~/Back ~w~~h~to return.");
+        TextDrawLetterSize(this.afk_brb[1], 0.509999, 1.900000);
+        TextDrawTextSize(this.afk_brb[1], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.afk_brb[1], 0);
+        TextDrawColor(this.afk_brb[1], 0xFFFFFFFF);
+        TextDrawUseBox(this.afk_brb[1], 0);
+        TextDrawBoxColor(this.afk_brb[1], 0x80808080);
+        TextDrawSetShadow(this.afk_brb[1], 1);
+        TextDrawSetOutline(this.afk_brb[1], 0);
+        TextDrawBackgroundColor(this.afk_brb[1], 0x000000FF);
+        TextDrawFont(this.afk_brb[1], 1);
+        TextDrawSetProportional(this.afk_brb[1], 1);
+        TextDrawSetSelectable(this.afk_brb[1], 0);
+
+        this.afk_brb[2] = TextDrawCreate(177.000000, 306.000000, "~g~~h~BRB~w~~h~ / ~g~~h~AFK");
+        TextDrawLetterSize(this.afk_brb[2], 0.519999, 1.900000);
+        TextDrawTextSize(this.afk_brb[2], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.afk_brb[2], 0);
+        TextDrawColor(this.afk_brb[2], 0xFFFFFFFF);
+        TextDrawUseBox(this.afk_brb[2], 0);
+        TextDrawBoxColor(this.afk_brb[2], 0x80808080);
+        TextDrawSetShadow(this.afk_brb[2], 1);
+        TextDrawSetOutline(this.afk_brb[2], 0);
+        TextDrawBackgroundColor(this.afk_brb[2], 0x000000FF);
+        TextDrawFont(this.afk_brb[2], 1);
+        TextDrawSetProportional(this.afk_brb[2], 1);
+        TextDrawSetSelectable(this.afk_brb[2], 0);
+
+        this.afk_brb[3] = TextDrawCreate(169.000000, 283.000000, "You ~g~~h~are ~w~~h~now.");
+        TextDrawLetterSize(this.afk_brb[3], 0.430000, 2.599999);
+        TextDrawTextSize(this.afk_brb[3], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.afk_brb[3], 0);
+        TextDrawColor(this.afk_brb[3], 0xFFFFFFFF);
+        TextDrawUseBox(this.afk_brb[3], 0);
+        TextDrawBoxColor(this.afk_brb[3], 0x80808080);
+        TextDrawSetShadow(this.afk_brb[3], 1);
+        TextDrawSetOutline(this.afk_brb[3], 0);
+        TextDrawBackgroundColor(this.afk_brb[3], 0x000000FF);
+        TextDrawFont(this.afk_brb[3], 1);
+        TextDrawSetProportional(this.afk_brb[3], 1);
+        TextDrawSetSelectable(this.afk_brb[3], 0);
+
         /* Reports TextDraw */
         this.reports = TextDrawCreate(546.000000, 30.000000, "");
         TextDrawLetterSize(this.reports, 0.299997, 1.100000);

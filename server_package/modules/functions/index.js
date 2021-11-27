@@ -22,5 +22,15 @@ module.exports = {
         const d = new Date();
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         return `${("0" + d.getDate()).slice(-2)} ${monthNames[d.getMonth()]}, ${d.getFullYear()}`;
+    },
+    decimalToHexString: function(number) {
+        if(number < 0) {
+            number = 0xFFFFFFFF + number + 1;
+        }
+        let hex = "";
+        for(let i = 0; i < 6; i++) {
+            hex += `${number.toString(16)[i]}`;
+        }
+        return hex;
     }
 }

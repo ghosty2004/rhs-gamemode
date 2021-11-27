@@ -128,7 +128,10 @@ module.exports = {
             SpawnedCar: -1,
             Spectating: -1,
             YouTubeSearchResults: [],
-            CageObjects: []
+            CageObjects: [],
+            AFK: false,
+            Need_Mail_Showed: false,
+            Rank_Label: null
         }
     }
 };

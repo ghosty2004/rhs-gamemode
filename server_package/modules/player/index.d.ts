@@ -124,7 +124,10 @@ export declare const Info: {
     SpawnedCar: number,
     Spectating: number,
     YouTubeSearchResults: Array<any>,
-    CageObjects: Array<any>
+    CageObjects: Array<any>,
+    AFK: boolean,
+    Need_Mail_Showed: boolean,
+    Rank_Label: null|number
 }[]
 
 export declare function ResetVariables(playerid: number): void;
