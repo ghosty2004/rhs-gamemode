@@ -2376,6 +2376,9 @@ CMD.on("giveweapon", (player, params) => {
 
 CMD.on("write", (player, params) => {
     if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params.slice(0).join(" ")) return SendUsage(player, "/Write [Text]");
+    samp.SendClientMessageToAll(-1, params.slice(0).join(" "));
+    SendACMD(player, "Write");
 });
 
 CMD.on("ahall", (player) => {
