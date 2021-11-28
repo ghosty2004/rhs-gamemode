@@ -1943,6 +1943,15 @@ CMD.on("jailed", (player) => {
 
 CMD.on("getinfo", (player, params) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0]) return SendUsage(player, "/GetInfo [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    let info = "Name\tValue";
+    info += `Name\t${target.GetPlayerName(24)}\n`;
+    info += `ID\t${target.playerid}\n`;
+    info += `IP\t${target.GetPlayerIp(16)}\n`;
+    info += `Position\t${JSON.stringify(target.GetPlayerPos())}`;
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, "Get Info", info, "Close", "");
 });
 
 CMD.on("jail", (player, params) => {
