@@ -24,7 +24,7 @@ module.exports = {
                     GangZone: GangZoneCreate(territory_position[0], territory_position[1], territory_position[2], territory_position[3])
                 },
                 capturing: {
-                    time: 30,
+                    time: 100,
                     turf: -1,
                     interval: null
                 }

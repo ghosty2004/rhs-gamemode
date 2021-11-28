@@ -7,7 +7,7 @@ module.exports = {
         return Math.floor(Math.random() * (max - min) + min); 
     },
     getPlayer: function(IDOrName) { 
-        let result = getPlayers().filter(f => f.GetPlayerName(24).toLowerCase().includes(`${IDOrName}`.toLowerCase()) || f.playerid == IDOrName)[0];
+        let result = getPlayers().filter(f => f.GetPlayerName(24).toLowerCase().includes(`${IDOrName}`.toLowerCase()) || f.playerid == Number(IDOrName))[0];
         if(result) return result;
         else return 0;
     },

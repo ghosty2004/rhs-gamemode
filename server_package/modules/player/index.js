@@ -43,7 +43,8 @@ module.exports = {
                 },
                 MemberSince: getBeatifulDate(),
                 ConnectTime: Math.floor(Date.now() / 1000),
-                Capturing: false
+                Capturing: false,
+                Capturing_Label: null
             },
             Kills_Data: {
                 Kills: 0,

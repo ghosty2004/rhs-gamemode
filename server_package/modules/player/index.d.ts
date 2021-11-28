@@ -39,7 +39,8 @@ export declare const Info: {
         },
         MemberSince: string,
         ConnectTime: number,
-        Capturing: boolean
+        Capturing: boolean,
+        Capturing_Label: null|number
     },
     Kills_Data: {
         Kills: number,

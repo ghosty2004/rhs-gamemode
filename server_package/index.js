@@ -1507,16 +1507,16 @@ CMD.on("gstats", (player, params) => {
     if(!Player.Info[target.playerid].Gang) return SendError(player, target == player ? Errors.NOT_MEMBER_OF_ANY_GANG : Errors.PLAYER_NOT_IN_ANY_GANG);
     let OnlineTimeGang = TotalGameTimeGang(target);
     let info = "";
-    info += `{BBFF00}Gang: {49FFFF}${Gang.Info[Player.Info[player.playerid].Gang].name}\n`;
-    info += `{BBFF00}Kills: {49FFFF}${Player.Info[player.playerid].Gang_Data.Kills}\n`;
-    info += `{BBFF00}Deaths: {49FFFF}${Player.Info[player.playerid].Gang_Data.Deaths}\n`;
-    info += `{BBFF00}Captures: {49FFFF}${Player.Info[player.playerid].Gang_Data.Captures}\n`;
-    info += `{BBFF00}Points: {49FFFF}${Player.Info[player.playerid].Gang_Data.Points}\n`;
-    info += `{BBFF00}Warnings: {49FFFF}${Player.Info[player.playerid].Gang_Data.Warns}/3\n`;
-    info += `{BBFF00}Rank: {49FFFF}${getGangRank(Player.Info[player.playerid].Gang_Data.Rank)}\n`;
+    info += `{BBFF00}Gang: {49FFFF}${Gang.Info[Player.Info[target.playerid].Gang].name}\n`;
+    info += `{BBFF00}Kills: {49FFFF}${Player.Info[target.playerid].Gang_Data.Kills}\n`;
+    info += `{BBFF00}Deaths: {49FFFF}${Player.Info[target.playerid].Gang_Data.Deaths}\n`;
+    info += `{BBFF00}Captures: {49FFFF}${Player.Info[target.playerid].Gang_Data.Captures}\n`;
+    info += `{BBFF00}Points: {49FFFF}${Player.Info[target.playerid].Gang_Data.Points}\n`;
+    info += `{BBFF00}Warnings: {49FFFF}${Player.Info[target.playerid].Gang_Data.Warns}/3\n`;
+    info += `{BBFF00}Rank: {49FFFF}${getGangRank(Player.Info[target.playerid].Gang_Data.Rank)}\n`;
     info += `{BBFF00}Time: {49FFFF}${OnlineTimeGang.hours} {BBFF00}hrs, {49FFFF}${OnlineTimeGang.minutes} {BBFF00}mins, {49FFFF}${OnlineTimeGang.seconds} {BBFF00}secs\n`;
     info += "\n";
-    info += `{FFFF99}Gang member since, {49FFFF}${Player.Info[player.playerid].Gang_Data.MemberSince}{FFFF99}!`;
+    info += `{FFFF99}Gang member since, {49FFFF}${Player.Info[target.playerid].Gang_Data.MemberSince}{FFFF99}!`;
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s Gang Stats!`, info, "Ok", "");
 });
 
@@ -1541,6 +1541,9 @@ CMD.on("capture", (player, params) => {
             let zone = GetPlayerGangZone(player);
             if(!zone) return SendError(player, "You are not in a Gang Territory!");
             if(zone.owner == Player.Info[player.playerid].Gang) return SendError(player, "This Territory is already owned by your Gang!");
+            if(Gang.Get().filter(f => f.capturing.turf == zone.GangZone)[0]) return SendError(player, "This territory is in war!");
+            if(Gang.Info[zone.owner].capturing.turf != -1) return SendError(player, "This territory owner is in another war!");
+            if(Gang.Get().filter(f => Gang.GetOwnedGangZones(Player.Info[zone.owner].Gang).some(s => s == f.capturing.turf) && f.capturing.turf != -1)[0]) return SendError(player, "This territory owner is in another war!");
             startCapture(player, zone.GangZone);
             break;
         }
@@ -1557,11 +1560,13 @@ CMD.on("capture", (player, params) => {
             if(zone.GangZone != Gang.Info[Player.Info[player.playerid].Gang].capturing.turf) return SendError(player, "You are not in the war territory!");
             player.GameTextForPlayer("~g~~h~Start killing!~n~~r~~h~don't leave the territory!", 3000, 3);
             Player.Info[player.playerid].Gang_Data.Capturing = true;
+            ShowCapturingLabelFor(player);
             break;
         }
         case "leave": {
             if(Player.Info[player.playerid].Gang_Data.Capturing) return SendError(player, "You are already joined in a territory war!");
             Player.Info[player.playerid].Gang_Data.Capturing = false;
+            HideCapturingLabelFor(player);
             break;
         }
         case "info": {
@@ -2486,22 +2491,31 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function ShowCapturingLabelFor(player) {
+    if(Player.Info[player.playerid].Gang_Data.Capturing_Label) return;
+    Player.Info[player.playerid].Gang_Data.Capturing_Label = Streamer.CreateDynamic3DTextLabel("Capturing...", -16776961, 0, 0, 0, 50, player.playerid);
+}
+
+function HideCapturingLabelFor(player) {
+    if(!Player.Info[player.playerid].Gang_Data.Capturing_Label) return;
+    Streamer.DestroyDynamic3DTextLabel(Player.Info[player.playerid].Gang_Data.Capturing_Label);
+    Player.Info[player.playerid].Gang_Data.Capturing_Label = null;
+}
+
 function ShowRankLabelFor(player) {
-    if(!Player.Info[player.playerid].Rank_Label) {
-        Player.Info[player.playerid].Rank_Label = Streamer.CreateDynamic3DTextLabel(getPlayerRankInLabel(player), -1, 0, 0, 0.40000000596046, 50, player.playerid);
-    }
+    if(Player.Info[player.playerid].Rank_Label) return
+    Player.Info[player.playerid].Rank_Label = Streamer.CreateDynamic3DTextLabel(getPlayerRankInLabel(player), -1, 0, 0, 0.40000000596046, 50, player.playerid);
 }
 
 function HideRankLabelFor(player) {
-    if(Player.Info[player.playerid].Rank_Label) {
-        Streamer.DestroyDynamic3DTextLabel(Player.Info[player.playerid].Rank_Label);
-    }
+    if(!Player.Info[player.playerid].Rank_Label) return;
+    Streamer.DestroyDynamic3DTextLabel(Player.Info[player.playerid].Rank_Label);
+    Player.Info[player.playerid].Rank_Label = null;
 }
 
 function UpdateRankLabelFor(player) {
-    if(Player.Info[player.playerid].Rank_Label) {
-        Streamer.UpdateDynamic3DTextLabelText(Player.Info[player.playerid].Rank_Label, -1, getPlayerRankInLabel(player));
-    }
+    if(!Player.Info[player.playerid].Rank_Label) return;
+    Streamer.UpdateDynamic3DTextLabelText(Player.Info[player.playerid].Rank_Label, -1, getPlayerRankInLabel(player));
 }
 
 function AfkBrb(player, type) {
@@ -2519,6 +2533,8 @@ function startCapture(player, zone) {
     let PlayerID = player.playerid;
 
     Player.Info[PlayerID].Gang_Data.Capturing = true;
+
+    ShowCapturingLabelFor(player);
 
     samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == GangID).forEach((i) => {
         i.GameTextForPlayer(`~h~~h~Territory war started by~n~~r~~h~${player.GetPlayerName(24)}~n~~y~~h~/capture join~n~~y~~h~/capture info`, 4000, 3);
@@ -2546,7 +2562,7 @@ function winCapture(GangID) {
     samp.GangZoneStopFlashForAll(zone);
     samp.GangZoneShowForAll(zone, Gang.Info[GangID].color);
 
-    Gang.Info[GangID].capturing.time = 30;
+    Gang.Info[GangID].capturing.time = 100;
     Gang.Info[GangID].capturing.turf = -1;
     clearInterval(Gang.Info[GangID].capturing.interval);
     Gang.Info[GangID].capturing.interval = null;
@@ -2569,6 +2585,7 @@ function winCapture(GangID) {
             Player.Info[i.playerid].Gang_Data.Captures++;
             Player.Info[i.playerid].Gang_Data.Points += 10;
             Player.Info[i.playerid].Gang_Data.Capturing = false;
+            HideCapturingLabelFor(i);
         }
     }); 
 }
@@ -2578,7 +2595,7 @@ function loseCapture(GangID) {
     samp.GangZoneStopFlashForAll(zone);
     samp.GangZoneShowForAll(zone, Gang.Get().filter(f => f.territory.GangZone == zone)[0].color);
 
-    Gang.Info[GangID].capturing.time = 30;
+    Gang.Info[GangID].capturing.time = 100;
     Gang.Info[GangID].capturing.turf = -1;
     clearInterval(Gang.Info[GangID].capturing.interval);
     Gang.Info[GangID].capturing.interval = null;
@@ -2595,12 +2612,15 @@ function loseCapture(GangID) {
         i.GameTextForPlayer("~w~~h~Your Gang has~n~~r~~h~failed capturing~n~~w~~h~the territory!", 4000, 3);
         i.TextDrawHideForPlayer(TextDraws.server.attack_territory);
         if(Player.Info[i.playerid].Gang_Data.Capturing) Player.Info[i.playerid].Gang_Data.Capturing = false;
+        HideCapturingLabelFor(i);
     });
 }
 
 function ShowGangZonesForPlayer(player) {
     Gang.Get().forEach((i) => {
         player.GangZoneShowForPlayer(i.territory.GangZone, Gang.Get().filter(f => f.territory.owner == i.territory.owner)[0].color);
+        let capturing = Gang.Get().filter(f => f.capturing.turf == i.territory.GangZone)[0];
+        if(capturing) player.GangZoneFlashForPlayer(i.territory.GangZone, capturing.color);
     });
 }
 
@@ -2989,7 +3009,7 @@ function TotalGameTime(player) {
 }
 
 function kickPlayer(player) {
-    setTimeout(player.Kick, 200);
+    setTimeout(player.Kick(), 200);
 }
 
 function SendACMD(player, cmdtext) {
@@ -3969,6 +3989,7 @@ samp.OnPlayerDisconnect((player, reason) => {
     savePlayer(player);
 
     HideRankLabelFor(player);
+    HideCapturingLabelFor(player);
 
     Player.ResetVariables(player.playerid);
     checkReportsTD();

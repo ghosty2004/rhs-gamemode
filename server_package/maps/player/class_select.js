@@ -1,7 +1,6 @@
 module.exports = {
     Objects: [],
     Load: function(player) {
-        this.UnLoad();
         this.Objects = [
             player.CreatePlayerObject(19128, -1486.909302, 1642.108398, 1059.624146, 0.000000, 0.000000, 0.000000, 350.0),
             player.CreatePlayerObject(957, -1486.676758, 1639.842163, 1059.705200, 180.000000, 0.000000, 0.000000, 350.0),
@@ -56,6 +55,9 @@ module.exports = {
         player.SetPlayerObjectMaterial(this.Objects[this.Objects.length-1], 1, 14808, "lee_strip2", "strip_neon_Curtain", 0);
     },
     UnLoad: function(player) {
-        this.Objects.forEach((i) => { player.DestroyPlayerObject(i); });
+        if(this.Objects.length != 0) {
+            this.Objects.forEach((i) => { player.DestroyPlayerObject(i); });
+            this.Objects = [];
+        }
     }
 }
