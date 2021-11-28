@@ -8,6 +8,7 @@ const samp = require("samp-node-lib");
 const colors = require("colors");
 const md5 = require("md5");
 const YouTubeSearch = require("youtube-search-without-api-key");
+const hastebin = require("hastebin-gen");
 
 /* YouTube Audio Stream Module */
 require("youtube-audio-server").listen(7777);
@@ -5170,4 +5171,11 @@ samp.OnPlayerSpawn((player) => {
     ShowGangZonesForPlayer(player);
     ShowRankLabelFor(player);
     return true;
+});
+
+/* Small part of Discord BOT */
+Discord.bot.on("showCommands", (message) => {
+    hastebin("/" + replaceAll(CMD.eventNames().toString(), ",", "\n/"), "txt").then((result) => {
+        message.channel.send(result);
+    });
 });

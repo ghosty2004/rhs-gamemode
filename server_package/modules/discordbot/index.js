@@ -26,7 +26,7 @@ bot.login(DISCORD_BOT.TOKEN).catch((error) => {
 });
 
 /* Custom Modules */
-const { DiscordCommand } = require("../events");
+const { DiscordCommand, Command } = require("../events");
 const con = require("../mysql");
 const { getPlayer } = require("../functions");
 
@@ -126,6 +126,10 @@ CMD.on("users", (message) => {
             });
         });
     });
+});
+
+CMD.on("servercommands", (message) => {
+    bot.emit("showCommands", message);
 });
 
 /* ========== */
