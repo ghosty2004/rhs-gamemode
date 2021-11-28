@@ -2445,8 +2445,8 @@ CMD.on("saveall", (player) => {
         savePlayer(i);
         i.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has saved your {FF0000}account{FFFF00}!`);
     });
-    for(let i = 0; i < Gang.Get().length; i++) saveGang(i);
     for(let i = 0; i < Clan.Get().length; i++) saveClan(i);
+    for(let i = 0; i < Gang.Get().length; i++) saveGang(i);
     SendACMD(player, "SaveAll");
 });
 
@@ -3145,9 +3145,11 @@ function saveClan(clanId) {
 function saveGang(gangId) {
     if(!Gang.Exists(gangId)) return;
     con.query("UPDATE gangs SET name = ?, position = ?, weapon = ?, color = ?, alliance = ?, points = ?, captures = ?, kills = ?, deaths = ?, territory_position = ? WHERE ID = ?", [
-        Gang.Info[gangId].name, JSON.stringify(Gang.Info[gangId].position), JSON.stringify(Gang.Info[gangId].weapons), Gang.Info[gangId].color, Gang.Info[gangId].alliance,
-        Gang.Info[gangId].points, Gang.Info[gangId].captures, Gang.Info[gangId].kills, Gang.Info[gangId].deaths, gangId
-    ]);
+        Gang.Info[gangId].name, JSON.stringify(Gang.Info[gangId].position), JSON.stringify(Gang.Info[gangId].weapons), Gang.Info[gangId].color, Gang.Info[gangId].alliance, Gang.Info[gangId].points, Gang.Info[gangId].captures, 
+        Gang.Info[gangId].kills, Gang.Info[gangId].deaths, JSON.stringify([Gang.Info[gangId].territory.MinX, Gang.Info[gangId].territory.MinY, Gang.Info[gangId].territory.MaxX, Gang.Info[gangId].territory.MaxY]), gangId
+    ], function(err, result) {
+        if(err) console.log(err);
+    });
 }
 
 function savePlayer(player) {
