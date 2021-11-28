@@ -2061,6 +2061,13 @@ CMD.on("caps", (player) => {
 
 CMD.on("disarm", (player, params) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0]) return SendError(player, "/Disarm [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    target.ResetPlayerWeapons();
+    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has disarmed you!`);
+    player.SendClientMessage(data.colors.YELLOW, `You have disarmed {FF0000}${target.GetPlayerName(24)}{FFFF00}!`);
+    SendACMD(player, "Disarm");
 });
 
 CMD.on("set", (player, params) => {
