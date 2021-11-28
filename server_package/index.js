@@ -2466,7 +2466,7 @@ CMD.on("teleplayer", (player, params) => {
     let target1 = getPlayer(params[0]);
     let target2 = getPlayer(params[1]);
     if(!target1 || !target2) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
-    target1.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has teleported you to player {FF0000}${target2.GetPlayerName(24)}!`);
+    target1.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has teleported you to player {FF0000}${target2.GetPlayerName(24)}{FFFF00}!`);
     target2.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has teleported {FF0000}${target1.GetPlayerName(24)} {FFFF00}to your location!`);
     player.SendClientMessage(data.colors.YELLOW, `You have teleported player {FF0000}${target1.GetPlayerName(24)} {FFFF00} to {FF0000}${target2.GetPlayerName(24)} {FFFF00}location!`);
     SendACMD(player, "TelePlayer");
