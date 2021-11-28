@@ -2431,6 +2431,8 @@ CMD.on("announcedmevent", (player) => {
 
 CMD.on("songforalloff", (player) => {
     if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    samp.getPlayers().forEach((i) => { i.StopAudioStreamForPlayer(); });
+    SendACMD(player, "SongForAllOff");
 });
 
 CMD.on("teleplayer", (player, params) => {
