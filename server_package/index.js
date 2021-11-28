@@ -1267,8 +1267,11 @@ CMD.on("vipchat", (player) => {
     if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
 });
 
-CMD.on("weaps", (player) => {
+CMD.on("weaps", (player, params) => {
     if(Player.Info[player.playerid].VIP < 2 && Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    if(!params[0]) return SendUsage(player, "/Weaps [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
 });
 
 CMD.on("godmode", (player) => {
