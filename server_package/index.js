@@ -2462,6 +2462,11 @@ CMD.on("giveallweapon", (player, params) => {
 
 CMD.on("spawnall", (player) => {
     if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
+        i.SpawnPlayer();
+        i.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has spawned all players{FFFF00}!`);
+    });
+    SendACMD(player, "SpawnAll");
 });
 
 CMD.on("muteall", (player, params) => {
