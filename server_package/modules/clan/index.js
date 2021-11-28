@@ -30,5 +30,11 @@ module.exports = {
     ExistsName: function(name) {
         if(Object.entries(this.Info).some(s => s.some(s => s.name == name))) return true;
         else return false;
+    },
+    Get: function() {
+        let data = Object.entries(this.Info);
+        let value = [];
+        for(let i = 0; i < data.length; i++) { value.push(data[i][1]); }
+        return value;
     }
 }

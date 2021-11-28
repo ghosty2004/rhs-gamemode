@@ -2445,6 +2445,8 @@ CMD.on("saveall", (player) => {
         savePlayer(i);
         i.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has saved your {FF0000}account{FFFF00}!`);
     });
+    for(let i = 0; i < Gang.Get().length; i++) saveGang(i);
+    for(let i = 0; i < Clan.Get().length; i++) saveClan(i);
     SendACMD(player, "SaveAll");
 });
 
@@ -3140,6 +3142,14 @@ function saveClan(clanId) {
     ]);
 }
 
+function saveGang(gangId) {
+    if(!Gang.Exists(gangId)) return;
+    con.query("UPDATE gangs SET name = ?, position = ?, weapon = ?, color = ?, alliance = ?, points = ?, captures = ?, kills = ?, deaths = ?, territory_position = ? WHERE ID = ?", [
+        Gang.Info[gangId].name, JSON.stringify(Gang.Info[gangId].position), JSON.stringify(Gang.Info[gangId].weapons), Gang.Info[gangId].color, Gang.Info[gangId].alliance,
+        Gang.Info[gangId].points, Gang.Info[gangId].captures, Gang.Info[gangId].kills, Gang.Info[gangId].deaths, gangId
+    ]);
+}
+
 function savePlayer(player) {
     if(!Player.Info[player.playerid].LoggedIn) return;
     let OnlineTime = TotalGameTime(player);
@@ -3589,7 +3599,7 @@ function ShowCMDS(player, page) {
             info += `{FF0000}/hidetag {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Ascunde-ti tie sau celorlalti jucatori tag-ul!" : "Hide your/others' tag."}\n`;
             info += `{FF0000}/vCmds {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Vezi o lista cu comenzile de VIP." : "View a list with all VIP Commands."}\n`;
             info += `{FF0000}/vup {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Activeaza/Dezactiveaza functia de VUP a vehiculului." : "Activate/Deactivate Vehicle's VUP Function."}\n`;
-            player.ShowPlayerDialog(Dialog.CMDS_2, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Comenzi - Pagina {FF0000}2", "Commands - Page {FF0000}2"), info, Lang(player, "Pagina 1", "Page 1"), Lang(player, "Pagin 3", "Page 3"));
+            player.ShowPlayerDialog(Dialog.CMDS_2, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Comenzi - Pagina {FF0000}2", "Commands - Page {FF0000}2"), info, Lang(player, "Pagina 1", "Page 1"), Lang(player, "Pagina 3", "Page 3"));
             break;
         }
         case 3: {
@@ -3738,8 +3748,6 @@ function LoadPlayerStats(player) {
                     info += "{FFFFFF}Adauga o parola secundara folosind comanda {FF0000}/Spassword{FFFFFF}!";
                 }
                 player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
-
-                //player.SpawnPlayer();
             }
         }
         else player.Kick();
