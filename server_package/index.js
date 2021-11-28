@@ -2442,6 +2442,7 @@ CMD.on("teleplayer", (player, params) => {
 /* ===================== */
 CMD.on("gethere", (player, params) => {
     if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    CMD.emit("get", player, params);
 });
 
 CMD.on("getall", (player) => {
