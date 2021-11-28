@@ -3009,7 +3009,10 @@ function TotalGameTime(player) {
 }
 
 function kickPlayer(player) {
-    setTimeout(player.Kick(), 200);
+    setTimeout(() => {
+        try { player.Kick(); }
+        catch {}
+    }, 200);
 }
 
 function SendACMD(player, cmdtext) {
