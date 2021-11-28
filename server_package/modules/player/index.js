@@ -42,7 +42,8 @@ module.exports = {
                     Seconds: 0
                 },
                 MemberSince: getBeatifulDate(),
-                ConnectTime: Math.floor(Date.now() / 1000)
+                ConnectTime: Math.floor(Date.now() / 1000),
+                Capturing: false
             },
             Kills_Data: {
                 Kills: 0,
@@ -131,8 +132,7 @@ module.exports = {
             CageObjects: [],
             AFK: false,
             Need_Mail_Showed: false,
-            Rank_Label: null,
-            Capturing: false
+            Rank_Label: null
         }
     }
 };

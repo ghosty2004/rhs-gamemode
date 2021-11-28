@@ -1495,7 +1495,7 @@ CMD.on("gm", (player) => {
     let info = "Name\tRank\n";
     let result = samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == Player.Info[player.playerid].Gang);
     result.forEach((i) => {
-        info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t{00BBF6}${getGangRank(Player.Info[i.playerid].Gang_Data.Rank)} ${Player.Info[i.playerid].Capturing ? "{FF0000}(Capturing)" : ""}\n`;
+        info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t{00BBF6}${getGangRank(Player.Info[i.playerid].Gang_Data.Rank)} ${Player.Info[i.playerid].Gang_Data.Capturing ? "{FF0000}(Capturing)" : ""}\n`;
     });
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Gang Members: {FF0000}${result.length}{AFAFAF} online - {FF0000}${Gang.Info[Player.Info[player.playerid].Gang].name}`, info, "Close", "");
 });
@@ -1550,18 +1550,18 @@ CMD.on("capture", (player, params) => {
             break;
         }
         case "join": {
-            if(Player.Info[player.playerid].Capturing) return SendError(player, "You are already joined in a territory war!");
+            if(Player.Info[player.playerid].Gang_Data.Capturing) return SendError(player, "You are already joined in a territory war!");
             if(Gang.Info[Player.Info[player.playerid].Gang].capturing.turf == -1) return SendError(player, "Your gang is not in a territory war!");
             let zone = GetPlayerGangZone(player);
             if(!zone) return SendError(player, "You are not in a Gang Territory!");
             if(zone.GangZone != Gang.Info[Player.Info[player.playerid].Gang].capturing.turf) return SendError(player, "You are not in the war territory!");
             player.GameTextForPlayer("~g~~h~Start killing!~n~~r~~h~don't leave the territory!", 3000, 3);
-            Player.Info[player.playerid].Capturing = true;
+            Player.Info[player.playerid].Gang_Data.Capturing = true;
             break;
         }
         case "leave": {
-            if(Player.Info[player.playerid].Capturing) return SendError(player, "You are already joined in a territory war!");
-            Player.Info[player.playerid].Capturing = false;
+            if(Player.Info[player.playerid].Gang_Data.Capturing) return SendError(player, "You are already joined in a territory war!");
+            Player.Info[player.playerid].Gang_Data.Capturing = false;
             break;
         }
         case "info": {
@@ -2516,7 +2516,7 @@ function startCapture(player, zone) {
     let GangID = Player.Info[player.playerid].Gang;
     let PlayerID = player.playerid;
 
-    Player.Info[PlayerID].Capturing = true;
+    Player.Info[PlayerID].Gang_Data.Capturing = true;
 
     samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == GangID).forEach((i) => {
         i.GameTextForPlayer(`~h~~h~Territory war started by~n~~r~~h~${player.GetPlayerName(24)}~n~~y~~h~/capture join~n~~y~~h~/capture info`, 4000, 3);
@@ -2563,10 +2563,10 @@ function winCapture(GangID) {
     samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == GangID).forEach((i) => {
         i.GameTextForPlayer("~g~~h~Your Gang has~n~~r~~h~succesfully captured~n~~w~~h~the territory!~n~~y~~h~+10 gang points", 4000, 3);
         i.TextDrawHideForPlayer(TextDraws.server.attack_territory);
-        if(Player.Info[i.playerid].Capturing) {
+        if(Player.Info[i.playerid].Gang_Data.Capturing) {
             Player.Info[i.playerid].Gang_Data.Captures++;
             Player.Info[i.playerid].Gang_Data.Points += 10;
-            Player.Info[i.playerid].Capturing = false;
+            Player.Info[i.playerid].Gang_Data.Capturing = false;
         }
     }); 
 }
@@ -2592,7 +2592,7 @@ function loseCapture(GangID) {
     samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == GangID).forEach((i) => {
         i.GameTextForPlayer("~w~~h~Your Gang has~n~~r~~h~failed capturing~n~~w~~h~the territory!", 4000, 3);
         i.TextDrawHideForPlayer(TextDraws.server.attack_territory);
-        if(Player.Info[i.playerid].Capturing) Player.Info[i.playerid].Capturing = false;
+        if(Player.Info[i.playerid].Gang_Data.Capturing) Player.Info[i.playerid].Gang_Data.Capturing = false;
     });
 }
 
@@ -2670,8 +2670,7 @@ function LeaveGang(player) {
     Player.Info[player.playerid].Gang_Data.OnlineTime.Seconds = 0;
     Player.Info[player.playerid].Gang_Data.MemberSince = Function.getBeatifulDate();
     Player.Info[player.playerid].Gang_Data.ConnectTime = Math.floor(Date.now() / 1000);
-
-    if(Player.Info[player.playerid].Capturing) Player.Info[player.playerid].Capturing = false;
+    Player.Info[player.playerid].Gang_Data.Capturing = false;
 
     player.SpawnPlayer();
 }
@@ -3181,7 +3180,6 @@ function UpdatePlayerDB(player, column, value) {
 
 function SetupPlayerForSpawn(player, type=0) { 
     player.SetPlayerColor(0xFFFFFFAA);
-    player.SetPlayerSkin(0);
     player.SetPlayerVirtualWorld(0);
     player.SetPlayerInterior(0);
     player.ResetPlayerWeapons();
@@ -3741,7 +3739,7 @@ function LoadPlayerStats(player) {
                 }
                 player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
 
-                player.SpawnPlayer();
+                //player.SpawnPlayer();
             }
         }
         else player.Kick();
@@ -3781,7 +3779,24 @@ samp.OnGameModeInit(() => {
 
     setInterval(Updater, 10000); /* An interval */
 
-    samp.AddPlayerClass(0, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); /* Player Class */
+    samp.AddPlayerClass(217, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // stunt man
+    samp.AddPlayerClass(122, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // pirate
+    samp.AddPlayerClass(23, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // skater
+    samp.AddPlayerClass(28, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // nigga
+    samp.AddPlayerClass(101, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // civil
+    samp.AddPlayerClass(115, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // mafia
+    samp.AddPlayerClass(116, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // mafia
+    samp.AddPlayerClass(53, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // killer
+    samp.AddPlayerClass(78, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // pops
+    samp.AddPlayerClass(134, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // killer
+    samp.AddPlayerClass(135, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // killer
+    samp.AddPlayerClass(137, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // zombie
+    samp.AddPlayerClass(93, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // girl
+    samp.AddPlayerClass(192, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // girl
+    samp.AddPlayerClass(193, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // girl
+    samp.AddPlayerClass(12, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // girl
+    samp.AddPlayerClass(55, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // girl
+    samp.AddPlayerClass(91, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // girl
     
     samp.DisableInteriorEnterExits();
     samp.UsePlayerPedAnims();
@@ -3834,6 +3849,40 @@ samp.OnPlayerKeyStateChange((player, newkeys, oldkeys) => {
         samp.RepairVehicle(player.vehicleId);
         player.PlayerPlaySound(1133, 0.0, 0.0, 0.0);
     }
+    return true;
+});
+
+samp.OnPlayerRequestClass((player, classid) => {
+    let string = "";
+    switch(classid) {
+        case 0: string = "~y~~h~Stunt man"; break;
+        case 1: string = "~r~~h~Pirate"; break;
+        case 2: string = "~y~~h~Skater"; break;
+        case 3: string = "~r~~h~Nigga"; break;
+        case 4: string = "~y~~h~Civil"; break;
+        case 5: string = "~r~~h~Mafia"; break;
+        case 6: string = "~y~~h~Mafia"; break;
+        case 7: string = "~r~~h~Killer"; break;
+        case 8: string = "~y~~h~Pops"; break;
+        case 9: string = "~r~~h~Killer"; break;
+        case 10: string = "~y~~h~Killer"; break;
+        case 11: string = "~y~~h~Z~r~~h~o~y~~h~m~r~~h~b~y~~h~i~r~~h~e"; break;
+        case 12: case 13: case 14: case 15: case 16: case 17: string = "~p~~h~Girl"; break;
+    }
+    player.GameTextForPlayer(string, 3000, 6);
+    player.SetPlayerInterior(14);
+    player.SetPlayerVirtualWorld(1000 + player.playerid);
+    player.SetPlayerPos(-1486.6014, 1641.9365, 1060.6945);
+    player.SetPlayerFacingAngle(44.9541);
+    player.SetPlayerSpecialAction(5);
+    player.SetPlayerCameraPos(-1490.8479003906, 1646.2893066406, 1062.2905273438);
+    player.SetPlayerCameraLookAt(-1490.1550292969, 1645.5900878906, 1062.1146240234);
+    return true;
+});
+
+samp.OnPlayerRequestSpawn((player) => {
+    if(!Player.Info[player.playerid].LoggedIn) return false;
+    Maps.Custom.PlayerObj_Class_Select.UnLoad(player);
     return true;
 });
 
@@ -3900,6 +3949,8 @@ samp.OnPlayerConnect(async(player) => {
         Server.Info.NewJoinedPlayers++;
 
         AddToTDLogs(`~r~~h~${player.GetPlayerName(24)}(${player.playerid}) ~y~~h~joined the server!`);
+
+        Maps.Custom.PlayerObj_Class_Select.Load(player);
     }
     return true;
 });

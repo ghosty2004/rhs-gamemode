@@ -38,7 +38,8 @@ export declare const Info: {
             Seconds: number
         },
         MemberSince: string,
-        ConnectTime: number
+        ConnectTime: number,
+        Capturing: boolean
     },
     Kills_Data: {
         Kills: number,
@@ -127,8 +128,7 @@ export declare const Info: {
     CageObjects: Array<any>,
     AFK: boolean,
     Need_Mail_Showed: boolean,
-    Rank_Label: null|number,
-    Capturing: boolean
+    Rank_Label: null|number
 }[]
 
 export declare function ResetVariables(playerid: number): void;

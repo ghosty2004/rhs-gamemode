@@ -37,6 +37,9 @@ const SF = require("./others/sf");
 const Spawn = require("./others/spawn");
 const Voller = require("./others/voller");
 
+/* Player's Objects */
+const PlayerObj_Class_Select = require("./player/class_select");
+
 /* Stunt Zones */
 const AA = require("./stuntzones/aa");
 const Chrome = require("./stuntzones/chrome");
@@ -105,5 +108,6 @@ module.exports = {
         LSAir.RemoveBuilding(player);
         LVAir.RemoveBuilding(player);
         SFAir.RemoveBuilding(player);
-    }
+    },
+    Custom: { PlayerObj_Class_Select }
 }
