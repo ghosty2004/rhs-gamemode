@@ -2474,6 +2474,11 @@ CMD.on("unmuteall", (player) => {
 
 CMD.on("disarmall", (player) => {
     if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
+        i.ResetPlayerWeapons();
+        i.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has disarmed all players{FFFF00}!`);
+    });
+    SendACMD(player, "DisarmAll");
 });
 
 CMD.on("freezeall", (player) => {
@@ -2541,22 +2546,6 @@ CMD.on("unban", async (player, params) => {
     }
     else player.SendClientMessage(data.colors.YELLOW, `Player {FF0000}${params[0]} {FFFF00}is not exists in database!`);
 });
-
-/*CMD.on("createteleport", (player, params) => {
-    if(params[0] && params.slice(1).join(" ")) {
-        if(!Teleport.Exists(params[0])) {
-            params[0] = params[0].replace("/", "");
-            con.query("INSERT INTO teleports (command, name, position) VALUES(?, ?, ?)", [params[0], params.slice(1).join(" "), JSON.stringify([player.position.x, player.position.y, player.position.z, player.position.angle])], function(err, result) {
-                if(!err) {
-                    Teleport.Create(result.insertId, params[0], params.slice(1).join(" "), [player.position.x, player.position.y, player.position.z, player.position.angle]);
-                    player.SendClientMessage(data.colors.LIGHT_YELLOW, `You have successfully created teleport {FFFFFF}/${params[0]} {BBFF00}with ID {FFFFFF}${result.insertId}{BBFF00}.`);
-                }
-            });
-        }
-        else SendError(player, "This teleport already exists.");
-    }
-    else SendUsage(player, "/CreateTeleport [Command] [Name]");
-});*/
 
 /* =============== */
 /* SA:MP Functions */
