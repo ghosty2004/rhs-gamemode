@@ -1,4 +1,5 @@
 declare interface Info {
+    id: number,
     name: string,
     owner: number,
     position: Array<number>,

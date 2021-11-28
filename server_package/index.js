@@ -1399,6 +1399,11 @@ CMD.on("songforall", (player, params) => {
     });
 });
 
+CMD.on("songforme", (player, params) => {
+    if(!params[0]) return SendUsage(player, "/SongForMe [URL]");
+    player.PlayAudioStreamForPlayer(params[0]);
+});
+
 /* ============== */
 /* Gangs Commands */
 /* ============== */
@@ -1605,7 +1610,48 @@ CMD.on("gtank", (player) => {
 });
 
 CMD.on("base", (player) => {
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+    if(Gang.Get().filter(f => f.territory.owner == Player.Info[player.playerid].Gang).length == 0) return SendError(player, "Your Gang don't own any teritories!");
+    let info = "";
+    for(let i = 0; i < Gang.Get().length; i++) {
+        if(Gang.Get()[i].territory.owner == Player.Info[player.playerid].Gang) {
+            info += `{33CC00}${Gang.Get()[i].name}\n`;
+        }
+    }
+    player.ShowPlayerDialog(Dialog.BASE_TELEPORT, samp.DIALOG_STYLE.LIST, "Base Teleport", info, "Teleport", "Cancel");
+});
 
+CMD.on("og", (player) => {
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+    let gang = Gang.Get().filter(f => player.IsPlayerInRangeOfPoint(10, f.gate.position[0], f.gate.position[1], f.gate.position[2]) && f.gate.object)[0];
+    if(!gang) return SendError(player, "You are not close to a gang gate!");
+    if(gang.id != Player.Info[player.playerid].Gang) return SendError(player, "You are not member of this gang gate!");
+    openGate(gang.id);
+});
+
+CMD.on("cg", (player) => {
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+    let gang = Gang.Get().filter(f => player.IsPlayerInRangeOfPoint(10, f.gate.position[0], f.gate.position[1], f.gate.position[2]) && f.gate.object)[0];
+    if(!gang) return SendError(player, "You are not close to a gang gate!");
+    if(gang.id != Player.Info[player.playerid].Gang) return SendError(player, "You are not member of this gang gate!");
+    closeGate(gang.id);
+});
+
+CMD.on("g", (player) => {
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+    let gang = Gang.Get().filter(f => player.IsPlayerInRangeOfPoint(10, f.gate.position[0], f.gate.position[1], f.gate.position[2]) && f.gate.object)[0];
+    if(!gang) return SendError(player, "You are not close to a gang gate!");
+    if(gang.id != Player.Info[player.playerid].Gang) return SendError(player, "You are not member of this gang gate!");
+    openGate(gang.id);
+    setTimeout(closeGate, 5000, gang.id);  
+});
+
+CMD.on("blow", (player) => {
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+});
+
+CMD.on("repair", (player) => {
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("gang", (player) => {
@@ -2456,8 +2502,8 @@ CMD.on("saveall", (player) => {
         savePlayer(i);
         i.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has saved your {FF0000}account{FFFF00}!`);
     });
-    for(let i = 0; i < Clan.Get().length; i++) saveClan(i);
-    for(let i = 0; i < Gang.Get().length; i++) saveGang(i);
+    Clan.Get().forEach((i) => { saveClan(i.id); });
+    Gang.Get().forEach((i) => { saveGang(i.id); });
     SendACMD(player, "SaveAll");
 });
 
@@ -2497,6 +2543,14 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function openGate(GangID) {
+    samp.MoveObject(Gang.Info[GangID].gate.object, Gang.Info[GangID].gate.position[0], Gang.Info[GangID].gate.position[1], Gang.Info[GangID].gate.position[2]-6, 9);
+}
+
+function closeGate(GangID) {
+    samp.MoveObject(Gang.Info[GangID].gate.object, Gang.Info[GangID].gate.position[0], Gang.Info[GangID].gate.position[1], Gang.Info[GangID].gate.position[2], 9);
+}
+
 function ShowRankLabelFor(player) {
     if(Player.Info[player.playerid].Rank_Label) return
     Player.Info[player.playerid].Rank_Label = Streamer.CreateDynamic3DTextLabel(getPlayerRankInLabel(player), -1, 0, 0, 0.40000000596046, 50, player.playerid);
@@ -2557,7 +2611,7 @@ function winCapture(GangID) {
     samp.GangZoneStopFlashForAll(zone);
     samp.GangZoneShowForAll(zone, Gang.Info[GangID].color);
 
-    Gang.Info[GangID].capturing.time = 100;
+    Gang.Info[GangID].capturing.time = 10;
     Gang.Info[GangID].capturing.turf = -1;
     clearInterval(Gang.Info[GangID].capturing.interval);
     Gang.Info[GangID].capturing.interval = null;
@@ -2590,7 +2644,7 @@ function loseCapture(GangID) {
     samp.GangZoneStopFlashForAll(zone);
     samp.GangZoneShowForAll(zone, Gang.Get().filter(f => f.territory.GangZone == zone)[0].color);
 
-    Gang.Info[GangID].capturing.time = 100;
+    Gang.Info[GangID].capturing.time = 10;
     Gang.Info[GangID].capturing.turf = -1;
     clearInterval(Gang.Info[GangID].capturing.interval);
     Gang.Info[GangID].capturing.interval = null;
@@ -3291,8 +3345,10 @@ function LoadGangs() {
         for(let i = 0; i < result.length; i++) {
             let position = JSON.parse(result[i].position);
             let weapons = JSON.parse(result[i].weapon);
+            let base_position = JSON.parse(result[i].base_position);
+            let gate_position = JSON.parse(result[i].gate_position);
             let territory_position = JSON.parse(result[i].territory_position);
-            Gang.Create(result[i].ID, result[i].name, [position[0], position[1], position[2], position[3]], weapons, result[i].color, result[i].alliance, result[i].points, result[i].captures, result[i].kills, result[i].deaths, [territory_position[0], territory_position[1], territory_position[2], territory_position[3]]);  
+            Gang.Create(result[i].ID, result[i].name, position, weapons, result[i].color, result[i].alliance, result[i].points, result[i].captures, result[i].kills, result[i].deaths, base_position, result[i].gate_objectid, gate_position, territory_position);  
         }
         console.log(`Loaded ${result.length} gangs.`);
     });
@@ -4022,6 +4078,24 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.BASE_TELEPORT: {
+            if(response) {
+                if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+                let count = 0;
+                for(let i = 0; i < Gang.Get().length; i++) {
+                    if(Gang.Get()[i].territory.owner == Player.Info[player.playerid].Gang) {
+                        if(count == listitem) {
+                            player.SetPlayerPos(Gang.Get()[i].base_position[0], Gang.Get()[i].base_position[1], Gang.Get()[i].base_position[2]);
+                            player.SetPlayerFacingAngle(Gang.Get()[i].base_position[3]);
+                            player.GameTextForPlayer("~g~~h~Teleported to~n~~r~~h~gang base", 3000, 3);
+                            break;
+                        }
+                        else count++;
+                    }
+                }
+            }
+            break;
+        }
         case Dialog.YOUTUBE_SEARCH: {
             if(response) {
                 for(let i = 0; i < Player.Info[player.playerid].YouTubeSearchResults.length; i++) {

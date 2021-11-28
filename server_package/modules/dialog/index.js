@@ -57,5 +57,6 @@ module.exports = {
     TRADE_REQUEST: 55,
     EVENT: 56,
     GANG: 57,
-    YOUTUBE_SEARCH: 58
+    YOUTUBE_SEARCH: 58,
+    BASE_TELEPORT: 59
 }
