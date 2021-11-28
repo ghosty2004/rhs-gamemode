@@ -131,7 +131,8 @@ module.exports = {
             CageObjects: [],
             AFK: false,
             Need_Mail_Showed: false,
-            Rank_Label: null
+            Rank_Label: null,
+            Capturing: false
         }
     }
 };

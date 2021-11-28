@@ -127,7 +127,8 @@ export declare const Info: {
     CageObjects: Array<any>,
     AFK: boolean,
     Need_Mail_Showed: boolean,
-    Rank_Label: null|number
+    Rank_Label: null|number,
+    Capturing: boolean
 }[]
 
 export declare function ResetVariables(playerid: number): void;
