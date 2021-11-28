@@ -2005,6 +2005,13 @@ CMD.on("uncage", (player, params) => {
 
 CMD.on("explode", (player, params) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0]) return SendUsage(player, "/Explode [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    samp.CreateExplosion(target.position.x, target.position.y, target.position.z, 7, 5);
+    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has exploded you{FFFF00}!`);
+    player.SendClientMessage(data.colors.YELLOW, `You have exploded {FF0000}${target.GetPlayerName(24)}{FFFF00}!`);
+    SendACMD(player, "Explode");
 });
 
 CMD.on("ip", (player, params) => {
