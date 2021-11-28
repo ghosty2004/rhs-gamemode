@@ -6,8 +6,10 @@ module.exports = {
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min) + min); 
     },
-    getPlayer: function(IDOrName) { 
-        let result = getPlayers().filter(f => f.GetPlayerName(24).toLowerCase().includes(`${IDOrName}`.toLowerCase()) || f.playerid == Number(IDOrName))[0];
+    getPlayer: function(IDOrName) {
+        let result; 
+        if(!isNaN(IDOrName)) result = getPlayers().filter(f => f.playerid == parseInt(IDOrName))[0];
+        else result = getPlayers().filter(f => f.GetPlayerName(24).toLowerCase().includes(`${IDOrName}`.toLowerCase()))[0];
         if(result) return result;
         else return 0;
     },

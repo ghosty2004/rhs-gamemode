@@ -1548,8 +1548,14 @@ CMD.on("capture", (player, params) => {
             break;
         }
         case "stop": {
-            if(Gang.Info[Player.Info[player.playerid].Gang].capturing.turf == -1) return SendError(player, "Your gang is not in a territory war!");
             if(player.GetPlayerVirtualWorld() != 0) return SendError(player, "You can capture stop a gang only being in /vw 0!");
+            let zone = GetPlayerGangZone(player);
+            if(!zone) return SendError(player, "You are not in a Gang Territory!");
+            let DefendGangZone = Gang.Get().filter(f => f.capturing.turf == zone.GangZone)[0];
+            if(!DefendGangZone) return SendError(player, "This territory is not attacked!");
+            if(Player.Info[player.playerid].Gang != zone.owner) return SendError(player, "You are not member of this territory owner Gang!");
+            if(samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == DefendGangZone.id && GetPlayerGangZone(f) == zone).length != 0) return SendError(player, "Eliminate all players from this territory and try again!");
+            loseCapture(DefendGangZone.id);
             break;
         }
         case "join": {
@@ -2491,17 +2497,6 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
-function ShowCapturingLabelFor(player) {
-    if(Player.Info[player.playerid].Gang_Data.Capturing_Label) return;
-    Player.Info[player.playerid].Gang_Data.Capturing_Label = Streamer.CreateDynamic3DTextLabel("Capturing...", -16776961, 0, 0, 0, 50, player.playerid);
-}
-
-function HideCapturingLabelFor(player) {
-    if(!Player.Info[player.playerid].Gang_Data.Capturing_Label) return;
-    Streamer.DestroyDynamic3DTextLabel(Player.Info[player.playerid].Gang_Data.Capturing_Label);
-    Player.Info[player.playerid].Gang_Data.Capturing_Label = null;
-}
-
 function ShowRankLabelFor(player) {
     if(Player.Info[player.playerid].Rank_Label) return
     Player.Info[player.playerid].Rank_Label = Streamer.CreateDynamic3DTextLabel(getPlayerRankInLabel(player), -1, 0, 0, 0.40000000596046, 50, player.playerid);
@@ -2614,6 +2609,17 @@ function loseCapture(GangID) {
         if(Player.Info[i.playerid].Gang_Data.Capturing) Player.Info[i.playerid].Gang_Data.Capturing = false;
         HideCapturingLabelFor(i);
     });
+}
+
+function ShowCapturingLabelFor(player) {
+    if(Player.Info[player.playerid].Gang_Data.Capturing_Label) return;
+    Player.Info[player.playerid].Gang_Data.Capturing_Label = Streamer.CreateDynamic3DTextLabel("Capturing...", -16776961, 0, 0, 0, 50, player.playerid);
+}
+
+function HideCapturingLabelFor(player) {
+    if(!Player.Info[player.playerid].Gang_Data.Capturing_Label) return;
+    Streamer.DestroyDynamic3DTextLabel(Player.Info[player.playerid].Gang_Data.Capturing_Label);
+    Player.Info[player.playerid].Gang_Data.Capturing_Label = null;
 }
 
 function ShowGangZonesForPlayer(player) {
