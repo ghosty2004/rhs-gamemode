@@ -2415,6 +2415,9 @@ CMD.on("read", (player, params) => {
 
 CMD.on("rac", (player) => {
     if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    samp.getAllVehicle().filter(f => !isVehicleOccupied(f)).forEach((i) => { samp.SetVehicleToRespawn(i); })
+    samp.SendClientMessageToAll(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has respawned all unused cars!`);
+    SendACMD(player, "Rac");
 });
 
 CMD.on("dmevent", (player) => {
@@ -2579,6 +2582,10 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function isVehicleOccupied(vehicleid) {
+    return samp.getPlayers().filter(f => f.IsPlayerInVehicle(vehicleid))[0];
+}
+
 function openGate(GangID) {
     samp.MoveObject(Gang.Info[GangID].gate.object, Gang.Info[GangID].gate.position[0], Gang.Info[GangID].gate.position[1], Gang.Info[GangID].gate.position[2]-6, 9);
 }
