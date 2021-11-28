@@ -2446,6 +2446,11 @@ CMD.on("gethere", (player, params) => {
 
 CMD.on("getall", (player) => {
     if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
+        i.SetPlayerPos(player.position.x, player.position.y, player.position.z);
+        i.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has teleported all players to his location{FFFF00}!`);
+    });
+    SendACMD(player, "GetAll");
 });
 
 CMD.on("akill", (player, params) => {
