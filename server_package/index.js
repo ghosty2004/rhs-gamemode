@@ -1037,9 +1037,11 @@ CMD.on("sellcar", (player) => {
     if(PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID).length == 0) return SendError(player, "You don't have any personal vehicle to use this command!");
     let car = PCar.Info.filter(f => f.vehicle == player.vehicleId && f.owner == Player.Info[player.playerid].AccID && player.IsPlayerInAnyVehicle())[0];
     if(!car) return SendError(player, "You need to drive your personal vehicle to use this command!");
-    con.query("DELETE FROM personalcars WHERE ID = ?", [car.id], function(err, result) {
+    con.query("DELETE FROM personalcars WHERE ID = ?", [car.id], async function(err, result) {
         if(err) return SendError(player, Errors.UNEXPECTED);
-        player.SendClientMessage(data.colors.YELLOW, `You have successfully sold your vehicle!`);
+        let price_back = car.from_admin == 0 ? Math.floor(await GetPersonalCarPrice(car.model)/2) : 0;
+        player.SendClientMessage(data.colors.YELLOW, `You have successfully sold your vehicle! You got {FF0000}+${Function.numberWithCommas(price_back)} {FFFF00}coins back!`);
+        Player.Info[player.playerid].Coins += price_back;
         samp.DestroyVehicle(car.vehicle);
         PCar.Delete(car.id);
     });
@@ -1051,6 +1053,16 @@ CMD.on("mycar", (player) => {
     player.GameTextForPlayer(`~r~~h~${player.GetPlayerName(24)}~n~~g~~h~welcome back to your~n~~y~~h~${samp.vehicleNames[car.model-400]}`, 4000, 4);
     samp.SetVehiclePos(car.vehicle, player.position.x, player.position.y, player.position.z);
     player.PutPlayerInVehicle(car.vehicle, 0);
+});
+
+CMD.on("vpark", (player) => {
+    if(PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID).length == 0) return SendError(player, "You don't have any personal vehicle to use this command!");
+    let car = PCar.Info.filter(f => f.vehicle == player.vehicleId && f.owner == Player.Info[player.playerid].AccID && player.IsPlayerInAnyVehicle())[0];
+    if(!car) return SendError(player, "You need to drive your personal vehicle to use this command!");
+    con.query("UPDATE personalcars SET color = ?, position = ? WHERE ID = ?", [JSON.stringify(), JSON.stringify(player.GetPlayerPos()), car.id], function(err, result) {
+        if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+        player.SendClientMessage(data.colors.YELLOW, `You have successfully parked your vehicle!`);
+    });
 });
 
 CMD.on("buycar", (player) => {
@@ -1217,6 +1229,14 @@ CMD.on("get", (player, params) => {
 
 CMD.on("carcolor", (player, params) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    if(!player.IsPlayerInAnyVehicle() && player.GetPlayerVehicleSeat() != 0) return SendError(player, "Trebuie sa fi intr-o masina si sa fi soferul ei pentru a putea folosi aceasta comanda!", "You must be in a car and must be the driver to use this command!");
+    if(!isNaN(params[0]) && !isNaN(params[1])) {
+        params[0] = parseInt(params[0]);
+        params[1] = parseInt(params[1]);
+        samp.ChangeVehicleColor(player.vehicleId, params[0], params[1]);
+        player.GameTextForPlayer("~w~~h~Colors ~g~~h~~h~Updated", 4000, 4);
+    }
+    else SendUsage(player, "/CarColor [Color1] [Color2]");
 });
 
 CMD.on("getid", (player, params) => {
@@ -2154,7 +2174,7 @@ CMD.on("set", (player, params) => {
                     break;
                 }
                 case "admin": {
-                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
                     if(params[2] < 0 || params[2] > 3) return SendError(player, "Invalid admin level (0-3)!");
                     target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Admin level to {FF0000}${getAdminRank(params[2], false)}{FFFF00}!`);
                     player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Admin level to {FF0000}${getAdminRank(params[2], false)}{FFFF00}!`);
@@ -2165,7 +2185,7 @@ CMD.on("set", (player, params) => {
                     break;
                 }
                 case "vip": {
-                    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                    if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
                     if(params[2] < 0 || params[2] > 4) return SendError(player, "Invalid vip level (0-3)!");
                     target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Vip level to {FF0000}${getVIPRank(params[2], false)}{FFFF00}!`);
                     player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Vip level to {FF0000}${getVIPRank(params[2], false)}{FFFF00}!`);
@@ -2644,10 +2664,6 @@ CMD.on("unban", async (player, params) => {
     else player.SendClientMessage(data.colors.YELLOW, `Player {FF0000}${params[0]} {FFFF00}is not exists in database!`);
 });
 
-CMD.on("debugpcars", (player) => {
-    player.SendClientMessage(-1, `You own {FF0000}${PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID).length} {FFFFFF}personal cars.`);
-});
-
 CMD.on("givepcar", (player, params) => {
     if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(params[0] && !isNaN(params[1])) {
@@ -2656,7 +2672,7 @@ CMD.on("givepcar", (player, params) => {
         params[1] = parseInt(params[1]);
         if(params[1] < 400 || params[1] > 611) return SendError(player, "Invalid Vehicle ID!");
         if(PCar.Info.filter(f => f.owner == Player.Info[target.playerid].AccID).length != 0) return SendError(player, "This player already own a personal car!");
-        GivePersonalCar(target, params[1]);
+        GivePersonalCar(target, params[1], 1);
         target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has gived you a personal car!`);
         player.SendClientMessage(data.colors.YELLOW, `You have successfully gived {FF0000}${target.GetPlayerName(24)} {FFFF00}a personal car!`);
         SendACMD(player, "GivePCar");
@@ -2667,9 +2683,18 @@ CMD.on("givepcar", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
-function GivePersonalCar(player, model) {
-    con.query("INSERT INTO personalcars (owner, model, color, position) VALUES(?, ?, ?, ?)", [Player.Info[player.playerid].AccID, model, JSON.stringify([0, 0]), JSON.stringify(player.GetPlayerPos())], function(err, result) {
-        PCar.Create(result.insertId, Player.Info[player.playerid].AccID, model, [0, 0], player.GetPlayerPos());
+function GetPersonalCarPrice(model) {
+    return new Promise((resolve, reject) => {
+        con.query("SELECT * FROM dealership WHERE model = ?", [model], function(err, result) {
+            if(err || result == 0) resolve(0);
+            else resolve(result[0].cost);
+        });
+    });
+}
+
+function GivePersonalCar(player, model, from_admin) {
+    con.query("INSERT INTO personalcars (owner, model, color, position, from_admin) VALUES(?, ?, ?, ?, ?)", [Player.Info[player.playerid].AccID, model, JSON.stringify([0, 0]), JSON.stringify(player.GetPlayerPos()), from_admin], function(err, result) {
+        PCar.Create(result.insertId, Player.Info[player.playerid].AccID, model, [0, 0], player.GetPlayerPos(), from_admin);
         LoadPlayerPersonalCars(player);
     });
 }
@@ -2683,7 +2708,7 @@ function BuySpecificCar(player, type, index) {
                 if(PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID).length != 0) return SendError(player, "You already own a personal car! Use /sellcar to sell it!");
                 Player.Info[player.playerid].Coins -= result[i].cost;
                 player.SendClientMessage(data.colors.YELLOW, `You have successfully purchased vehicle {FF0000}${samp.vehicleNames[result[i].model-400]} {FFFF00}with {FF0000}${Function.numberWithCommas(result[i].cost)} {FFFF00}coins!`);
-                GivePersonalCar(player, result[i].model);
+                GivePersonalCar(player, result[i].model, 0);
                 break;
             }
         }
@@ -3527,7 +3552,7 @@ function LoadPersonalCars() {
         for(let i = 0; i < result.length; i++) {
             let color = JSON.parse(result[i].color);
             let position = JSON.parse(result[i].position);
-            PCar.Create(result[i].ID, result[i].owner, result[i].model, color, position);
+            PCar.Create(result[i].ID, result[i].owner, result[i].model, color, position, result[i].from_admin);
         }
         console.log(`Loaded ${result.length} personal cars.`);
     });
@@ -4069,7 +4094,18 @@ function getPositionZ(x, y) {
     });
 }*/
 
+let stdin = process.openStdin();
+
+stdin.addListener("data", function(d) {
+    let command = d.toString().trim();
+    if(command == "restart" || command == "rr") {
+        process.exit();
+    }
+});
+
+/* ============ */
 /* SA:MP Events */
+/* ============ */
 samp.OnGameModeInit(() => {
     try {
         console.log("\n");
@@ -4250,7 +4286,7 @@ samp.OnPlayerClickPlayer((player, clickedplayer) => {
 
 samp.OnPlayerDeath((player, killerid, reason) => {
     try {
-        if(samp.IsPlayerConnected(killerid)) {
+        if(samp.IsPlayerConnected(killerid.playerid)) {
             samp.SendDeathMessage(killerid.playerid, player.playerid, killerid.GetPlayerWeapon());
             Player.Info[killerid.playerid].Kills_Data.Kills++;
         }
@@ -4354,7 +4390,7 @@ samp.OnPlayerDisconnect((player, reason) => {
         switch(reason) {
             case 0: reason_string = "~p~~h~(Timeout)"; break;
             case 1: reason_string = "~r~~h~(Leaving)"; break;
-            case 2: reason_string = "~r~~h~(Kick/Ban)"; break;
+            case 2: reason_string = "~r~~h~(Kicked/Bannned)"; break;
         }
         AddToTDLogs(`~r~~h~${player.GetPlayerName(24)}(${player.playerid}) ~w~~h~has left the server ${reason_string}!`);
     }
@@ -4364,8 +4400,8 @@ samp.OnPlayerDisconnect((player, reason) => {
 
 samp.OnPlayerUpdate((player) => {
     try {
-        if(player.IsPlayerInAnyVehicle()) {
-            PCar.Info.filter(f => f.vehicle != null && f.vehicle == player.vehicleId).forEach(async(i) => {
+        if(player.IsPlayerInAnyVehicle()) { 
+            PCar.Info.filter(f => f.vehicle != null && f.vehicle == player.vehicleId && player.GetPlayerVehicleSeat() == 0).forEach(async(i) => {
                 if(i.owner != Player.Info[player.playerid].AccID) {
                     player.GameTextForPlayer(`~r~~h~WARNING~n~~w~~h~This is not~n~~w~~h~your vehicle~n~~g~~h~${samp.getPlayers().filter(f => Player.Info[f.playerid].AccID == i.owner)[0].GetPlayerName(24)}`, 4000, 4);
                     player.SetPlayerPos(player.position.x, player.position.y, player.position.z+2);
