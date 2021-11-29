@@ -93,6 +93,7 @@ export declare const Info: {
     Caged: number,
     Kicks: number,
     Last_Chat_Message: number,
+    Last_Command: number,
     SpecialZone: {
         Targets: boolean
     },

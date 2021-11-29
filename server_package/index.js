@@ -40,7 +40,7 @@ const TextDraws = require("./textdraws");
 const ServerLogs = ["", "", ""];
 
 /* Functions */
-const { getPlayer, isNumber } = require("./modules/functions");
+const { getPlayer } = require("./modules/functions");
 
 /* Data's */
 const data = {
@@ -98,6 +98,8 @@ CMD.on("discordsignout", (player) => {
     player.SendClientMessage(0x5865F2AA, `[DISCORD]: {FFFFFF}You have signed out from your account: {5865F2}${user ? `${user.tag}` : "null"}{FFFFFF}!`);
     user.send(`You have signed out from account **${player.GetPlayerName(24)}**`).catch(() => {});
     Player.Info[player.playerid].Discord = 0;
+    UpdatePlayer(player, "discord", 0);
+    con.query("UPDATE users SET discord = ? WHERE ID = ?", [Player.Info[player.playerid].Discord, Player.Info[player.playerid].AccID]);
 });
 
 /* ================ */
@@ -2683,6 +2685,10 @@ CMD.on("givepcar", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function UpdatePlayer(player, column, value) {
+    con.query(`UPDATE users SET ${column} = ? WHERE ID = ?`, [value, Player.Info[player.playerid].AccID]);
+}
+
 function GetPersonalCarPrice(model) {
     return new Promise((resolve, reject) => {
         con.query("SELECT * FROM dealership WHERE model = ?", [model], function(err, result) {
@@ -3353,40 +3359,49 @@ function replaceAll(string, search, replace) {
     return string.replace(new RegExp(search, 'g'), replace);
 }
 
-function SendAntiSpam(player, time) {
-    player.SendClientMessage(data.colors.LIGHT_YELLOW, Lang(player, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${time}{BBFF00} secunde pentru a scrie ceva din nou!`, `ANTI-SPAM: {BBFF00}Please wait {00BBF6}${time}{BBFF00} seconds to write something again!`));
+function SendAntiSpam(player, time, type) {
+    switch(type) {
+        case 0: {
+            player.SendClientMessage(data.colors.LIGHT_YELLOW, Lang(player, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${time}{BBFF00} secunde pentru a scrie ceva din nou!`, `ANTI-SPAM: {BBFF00}Please wait {00BBF6}${time}{BBFF00} seconds to write something again!`));
+            break;
+        }
+        case 1: {
+            player.SendClientMessage(data.colors.LIGHT_YELLOW, Lang(player, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${time}{BBFF00} secunde pentru a folosi comenzi din nou!`, `ANTI-SPAM: {BBFF00}Please wait {00BBF6}${time}{BBFF00} seconds to use commands again!`));
+            break;
+        }
+    }
 }
 
-function checkAntiSpam(player) {
+function checkAntiSpam(player, type) {
     /* Unlimited */
-    if(Player.Info[player.playerid].Admin >= 1 || Player.Info[player.playerid].VIP == 4) return true;
+    if(Player.Info[player.playerid].Admin >= 1 || Player.Info[player.playerid].VIP == 4 || Player.Info[player.playerid].RconType >= 1) return true;
     /* 1 Second */
     else if(Player.Info[player.playerid].VIP == 3) {
-        if((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message) < 1) {
+        if((Math.floor(Date.now() / 1000) - (type == 0 ? Player.Info[player.playerid].Last_Chat_Message : Player.Info[player.playerid].Last_Command)) < 1) {
             let time;
-            if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 0) time = 1;
-            SendAntiSpam(player, time);
+            if(Math.floor(Date.now() / 1000) - (type == 0 ? Player.Info[player.playerid].Last_Chat_Message : Player.Info[player.playerid].Last_Command) == 0) time = 1;
+            SendAntiSpam(player, time, type);
             return false;
         }
     }
     /* 2 Seconds */
     else if(Player.Info[player.playerid].VIP == 2) {
-        if((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message) < 2) {
+        if((Math.floor(Date.now() / 1000) - (type == 0 ? Player.Info[player.playerid].Last_Chat_Message : Player.Info[player.playerid].Last_Command)) < 2) {
             let time;
-            if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 0) time = 2;
-            else if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 1) time = 1;
-            SendAntiSpam(player, time);
+            if(Math.floor(Date.now() / 1000) - (type == 0 ? Player.Info[player.playerid].Last_Chat_Message : Player.Info[player.playerid].Last_Command) == 0) time = 2;
+            else if(Math.floor(Date.now() / 1000) - (type == 0 ? Player.Info[player.playerid].Last_Chat_Message : Player.Info[player.playerid].Last_Command) == 1) time = 1;
+            SendAntiSpam(player, time, type);
             return false;
         } 
     }
     /* 3 Seconds */
     else {
-        if((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message) < 3) {
+        if((Math.floor(Date.now() / 1000) - (type == 0 ? Player.Info[player.playerid].Last_Chat_Message : Player.Info[player.playerid].Last_Command)) < 3) {
             let time;
-            if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 0) time = 3;
-            else if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 1) time = 2;
-            else if(Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Last_Chat_Message == 2) time = 1;
-            SendAntiSpam(player, time);
+            if(Math.floor(Date.now() / 1000) - (type == 0 ? Player.Info[player.playerid].Last_Chat_Message : Player.Info[player.playerid].Last_Command) == 0) time = 3;
+            else if(Math.floor(Date.now() / 1000) - (type == 0 ? Player.Info[player.playerid].Last_Chat_Message : Player.Info[player.playerid].Last_Command) == 1) time = 2;
+            else if(Math.floor(Date.now() / 1000) - (type == 0 ? Player.Info[player.playerid].Last_Chat_Message : Player.Info[player.playerid].Last_Command) == 2) time = 1;
+            SendAntiSpam(player, time, type);
             return false;
         }
     }
@@ -3472,10 +3487,6 @@ function ResetPlayerClanCreateVariables(player) {
     for(let i = 0; i < 6; i++) {
         Player.Info[player.playerid].Creating_Clan.weapons[i] = 0;
     }
-}
-
-function UpdatePlayerDB(player, column, value) {
-    con.query(`UPDATE users SET ${column} = ? WHERE ID = ?`, [value, Player.Info[player.playerid].AccID]);
 }
 
 function SetupPlayerForSpawn(player, type=0) { 
@@ -5127,8 +5138,8 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         Clan.Create(result.insertId, Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, [0, 0, 0, 0], [Player.Info[player.playerid].Creating_Clan.weapons[0], Player.Info[player.playerid].Creating_Clan.weapons[1], Player.Info[player.playerid].Creating_Clan.weapons[2], Player.Info[player.playerid].Creating_Clan.weapons[3], Player.Info[player.playerid].Creating_Clan.weapons[4], Player.Info[player.playerid].Creating_Clan.weapons[5]], Player.Info[player.playerid].Creating_Clan.color, {member: Player.Info[player.playerid].Creating_Clan.skin.member, leader: Player.Info[player.playerid].Creating_Clan.skin.leader}, 0, 0);
                         Player.Info[player.playerid].Clan = result.insertId;
                         Player.Info[player.playerid].Clan_Rank = 3;
-                        UpdatePlayerDB(player, "clan", Player.Info[player.playerid].Clan);
-                        UpdatePlayerDB(player, "clan_rank", Player.Info[player.playerid].Clan_Rank);
+                        UpdatePlayer(player, "clan", Player.Info[player.playerid].Clan);
+                        UpdatePlayer(player, "clan_rank", Player.Info[player.playerid].Clan_Rank);
                         player.SetPlayerColor(Player.Info[player.playerid].Creating_Clan.color);
                         player.SetPlayerSkin(Player.Info[player.playerid].Creating_Clan.skin.leader);
                         for(let i = 0; i < 6; i++) {
@@ -5482,9 +5493,9 @@ samp.OnPlayerText((player, text) => {
     try {
         if(Player.Info[player.playerid].AFK) return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use the~n~~r~~h~Chat~w~~h~!", 4000, 4);
 
-        if(!checkAntiSpam(player)) return false;
-
+        if(!checkAntiSpam(player, 0)) return false;
         Player.Info[player.playerid].Last_Chat_Message = Math.floor(Date.now() / 1000);
+
         Server.Info.Messages++;
         
         if(!CheckCustomChat(player, text)) return false;
@@ -5520,12 +5531,17 @@ samp.OnPlayerSpawn((player) => {
 samp.OnPlayerCommandText((player, cmdtext) => {
     try {
         if(Player.Info[player.playerid].LoggedIn) {
+            if(!checkAntiSpam(player, 1)) return true;
+            Player.Info[player.playerid].Last_Command = Math.floor(Date.now() / 1000);
+
             cmdtext = cmdtext.replace("/", "");
             let params = cmdtext.split(/[ ]+/);
             cmdtext = params[0].toLowerCase();
             params.shift();
+
             if(isPlayerInSpecialZone(player) && cmdtext != "leave") return player.GameTextForPlayer("~w~~h~Use ~r~~h~/Leave ~w~~h~to ~r~~h~Leave~w~~h~!", 4000, 4);
             if(Player.Info[player.playerid].AFK && cmdtext != "back") return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use~n~~r~~h~Commands~w~~h~!", 3000, 4);
+            
             if(CMD.eventNames().some(s => s == cmdtext)) {
                 CMD.emit(cmdtext, player, params);
             }

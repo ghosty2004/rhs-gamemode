@@ -1,4 +1,5 @@
 const { getPlayers } = require("samp-node-lib");
+const { query } = require("../mysql");
 
 module.exports = {
     getRandomInt: function(min, max) {

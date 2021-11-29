@@ -26,9 +26,9 @@ bot.login(DISCORD_BOT.TOKEN).catch((error) => {
 });
 
 /* Custom Modules */
-const { DiscordCommand, Command } = require("../events");
+const { DiscordCommand } = require("../events");
 const con = require("../mysql");
-const { getPlayer } = require("../functions");
+const { getPlayer, numberWithCommas } = require("../functions");
 
 const Errors = require("../errors");
 const Player = require("../player");
@@ -63,8 +63,8 @@ function getStatsEmbed(user) {
                 embed.setTitle(`${result[0].name}'s stats:`, true);
                 embed.addField("ID:", `${result[0].ID}`, true);
                 embed.addField("Name:", `${result[0].name}`, true);
-                embed.addField("Money:", `${result[0].money}`, true);
-                embed.addField("Coins:", `${result[0].coins}`, true);
+                embed.addField("Money:", `$${numberWithCommas(result[0].money)}`, true);
+                embed.addField("Coins:", `${numberWithCommas(result[0].coins)}`, true);
                 embed.addField("Respect:", `+${result[0].respect_positive} / -${result[0].respect_negative}`, true);
                 embed.addField("Online Time:", `${result[0].hours} hrs, ${result[0].minutes} mins, ${result[0].seconds} secs`, true);
                 resolve(embed);
@@ -152,6 +152,7 @@ bot.on("messageCreate", (message) => {
                     Player.Info[player[0].playerid].DiscordLoginRequest.From = null;
                     Player.Info[player[0].playerid].DiscordLoginRequest.Code = 0;
                     Player.Info[player[0].playerid].Discord = message.author.id;
+                    con.query("UPDATE users SET discord = ? WHERE ID = ?", [Player.Info[player[0].playerid].Discord, Player.Info[player[0].playerid].AccID])
                 }
                 else {
                     message.channel.send("Invalid code provided.");
