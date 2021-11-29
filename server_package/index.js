@@ -15,6 +15,7 @@ require("youtube-audio-server").listen(7777);
 
 /* Custom Modules */
 const Clan = require("./modules/clan");
+const Checkpoint = require("./modules/checkpoint");
 const Dialog = require("./modules/dialog");
 const Errors = require("./modules/errors");
 const events = require("./modules/events");
@@ -740,15 +741,15 @@ CMD.on("tutorial", (player) => {
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Tutorial - Cum poti face 10/10 stats!", "Tutorial - How to make 10/10 stats!"), info, "Ok", "");
 });
 
-CMD.on("credits", (player) => {
+CMD.on("credits", async (player) => {
     let info = "";
     info += `{00BBF6}${Player.Info[player.playerid].Language == 1 ? "Mai jos ai o lista cu cei ce au contribuit la crearea acestui server:" : "Before is a list with server's creators:"}\n`;
     info += "\n";
     info += "{FF0000}Scripter:\n";
-    info += "{15FF00}Voller.\n";
+    info += "{15FF00}ghosty\n";
     info += "\n";
     info += `{0072FF}${Player.Info[player.playerid].Language == 1 ? "Proprietari:" : "Owners:"}\n`;
-    info += "{15FF00}Voller.\n";
+    info += `{15FF00}${await getServerFounders()}\n`;
     info += "\n";
     info += `{FF0000}${Player.Info[player.playerid].Language == 1 ? "Creatorii Hartilor:" : "Maps Creators:"}\n`;
     info += "{15FF00}[9mm]_LimiTLesS_\n";
@@ -2603,16 +2604,31 @@ CMD.on("unban", async (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function getServerFounders() {
+    return new Promise((resolve, reject) => {
+        con.query("SELECT * FROM users WHERE rcontype = ?", [3], function(err, result) {
+            if(err || result == 0) resolve("none");
+            else {
+                let owners = [];
+                for(let i = 0; i < result.length; i++) {
+                    owners.push(result[i].name);
+                }
+                resolve(replaceAll(owners.toString(), ",", "\n"));
+            }
+        });
+    });
+}
+
 function isVehicleOccupied(vehicleid) {
     return samp.getPlayers().filter(f => f.IsPlayerInVehicle(vehicleid))[0];
 }
 
 function openGate(GangID) {
-    samp.MoveObject(Gang.Info[GangID].gate.object, Gang.Info[GangID].gate.position[0], Gang.Info[GangID].gate.position[1], Gang.Info[GangID].gate.position[2]-6, 9);
+    samp.MoveObject(Gang.Info[GangID].gate.object, Gang.Info[GangID].gate.position[0], Gang.Info[GangID].gate.position[1], Gang.Info[GangID].gate.position[2]-6, 9, Gang.Info[GangID].gate.position[3], Gang.Info[GangID].gate.position[4], Gang.Info[GangID].gate.position[5]);
 }
 
 function closeGate(GangID) {
-    samp.MoveObject(Gang.Info[GangID].gate.object, Gang.Info[GangID].gate.position[0], Gang.Info[GangID].gate.position[1], Gang.Info[GangID].gate.position[2], 9);
+    samp.MoveObject(Gang.Info[GangID].gate.object, Gang.Info[GangID].gate.position[0], Gang.Info[GangID].gate.position[1], Gang.Info[GangID].gate.position[2], 9, Gang.Info[GangID].gate.position[3], Gang.Info[GangID].gate.position[4], Gang.Info[GangID].gate.position[5]);
 }
 
 function ShowRankLabelFor(player) {
@@ -3399,6 +3415,7 @@ function SetupPlayerForSpawn(player, type=0) {
 
 function LoadFromDB() {
     LoadGangs();
+    LoadGangsTeleportsCheckpoints();
     LoadSpawnZones();
     LoadTeleports();
     LoadClans();
@@ -3412,9 +3429,20 @@ function LoadGangs() {
             let base_position = JSON.parse(result[i].base_position);
             let gate_position = JSON.parse(result[i].gate_position);
             let territory_position = JSON.parse(result[i].territory_position);
-            Gang.Create(result[i].ID, result[i].name, position, weapons, result[i].color, result[i].alliance, result[i].points, result[i].captures, result[i].kills, result[i].deaths, base_position, result[i].gate_objectid, gate_position, territory_position);  
+            Gang.Create(result[i].ID, result[i].name, position, weapons, result[i].color, result[i].alliance, result[i].points, result[i].captures, result[i].kills, result[i].deaths, base_position, result[i].gate_objectid, gate_position, territory_position);
         }
         console.log(`Loaded ${result.length} gangs.`);
+    });
+}
+
+function LoadGangsTeleportsCheckpoints() {
+    con.query("SELECT * FROM gangscheckpoints", function(err, result) {
+        for(let i = 0; i < result.length; i++) {
+            let position = JSON.parse(result[i].position);
+            let position_to = JSON.parse(result[i].position_to);
+            Gang.CreateTeleportCheckpoint(result[i].gang_id, result[i].ID, position, position_to, result[i].textlabel);
+        }   
+        console.log(`Loaded ${result.length} gangs teleports checkpoints.`);
     });
 }
 
@@ -3970,6 +3998,21 @@ samp.OnGameModeExit(() => {
     return true;
 });
 
+samp.OnPlayerEnterCheckpoint((player) => {
+    if(Checkpoint.IsPlayerInAnyCustomCheckpoint(player)) {
+        for(let i = 1; i <= Gang.Get().length; i++) {
+            let index = Gang.Info[i].teleportcheckpoints.findIndex(f => f.checkpoint == Checkpoint.GetPlayerCustomCheckpoint(player));
+            if(index != -1) {
+                if(Gang.Info[i].id == Player.Info[player.playerid].Gang) {
+                    player.SetPlayerPos(Gang.Info[i].teleportcheckpoints[index].position_to[0], Gang.Info[i].teleportcheckpoints[index].position_to[1], Gang.Info[i].teleportcheckpoints[index].position_to[2]);
+                    player.SetPlayerFacingAngle(Gang.Info[i].teleportcheckpoints[index].position_to[3]);
+                }
+            }
+        }
+    }
+    return true;
+});
+
 samp.OnRconLoginAttempt((ip, password, success) => {
     if(success) {
         samp.getPlayers().filter(f => f.GetPlayerIp(16) == ip && Player.Info[f.playerid].LoggedIn).forEach((i) => {
@@ -4394,12 +4437,12 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.PLAYER_CLICK: {
             if(response) {
                 switch(listitem) {
-                    case 0: CMD.emit("stats", player, Player.Info[player.playerid].ClickedPlayer); break;
-                    case 1: CMD.emit("gstats", player, Player.Info[player.playerid].ClickedPlayer); break;
-                    case 2: CMD.emit("cinfo", player, Player.Info[player.playerid].ClickedPlayer); break;
-                    case 3: CMD.emit("astats", player, Player.Info[player.playerid].ClickedPlayer); break;
-                    case 4: CMD.emit("pm", player, Player.Info[player.playerid].ClickedPlayer); break;
-                    case 5: CMD.emit("spec", player, Player.Info[player.playerid].ClickedPlayer); break;
+                    case 0: CMD.emit("stats", player, [Player.Info[player.playerid].ClickedPlayer]); break;
+                    case 1: CMD.emit("gstats", player, [Player.Info[player.playerid].ClickedPlayer]); break;
+                    case 2: CMD.emit("cinfo", player, [Player.Info[player.playerid].ClickedPlayer]); break;
+                    case 3: CMD.emit("astats", player, [Player.Info[player.playerid].ClickedPlayer]); break;
+                    case 4: CMD.emit("pm", player, [Player.Info[player.playerid].ClickedPlayer]); break;
+                    case 5: CMD.emit("spec", player, [Player.Info[player.playerid].ClickedPlayer]); break;
                 }
             }
             break;

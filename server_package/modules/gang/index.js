@@ -1,4 +1,5 @@
 const { GangZoneCreate, GangZoneDestroy, CreateObject, Create3DTextLabel, DestroyObject, Delete3DTextLabel } = require("samp-node-lib");
+const { CreateCustomCheckpoint, DeleteCustomCheckpoint } = require("../checkpoint");
 
 module.exports = {
     Info: {},
@@ -34,7 +35,8 @@ module.exports = {
                     time: 10,
                     turf: -1,
                     interval: null
-                }
+                },
+                teleportcheckpoints: []
             }
             return true;
         }
@@ -52,6 +54,42 @@ module.exports = {
     },
     Exists: function(id) {
         if(this.Info[id]) return true;
+        else return false;
+    },
+    CreateTeleportCheckpoint: function(gang_id, id, position, position_to, textlabel) {
+        if(this.Info[gang_id]) {
+            if(!this.Info[gang_id].teleportcheckpoints.some(s => s.id == id)) {
+                this.Info[gang_id].teleportcheckpoints.push({
+                    id: id,
+                    position: position,
+                    position_to: position_to,
+                    textlabel: textlabel,
+                    label: Create3DTextLabel(`{BBFF00}Teleport to\n{00BBF6}${textlabel}`, -1, position[0], position[1], position[2], 20),
+                    checkpoint: CreateCustomCheckpoint(position[0], position[1], position[2], 1, 3)
+                });
+                return true;
+            }
+            else return false;
+        }
+        else return false;
+    },
+    DeleteTeleportCheckpoint: function(gang_id, id) {
+        if(this.Info[gang_id]) {
+            let index = this.Info[gang_id].teleportcheckpoints.findIndex(f => f.id == id);
+            if(index != -1) {
+                Delete3DTextLabel(this.Info[gang_id].teleportcheckpoints[index].label);
+                DeleteCustomCheckpoint(this.Info[gang_id].teleportcheckpoints[index].checkpoint);
+                this.Info[gang_id].teleportcheckpoints.splice(index, 1);
+                return true;
+            }
+            else return false;
+        }
+        else return false;
+    },
+    ExistsTeleportCheckpoint: function(gang_id, id) {
+        if(this.Info[gang_id]) {
+            return this.Info[gang_id].teleportcheckpoints.some(s => s.id == id);
+        }
         else return false;
     },
     Get: function() {
