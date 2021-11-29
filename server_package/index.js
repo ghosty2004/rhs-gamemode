@@ -3700,7 +3700,7 @@ function getRconRank(rank) {
 function getAdminRank(rank, hex=true) {
     let string = "";
     switch(rank) {
-        case 0: string = `Demote`; break;
+        case 0: string = "Demote"; break;
         case 1: string = `${hex ? "{FF0000}" : ""}Junior`; break;
         case 2: string = `${hex ? "{FFFF00}" : ""}Senior`; break;
         case 3: string = `${hex ? "{0072FF}" : ""}Master`; break;
@@ -3711,6 +3711,7 @@ function getAdminRank(rank, hex=true) {
 function getVIPRank(rank, hex=true) {
     let string = "";
     switch(rank) {
+        case 0: string = "Demote"; break;
         case 1: string = `${hex ? "{FF0000}" : ""}Red`; break;
         case 2: string = `${hex ? "{FFFF00}" : ""}Yellow`; break;
         case 3: string = `${hex ? "{0077FF}" : ""}Blue`; break;
