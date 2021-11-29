@@ -23,6 +23,7 @@ const Function = require("./modules/functions");
 const Gang = require("./modules/gang");
 const Minigames = require("./modules/minigames");
 const con = require("./modules/mysql"); 
+const PCar = require("./modules/pcar");
 const Player = require("./modules/player");
 const Server = require("./modules/server");
 const SpawnZone = require("./modules/spawnzone");
@@ -39,7 +40,7 @@ const TextDraws = require("./textdraws");
 const ServerLogs = ["", "", ""];
 
 /* Functions */
-const { getPlayer } = require("./modules/functions");
+const { getPlayer, isNumber } = require("./modules/functions");
 
 /* Data's */
 const data = {
@@ -1020,6 +1021,39 @@ CMD.on("sstunts", (player) => {
     info += "{FF0000}Simple Stunt 28\n";
     info += "{FF0000}Simple Stunt 29";
     player.ShowPlayerDialog(Dialog.TELES_SIMPLE_STUNTS, samp.DIALOG_STYLE.LIST, "Simple Stunts", info, "Teleport", "Back");
+});
+
+/* ====================== */
+/* Personal Cars Commands */
+/* ====================== */
+CMD.on("sellcar", (player) => {
+    if(PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID).length == 0) return SendError(player, "You don't have any personal vehicle to use this command!");
+    let car = PCar.Info.filter(f => f.vehicle == player.vehicleId && f.owner == Player.Info[player.playerid].AccID && player.IsPlayerInAnyVehicle())[0];
+    if(!car) return SendError(player, "You need to drive your personal vehicle to use this command!");
+    con.query("DELETE FROM personalcars WHERE ID = ?", [car.id], function(err, result) {
+        if(err) return SendError(player, Errors.UNEXPECTED);
+        player.SendClientMessage(data.colors.YELLOW, `You have successfully sold your vehicle!`);
+        samp.DestroyVehicle(car.vehicle);
+        PCar.Delete(car.id);
+    });
+});
+
+CMD.on("mycar", (player) => {
+    let car = PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID && f.vehicle != null)[0];
+    if(!car) return SendError(player, "You don't have any personal vehicle to use this command!");
+    player.GameTextForPlayer(`~r~~h~${player.GetPlayerName(24)}~n~~g~~h~welcome back to your~n~~y~~h~${samp.vehicleNames[car.model-400]}`, 4000, 4);
+    samp.SetVehiclePos(car.vehicle, player.position.x, player.position.y, player.position.z);
+    player.PutPlayerInVehicle(car.vehicle, 0);
+});
+
+CMD.on("buycar", (player) => {
+    let info = "";
+    info += "Cheap Vehicles\n";
+    info += "Regular Vehicles\n";
+    info += "Expensive Vehicles\n";
+    info += "Bike/Moto\n";
+    info += "Premium Vehicles";
+    player.ShowPlayerDialog(Dialog.BUYCAR, samp.DIALOG_STYLE.LIST, "{FF0000}#DealerShip {FFFF00}#Select", info, "Select", "Close");
 });
 
 /* ============= */
@@ -2601,9 +2635,65 @@ CMD.on("unban", async (player, params) => {
     else player.SendClientMessage(data.colors.YELLOW, `Player {FF0000}${params[0]} {FFFF00}is not exists in database!`);
 });
 
+CMD.on("debugpcars", (player) => {
+    player.SendClientMessage(-1, `You own {FF0000}${PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID).length} {FFFFFF}personal cars.`);
+});
+
+CMD.on("givepcar", (player, params) => {
+    if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(params[0] && !isNaN(params[1])) {
+        let target = getPlayer(params[0]);
+        if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+        params[1] = parseInt(params[1]);
+        if(params[1] < 400 || params[1] > 611) return SendError(player, "Invalid Vehicle ID!");
+        if(PCar.Info.filter(f => f.owner == Player.Info[target.playerid].AccID).length != 0) return SendError(player, "This player already own a personal car!");
+        GivePersonalCar(target, params[1]);
+        target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has gived you a personal car!`);
+        player.SendClientMessage(data.colors.YELLOW, `You have successfully gived {FF0000}${target.GetPlayerName(24)} {FFFF00}a personal car!`);
+        SendACMD(player, "GivePCar");
+    }
+    else SendUsage(player, "/GivePCar [ID/Name] [Vehicle ID]");
+});
+
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function GivePersonalCar(player, model) {
+    con.query("INSERT INTO personalcars (owner, model, color, position) VALUES(?, ?, ?, ?)", [Player.Info[player.playerid].AccID, model, JSON.stringify([0, 0]), JSON.stringify(player.GetPlayerPos())], function(err, result) {
+        PCar.Create(result.insertId, Player.Info[player.playerid].AccID, model, [0, 0], player.GetPlayerPos());
+        LoadPlayerPersonalCars(player);
+    });
+}
+
+function BuySpecificCar(player, type, index) {
+    con.query("SELECT * FROM dealership WHERE type = ?", [type], function(err, result) {
+        if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+        for(let i = 0; i < result.length; i++) {
+            if(i == index) {
+                if(Player.Info[player.playerid].Coins < result[i].cost) return SendError(player, "You don't have enought coins to buy this car!");
+                if(PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID).length != 0) return SendError(player, "You already own a personal car! Use /sellcar to sell it!");
+                Player.Info[player.playerid].Coins -= result[i].cost;
+                player.SendClientMessage(data.colors.YELLOW, `You have successfully purchased vehicle {FF0000}${samp.vehicleNames[result[i].model-400]} {FFFF00}with {FF0000}${Function.numberWithCommas(result[i].cost)} {FFFF00}coins!`);
+                GivePersonalCar(player, result[i].model);
+                break;
+            }
+        }
+    });
+}
+
+function LoadPlayerPersonalCars(player) {
+    PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID && f.vehicle == null).forEach((i) => {
+        i.vehicle = samp.CreateVehicle(i.model, i.position[0], i.position[1], i.position[2], 0, i.color[0], i.color[1]);
+    });
+}
+
+function UnLoadPlayerPersonalCars(player) {
+    PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID && f.vehicle != null).forEach((i) => {
+        samp.DestroyVehicle(i.vehicle);
+        i.vehicle = null;
+    });
+}
+
 function getServerFounders() {
     return new Promise((resolve, reject) => {
         con.query("SELECT * FROM users WHERE rcontype = ?", [3], function(err, result) {
@@ -3414,11 +3504,23 @@ function SetupPlayerForSpawn(player, type=0) {
 }
 
 function LoadFromDB() {
+    LoadPersonalCars();
     LoadGangs();
     LoadGangsTeleportsCheckpoints();
     LoadSpawnZones();
     LoadTeleports();
     LoadClans();
+}
+
+function LoadPersonalCars() {
+    con.query("SELECT * FROM personalcars", function(err, result) {
+        for(let i = 0; i < result.length; i++) {
+            let color = JSON.parse(result[i].color);
+            let position = JSON.parse(result[i].position);
+            PCar.Create(result[i].ID, result[i].owner, result[i].model, color, position);
+        }
+        console.log(`Loaded ${result.length} personal cars.`);
+    });
 }
 
 function LoadGangs() {
@@ -3910,6 +4012,8 @@ function LoadPlayerStats(player) {
 
                 checkReportsTD(player);
 
+                LoadPlayerPersonalCars(player);
+
                 let info = "";
                 info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
                 info += "{BBFF00}Ai fost autentificat cu succes!\n";
@@ -4112,7 +4216,7 @@ samp.OnPlayerTakeDamage((player, issuerid, amount, weaponid, bodypart) => {
 });
 
 samp.OnPlayerEnterVehicle((player, vehicleid, ispassenger) => {
-    player.GameTextForPlayer(`${samp.vehicleNames[samp.GetVehicleModel(vehicleid)-400]}`, 500, 1);
+    //player.GameTextForPlayer(`${samp.vehicleNames[samp.GetVehicleModel(vehicleid)-400]}`, 500, 1);
     return true;
 });
 
@@ -4162,6 +4266,7 @@ samp.OnPlayerDisconnect((player, reason) => {
 
     HideRankLabelFor(player);
     HideCapturingLabelFor(player);
+    UnLoadPlayerPersonalCars(player);
 
     Player.ResetVariables(player.playerid);
     checkReportsTD();
@@ -4180,11 +4285,101 @@ samp.OnPlayerDisconnect((player, reason) => {
 });
 
 samp.OnPlayerUpdate((player) => {
+    if(player.IsPlayerInAnyVehicle()) {
+        PCar.Info.filter(f => f.vehicle != null && f.vehicle == player.vehicleId).forEach(async(i) => {
+            if(i.owner != Player.Info[player.playerid].AccID) {
+                player.GameTextForPlayer(`~r~~h~WARNING~n~~w~~h~This is not~n~~w~~h~your vehicle~n~~g~~h~${samp.getPlayers().filter(f => Player.Info[f.playerid].AccID == i.owner)[0].GetPlayerName(24)}`, 4000, 4);
+                player.SetPlayerPos(player.position.x, player.position.y, player.position.z+2);
+            }
+        });
+    }
     return true;
 });
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.BUYCAR_CHEAP: {
+            if(response) BuySpecificCar(player, "cheap", listitem);
+            break;
+        }
+        case Dialog.BUYCAR_REGULAR: {
+            if(response) BuySpecificCar(player, "regular", listitem);
+            break;
+        }
+        case Dialog.BUYCAR_EXPENSIVE: {
+            if(response) BuySpecificCar(player, "expensive", listitem);
+            break;
+        }
+        case Dialog.BUYCAR_BIKES: {
+            if(response) BuySpecificCar(player, "bikes", listitem);
+            break;
+        }
+        case Dialog.BUYCAR_PREMIUM: {
+            if(response) BuySpecificCar(player, "premium", listitem);
+            break;
+        }
+        case Dialog.BUYCAR: {
+            if(response) {
+                switch(listitem) {
+                    case 0: {
+                        con.query("SELECT * FROM dealership WHERE type = ?", ["cheap"], function(err, result) {
+                            if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+                            let info = "Vehicle\tCoins\n";
+                            for(let i = 0; i < result.length; i++) {
+                                info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
+                            }
+                            player.ShowPlayerDialog(Dialog.BUYCAR_CHEAP, samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Cheap Vehicles", info, "Buy", "Close");
+                        });
+                        break;
+                    }
+                    case 1: {
+                        con.query("SELECT * FROM dealership WHERE type = ?", ["regular"], function(err, result) {
+                            if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+                            let info = "Vehicle\tCoins\n";
+                            for(let i = 0; i < result.length; i++) {
+                                info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
+                            }
+                            player.ShowPlayerDialog(Dialog.BUYCAR_REGULAR, samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Regular Vehicles", info, "Buy", "Close");
+                        });
+                        break;
+                    }
+                    case 2: {
+                        con.query("SELECT * FROM dealership WHERE type = ?", ["expensive"], function(err, result) {
+                            if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+                            let info = "Vehicle\tCoins\n";
+                            for(let i = 0; i < result.length; i++) {
+                                info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
+                            }
+                            player.ShowPlayerDialog(Dialog.BUYCAR_EXPENSIVE, samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Expensive Vehicles", info, "Buy", "Close");
+                        });
+                        break;
+                    }
+                    case 3: {
+                        con.query("SELECT * FROM dealership WHERE type = ?", ["bikes"], function(err, result) {
+                            if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+                            let info = "Vehicle\tCoins\n";
+                            for(let i = 0; i < result.length; i++) {
+                                info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
+                            }
+                            player.ShowPlayerDialog(Dialog.BUYCAR_BIKES, samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Bikes/Moto", info, "Buy", "Close");
+                        });
+                        break;
+                    }
+                    case 4: {
+                        con.query("SELECT * FROM dealership WHERE type = ?", ["premium"], function(err, result) {
+                            if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+                            let info = "Vehicle\tCoins\n";
+                            for(let i = 0; i < result.length; i++) {
+                                info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
+                            }
+                            player.ShowPlayerDialog(Dialog.BUYCAR_PREMIUM, samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Premium Vehicles", info, "Buy", "Close");
+                        });
+                        break;
+                    }
+                }
+            }
+            break;
+        }
         case Dialog.BASE_TELEPORT: {
             if(response) {
                 if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);

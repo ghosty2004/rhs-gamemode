@@ -39,5 +39,8 @@ module.exports = {
         let mins = ~~((time % 3600) / 60);
         let secs = ~~time % 60;
         return `${mins}:${secs}`;
+    },
+    numberWithCommas: function(number) {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 }
