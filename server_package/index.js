@@ -4106,6 +4106,11 @@ samp.OnGameModeInit(() => {
 
     for(let i = 0; i < 1000; i++) Player.ResetVariables(i);
 
+    /* Buster Actor & Label */
+    data.settings.BUSTER_ACTOR = samp.CreateActor(149, 2016.1802978516, 1531.201171875, 10.838399887085, 266.51278686523);
+    samp.SetActorInvulnerable(data.settings.BUSTER_ACTOR, false);
+    data.settings.BUSTER_LABEL = samp.Create3DTextLabel("RHSBuster", -16776961, 2016.1802978516, 1531.201171875, 12.838399887085, 50);
+
     return true;
 });
 
@@ -4218,7 +4223,11 @@ samp.OnPlayerClickPlayer((player, clickedplayer) => {
 });
 
 samp.OnPlayerDeath((player, killerid, reason) => {
-    if(killerid) samp.SendDeathMessage(killerid.playerid, player.playerid, killerid.GetPlayerWeapon());
+    if(killerid) {
+        samp.SendDeathMessage(killerid.playerid, player.playerid, killerid.GetPlayerWeapon());
+        Player.Info[killerid.playerid].Kills_Data.Kills++;
+    }
+    Player.Info[player.playerid].Kills_Data.Deaths++;
     return true;
 });
 
@@ -4232,6 +4241,13 @@ samp.OnPlayerTakeDamage((player, issuerid, amount, weaponid, bodypart) => {
 
 samp.OnPlayerEnterVehicle((player, vehicleid, ispassenger) => {
     //player.GameTextForPlayer(`${samp.vehicleNames[samp.GetVehicleModel(vehicleid)-400]}`, 500, 1);
+    return true;
+});
+
+samp.OnPlayerGiveDamageActor((player, damaged_actorid, amount, weaponid, bodypart) => {
+    if(damaged_actorid == data.settings.BUSTER_ACTOR) {
+        player.SendClientMessage(data.colors.RED, `${data.settings.BUSTER_PREFIX}: Stop shooting me idiot, will kick you!`);
+    }
     return true;
 });
 

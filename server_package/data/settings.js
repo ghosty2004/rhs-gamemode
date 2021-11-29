@@ -33,5 +33,7 @@ module.exports = {
         "If I were doing any better, I'd hire you to enjoy it with me.",
         "Yes?",
         "What?"
-    ]
+    ],
+    BUSTER_ACTOR: null,
+    BUSTER_LABEL: null
 }
