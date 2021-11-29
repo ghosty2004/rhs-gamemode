@@ -633,8 +633,8 @@ CMD.on("stats", (player, params) => {
         let OnlineTime = TotalGameTime(target);
         let info = "";
         info += "{FF4800}General statistics\n";
-        info += `{BBFF00}Money: {49FFFF}$${Player.Info[target.playerid].Money}\n`;
-        info += `{BBFF00}Coins: {49FFFF}${Player.Info[target.playerid].Coins}\n`;
+        info += `{BBFF00}Money: {49FFFF}$${Function.numberWithCommas(Player.Info[target.playerid].Money)}\n`;
+        info += `{BBFF00}Coins: {49FFFF}${Function.numberWithCommas(Player.Info[target.playerid].Coins)}\n`;
         info += `{BBFF00}Respect: {49FFFF}+${Player.Info[target.playerid].Respect.Positive} {BBFF00}/ {49FFFF}-${Player.Info[player.playerid].Respect.Negative}\n`;
         info += `{BBFF00}Online time: {49FFFF}${OnlineTime.hours} {BBFF00}hrs, {49FFFF}${OnlineTime.minutes} {BBFF00}mins, {49FFFF}${OnlineTime.seconds} {BBFF00}secs\n`;
         info += `{BBFF00}Admin: ${Player.Info[target.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
@@ -656,8 +656,15 @@ CMD.on("stats", (player, params) => {
         info += `{BBFF00}House: {FF0000}No\n`;
         info += `{BBFF00}Personal Vehicle: {FF0000}No\n`;
         info += "\n";
-        info += `{FF4800}Statistics note: {49FFFF}${getPlayerStatsNote(target)}{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob`
-        player.ShowPlayerDialog(Dialog.STATS, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s stats!${Player.Info[target.playerid].Kicks ? ` - {FF0000}${Player.Info[target.playerid].Kicks}/3 {BBFF00}kicks` : ""}`, info, "Ok", `${target == player ? "Description" : ""}`);
+        info += `{FF4800}Statistics note: {49FFFF}${getPlayerStatsNote(target)}{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob\n`;
+        if(Player.Info[target.playerid].Description[1] || Player.Info[target.playerid].Description[2] || Player.Info[target.playerid].Description[3]) {
+            info += "\n";
+            info += "{FF4800}Description";
+            for(let i = 1; i <= 3; i++) {
+                info += `\n{49FFFF}${Player.Info[target.playerid].Description[i]}`;
+            }
+        }
+        player.ShowPlayerDialog(target == player ? Dialog.STATS : Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s stats!${Player.Info[target.playerid].Kicks ? ` - {FF0000}${Player.Info[target.playerid].Kicks}/3 {BBFF00}kicks` : ""}`, info, "Ok", `${target == player ? "Description" : ""}`);
     }
     else SendError(player, Errors.PLAYER_NOT_CONNECTED);
 });
@@ -3414,8 +3421,8 @@ function savePlayer(player) {
     con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, hours = ?, minutes = ?, seconds = ?, admin = ?, VIP = ?, VIP_Expire = ?, clan = ?,\
     clan_rank = ?, gang = ?, gang_rank = ?, gang_kills = ?, gang_deaths = ?, gang_captures = ?, gang_points = ?, gang_warns = ?, gang_hours = ?, gang_minutes = ?, gang_seconds = ?, gang_membersince = ?,\
     kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?, month_minutes = ?, month_seconds = ?,\
-    month_kills = ?, month_headshots = ?, month_killingspree = ?, month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?, month_racepoints = ?, jailed = ?,\
-    caged = ?, kicks = ?, discord = ? WHERE ID = ?", [
+    month_kills = ?, month_headshots = ?, month_killingspree = ?, month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?, month_racepoints = ?, description1 = ?,\
+    description2 = ?, description3 = ?, jailed = ?, caged = ?, kicks = ?, discord = ? WHERE ID = ?", [
         Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
         OnlineTime.hours, OnlineTime.minutes, OnlineTime.seconds, Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, 
         Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Gang_Data.Rank, Player.Info[player.playerid].Gang_Data.Kills, Player.Info[player.playerid].Gang_Data.Deaths, 
@@ -3424,7 +3431,8 @@ function savePlayer(player) {
         Player.Info[player.playerid].Kills_Data.BestKillingSpree, Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, 
         Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].AdminPoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds, Player.Info[player.playerid].Month.Kills_Data.Kills, 
         Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, Player.Info[player.playerid].Month.Kills_Data.Deaths, 
-        Player.Info[player.playerid].Driving_Data.DriftPoints, Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Caged, 
+        Player.Info[player.playerid].Month.Driving_Data.DriftPoints, Player.Info[player.playerid].Month.Driving_Data.StuntPoints, Player.Info[player.playerid].Month.Driving_Data.RacePoints, Player.Info[player.playerid].Description[1],
+        Player.Info[player.playerid].Description[2], Player.Info[player.playerid].Description[3], Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Caged, 
         Player.Info[player.playerid].Kicks, Player.Info[player.playerid].Discord, Player.Info[player.playerid].AccID
     ]);
 }
@@ -3994,9 +4002,12 @@ function LoadPlayerStats(player) {
                 Player.Info[player.playerid].Month.Kills_Data.KillingSpree = result[0].month_killingspree;
                 Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree = result[0].month_bestkillingspree;
                 Player.Info[player.playerid].Month.Kills_Data.Deaths = result[0].month_deaths;
-                Player.Info[player.playerid].Driving_Data.DriftPoints = result[0].month_driftpoints;
-                Player.Info[player.playerid].Driving_Data.StuntPoints = result[0].month_stuntpoints;
-                Player.Info[player.playerid].Driving_Data.RacePoints = result[0].month_racepoints;
+                Player.Info[player.playerid].Month.Driving_Data.DriftPoints = result[0].month_driftpoints;
+                Player.Info[player.playerid].Month.Driving_Data.StuntPoints = result[0].month_stuntpoints;
+                Player.Info[player.playerid].Month.Driving_Data.RacePoints = result[0].month_racepoints;
+                Player.Info[player.playerid].Description[1] = result[0].description1;
+                Player.Info[player.playerid].Description[2] = result[0].description2;
+                Player.Info[player.playerid].Description[3] = result[0].description3;
                 Player.Info[player.playerid].Jailed = result[0].jailed;
                 Player.Info[player.playerid].Caged = result[0].caged;
                 Player.Info[player.playerid].Kicks = result[0].kicks;
@@ -4212,6 +4223,10 @@ samp.OnPlayerDeath((player, killerid, reason) => {
 });
 
 samp.OnPlayerTakeDamage((player, issuerid, amount, weaponid, bodypart) => {
+    if(issuerid) {
+        if(!Player.Info[issuerid].Gang || !Player.Info[player.playerid].Gang) return;
+        if(Player.Info[issuerid].Gang == Player.Info[player.playerid].Gang) samp.GameTextForPlayer(issuerid, "~n~~n~~n~~n~~n~~n~~r~~h~Warning~n~~w~~h~Stop Shooting in your~n~~w~~h~gang members!", 2000, 3);
+    }
     return true;
 });
 
@@ -5188,7 +5203,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.STATS_DESCRIPTION: {
             if(response) {
                 Player.Info[player.playerid].Editing_Stats_Description_Line = listitem + 1;
-                player.ShowPlayerDialog(Dialog.STATS_DESCRIPTION_INPUT, samp.DIALOG_STYLE.INPUT, Lang(player, "Descriere", "Description"), "", Lang(player, "Ok", "Update"), Lang(player, "Renunta", "Cancel"));
+                player.ShowPlayerDialog(Dialog.STATS_DESCRIPTION_INPUT, samp.DIALOG_STYLE.INPUT, Lang(player, "Descriere", "Description"), Lang(player, "{FFFF00}Te rugam sa iti introduci {FF0000}Descrierea{FFFF00}:", "{FFFF00}Please enter your {FF0000}Description{FFFF00}:"), Lang(player, "Ok", "Update"), Lang(player, "Renunta", "Cancel"));
             }
             else CMD.emit("stats", player, []);
             break;
@@ -5197,8 +5212,9 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             if(response) {
                 Player.Info[player.playerid].Description[Player.Info[player.playerid].Editing_Stats_Description_Line] = inputtext;
                 player.SendClientMessage(data.colors.YELLOW, Lang(player, "Ti-ai modificat Descrierea! Scrie {FF0000}/Stats {FFFF00}pentru a o vedea!", "You have updated your Description! Type {FF0000}/Stats {FFFF00}to see it!"));
+                Player.Info[player.playerid].Editing_Stats_Description_Line = 0;
             }
-            Player.Info[player.playerid].Editing_Stats_Description_Line = 0;
+            else Player.Info[player.playerid].Editing_Stats_Description_Line = 0;
             break;
         }
         case Dialog.BUYVIP: {
