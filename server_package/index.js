@@ -47,10 +47,8 @@ const data = {
     settings: require("./data/settings"),
 }
 
-/* ============= */
-/* MYSQL Connect */
-/* ============= */
-con.connect((err) => {
+/* MYSQL Connect Event */
+con.on("mysqlConnect", (err) => {
     if(!err) {
         console.log("MYSQL:".yellow + ` Connection successfully established.`.green);
         LoadFromDB();
@@ -58,7 +56,7 @@ con.connect((err) => {
     else {
         console.log("MYSQL:".yellow + ` Connection have been refused.`.red);
         process.exit();
-    }
+    } 
 });
 
 /* ============== */
