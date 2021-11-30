@@ -4870,7 +4870,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.TRADE_VALIDATE_BUY_ITEM: {
             if(response) {
                 inputtext = parseInt(inputtext);
-                let target = samp.getPlayers().filter(f => Player.Info[player.playerid].Trade.On == Player.Info[f.playerid].Atrade)[0];
+                let target = samp.getPlayers().filter(f => f.playerid == Player.Info[player.playerid].Trade.On && Player.Info[f.playerid].Atrade == player.playerid)[0];
                 if(!target) return SendError(player, Errors.UNEXPECTED);
                 inputtext = parseInt(inputtext);
                 if(getTradeItemAmount(target, Player.Info[player.playerid].Trade.Buy.Item) >= inputtext || !isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item)) {
@@ -4887,7 +4887,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.TRADE_SEND: {
             if(response) {
-                let target = samp.getPlayers().filter(f => Player.Info[player.playerid].Trade.On == Player.Info[f.playerid].Atrade)[0];
+                let target = samp.getPlayers().filter(f => f.playerid == Player.Info[player.playerid].Trade.On && Player.Info[f.playerid].Atrade == player.playerid)[0];
                 if(!target) return SendError(player, Errors.UNEXPECTED);
                 player.SendClientMessage(data.colors.YELLOW, "Trade request was sent successfully! Please wait while player Accepts or Rejects the Trade Request!");
                 Player.Info[target.playerid].TradeRequestFrom = player.playerid;
