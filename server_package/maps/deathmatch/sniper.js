@@ -1,0 +1,51 @@
+module.exports = {
+    Load: function() {
+        let fso_map;
+        fso_map = CreateDynamicObject(1437, 2569.262939, 2710.466064, 23.155437, 0.000000, 0.000000, 270.000000, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(1437, 2560.483154, 2719.078125, 13.005456, 0.000007, -0.000014, 179.999863, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(1437, 2560.483154, 2716.347168, 13.005456, -0.000007, 0.000014, -0.000007, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(1437, 2592.182617, 2801.388428, 11.025441, -0.000007, -0.000000, -89.999977, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(1428, 2607.166260, 2802.607910, 23.888062, 0.000000, 0.000000, 0.000000, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(1428, 2626.627441, 2803.396973, 29.087034, 0.000000, 0.000000, 270.000000, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        CreateDynamicObject(8576, 2626.394775, 2809.617676, 26.257540, 0.000000, 0.000000, 180.000000, -1, -1);
+        fso_map = CreateDynamicObject(1428, 2666.828125, 2805.549072, 32.787064, 0.000000, 0.000000, 360.000000, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(1437, 2632.562988, 2827.407471, 36.530884, 0.000000, 0.000000, 0.000000, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        CreateDynamicObject(8355, 2497.198975, 2788.610352, 29.215630, 540.000000, 90.000000, 180.000000, -1, -1);
+        fso_map = CreateDynamicObject(1437, 2569.262939, 2710.466064, 23.155437, 0.000000, 0.000000, 270.000000, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(1437, 2560.483154, 2719.078125, 13.005456, 0.000007, -0.000014, 179.999863, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(1437, 2560.483154, 2716.347168, 13.005456, -0.000007, 0.000014, -0.000007, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(19843, 2560.492920, 2717.718750, 17.843348, 0.000014, 0.000007, 89.999924, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(1437, 2560.483154, 2702.808594, 12.005456, -0.000007, 0.000014, -0.000007, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(1437, 2604.375488, 2790.716064, 15.975397, 0.000000, 0.000000, 270.000000, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(1437, 2592.182617, 2801.388428, 11.025441, -0.000007, -0.000000, -89.999977, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        CreateDynamicObject(19843, 2593.569336, 2801.380371, 15.919719, 0.000000, 0.000007, 0.000000, -1, -1);
+        fso_map = CreateDynamicObject(1428, 2607.166260, 2802.607910, 23.888062, 0.000000, 0.000000, 0.000000, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(19843, 2625.396484, 2803.396973, 9.780018, -2.000000, 0.000000, 630.000000, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 9919, "grnwht_sfe", "vic01_LA", 0);
+        fso_map = CreateDynamicObject(1428, 2626.627441, 2803.396973, 29.087034, 0.000000, 0.000000, 270.000000, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        CreateDynamicObject(8576, 2626.394775, 2809.617676, 26.257540, 0.000000, 0.000000, 180.000000, -1, -1);
+        fso_map = CreateDynamicObject(1428, 2666.828125, 2805.549072, 32.787064, 0.000000, 0.000000, 360.000000, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        fso_map = CreateDynamicObject(1437, 2632.562988, 2827.407471, 36.530884, 0.000000, 0.000000, 0.000000, -1, -1);
+        SetDynamicObjectMaterial(fso_map, 0, 2127, "cj_kitchen", "CJ_RED", 0);
+        CreateDynamicObject(8355, 2497.198975, 2788.610352, 29.215630, 540.000000, 90.000000, 180.000000, -1, -1);
+        CreateDynamicObject(8355, 2566.401123, 2857.708252, 29.215630, 540.000000, 90.000000, 90.000000, -1, -1);
+    }
+}

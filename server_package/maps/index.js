@@ -10,6 +10,18 @@ global.CreateDynamicObject = CreateDynamicObject;
 global.SetDynamicObjectMaterial = SetDynamicObjectMaterial;
 global.SetDynamicObjectMaterialText = SetDynamicObjectMaterialText;
 
+/* Death Match */
+const DE = require("./deathmatch/de");
+const GunWar = require("./deathmatch/gunwar");
+const Hell = require("./deathmatch/hell");
+const M4 = require("./deathmatch/m4");
+const Minigun = require("./deathmatch/minigun");
+const MRF = require("./deathmatch/mrf");
+const OH = require("./deathmatch/oh");
+const OS = require("./deathmatch/os");
+const Pro = require("./deathmatch/pro");
+const Sniper = require("./deathmatch/sniper");
+
 /* Drifts */
 const Drift1 = require("./drifts/1");
 
@@ -49,6 +61,18 @@ const SFAir = require("./stuntzones/sfair");
 
 module.exports = {
     Load: function() {
+        /* Death Match */
+        DE.Load();
+        GunWar.Load();
+        Hell.Load();
+        M4.Load();
+        Minigun.Load();
+        MRF.Load();
+        OH.Load();
+        OS.Load();
+        Pro.Load();
+        Sniper.Load();
+
         /* Drifts */
         Drift1.Load();
 
@@ -84,6 +108,10 @@ module.exports = {
         SFAir.Load();
     },
     RemoveBuildings: function(player) {
+        /* Death Match */
+        GunWar.RemoveBuilding(player);
+        M4.RemoveBuilding(player);
+
         /* Drifts */
         Drift1.RemoveBuilding(player);
 

@@ -2212,7 +2212,7 @@ CMD.on("set", (player, params) => {
                 }
                 case "vip": {
                     if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-                    if(params[2] < 0 || params[2] > 4) return SendError(player, "Invalid vip level (0-3)!");
+                    if(params[2] < 0 || params[2] > 4) return SendError(player, "Invalid vip level (0-4)!");
                     target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Vip level to {FF0000}${getVIPRank(params[2], false)}{FFFF00}!`);
                     player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Vip level to {FF0000}${getVIPRank(params[2], false)}{FFFF00}!`);
                     Player.Info[target.playerid].VIP = params[2];
@@ -2710,6 +2710,7 @@ CMD.on("givepcar", (player, params) => {
 /* SA:MP Functions */
 /* =============== */
 function CheckAntiCheat(player) {
+    if(Player.Info[player.playerid].Admin > 0 || Player.Info[player.playerid].RconType > 0) return;
     /* ======== */
     /* Fly Hack */
     /* ======== */
@@ -2795,7 +2796,8 @@ function closeGate(GangID) {
 }
 
 function ShowRankLabelFor(player) {
-    if(Player.Info[player.playerid].Rank_Label) return
+    if(Player.Info[player.playerid].Rank_Label) return;
+    if(getPlayerRankInLabel(player) == "") return;
     Player.Info[player.playerid].Rank_Label = Streamer.CreateDynamic3DTextLabel(getPlayerRankInLabel(player), -1, 0, 0, 0.40000000596046, 50, player.playerid);
 }
 
@@ -2806,7 +2808,8 @@ function HideRankLabelFor(player) {
 }
 
 function UpdateRankLabelFor(player) {
-    if(!Player.Info[player.playerid].Rank_Label) return;
+    if(!Player.Info[player.playerid].Rank_Label) ShowRankLabelFor(player);
+    if(getPlayerRankInLabel(player) == "") return HideRankLabelFor(player);
     Streamer.UpdateDynamic3DTextLabelText(Player.Info[player.playerid].Rank_Label, -1, getPlayerRankInLabel(player));
 }
 
