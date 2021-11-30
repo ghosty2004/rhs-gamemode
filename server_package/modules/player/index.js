@@ -114,6 +114,7 @@ module.exports = {
             GodCar: false,
             Atrade: -1,
             Trade: {
+                On: -1,
                 Sell: {
                     Item: -1,
                     Value: 0

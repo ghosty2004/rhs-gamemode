@@ -3333,6 +3333,7 @@ function checkReportsTD(player=false) {
 }
 
 function resetTradeVariables(player) {
+    Player.Info[player.playerid].Trade.On = -1;
     Player.Info[player.playerid].Trade.Sell.Item = -1;
     Player.Info[player.playerid].Trade.Sell.Value = 0;
     Player.Info[player.playerid].Trade.Buy.Item = -1;
@@ -4817,6 +4818,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                 let target = getPlayer(inputtext);
                 if(!target || target.playerid == player.playerid) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
                 if(Player.Info[target.playerid].Atrade != player.playerid) return SendError(player, "That player has no Trade activated on you!");
+                Player.Info[player.playerid].Trade.On = target.playerid;
                 let info = "";
                 info += "{00FF00}Sell {FF0000}Money\n";
                 info += "{00FF00}Sell {FF0000}Hours\n";
@@ -4868,7 +4870,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.TRADE_VALIDATE_BUY_ITEM: {
             if(response) {
                 inputtext = parseInt(inputtext);
-                let target = samp.getPlayers().filter(f => Player.Info[f.playerid].Atrade == player.playerid)[0];
+                let target = samp.getPlayers().filter(f => Player.Info[player.playerid].Trade.On == Player.Info[f.playerid].Atrade)[0];
                 if(!target) return SendError(player, Errors.UNEXPECTED);
                 inputtext = parseInt(inputtext);
                 if(getTradeItemAmount(target, Player.Info[player.playerid].Trade.Buy.Item) >= inputtext || !isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item)) {
@@ -4885,7 +4887,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.TRADE_SEND: {
             if(response) {
-                let target = samp.getPlayers().filter(f => Player.Info[f.playerid].Atrade == player.playerid)[0];
+                let target = samp.getPlayers().filter(f => Player.Info[player.playerid].Trade.On == Player.Info[f.playerid].Atrade)[0];
                 if(!target) return SendError(player, Errors.UNEXPECTED);
                 player.SendClientMessage(data.colors.YELLOW, "Trade request was sent successfully! Please wait while player Accepts or Rejects the Trade Request!");
                 Player.Info[target.playerid].TradeRequestFrom = player.playerid;

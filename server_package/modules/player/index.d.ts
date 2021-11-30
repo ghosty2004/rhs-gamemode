@@ -110,6 +110,7 @@ export declare const Info: {
     GodCar: boolean,
     Atrade: number,
     Trade: {
+        On: number,
         Sell: {
             Item: number,
             Value: number
