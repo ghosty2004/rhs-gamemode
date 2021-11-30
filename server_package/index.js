@@ -337,6 +337,10 @@ CMD.on("leave", (player) => {
             Player.Info[player.playerid].SpecialZone.Targets = false;
             Player.Info[player.playerid].TargetsPoints = 0;
         }
+        if(Player.Info[player.playerid].In_DM != "none") {
+            if(Player.Info[player.playerid].In_DM == "mrf") Player.Info[player.playerid].Selected_MRF_Weapon = null;
+            Player.Info[player.playerid].In_DM = "none";
+        }
         player.SpawnPlayer();
     }
 });
@@ -834,18 +838,74 @@ CMD.on("jumps", (player) => {
 
 CMD.on("dm", (player) => {
     let info = "Command\tDescription\tPlaying\n";
-    info += `{49FFFF}/Minigun\t{BBFF00}Minigun DeathMatch\t{00BBF6}0 Players\n`;
-    info += `{49FFFF}/De\t{BBFF00}Desert Eagle DeathMatch\t{00BBF6}0 Players\n`;
-    info += `{49FFFF}/M4\t{BBFF00}M4 DeathMatch\t{00BBF6}0 Players\n`;
-    info += `{49FFFF}/Os\t{BBFF00}One Shot DeathMatch\t{00BBF6}0 Players\n`;
-    info += `{49FFFF}/Sniper\t{BBFF00}Sniper DeathMatch\t{00BBF6}0 Players\n`;
-    info += `{49FFFF}/Mrf\t{BBFF00}Minigun-Rocket-Flame\t{00BBF6}0 Players\n`;
-    info += `{49FFFF}/GArena\t{BBFF00}Gang Arena DeathMatch\t{00BBF6}0 Players\n`;
-    info += `{49FFFF}/Oh\t{BBFF00}One Hit DeathMatch\t{00BBF6}0 Players\n`;
-    info += `{49FFFF}/Prodm\t{BBFF00}Pro DeathMatch\t{00BBF6}0 Players\n`;
-    info += `{49FFFF}/Helldm\t{BBFF00}Hell DeathMatch\t{00BBF6}0 Players\n`;
-    info += `{49FFFF}/GunWar\t{BBFF00}Gun War DeathMatch\t{00BBF6}0 Players`;
+    info += `{49FFFF}/Minigun\t{BBFF00}Minigun DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "minigun").length} Players\n`;
+    info += `{49FFFF}/De\t{BBFF00}Desert Eagle DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "de").length} Players\n`;
+    info += `{49FFFF}/M4\t{BBFF00}M4 DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "m4").length} Players\n`;
+    info += `{49FFFF}/Os\t{BBFF00}One Shot DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "os").length} Players\n`;
+    info += `{49FFFF}/Sniper\t{BBFF00}Sniper DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "sniper").length} Players\n`;
+    info += `{49FFFF}/Mrf\t{BBFF00}Minigun-Rocket-Flame\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "mrf").length} Players\n`;
+    info += `{49FFFF}/GArena\t{BBFF00}Gang Arena DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "garena").length} Players\n`;
+    info += `{49FFFF}/Oh\t{BBFF00}One Hit DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "oh").length} Players\n`;
+    info += `{49FFFF}/Prodm\t{BBFF00}Pro DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "prodm").length} Players\n`;
+    info += `{49FFFF}/Helldm\t{BBFF00}Hell DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "helldm").length} Players\n`;
+    info += `{49FFFF}/GunWar\t{BBFF00}Gun War DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "gunwar").length} Players`;
     player.ShowPlayerDialog(Dialog.TELES_DM, samp.DIALOG_STYLE.TABLIST_HEADERS, "Death match zone", info, "Teleport", "Back");
+});
+
+CMD.on("minigun", (player) => { 
+    Player.Info[player.playerid].In_DM = "minigun"; 
+    spawnPlayerInDM(player, true);
+});
+
+CMD.on("de", (player) => { 
+    Player.Info[player.playerid].In_DM = "de"; 
+    spawnPlayerInDM(player, true);
+});
+
+CMD.on("m4", (player) => { 
+    Player.Info[player.playerid].In_DM = "m4"; 
+    spawnPlayerInDM(player, true);
+});
+
+CMD.on("os", (player) => { 
+    Player.Info[player.playerid].In_DM = "os"; 
+    spawnPlayerInDM(player, true);
+});
+
+CMD.on("sniper", (player) => { 
+    Player.Info[player.playerid].In_DM = "sniper"; 
+    spawnPlayerInDM(player, true);
+});
+
+CMD.on("mrf", (player) => { 
+    Player.Info[player.playerid].In_DM = "mrf"; 
+    spawnPlayerInDM(player, true);
+});
+
+CMD.on("garena", (player) => { 
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+    Player.Info[player.playerid].In_DM = "garena"; 
+    spawnPlayerInDM(player, true);
+});
+
+CMD.on("oh", (player) => { 
+    Player.Info[player.playerid].In_DM = "oh"; 
+    spawnPlayerInDM(player, true);
+});
+
+CMD.on("prodm", (player) => { 
+    Player.Info[player.playerid].In_DM = "prodm";
+    spawnPlayerInDM(player, true);
+});
+
+CMD.on("helldm", (player) => { 
+    Player.Info[player.playerid].In_DM = "helldm"; 
+    spawnPlayerInDM(player, true);
+});
+
+CMD.on("gunwar", (player) => { 
+    Player.Info[player.playerid].In_DM = "gunwar"; 
+    spawnPlayerInDM(player, true);
 });
 
 CMD.on("int", (player) => {
@@ -2709,6 +2769,167 @@ CMD.on("givepcar", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function spawnPlayerInDM(player, first_time=false) {
+    player.ResetPlayerWeapons();
+
+    switch(Player.Info[player.playerid].In_DM) {
+        case "minigun": {
+            let random = Function.getRandomInt(0, 4);
+            let position = [];
+            switch(random) {
+                case 0: position = [-1625.3544,1379.0140,7.1823,324.2485]; break;
+                case 1: position = [-1719.8314,1366.9905,7.1875,306.8162]; break;
+                case 2: position = [-1666.5353,1415.7769,12.3906,225.7850]; break;
+                case 3: position = [-1644.4319,1366.8529,7.1797,44.9456]; break;
+                case 4: position = [-1702.0450,1368.1627,7.1722,226.4952]; break;
+            }
+            player.SetPlayerVirtualWorld(5);
+            player.GivePlayerWeapon(38, 99999);
+            TelePlayer(player, "mg", "Minigun Death Match", position[0], position[1], position[2], position[3], true, first_time);
+            break;
+        }
+        case "de": {
+            let random = Function.getRandomInt(0, 2);
+            let position = [];
+            switch(random) {
+               case 0: position = [2793.2666,1196.4672,886.7245,300.1425]; break;
+               case 1: position = [2803.0750,1192.4269,886.8182,2.1832]; break;
+               case 3: position = [2793.5303,1211.1782,886.7245,234.0286]; break;
+            }
+            player.SetPlayerVirtualWorld(10);
+            player.GivePlayerWeapon(24, 99999);
+            TelePlayer(player, "de", "Desert Eagle Death Match", position[0], position[1], position[2], position[3], true, first_time);
+            break;
+        }
+        case "m4": {
+            let random = Function.getRandomInt(0, 3);
+            let position = [];
+            switch(random) {
+                case 0: position = [-975.1617,1089.8494,1344.9731,88.0373]; break;
+                case 1: position = [-1130.9963,1057.7804,1346.4141,271.0490]; break;
+                case 2: position = [-973.3922,1061.2731,1345.6709,88.0606]; break;
+                case 3: position = [-1132.2537,1028.9749,1345.7339,269.4823]; break; 
+            }
+            player.SetPlayerVirtualWorld(15);
+            player.SetPlayerInterior(10);
+            player.GivePlayerWeapon(31, 99999);
+            TelePlayer(player, "m4", "M4 Death Match", position[0], position[1], position[2], position[3], true, first_time);
+            break;
+        }
+        case "os": {
+            let random = Function.getRandomInt(0, 2);
+            let position = [];
+            switch(random) {
+                case 0: position = [2608.9607,2810.7185,10.8203,17.0205]; break;
+                case 1: position = [2593.0830,2825.6453,19.9922,86.3488]; break;
+                case 2: position = [2581.3047,2845.7510,10.8203,170.7642]; break;
+            }
+            player.SetPlayerVirtualWorld(20);
+            player.GivePlayerWeapon(24, 99999);
+            player.SetPlayerHealth(1);
+            TelePlayer(player, "os", "One Shot Death Match", position[0], position[1], position[2], position[3], true, first_time);
+            break;
+        }
+        case "sniper": {
+            let random = Function.getRandomInt(0, 3);
+            let position = [];
+            switch(random) {
+                case 0: position = [2505.0569,2697.8140,10.8203,266.3022]; break;
+                case 1: position = [2743.7498,2853.0085,10.8203,122.2145]; break;
+                case 2: position = [2552.4675,2710.4966,10.8203,6.2565]; break;
+                case 3: position = [2589.6985,2801.3074,10.8203,91.7974]; break;
+            }
+            player.SetPlayerVirtualWorld(25);
+            player.GivePlayerWeapon(34, 99999);
+            TelePlayer(player, "sniper", "Sniper Death Match", position[0], position[1], position[2], position[3], true, first_time);
+            break;
+        }
+        case "mrf": {
+            let random = Function.getRandomInt(0, 6);
+            let position = [];
+            switch(random) {
+                case 0: position = [2804.8286,856.7043,10.7500,170.7172]; break;
+                case 1: position = [2887.6555,1014.4090,10.7500,90.4689]; break;
+                case 2: position = [2786.4563,961.9937,14.2559,267.3053]; break;
+                case 3: position = [2855.4199,893.4794,9.9286,358.2252]; break;
+                case 4: position = [2884.7864,942.9882,10.7500,90.7272]; break;
+                case 5: position = [2855.2422,855.4941,9.9674,176.0437]; break;
+                case 6: position = [2789.9875,998.6318,10.7500,183.2399]; break;
+            }
+            player.SetPlayerVirtualWorld(30);
+            if(Player.Info[player.playerid].Selected_MRF_Weapon == null) {
+                let info = "";
+                info += "{0072FF}Minigun\n"
+                info += "{FFFF00}Rocket Launcher\n"
+                info += "{FF0000}Flame-Thrower";
+                player.ShowPlayerDialog(Dialog.SELECT_MRF_WEAPON, samp.DIALOG_STYLE.LIST, "Minigun-Rocket-Flame Death Match - Select Weapon", info, "Select", "Leave");
+            }
+            else player.GivePlayerWeapon(Player.Info[player.playerid].Selected_MRF_Weapon, 99999);
+            TelePlayer(player, "mrf", "M.R.F Death Match", position[0], position[1], position[2], position[3], true, first_time);
+            break;
+        }
+        case "garena": {
+            Player.Info[player.playerid].In_DM = "none";
+            player.SpawnPlayer();
+            break;
+        }
+        case "oh": {
+            let random = Function.getRandomInt(0, 1);
+            let position = [];
+            switch(random) {
+                case 0: position = [-1846.2910,791.3270,113.2891,54.8324]; break;
+                case 1: position = [-1845.4417,805.9675,113.2891,100.4750]; break;
+            }
+            player.SetPlayerVirtualWorld(35);
+            player.SetPlayerHealth(1);
+            player.SetPlayerTime(0);
+            TelePlayer(player, "oh", "One Hit Death Match", position[0], position[1], position[2], position[3], true, first_time);
+            break;
+        }
+        case "prodm": {
+            let random = Function.getRandomInt(0, 3);
+            let position = [];
+            switch(random) {
+                case 0: position = [-1086.5519,2599.2061,1796.1300,311.4927]; break;
+                case 1: position = [-1086.6243,2643.1519,1796.1300,225.5919]; break;
+                case 2: position = [-1041.7769,2599.5005,1796.1300,47.6403]; break;
+            }
+            player.SetPlayerVirtualWorld(40);
+            player.GivePlayerWeapon(24, 99999);
+            player.GivePlayerWeapon(25, 99999);
+            player.GivePlayerWeapon(28, 99999);
+            player.GivePlayerWeapon(31, 99999);
+            player.GivePlayerWeapon(34, 99999);
+            TelePlayer(player, "prodm", "Pro Death Match", position[0], position[1], position[2], position[3], true, first_time);
+            break;
+        }
+        case "helldm": {
+            let random = Function.getRandomInt(0, 4);
+            let position = [];
+            switch(random) {
+                case 0: position = [1482.8680,-118.3745,2117.4136,346.7376]; break;
+                case 1: position = [1482.7861,-118.7205,2117.4136,346.7376]; break;
+                case 2: position = [1428.7452,-91.8292,2117.4136,289.3709]; break;
+                case 3: position = [1488.5153,-48.6941,2117.4136,166.7127]; break;
+                case 4: position = [1426.9746,-68.0348,2118.2300,250.3109]; break;
+            }
+            player.SetPlayerVirtualWorld(45);
+            player.SetPlayerTime(0);
+            player.GivePlayerWeapon(24, 99999);
+            player.GivePlayerWeapon(25, 99999);
+            player.GivePlayerWeapon(29, 99999);
+            player.GivePlayerWeapon(31, 99999);
+            TelePlayer(player, "helldm", "Hell Death Match", position[0], position[1], position[2], position[3], true, first_time);
+            break;
+        }
+        case "gunwar": {
+            Player.Info[player.playerid].In_DM = "none";
+            player.SpawnPlayer();
+            break;
+        }
+    }
+}
+
 function CheckAntiCheat(player) {
     if(Player.Info[player.playerid].Admin > 0 || Player.Info[player.playerid].RconType > 0) return;
     /* ======== */
@@ -3331,6 +3552,7 @@ function SendACMD(player, cmdtext) {
 function isPlayerInSpecialZone(player) {
     let value = false;
     if(Player.Info[player.playerid].SpecialZone.Targets) value = true;
+    if(Player.Info[player.playerid].In_DM != "none") value = true;
     return value;
 }
 
@@ -3345,11 +3567,22 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function TelePlayer(player, cmdtext, name, x, y, z, angle) {
-    player.GameTextForPlayer(`~y~~h~Welcome to~n~~g~~h~${name}`, 4000, 3);
+function TelePlayer(player, cmdtext, name, x, y, z, angle, dm=false, gametext=true) {
+    switch(dm) {
+        case false: {
+            if(gametext) player.GameTextForPlayer(`~y~~h~Welcome to~n~~g~~h~${name}`, 4000, 3); 
+            break;
+        }
+        case true: {
+            if(gametext) player.GameTextForPlayer(`~g~~h~Welcome To~n~~r~~h~${name}`, 4000, 5); 
+            break;
+        }
+    }
+
     player.SetPlayerPos(x, y, z);
     player.SetPlayerFacingAngle(angle);
-    AddToTDLogs(`~b~~h~${player.GetPlayerName(24)} ~y~~h~has gone to ~r~~h~${name} ~b~~h~- /${cmdtext}`);
+
+    if(gametext) AddToTDLogs(`~b~~h~${player.GetPlayerName(24)} ~y~~h~has gone to ~r~~h~${name} ~b~~h~- /${cmdtext}`);
 }
 
 function CheckCustomChat(player, text) {
@@ -3529,6 +3762,7 @@ function SetupPlayerForSpawn(player, type=0) {
     player.SetPlayerVirtualWorld(0);
     player.SetPlayerInterior(0);
     player.ResetPlayerWeapons();
+    player.SetPlayerHealth(100);
 
     /* Check if the player is jailed */
     if(Player.Info[player.playerid].Jailed) return player.SetPlayerPos(data.position.JAIL.x, data.position.JAIL.y, data.position.JAIL.z);
@@ -3580,8 +3814,11 @@ function SetupPlayerForSpawn(player, type=0) {
         player.SetPlayerFacingAngle(position[3]);
     }
 
-    /* Check if the players is Caged */
+    /* Check if the player is Caged */
     if(Player.Info[player.playerid].Caged) CagePlayer(player);
+
+    /* Check if the player is in DeathMatch */
+    if(Player.Info[player.playerid].In_DM != "none") spawnPlayerInDM(player);
 }
 
 function LoadFromDB() {
@@ -4381,6 +4618,8 @@ samp.OnPlayerDisconnect((player, reason) => {
     HideCapturingLabelFor(player);
     UnLoadPlayerPersonalCars(player);
 
+    if(Player.Info[player.playerid].SpawnedCar) samp.DestroyVehicle(Player.Info[player.playerid].SpawnedCar);
+
     Player.ResetVariables(player.playerid);
     checkReportsTD();
 
@@ -4412,6 +4651,18 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.SELECT_MRF_WEAPON: {
+            if(response) {
+                switch(listitem) {
+                    case 0: Player.Info[player.playerid].Selected_MRF_Weapon = 38; break;
+                    case 1: Player.Info[player.playerid].Selected_MRF_Weapon = 35; break;
+                    case 2: Player.Info[player.playerid].Selected_MRF_Weapon = 37; break;
+                }
+                player.GivePlayerWeapon(Player.Info[player.playerid].Selected_MRF_Weapon, 99999);
+            }
+            else CMD.emit("leave");
+            break;
+        }
         case Dialog.BUYCAR_CHEAP: {
             if(response) BuySpecificCar(player, "cheap", listitem);
             break;
@@ -5487,6 +5738,7 @@ samp.OnPlayerText((player, text) => {
 
 samp.OnPlayerSpawn((player) => {
     if(!Player.Info[player.playerid].LoggedIn) return player.Kick();
+
     HideConnectTextDraw(player);
     ShowSpawnTextDraw(player);
     player.SetPlayerVirtualWorld(0);
@@ -5517,7 +5769,8 @@ samp.OnPlayerCommandText((player, cmdtext) => {
         if(Player.Info[player.playerid].AFK && cmdtext != "back") return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use~n~~r~~h~Commands~w~~h~!", 3000, 4);
         
         if(CMD.eventNames().some(s => s == cmdtext)) {
-            CMD.emit(cmdtext, player, params);
+            try { CMD.emit(cmdtext, player, params); }
+            catch(e) { console.log(e.stack); }
         }
         else if(Teleport.Exists(cmdtext)) {
             TelePlayer(player, cmdtext, Teleport.Info[cmdtext].name, Teleport.Info[cmdtext].position[0], Teleport.Info[cmdtext].position[1], Teleport.Info[cmdtext].position[2], Teleport.Info[cmdtext].position[3]);

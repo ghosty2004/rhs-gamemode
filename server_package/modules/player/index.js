@@ -135,19 +135,8 @@ module.exports = {
             AFK: false,
             Need_Mail_Showed: false,
             Rank_Label: null,
-            In_DM: {
-                Minigun: false,
-                DE: false,
-                M4: false,
-                OS: false,
-                Sniper: false,
-                MRF: false,
-                Garena: false,
-                OneHit: false,
-                Pro: false,
-                Hell: false,
-                GunWar: false
-            }
+            In_DM: "none",
+            Selected_MRF_Weapon: null
         }
     }
 };

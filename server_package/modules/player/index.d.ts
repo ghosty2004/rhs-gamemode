@@ -131,19 +131,8 @@ export declare const Info: {
     AFK: boolean,
     Need_Mail_Showed: boolean,
     Rank_Label: null|number,
-    In_DM: {
-        Minigun: boolean,
-        DE: boolean,
-        M4: boolean,
-        OS: boolean,
-        Sniper: boolean,
-        MRF: boolean,
-        Garena: boolean,
-        OneHit: boolean,
-        Pro: boolean,
-        Hell: boolean,
-        GunWar: boolean
-    }
+    In_DM: "none"|"minigun"|"de"|"m4"|"os"|"sniper"|"mrf"|"garena"|"oh"|"prodm"|"helldm"|"gunwar",
+    Selected_MRF_Weapon: null|38|35|37
 }[]
 
 export declare function ResetVariables(playerid: number): void;
