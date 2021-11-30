@@ -130,7 +130,20 @@ export declare const Info: {
     CageObjects: Array<any>,
     AFK: boolean,
     Need_Mail_Showed: boolean,
-    Rank_Label: null|number
+    Rank_Label: null|number,
+    In_DM: {
+        Minigun: boolean,
+        DE: boolean,
+        M4: boolean,
+        OS: boolean,
+        Sniper: boolean,
+        MRF: boolean,
+        Garena: boolean,
+        OneHit: boolean,
+        Pro: boolean,
+        Hell: boolean,
+        GunWar: boolean
+    }
 }[]
 
 export declare function ResetVariables(playerid: number): void;

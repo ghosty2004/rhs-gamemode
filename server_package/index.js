@@ -494,6 +494,7 @@ CMD.on("report", (player, params) => {
             player.SendClientMessage(data.colors.RED, `/REPORT: {BBFF00}${target.GetPlayerName(24)}(${target.playerid}) was reported at administrators online. Reason: ${params.slice(1).join(" ")}`);
             Player.Info[target.playerid].Reported.By = player.playerid;
             Player.Info[target.playerid].Reported.Reason = params.slice(1).join(" ");
+            SendMessageToAdmins(data.colors.RED, `/REPORTS: {00BBF6}${player.GetPlayerName(24)}(${player.playerid}) {BBFF00}reported {00BBF6}${target.GetPlayerName(24)}(${target.playerid}){BBFF00} Reason: {00BBF6}${params.slice(1).join(" ")}`);
             checkReportsTD();
         }
         else SendError(player, Errors.PLAYER_NOT_CONNECTED);
@@ -502,9 +503,11 @@ CMD.on("report", (player, params) => {
 });
 
 CMD.on("up", (player, params) => {
-    if(isNaN(params[0])) return SendUsage(player, "");
+    if(isNaN(params[0])) return SendUsage(player, "/UP [Meters]");
     params[0] = parseInt(params[0]);
-    player.SetPlayerPos(player.position.x, player.position.y, player.position.z + params[1]);
+    if(params[0] < 0 || params[0] > 3000) return SendError(player, "Invalid height (0-3000)!");
+    player.GivePlayerWeapon(46, 1);
+    player.SetPlayerPos(player.position.x, player.position.y, player.position.z + params[0]);
     player.SendClientMessage(data.colors.GREEN, Lang(player, `Te-ai teleportat la {00BBF6}${params[0]} metri {00FF00}altitudine!`, `You have been teleported to {00BBF6}${params[0]} meters {00FF00}altitude!`));
 });
 
@@ -1379,7 +1382,13 @@ CMD.on("spec", (player, params) => {
     if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
     if(target.GetPlayerState() == samp.PLAYER_STATE.SPECTATING) return SendError(player, "Player spectating someone else!");
     player.GameTextForPlayer("~w~now~g~~h~ spectating~n~~w~type~r~~h~ /spec off~w~ to stop", 4000, 3);
-    if(Player.Info[player.playerid].Admin) SendMessageToAdmins(data.colors.BLUE, `Admin: {FFFF00}${player.GetPlayerName(24)} {0000FF}has started spectating player {FFFF00}#${target.playerid}`);
+    if(Player.Info[player.playerid].Admin) {
+        SendMessageToAdmins(data.colors.BLUE, `Admin: {FFFF00}${player.GetPlayerName(24)} {0000FF}has started spectating player {FFFF00}#${target.playerid}`);
+        if(Player.Info[target.playerid].Reported.By != -1) {
+            if(!samp.IsPlayerConnected(Player.Info[target.playerid].Reported.By)) return;
+            samp.SendClientMessage(Player.Info[target.playerid].Reported.By, `/REPORT: {BBFF00}Administrator {FFFF00}${player.GetPlayerName(24)}{BBFF00} is now spectating the reported id {FFFF00}#${target.playerid}`);
+        }
+    }
     StartSpectate(player, target);
 });
 
@@ -1964,6 +1973,21 @@ CMD.on("res", (player, params) => {
         params[1] = parseInt(params[1]);
         if(!isReportIdExists(params[0])) return SendError(player, "This report ID not exists!");
         if(params[1] != 1 && params[1] != 0) return SendError(player, "Invalid hack check value!");
+        SendMessageToAdmins(data.colors.BLUE, `Admin: {FFFF00}${player.GetPlayerName(24)} {0000FF}has resolved the report id {FFFF00}#${params[0]}`);
+        if(samp.IsPlayerConnected(Player.Info[params[0]].Reported.By)) {
+            samp.SendClientMessage(Player.Info[params[0]].Reported.By, data.colors.RED, `/REPORT: {BBFF00}Your report has been resolved by Admin ${player.GetPlayerName(24)}!`);
+            switch(params[1]) {
+                case 0: {
+                    samp.SendClientMessage(Player.Info[params[0]].Reported.By, data.colors.RED, "/REPORT: {BBFF00}Because the reported player was unguilty you didn't receive anything!");
+                    break;
+                }
+                case 1: {
+                    samp.SendClientMessage(Player.Info[params[0]].Reported.By, data.colors.RED, "/REPORT: {BBFF00}Because the reported player got punished, you received 50 coins as a reward!");
+                    Player.Info[Player.Info[params[0]].Reported.By].Coins += 50;
+                    break;
+                }
+            }
+        }
         Player.Info[params[0]].Reported.By = -1;
         checkReportsTD();
     }
@@ -2685,6 +2709,15 @@ CMD.on("givepcar", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function CheckAntiCheat(player) {
+    /* ======== */
+    /* Fly Hack */
+    /* ======== */
+    if(player.GetPlayerAnimationIndex() == 958) {
+        SendMessageToAdmins(data.colors.RED, `${data.settings.BUSTER_PREFIX}: ${player.GetPlayerName(24)}(${player.playerid}) possible use Fly Hack!`);
+    }
+}
+
 function UpdatePlayer(player, column, value) {
     con.query(`UPDATE users SET ${column} = ? WHERE ID = ?`, [value, Player.Info[player.playerid].AccID]);
 }
@@ -3131,7 +3164,6 @@ function getRegistredPlayersCount() {
 function Updater() {
     /* Server HostName Changer */
     samp.SendRconCommand(`hostname ${data.settings.RANDOM_SERVER_NAMES[Function.getRandomInt(0, data.settings.RANDOM_SERVER_NAMES.length)]}`);
-    //samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => { savePlayer(i); });
 }
 
 function banPlayer(player, admin, days, reason) {
@@ -4420,6 +4452,7 @@ samp.OnPlayerUpdate((player) => {
                 }
             });
         }
+        CheckAntiCheat(player);
     }
     catch(e) { console.log(e.stack); }
     return true;
