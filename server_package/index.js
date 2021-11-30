@@ -856,6 +856,7 @@ CMD.on("minigun", (player) => {
     Player.Info[player.playerid].In_DM = "minigun"; 
     spawnPlayerInDM(player, true);
 });
+CMD.on("mg", (player) => { CMD.emit("minigun", player); });
 
 CMD.on("de", (player) => { 
     Player.Info[player.playerid].In_DM = "de"; 
@@ -3759,6 +3760,7 @@ function ResetPlayerClanCreateVariables(player) {
 
 function SetupPlayerForSpawn(player, type=0) { 
     player.SetPlayerColor(0xFFFFFFAA);
+    player.SetPlayerTime(12);
     player.SetPlayerVirtualWorld(0);
     player.SetPlayerInterior(0);
     player.ResetPlayerWeapons();
@@ -5461,7 +5463,19 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.TELES_DM: {
             if(response) {
-
+                switch(listitem) {
+                    case 0: CMD.emit("minigun", player); break;
+                    case 1: CMD.emit("de", player); break;
+                    case 2: CMD.emit("m4", player); break;
+                    case 3: CMD.emit("os", player); break;
+                    case 4: CMD.emit("sniper", player); break;
+                    case 5: CMD.emit("mrf", player); break;
+                    case 6: CMD.emit("garena", player); break;
+                    case 7: CMD.emit("oh", player); break;
+                    case 8: CMD.emit("prodm", player); break;
+                    case 9: CMD.emit("helldm", player); break;
+                    case 10: CMD.emit("gunwar", player); break;
+                }
             }
             else CMD.emit("teles", player);
             break;
