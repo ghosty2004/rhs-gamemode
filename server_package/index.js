@@ -5499,6 +5499,7 @@ samp.OnPlayerSpawn((player) => {
     ShowRankLabelFor(player);
 
     player.PlayerPlaySound(1063, 0.0, 0.0, 0.0);
+
     return true;
 });
 
