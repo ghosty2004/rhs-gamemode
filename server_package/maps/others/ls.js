@@ -602,18 +602,6 @@ module.exports = {
         CreateDynamicObject(2011, 1213.900024, -1660.540039, 10.790000, 0.000000, 0.000000, 0.000000, -1, -1);
         CreateDynamicObject(19124, 1501.969971, -1758.280029, 13.250000, 0.000000, 0.000000, 0.000000, -1, -1);
         CreateDynamicObject(869, 1466.609985, -1764.890015, 13.230000, 0.000000, 0.000000, 0.000000, -1, -1);
-        fso_map = CreateDynamicObject(18792, 1710.150635, -1817.623779, 129.205338, 9.899998, -11.000000, 46.300014, -1, -1);
-        SetDynamicObjectMaterial(fso_map, 4, 19082, "laserpointer4", "laserbeam-4-64x64", 0);
-        SetDynamicObjectMaterial(fso_map, 3, 14668, "711c", "CJ_7_11_TILE", 0);
-        SetDynamicObjectMaterial(fso_map, 2, 14668, "711c", "CJ_7_11_TILE", 0);
-        SetDynamicObjectMaterial(fso_map, 1, 14668, "711c", "CJ_7_11_TILE", 0);
-        SetDynamicObjectMaterial(fso_map, 0, 14668, "711c", "CJ_7_11_TILE", 0);
-        fso_map = CreateDynamicObject(18789, 1629.825317, -1897.208862, 108.801033, 24.600000, -10.899998, 49.500000, -1, -1);
-        SetDynamicObjectMaterial(fso_map, 4, 19082, "laserpointer4", "laserbeam-4-64x64", 0);
-        SetDynamicObjectMaterial(fso_map, 3, 14668, "711c", "CJ_7_11_TILE", 0);
-        SetDynamicObjectMaterial(fso_map, 2, 14668, "711c", "CJ_7_11_TILE", 0);
-        SetDynamicObjectMaterial(fso_map, 1, 14668, "711c", "CJ_7_11_TILE", 0);
-        SetDynamicObjectMaterial(fso_map, 0, 14668, "711c", "CJ_7_11_TILE", 0);
         fso_map = CreateDynamicObject(7914, 1637.489502, -1722.789185, 33.320271, 0.000000, 0.000000, 332.000000, -1, -1);
         SetDynamicObjectMaterialText(fso_map, 0, "{0061ff} Romania {ffff00} HarD {ff0000} Stunt", 80, "Calibri", 20, 0, 0, 0, 1);
         CreateDynamicObject(700, 1511.880005, -1771.849976, 13.040000, 356.859985, 0.000000, 3.140000, -1, -1);
