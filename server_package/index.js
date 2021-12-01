@@ -1228,7 +1228,7 @@ CMD.on("weather", (player, params) => {
     if(!isNumber(params[0])) return SendUsage(player, "/weather [Weather]");
     if(params[0] < 0 || params[0] > 20) return SendError(player, "Invalid weather (0-20)!");
     player.SetPlayerWeather(params[0]);
-    player.SendClientCheck(data.colors.LIGHT_BLUE, `You have setted your weather to ${params[0]}.`);
+    player.SendClientMessage(data.colors.LIGHT_BLUE, `You have setted your weather to ${params[0]}.`);
 });
 
 CMD.on("vad", (player, params) => {
