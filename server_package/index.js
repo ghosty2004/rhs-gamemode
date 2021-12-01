@@ -40,7 +40,7 @@ const TextDraws = require("./textdraws");
 const ServerLogs = ["", "", ""];
 
 /* Functions */
-const { getPlayer } = require("./modules/functions");
+const { getPlayer, isNumber } = require("./modules/functions");
 
 /* Data's */
 const data = {
@@ -1216,10 +1216,19 @@ CMD.on("astats", (player, params) => {
 
 CMD.on("time", (player, params) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    if(!isNumber(params[0]) || !isNumber(params[1])) return SendUsage(player, "/time [Hour] [Minutes]");
+    if(params[0] < 0 || params[0] > 23) return SendError(player, "Invalid hour (0-23)!");
+    if(params[1] < 0 || params[1] > 59) return SendError(player, "Invalid minute (0-59)!");
+    player.SetPlayerTime(params[0], params[1]);
+    player.SendClientMessage(data.colors.LIGHT_BLUE, `You have setted your time to ${params[0]}:${params[1]}.`);
 });
 
 CMD.on("weather", (player, params) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    if(!isNumber(params[0])) return SendUsage(player, "/weather [Weather]");
+    if(params[0] < 0 || params[0] > 20) return SendError(player, "Invalid weather (0-20)!");
+    player.SetPlayerWeather(params[0]);
+    player.SendClientCheck(data.colors.LIGHT_BLUE, `You have setted your weather to ${params[0]}.`);
 });
 
 CMD.on("vad", (player, params) => {
@@ -1231,9 +1240,9 @@ CMD.on("goto", (player, params) => {
     if(!params[0]) return SendUsage(player, "/Goto [ID/Name]");
     let target = getPlayer(params[0]);
     if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    player.SetPlayerPos(target.position.x, target.position.y, target.position.z);
     player.SendClientMessage(data.colors.LIGHT_BLUE, `You have teleported to player ${target.GetPlayerName(24)}.`);
     target.SendClientMessage(data.colors.LIGHT_BLUE, `${player.GetPlayerName(24)} have been teleported to you.`);
-    player.SetPlayerPos(target.position.x, target.position.y, target.position.z);
     SendACMD(player, "Goto");
 });
 
@@ -1248,6 +1257,8 @@ CMD.on("vclub", (player) => {
 
 CMD.on("vdisarm", (player) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    player.ResetPlayerWeapons();
+    player.SendClientMessage(data.colors.LIGHT_BLUE, "You have disarmed yourself!");
 });
 
 CMD.on("fire", (player) => {
@@ -5823,7 +5834,10 @@ samp.OnPlayerCommandText((player, cmdtext) => {
         if(Player.Info[player.playerid].AFK && cmdtext != "back") return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use~n~~r~~h~Commands~w~~h~!", 3000, 4);
         
         if(CMD.eventNames().some(s => s == cmdtext)) {
-            try { CMD.emit(cmdtext, player, params); }
+            try { 
+                for(let i = 0; i < params.length; i++) if(!isNaN(params[i])) params[i] = parseInt(params[i]);
+                CMD.emit(cmdtext, player, params); 
+            }
             catch(e) { console.log(e.stack); }
         }
         else if(Teleport.Exists(cmdtext)) { 
