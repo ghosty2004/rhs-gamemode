@@ -1418,7 +1418,7 @@ CMD.on("spec", (player, params) => {
         SendMessageToAdmins(data.colors.BLUE, `Admin: {FFFF00}${player.GetPlayerName(24)} {0000FF}has started spectating player {FFFF00}#${target.playerid}`);
         if(Player.Info[target.playerid].Reported.By != -1) {
             if(!samp.IsPlayerConnected(Player.Info[target.playerid].Reported.By)) return;
-            samp.SendClientMessage(Player.Info[target.playerid].Reported.By, `/REPORT: {BBFF00}Administrator {FFFF00}${player.GetPlayerName(24)}{BBFF00} is now spectating the reported id {FFFF00}#${target.playerid}`);
+            samp.SendClientMessage(Player.Info[target.playerid].Reported.By, data.colors.RED, `/REPORT: {BBFF00}Administrator {FFFF00}${player.GetPlayerName(24)}{BBFF00} is now spectating the reported id {FFFF00}#${target.playerid}`);
         }
     }
     StartSpectate(player, target);
