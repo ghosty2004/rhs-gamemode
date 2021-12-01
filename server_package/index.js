@@ -1243,6 +1243,7 @@ CMD.on("spawnme", (player) => {
 
 CMD.on("vclub", (player) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    TelePlayer(player, "vclub", "VIP Club", -854.8422, -1967.1138, 15.9304, 249.0278);
 });
 
 CMD.on("vdisarm", (player) => {

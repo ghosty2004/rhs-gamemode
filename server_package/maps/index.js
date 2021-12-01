@@ -47,6 +47,7 @@ const Pimps = require("./others/pimps");
 const Quarry = require("./others/quarry.js");
 const SF = require("./others/sf");
 const Spawn = require("./others/spawn");
+const VIPClub = require("./others/vipclub");
 const Voller = require("./others/voller");
 
 /* Player's Objects */
@@ -98,6 +99,7 @@ module.exports = {
         Quarry.Load();
         SF.Load();
         Spawn.Load();
+        VIPClub.Load();
         Voller.Load();
 
         /* Stunt Zones */
@@ -129,6 +131,7 @@ module.exports = {
         LVTrans.RemoveBuilding(player);
         Pimps.RemoveBuilding(player);
         SF.RemoveBuilding(player);
+        VIPClub.RemoveBuilding(player);
         Voller.RemoveBuilding(player);
 
         /* Stunt Zones */
