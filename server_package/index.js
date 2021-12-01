@@ -46,7 +46,7 @@ const { getPlayer } = require("./modules/functions");
 const data = {
     colors: require("./data/colors"),
     position: require("./data/positions"),
-    settings: require("./data/settings"),
+    settings: require("./data/settings")
 }
 
 /* MYSQL Connect Event */
@@ -926,16 +926,9 @@ CMD.on("drifts", (player) => {
 });
 
 CMD.on("drift", (player, params) => {
-    switch(parseInt(params[0])) {
-        case 1: TelePlayer(player, "drift 1", "Drift 1", data.position.DRIFT[1][0], data.position.DRIFT[1][1], data.position.DRIFT[1][2], data.position.DRIFT[1][3]); break;
-        case 2: TelePlayer(player, "drift 2", "Drift 2", data.position.DRIFT[2][0], data.position.DRIFT[2][1], data.position.DRIFT[2][2], data.position.DRIFT[2][3]); break;
-        case 3: TelePlayer(player, "drift 3", "Drift 3", data.position.DRIFT[3][0], data.position.DRIFT[3][1], data.position.DRIFT[3][2], data.position.DRIFT[3][3]); break;
-        case 4: TelePlayer(player, "drift 4", "Drift 4", data.position.DRIFT[4][0], data.position.DRIFT[4][1], data.position.DRIFT[4][2], data.position.DRIFT[4][3]); break;
-        case 5: TelePlayer(player, "drift 5", "Drift 5", data.position.DRIFT[5][0], data.position.DRIFT[5][1], data.position.DRIFT[5][2], data.position.DRIFT[5][3]); break;
-        case 6: TelePlayer(player, "drift 6", "Drift 6", data.position.DRIFT[6][0], data.position.DRIFT[6][1], data.position.DRIFT[6][2], data.position.DRIFT[6][3]); break;
-        case 7: CMD.emit("lvair", player); break;
-        default: CMD.emit("drifts", player); break;
-    }
+    let result = Teleport.Info.find(f => f.command == `drift ${parseInt(params[0])}`);
+    if(result) TelePlayer(player, result.command, result.name, result.position[0], result.position[1], result.position[2], result.position[3]);
+    else CMD.emit("drifts", player);
 });
 
 CMD.on("races", (player) => {
@@ -1069,7 +1062,7 @@ CMD.on("splaces", (player) => {
 
 CMD.on("others", (player) => {
     let info = "Command\tDescription\n";
-    Teleport.Get().filter(f => f.type == "others").forEach((i) => {
+    Teleport.Info.filter(f => f.type == "others").forEach((i) => {
         info += `{49FFFF}/${capitalizeFirstLetter(i.command)}\t{BBFF00}${i.name}\n`;
     });
     player.ShowPlayerDialog(Dialog.TELES_OTHERS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Other Teleports", info, "Teleport", "Back");
@@ -5497,7 +5490,8 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.TELES_DRIFTS: {
             if(response) {
-                for(let i = 0; i < 7; i++) {
+                let result = Teleport.Info.filter(f => f.type == "drifts");
+                for(let i = 0; i < result.length; i++) {
                     if(i == listitem) {
                         CMD.emit("drift", player, [i+1]);
                         break;
@@ -5551,7 +5545,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.TELES_OTHERS: {
             if(response) {
-                let result = Teleport.Get().filter(f => f.type == "others");
+                let result = Teleport.Info.filter(f => f.type == "others");
                 for(let i = 0; i < result.length; i++) {
                     if(i == listitem) {
                         TelePlayer(player, result[i].command, result[i].name, result[i].position[0], result[i].position[1], result[i].position[2], result[i].position[3]);  
@@ -5806,8 +5800,9 @@ samp.OnPlayerCommandText((player, cmdtext) => {
             try { CMD.emit(cmdtext, player, params); }
             catch(e) { console.log(e.stack); }
         }
-        else if(Teleport.Exists(cmdtext)) {
-            TelePlayer(player, cmdtext, Teleport.Info[cmdtext].name, Teleport.Info[cmdtext].position[0], Teleport.Info[cmdtext].position[1], Teleport.Info[cmdtext].position[2], Teleport.Info[cmdtext].position[3]);
+        else if(Teleport.Exists(cmdtext)) { 
+            let result = Teleport.Info.find(f => f.command == cmdtext);
+            TelePlayer(player, cmdtext, result.name, result.position[0], result.position[1], result.position[2], result.position[3]);
         }
         else player.SendClientMessage(data.colors.RED, Lang(player, `Comanda {BBFF00}/${cmdtext}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`, `Command {BBFF00}/${cmdtext}{FF0000} don't exist! Use {BBFF00}/help{FF0000} or {BBFF00}/cmds{FF0000}!`));
     }
