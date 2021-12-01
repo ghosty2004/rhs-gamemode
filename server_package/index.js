@@ -44,6 +44,7 @@ const { getPlayer, isNumber } = require("./modules/functions");
 
 /* Data's */
 const data = {
+    animations: require("./data/animations"),
     colors: require("./data/colors"),
     position: require("./data/positions"),
     settings: require("./data/settings")
@@ -189,24 +190,29 @@ CMD.on("skin", (player, params) => {
 
 CMD.on("anim", (player, params) => {
     if(!params[0]) return SendUsage(player, "/anim [List/Anim]");
-    switch(params[0]) {
-        case "list": {
-            let info = "";
-            info += "{BBFF00}The following {00BBF6}Anims {BBFF00}can be used with the command {00BBF6}/Anim [Anim]{BBFF00}!\n";
-            info += "{00BBF6}Example: {BBFF00}/Anim wave\n";
-            info += "\n";
-            info += "{BBFF00}Wave{00BBF6}, {BBFF00}Wank{00BBF6}, {BBFF00}Fall{00BBF6}, {BBFF00}Fall2{00BBF6}, {BBFF00}Relax{00BBF6}, {BBFF00}Hup{00BBF6}, {BBFF00}Bomb{00BBF6}, {BBFF00}Rob{00BBF6}, {BBFF00}Taichi{00BBF6}, {BBFF00}Spank{00BBF6},{BBFF00}CJ{00BBF6},\n";
-            info += "{BBFF00}Sick{00BBF6}, {BBFF00}Talk{00BBF6}, {BBFF00}Kiss{00BBF6}, {BBFF00}Sit{00BBF6}, {BBFF00}FuckU{00BBF6}, {BBFF00}Coc{00BBF6}, {BBFF00}Rocky{00BBF6}, {BBFF00}Smoke{00BBF6}, {BBFF00}Beach{00BBF6}, {BBFF00}Look{00BBF6}, {BBFF00}Gro{00BBF6},\n";
-            info += "{BBFF00}Circ{00BBF6}, {BBFF00}Med{00BBF6}, {BBFF00}Chat{00BBF6}, {BBFF00}Die{00BBF6}, {BBFF00}Slap{00BBF6}, {BBFF00}Roll{00BBF6}, {BBFF00}Glitch{00BBF6}, {BBFF00}Fire{00BBF6}, {BBFF00}Vomit{00BBF6}, {BBFF00}Drunk{00BBF6}, {BBFF00}Lbp{00BBF6},\n";
-            info += "{BBFF00}GetIn{00BBF6}, {BBFF00}Pee{00BBF6}, {BBFF00}Piss{00BBF6}, {BBFF00}Kick{00BBF6}, {BBFF00}Cell{00BBF6}, {BBFF00}Phone{00BBF6}, {BBFF00}Laugh{00BBF6}, {BBFF00}Eat{00BBF6}, {BBFF00}Inj{00BBF6}, {BBFF00}SlapAss{00BBF6}, {BBFF00}Deal{00BBF6},\n";
-            info += "{BBFF00}Lay{00BBF6}, {BBFF00}Arrest{00BBF6}, {BBFF00}ScaRED{00BBF6}, {BBFF00}BJ{00BBF6}, {BBFF00}BJ2{00BBF6}, {BBFF00}BJ3{00BBF6}, {BBFF00}Swat{00BBF6}, {BBFF00}Swat2{00BBF6}, {BBFF00}Swat3{00BBF6}, {BBFF00}Swat4{00BBF6}, {BBFF00}Swat5{BBFF00},\n";
-            info += "{BBFF00}Swat6{00BBF6}, {BBFF00}Shout{00BBF6}, {BBFF00}Strip{00BBF6}, {BBFF00}Strip2{00BBF6}, {BBFF00}Strip3{00BBF6}, {BBFF00}Strip4{00BBF6}, {BBFF00}Strip5{00BBF6}, {BBFF00}BaseBall{00BBF6}, {BBFF00}BaseBall2{00BBF6}.\n";
-            info += "\n";
-            info += "{00BBF6}Pont: {BBFF00}To stop an {00BBF6}Anim {BBFF00}, type {00BBF6}/Anim {FF0000}stop{BBFF00}.\n";
-            info += "{BBFF00}Total Anims: {FF0000}64";
-            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Anim {FF0000}List", info, "Close", "");
-            break;
-        }
+    if(params[0] == "list") {
+        let info = "";
+        info += "{BBFF00}The following {00BBF6}Anims {BBFF00}can be used with the command {00BBF6}/Anim [Anim]{BBFF00}!\n";
+        info += `{00BBF6}Example: {BBFF00}/Anim ${data.animations.at(0).name}\n`; // cell, phone
+        info += "\n";
+
+        let count = 0;
+        data.animations.forEach((i) => {
+            count++;
+            info += `{BBFF00}${capitalizeFirstLetter(i.name)}{00BBF6}, ${count == 11 ? "\n" : ""}`;
+            if(count == 11) count = 0;
+        });
+
+        info += "\n\n";
+        info += "{00BBF6}Pont: {BBFF00}To stop an {00BBF6}Anim {BBFF00}, type {00BBF6}/Anim {FF0000}stop{BBFF00}.\n";
+        info += `{BBFF00}Total Anims: {FF0000}${data.animations.length}`;
+        player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Anim {FF0000}List", info, "Close", "");
+    }
+    else if(params[0] == "stop") player.ClearAnimations(true);
+    else {
+        let result = data.animations.find(f => f.name == params[0]);
+        if(!result) return SendError(player, "Invalid Anim!");
+        player.ApplyAnimation(result.value[0], result.value[1], result.value[2], result.value[3], result.value[4], result.value[5], result.value[6], result.value[7], true);
     }
 });
 
