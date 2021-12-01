@@ -925,6 +925,19 @@ CMD.on("drifts", (player) => {
     player.ShowPlayerDialog(Dialog.TELES_DRIFTS, samp.DIALOG_STYLE.LIST, "Drifts", info, "Teleport", "Back");
 });
 
+CMD.on("drift", (player, params) => {
+    switch(parseInt(params[0])) {
+        case 1: TelePlayer(player, "drift 1", "Drift 1", data.position.DRIFT[1][0], data.position.DRIFT[1][1], data.position.DRIFT[1][2], data.position.DRIFT[1][3]); break;
+        case 2: TelePlayer(player, "drift 2", "Drift 2", data.position.DRIFT[2][0], data.position.DRIFT[2][1], data.position.DRIFT[2][2], data.position.DRIFT[2][3]); break;
+        case 3: TelePlayer(player, "drift 3", "Drift 3", data.position.DRIFT[3][0], data.position.DRIFT[3][1], data.position.DRIFT[3][2], data.position.DRIFT[3][3]); break;
+        case 4: TelePlayer(player, "drift 4", "Drift 4", data.position.DRIFT[4][0], data.position.DRIFT[4][1], data.position.DRIFT[4][2], data.position.DRIFT[4][3]); break;
+        case 5: TelePlayer(player, "drift 5", "Drift 5", data.position.DRIFT[5][0], data.position.DRIFT[5][1], data.position.DRIFT[5][2], data.position.DRIFT[5][3]); break;
+        case 6: TelePlayer(player, "drift 6", "Drift 6", data.position.DRIFT[6][0], data.position.DRIFT[6][1], data.position.DRIFT[6][2], data.position.DRIFT[6][3]); break;
+        case 7: CMD.emit("lvair", player); break;
+        default: CMD.emit("drifts", player); break;
+    }
+});
+
 CMD.on("races", (player) => {
 
 });
@@ -5484,7 +5497,12 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.TELES_DRIFTS: {
             if(response) {
-
+                for(let i = 0; i < 7; i++) {
+                    if(i == listitem) {
+                        CMD.emit("drift", player, [i+1]);
+                        break;
+                    }
+                }
             }
             else CMD.emit("teles", player);
             break;
