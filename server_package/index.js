@@ -2705,6 +2705,13 @@ CMD.on("saveall", (player) => {
     SendACMD(player, "SaveAll");
 });
 
+CMD.on("clearlogs", (player) => {
+    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    for(let i = 0; i < 3; i++) AddToTDLogs("");
+    player.SendClientMessage(data.colors.YELLOW, `You have successfully {FF0000}cleared {FFFF00}the logs!`);
+    SendACMD(player, "ClearLogs");
+});
+
 CMD.on("unban", async (player, params) => {
     if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!params[0]) return SendUsage(player, "/UnBan [Name]");
