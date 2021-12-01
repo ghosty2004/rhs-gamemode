@@ -43,5 +43,9 @@ module.exports = {
     },
     numberWithCommas: function(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    },
+    getDateForLastOn: function() {
+        const d = new Date();
+        return `${("0" + d.getDate()).slice(-2)}:${d.getMonth()+1}:${d.getFullYear()}`;
     }
 }

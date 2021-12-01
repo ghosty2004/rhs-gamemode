@@ -570,7 +570,41 @@ CMD.on("session", (player) => {
 });
 
 CMD.on("ostats", (player, params) => {
-
+    if(!params[0]) return SendUsage(player, "/ostats [Name]");
+    let Online = samp.getPlayers().find(f => f.GetPlayerName(24) == params[0]);
+    if(Online) return player.SendClientMessage(data.colors.RED, `Sorry... but player '${params[0]}' it's connected, use '/stats ${Online.playerid}' to view his stats!`);
+    con.query("SELECT * FROM users WHERE name = ?", [params[0]], function(err, result) {
+        if(err || result == 0) return player.SendClientMessage(data.colors.RED, `Sorry... but player "${params[0]}" is not registered in our database!`);
+        let info = "";
+        info += "{FF4800}General statistics\n";
+        info += `{BBFF00}Money: {49FFFF}$${Function.numberWithCommas(result[0].money)}\n`;
+        info += `{BBFF00}Coins: {49FFFF}${Function.numberWithCommas(result[0].coins)}\n`;
+        info += `{BBFF00}Respect: {49FFFF}+${result[0].respect_positive} {BBFF00}/ {49FFFF}-${result[0].respect_negative}\n`;
+        info += `{BBFF00}Online time: {49FFFF}${result[0].hours} {BBFF00}hrs, {49FFFF}${result[0].minutes} {BBFF00}mins, {49FFFF}${result[0].seconds} {BBFF00}secs\n`;
+        info += `{BBFF00}Admin: ${result[0].admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(result[0].admin)}` : "{FF0000}No"}\n`;
+        info += `{BBFF00}VIP: ${result[0].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(result[0].VIP)}` : "{FF0000}No"}\n`;
+        info += "\n";
+        info += "{FF4800}Killer statistics\n";
+        info += `{BBFF00}Kills: {49FFFF}${result[0].kills} {BBFF00}| Headshots: {49FFFF}${result[0].headshots}\n`;
+        info += `{BBFF00}Killing Spree: {49FFFF}${result[0].killingspree} {BBFF00}| Best Killing Spree: {49FFFF}${result[0].bestkillingspree}\n`;
+        info += `{BBFF00}Deaths: {49FFFF}${result[0].deaths}\n`;
+        info += `{BBFF00}Killer Rank: ${getRanksRankName("kills", result[0].kills)}\n`;
+        info += "\n";
+        info += "{FF4800}Driving skills\n";
+        info += `{BBFF00}Drift Points: {49FFFF}${result[0].driftpoints} {BBFF00}(${getRanksRankName("drift", result[0].driftpoints)}{BBFF00})\n`;
+        info += `{BBFF00}Stunt Points: {49FFFF}${result[0].stuntpoints} {BBFF00}(${getRanksRankName("stunt", result[0].stuntpoints)}{BBFF00})\n`;
+        info += `{BBFF00}Race Points: {49FFFF}${result[0].racepoints} {BBFF00}(${getRanksRankName("race", result[0].racepoints)}{BBFF00})\n`;
+        info += "\n";
+        info += "{FF4800}Properties\n";
+        info += `{BBFF00}Business: {FF0000}No\n`;
+        info += `{BBFF00}House: {FF0000}No\n`;
+        info += `{BBFF00}Personal Vehicle: {49FFFF}Yes\n`;
+        info += "\n";
+        info += `{FF4800}Statistics note: {49FFFF}${getPlayerStatsNote(result[0], true)}{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob\n`;
+        info += "\n";
+        info += `{FF4800}Last Online: {49FFFF}${result[0].laston}`;
+        player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${params[0]}{BBFF00}'s offline stats!`, info, "Ok", "");
+    });
 });
 
 CMD.on("skill", (player) => {
@@ -3506,15 +3540,15 @@ function SendMessageToAdmins(color, message) {
     });
 }
 
-function getPlayerStatsNote(player) {
+function getPlayerStatsNote(player, offline_check=false) {
     let note = 0;
-    if(Player.Info[player.playerid].Driving_Data.StuntPoints >= 1000) note += 1;
-    if(Player.Info[player.playerid].Driving_Data.DriftPoints >= 1000) note += 1;
-    if(Player.Info[player.playerid].Driving_Data.RacePoints >= 100) note += 1;
-    if(Player.Info[player.playerid].Kills_Data.BestKillingSpree >= 100) note += 1;
-    if(TotalGameTime(player).hours >= 100) note += 1;
-    if(Player.Info[player.playerid].Respect.Positive >= 50) note += 1;
-    if(Player.Info[player.playerid].Coins >= 25000) note += 1;
+    if((offline_check ? player.stuntpoints : Player.Info[player.playerid].Driving_Data.StuntPoints) >= 1000) note += 1;
+    if((offline_check ? player.driftpoints : Player.Info[player.playerid].Driving_Data.DriftPoints) >= 1000) note += 1;
+    if((offline_check ? player.racepoints : Player.Info[player.playerid].Driving_Data.RacePoints) >= 100) note += 1;
+    if((offline_check ? player.bestkillingspree : Player.Info[player.playerid].Kills_Data.BestKillingSpree) >= 100) note += 1;
+    if((offline_check ? player.hours : TotalGameTime(player).hours) >= 100) note += 1;
+    if((offline_check ? player.respect_positive : Player.Info[player.playerid].Respect.Positive) >= 50) note += 1;
+    if((offline_check ? player.coins : Player.Info[player.playerid].Coins) >= 25000) note += 1;
     return note;
 }
 
@@ -3740,7 +3774,7 @@ function savePlayer(player) {
     clan_rank = ?, gang = ?, gang_rank = ?, gang_kills = ?, gang_deaths = ?, gang_captures = ?, gang_points = ?, gang_warns = ?, gang_hours = ?, gang_minutes = ?, gang_seconds = ?, gang_membersince = ?,\
     kills = ?, headshots = ?, killingspree = ?, bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?, month_minutes = ?, month_seconds = ?,\
     month_kills = ?, month_headshots = ?, month_killingspree = ?, month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?, month_racepoints = ?, description1 = ?,\
-    description2 = ?, description3 = ?, jailed = ?, caged = ?, kicks = ?, discord = ? WHERE ID = ?", [
+    description2 = ?, description3 = ?, laston = ?, jailed = ?, caged = ?, kicks = ?, discord = ? WHERE ID = ?", [
         Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
         OnlineTime.hours, OnlineTime.minutes, OnlineTime.seconds, Player.Info[player.playerid].Admin, Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, 
         Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Gang_Data.Rank, Player.Info[player.playerid].Gang_Data.Kills, Player.Info[player.playerid].Gang_Data.Deaths, 
@@ -3750,7 +3784,7 @@ function savePlayer(player) {
         Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].AdminPoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds, Player.Info[player.playerid].Month.Kills_Data.Kills, 
         Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, Player.Info[player.playerid].Month.Kills_Data.Deaths, 
         Player.Info[player.playerid].Month.Driving_Data.DriftPoints, Player.Info[player.playerid].Month.Driving_Data.StuntPoints, Player.Info[player.playerid].Month.Driving_Data.RacePoints, Player.Info[player.playerid].Description[1],
-        Player.Info[player.playerid].Description[2], Player.Info[player.playerid].Description[3], Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Caged, 
+        Player.Info[player.playerid].Description[2], Player.Info[player.playerid].Description[3], Function.getDateForLastOn(), Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Caged, 
         Player.Info[player.playerid].Kicks, Player.Info[player.playerid].Discord, Player.Info[player.playerid].AccID
     ]);
 }
@@ -4325,6 +4359,7 @@ function LoadPlayerStats(player) {
                 Player.Info[player.playerid].Description[1] = result[0].description1;
                 Player.Info[player.playerid].Description[2] = result[0].description2;
                 Player.Info[player.playerid].Description[3] = result[0].description3;
+                Player.Info[player.playerid].LastOn = result[0].laston;
                 Player.Info[player.playerid].Jailed = result[0].jailed;
                 Player.Info[player.playerid].Caged = result[0].caged;
                 Player.Info[player.playerid].Kicks = result[0].kicks;

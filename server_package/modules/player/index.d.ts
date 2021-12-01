@@ -79,6 +79,7 @@ export declare const Info: {
         "2": string,
         "3": string
     },
+    LastOn: "Unknown",
     Editing_Stats_Description_Line: number,
     Creating_Clan: {
         name: string,
