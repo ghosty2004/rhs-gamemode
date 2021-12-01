@@ -35,5 +35,8 @@ module.exports = {
         "What?"
     ],
     BUSTER_ACTOR: null,
-    BUSTER_LABEL: null
+    BUSTER_LABEL: null,
+    GANGS: {
+        CAPTURE_TIME: 5 * 60 // 5 Minutes
+    }
 }

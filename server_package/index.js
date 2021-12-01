@@ -780,14 +780,9 @@ CMD.on("teles", (player) => {
 
 CMD.on("stunts", (player) => {
     let info = "Command\tDescription\n";
-    info += "{49FFFF}/Aa\t{BBFF00}Old Airport\n";
-    info += "{49FFFF}/LsAir\t{BBFF00}Los Santos Airport\n";
-    info += "{49FFFF}/SfAir\t{BBFF00}San Fierro Airport\n";
-    info += "{49FFFF}/Jizzy\t{BBFF00}Jizzy Stunt\n";
-    info += "{49FFFF}/Chrome\t{BBFF00}Stunt Chrome\n";
-    info += "{49FFFF}/Rc\t{BBFF00}Roller Coaster\n";
-    info += "{49FFFF}/Bmx\t{BBFF00}Stunt BMX\n";
-    info += "{49FFFF}/Mc\t{BBFF00}Monster Crash\n";
+    Teleport.Info.filter(f => f.type == "stunts").forEach((i) => {
+        info += `{49FFFF}/${capitalizeFirstLetter(i.command)}\t{BBFF00}${i.name}\n`;
+    });
     info += "{49FFFF}/Sstunts\t{BBFF00}Simple Stunts";
     player.ShowPlayerDialog(Dialog.TELES_STUNTS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Stunts", info, "Teleport", "Back");
 });
@@ -3055,7 +3050,7 @@ function winCapture(GangID) {
     samp.GangZoneStopFlashForAll(zone);
     samp.GangZoneShowForAll(zone, Gang.Info[GangID].color);
 
-    Gang.Info[GangID].capturing.time = 10;
+    Gang.Info[GangID].capturing.time = data.settings.GANGS.CAPTURE_TIME;
     Gang.Info[GangID].capturing.turf = -1;
     clearInterval(Gang.Info[GangID].capturing.interval);
     Gang.Info[GangID].capturing.interval = null;
@@ -3088,7 +3083,7 @@ function loseCapture(GangID) {
     samp.GangZoneStopFlashForAll(zone);
     samp.GangZoneShowForAll(zone, Gang.Get().filter(f => f.territory.GangZone == zone)[0].color);
 
-    Gang.Info[GangID].capturing.time = 10;
+    Gang.Info[GangID].capturing.time = data.settings.GANGS.CAPTURE_TIME;
     Gang.Info[GangID].capturing.turf = -1;
     clearInterval(Gang.Info[GangID].capturing.interval);
     Gang.Info[GangID].capturing.interval = null;
@@ -5473,7 +5468,14 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.TELES_STUNTS: {
             if(response) {
-
+                let result = Teleport.Info.filter(f => f.type == "stunts");
+                for(let i = 0; i < result.length; i++) {
+                    if(i == listitem) {
+                        TelePlayer(player, result[i].command, result[i].name, result[i].position[0], result[i].position[1], result[i].position[2], result[i].position[3]);
+                        break;
+                    }
+                }
+                if(listitem == result.length) CMD.emit("sstunts", player);
             }
             else CMD.emit("teles", player);
             break;

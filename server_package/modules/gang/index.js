@@ -1,4 +1,5 @@
 const { GangZoneCreate, GangZoneDestroy, CreateObject, Create3DTextLabel, DestroyObject, Delete3DTextLabel } = require("samp-node-lib");
+const { GANGS } = require("../../data/settings");
 const { CreateCustomCheckpoint, DeleteCustomCheckpoint } = require("../checkpoint");
 
 module.exports = {
@@ -32,7 +33,7 @@ module.exports = {
                     GangZone: GangZoneCreate(territory_position[0], territory_position[1], territory_position[2], territory_position[3])
                 },
                 capturing: {
-                    time: 10,
+                    time: GANGS.CAPTURE_TIME,
                     turf: -1,
                     interval: null
                 },
