@@ -210,7 +210,7 @@ CMD.on("anim", (player, params) => {
     }
     else if(params[0] == "stop") player.ClearAnimations(true);
     else {
-        let result = data.animations.find(f => f.name == params[0]);
+        let result = data.animations.find(f => f.name.toLowerCase() == params[0].toLowerCase());
         if(!result) return SendError(player, "Invalid Anim!");
         player.ApplyAnimation(result.value[0], result.value[1], result.value[2], result.value[3], result.value[4], result.value[5], result.value[6], result.value[7], true);
     }
