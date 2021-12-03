@@ -1270,6 +1270,8 @@ CMD.on("vdisarm", (player) => {
 
 CMD.on("fire", (player) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    player.GivePlayerWeapon(42, 500);
+    player.GameTextForPlayer("~w~~h~You have received a ~n~~w~~h~VIP fire extinguisher ~g~~h~FREE", 3000, 4);
 });
 
 CMD.on("get", (player, params) => {
