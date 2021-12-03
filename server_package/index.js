@@ -1231,14 +1231,14 @@ CMD.on("time", (player, params) => {
 
 CMD.on("weather", (player, params) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
-    if(!isNumber(params[0])) return SendUsage(player, "/weather [Weather]");
-    if(params[0] < 0 || params[0] > 20) return SendError(player, "Invalid weather (0-20)!");
+    if(!isNumber(params[0])) return SendUsage(player, "/weather [WeatherID]");
     player.SetPlayerWeather(params[0]);
     player.SendClientMessage(data.colors.LIGHT_BLUE, `You have setted your weather to ${params[0]}.`);
 });
 
 CMD.on("vad", (player, params) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    if(!params.slice(0).join(" ")) return SendUsage(player, "/Vad [Text]");
 });
 
 CMD.on("goto", (player, params) => {
