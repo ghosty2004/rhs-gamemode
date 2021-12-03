@@ -1265,7 +1265,7 @@ CMD.on("vclub", (player) => {
 CMD.on("vdisarm", (player) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
     player.ResetPlayerWeapons();
-    player.SendClientMessage(data.colors.LIGHT_BLUE, "You have disarmed yourself!");
+    player.GameTextForPlayer("~w~~h~Disarmed!", 3000, 1);
 });
 
 CMD.on("fire", (player) => {
