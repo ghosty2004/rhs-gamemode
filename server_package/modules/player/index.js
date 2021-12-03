@@ -23,6 +23,18 @@ module.exports = {
                 Seconds: 0
             },
             Admin: 0,
+            AdminActivity: {
+                Points: 0,
+                Kicks: 0,
+                Warns: 0,
+                Bans: 0,
+                ReactionTests: 0,
+                MathTests: 0,
+                Jails: 0,
+                Mutes: 0,
+                ClearChats: 0,
+                Since: "Unknown"
+            },
             RconType: 0,
             VIP: 0,
             VIP_Expire: 0,
@@ -41,7 +53,7 @@ module.exports = {
                     Minutes: 0,
                     Seconds: 0
                 },
-                MemberSince: getBeatifulDate(),
+                MemberSince: "Unknown",
                 ConnectTime: Math.floor(Date.now() / 1000),
                 Capturing: false,
                 Capturing_Label: null

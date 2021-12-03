@@ -49,7 +49,7 @@ module.exports = {
         return `${("0" + d.getDate()).slice(-2)}:${d.getMonth()+1}:${d.getFullYear()}`;
     },
     isNumber: function(value) {
-        if(typeof(value) == "number") return true;
+        if(typeof(value) == "number" || !isNaN(value)) return true;
         else return false;
     }
 }

@@ -19,6 +19,18 @@ export declare const Info: {
         Seconds: number
     },
     Admin: number,
+    AdminActivity: {
+        Points: number,
+        Kicks: number,
+        Warns: number,
+        Bans: number,
+        ReactionTests: number,
+        MathTests: number,
+        Jails: number,
+        Mutes: number,
+        ClearChats: number,
+        Since: string
+    },
     RconType: number,
     VIP: number,
     VIP_Expire: number,
