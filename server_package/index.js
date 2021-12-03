@@ -1349,6 +1349,42 @@ CMD.on("dos", (player) => {
 
 CMD.on("mycolor", (player) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    let info = "";
+    switch(Player.Info[player.playerid].Language) {
+        case 0: {
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({FF0000}in Rosu{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({0000FF}in Albastru{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({AFAFAF}in Gri{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({33AA33}in Verde{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({FFFF00}in Galben{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({FFFFFF}in Alb{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({800080}in Mov{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({FF9900}in Portocaliu{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({FF66FF}in Roz{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({10F441}in Verde Lamai{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({000000}in Negru{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({00BBF6}in Albastru Deschis{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({FFEB7B}in Crem{00FF00})";
+            break;
+        }
+        case 1: {
+            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({FF0000}to Red{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({0000FF}to Blue{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({AFAFAF}to Grey{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({33AA33}to Green{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({FFFF00}to Yellow{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({FFFFFF}to White{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({800080}to Purple{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({FF9900}to Orange{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({FF66FF}to Pink{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({10F441}to Lime{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({000000}to Black{00FF00})\n";
+            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({00BBF6}to Light Blue{00FF00})\n";
+            info += "{00FF00}>{00bbF6}> {00FF00}Change Color ({00BBF6}to Crem {00FF00})";
+            break;
+        }
+    }
+    player.ShowPlayerDialog(Dialog.MY_COLOR, samp.DIALOG_STYLE.LIST, "Color {FF0000}Menu", info, Lang(player, "Schimba", "Change"), Lang(player, "Inchide", "Close"));
 });
 
 CMD.on("vbike", (player) => {
@@ -4758,6 +4794,25 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.MY_COLOR: {
+            switch(listitem) {
+                case 0: player.SetPlayerColor(0xFF0000AA); break;
+                case 1: player.SetPlayerColor(0x0000FFAA); break;
+                case 2: player.SetPlayerColor(0xAFAFAFAA); break;
+                case 3: player.SetPlayerColor(0x33AA33AA); break;
+                case 4: player.SetPlayerColor(0xFFFF00AA); break;
+                case 5: player.SetPlayerColor(0xFFFFFFAA); break;
+                case 6: player.SetPlayerColor(0x800080AA); break;
+                case 7: player.SetPlayerColor(0xFF9900AA); break;
+                case 8: player.SetPlayerColor(0xFF66FFAA); break;
+                case 9: player.SetPlayerColor(0x10F441AA); break;
+                case 10: player.SetPlayerColor(0x000000AA); break;
+                case 11: player.SetPlayerColor(0x00BBF6AA); break;
+                case 12: player.SetPlayerColor(0x00BBF6AA); break;
+            }
+            player.GameTextForPlayer("~w~~h~Color ~g~~h~changed", 4000, 4);
+            break;
+        }
         case Dialog.SELECT_MRF_WEAPON: {
             if(response) {
                 switch(listitem) {

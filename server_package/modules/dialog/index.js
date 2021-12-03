@@ -65,5 +65,6 @@ module.exports = {
     BUYCAR_EXPENSIVE:           64,
     BUYCAR_BIKES:               65,
     BUYCAR_PREMIUM:             66,
-    SELECT_MRF_WEAPON:          67
+    SELECT_MRF_WEAPON:          67,
+    MY_COLOR:                   68
 }
