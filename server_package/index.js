@@ -1299,6 +1299,14 @@ CMD.on("carcolor", (player, params) => {
 
 CMD.on("getid", (player, params) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    if(!params[0]) return SendUsage(player, "/GetID [Name]");
+    let result = samp.getPlayers().filter(f => f.GetPlayerName(24).toLowerCase().includes(`${params[0]}`.toLowerCase()));
+    if(result.length == 0) return SendError(player, "No Players Localized!");
+    let info = "";
+    result.forEach((i) => {
+        info += `1. ${i.GetPlayerName(24)} {00BBF6}(ID: ${i.playerid})\n`;
+    });
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.LIST, `Searched for: "${params[0]}"`, info, "Close", "");
 });
 
 CMD.on("lockcar", (player) => {
