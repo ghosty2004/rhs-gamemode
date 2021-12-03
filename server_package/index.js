@@ -1254,6 +1254,7 @@ CMD.on("goto", (player, params) => {
 
 CMD.on("spawnme", (player) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
+    player.SpawnPlayer();
 });
 
 CMD.on("vclub", (player) => {
