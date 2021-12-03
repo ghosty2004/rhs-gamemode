@@ -571,8 +571,12 @@ CMD.on("holdoff", (player) => {
 
 });
 
-CMD.on("session", (player) => {
-
+CMD.on("session", (player, params) => {
+    let target = player;
+    if(params[0]) target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    let OnlineTime = Function.timestampToHMS(Player.Info[target.playerid].ConnectTime);
+    player.SendClientMessage(data.colors.LIGHT_YELLOW, `${target.GetPlayerName(24)} has ${OnlineTime.hours} hours, ${OnlineTime.minutes} minutes & ${OnlineTime.seconds} seconds since connect!`);
 });
 
 CMD.on("ostats", (player, params) => {
