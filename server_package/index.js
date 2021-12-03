@@ -4795,22 +4795,24 @@ samp.OnPlayerUpdate((player) => {
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
         case Dialog.MY_COLOR: {
-            switch(listitem) {
-                case 0: player.SetPlayerColor(0xFF0000AA); break;
-                case 1: player.SetPlayerColor(0x0000FFAA); break;
-                case 2: player.SetPlayerColor(0xAFAFAFAA); break;
-                case 3: player.SetPlayerColor(0x33AA33AA); break;
-                case 4: player.SetPlayerColor(0xFFFF00AA); break;
-                case 5: player.SetPlayerColor(0xFFFFFFAA); break;
-                case 6: player.SetPlayerColor(0x800080AA); break;
-                case 7: player.SetPlayerColor(0xFF9900AA); break;
-                case 8: player.SetPlayerColor(0xFF66FFAA); break;
-                case 9: player.SetPlayerColor(0x10F441AA); break;
-                case 10: player.SetPlayerColor(0x000000AA); break;
-                case 11: player.SetPlayerColor(0x00BBF6AA); break;
-                case 12: player.SetPlayerColor(0x00BBF6AA); break;
+            if(response) {
+                switch(listitem) {
+                    case 0: player.SetPlayerColor(0xFF0000AA); break;
+                    case 1: player.SetPlayerColor(0x0000FFAA); break;
+                    case 2: player.SetPlayerColor(0xAFAFAFAA); break;
+                    case 3: player.SetPlayerColor(0x33AA33AA); break;
+                    case 4: player.SetPlayerColor(0xFFFF00AA); break;
+                    case 5: player.SetPlayerColor(0xFFFFFFAA); break;
+                    case 6: player.SetPlayerColor(0x800080AA); break;
+                    case 7: player.SetPlayerColor(0xFF9900AA); break;
+                    case 8: player.SetPlayerColor(0xFF66FFAA); break;
+                    case 9: player.SetPlayerColor(0x10F441AA); break;
+                    case 10: player.SetPlayerColor(0x000000AA); break;
+                    case 11: player.SetPlayerColor(0x00BBF6AA); break;
+                    case 12: player.SetPlayerColor(0x00BBF6AA); break;
+                }
+                player.GameTextForPlayer("~w~~h~Color ~g~~h~changed", 4000, 4);
             }
-            player.GameTextForPlayer("~w~~h~Color ~g~~h~changed", 4000, 4);
             break;
         }
         case Dialog.SELECT_MRF_WEAPON: {
