@@ -493,6 +493,10 @@ CMD.on("pm", (player, params) => {
 
 });
 
+CMD.on("holddata", (player) => {
+    console.log(Player.Info[player.playerid].Holds);
+});
+
 CMD.on("hold", (player) => {
     let info = "";
     info += "{0072FF}Create hold\n";
@@ -502,6 +506,14 @@ CMD.on("hold", (player) => {
     info += "{FF0000}Load holds ({FFFFFF}/holdon{FF0000})\n";
     info += "{FF0000}Remove holds ({FFFFFF}/holdoff{FF0000})";
     player.ShowPlayerDialog(Dialog.HOLD, samp.DIALOG_STYLE.LIST, "{BBFF00}Create, edit, use holds {00BBF6}Have fun!", info, "Select", "Close");
+});
+
+CMD.on("holdon", (player) => {
+
+});
+
+CMD.on("holdoff", (player) => {
+
 });
 
 CMD.on("report", (player, params) => {
@@ -573,10 +585,6 @@ CMD.on("top", (player) => {
     info += "{BBFF00}Top 10 players in this month\n";
     info += `{FFEB7B}Top 100 and many more, only on{FF0000} ${data.settings.SERVER_WEB}`;
     player.ShowPlayerDialog(Dialog.TOP, samp.DIALOG_STYLE.LIST, "Top 10", info, "Select", "Close");
-});
-
-CMD.on("holdoff", (player) => {
-
 });
 
 CMD.on("session", (player, params) => {
@@ -3103,10 +3111,10 @@ function ResetPlayerHoldCreateVariables(player) {
 }
 
 function LoadPlayerHolds(player) {
-    con.query("SELECT * FROM holds WHERE owner = ?", [Player.Info[player.playerid]], function(err, result) {
+    con.query("SELECT * FROM holds WHERE owner = ?", [Player.Info[player.playerid].AccID], function(err, result) {
         if(err || result == 0) return;
         for(let i = 0; i < result.length; i++) {
-            let index = Player.Info[player.playerid].Holds.findIndex(f => f.index == result[i].index);
+            let index = Player.Info[player.playerid].Holds.findIndex(f => f.index == result[i].index_number);
             if(index != -1) {
                 Player.Info[player.playerid].Holds[index].used = true;
                 Player.Info[player.playerid].Holds[index].model = result[i].model;
@@ -4726,6 +4734,22 @@ samp.OnPlayerEditObject((player, playerobject, objectid, response, fX, fY, fZ, f
 });
 
 samp.OnPlayerEditAttachedObject((player, response, index, modelid, boneid, fOffsetX, fOffsetY, fOffsetZ, fRotX, fRotY, fRotZ, fScaleX, fSclaeY, fScaleZ) => {
+    if(index == Player.Info[player.playerid].HoldsData.Editing && modelid == Player.Info[player.playerid].HoldsData.CreatingId) {
+        if(response) {
+            Player.Info[player.playerid].Holds[index].used = true;
+            Player.Info[player.playerid].Holds[index].model = modelid;
+            Player.Info[player.playerid].Holds[index].bone = boneid;
+            Player.Info[player.playerid].Holds[index].offsetposition = [fOffsetX, fOffsetY, fOffsetZ];
+            Player.Info[player.playerid].Holds[index].offsetrotation = [fRotX, fRotY, fRotZ];
+            Player.Info[player.playerid].Holds[index].offsetscale = [fScaleX, fSclaeY, fScaleZ];
+            player.GameTextForPlayer("~w~~h~Hold ~r~~h~Created~n~~w~~h~type ~r~~h~/hold~w~~h~ for more!", 3000, 3);
+        }
+        else {
+            RemovePlayerHoldIndex(player, index);
+            player.GameTextForPlayer("~w~~h~Hold ~r~~h~removed", 3000, 4);
+        }
+        ResetPlayerHoldCreateVariables(player);
+    }
     return true;
 });
 
@@ -4877,6 +4901,26 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         player.ShowPlayerDialog(Dialog.HOLD_SELECT, samp.DIALOG_STYLE.LIST, "{BBFF00}You can hold 10 objects! Choose slot for hold!", info, "Select", "Back");
                         break;
                     }
+                    case 1: {
+                        break;
+                    }
+                    case 2: {
+                        let result = Player.Info[player.playerid].Holds.filter(f => f.used);
+                        if(result.length == 0) return SendError(player, "You don't have holds!");
+                        result.forEach((i) => {
+                            con.query("SELECT * FROM holds WHERE owner = ? AND index_number = ?", [Player.Info[player.playerid].AccID, i.index], function(err, result) {
+                                if(result == 0) con.query("INSERT INTO holds (owner, index_number, model, bone, offsetposition, offsetrotation, offsetscale) VALUES(?, ?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].AccID, i.index, i.model, i.bone, JSON.stringify(i.offsetposition), JSON.stringify(i.offsetrotation), JSON.stringify(i.offsetscale)]);
+                                else con.query("UPDATE holds SET model = ?, bone = ?, offsetposition = ?, offsetrotation = ?, offsetscale = ? WHERE index_number = ? AND owner = ?", [i.model, i.bone, JSON.stringify(i.offsetposition), JSON.stringify(i.offsetrotation), JSON.stringify(i.offsetscale), i.index, Player.Info[player.playerid].AccID]);
+                            });
+                        });
+                        player.GameTextForPlayer("~w~~h~All ~r~~h~holds ~w~~h~saved", 3000, 3);
+                        break;
+                    }
+                    case 3: {
+                        break;
+                    }
+                    case 4: CMD.emit("holdon", player); break;
+                    case 5: CMD.emit("holdoff", player); break;
                 }
             }
             else ResetPlayerHoldCreateVariables(player);
@@ -4889,7 +4933,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         Player.Info[player.playerid].HoldsData.Editing = Player.Info[player.playerid].Holds[i].index;
                         switch(Player.Info[player.playerid].Holds[i].used) {
                             case true: {
-                                player.ShowPlayerDialog(Dialog.HOLD_REMOVE_OR_EDIT, samp.DIALOG_STYLE.MSGBOX, "", "{0072FF}Sorry but this slot is curently used!\n{0072FF}Do you wish to edit the hold in that slot or remove it ?", "Edit", "Remove");
+                                player.ShowPlayerDialog(Dialog.HOLD_REMOVE_OR_EDIT, samp.DIALOG_STYLE.MSGBOX, "{BBFF00}Oops...! Error!", "{0072FF}Sorry but this slot is curently used!\n{0072FF}Do you wish to edit the hold in that slot or remove it ?", "Edit", "Remove");
                                 break;
                             }
                             case false: {
@@ -4912,6 +4956,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                 if(index != -1) {
                     RemovePlayerHoldIndex(player, Player.Info[player.playerid].HoldsData.Editing);
                     ResetPlayerHoldCreateVariables(player);
+                    player.GameTextForPlayer("~w~~h~Hold ~r~~h~removed", 3000, 4);
                 }
             }
             break;
@@ -4945,7 +4990,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.HOLD_CREATE_SELECT_BODY: {
             if(response) {
-                player.SetPlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing, Player.Info[player.playerid].HoldsData.CreatingId, listitem, 0, 0, 0, 0, 0, 0);
+                player.SetPlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing, Player.Info[player.playerid].HoldsData.CreatingId, listitem+1);
                 player.EditAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
             }
             else CMD.emit("hold", player);  
