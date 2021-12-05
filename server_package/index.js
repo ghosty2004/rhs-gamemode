@@ -2591,6 +2591,10 @@ CMD.on("despawncars", (player) => {
     SendACMD(player, "DespawnCars");
 });
 
+CMD.on("ticks", (player) => {
+    player.SendClientMessage(-1, `The server has {FF0000}${samp.GetServerTickRate()} {FFFFFF}ticks.`);
+});
+
 /* ===================== */
 /* ADMIN SENIOR COMMANDS */
 /* ===================== */
