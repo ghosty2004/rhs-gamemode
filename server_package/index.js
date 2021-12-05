@@ -17,6 +17,8 @@ require("youtube-audio-server").listen(7777);
 const Clan = require("./modules/clan");
 const Checkpoint = require("./modules/checkpoint");
 const Dialog = require("./modules/dialog");
+const Discord = require("./modules/discordbot");
+const DropWeapon = require("./modules/dropweapon");
 const Errors = require("./modules/errors");
 const events = require("./modules/events");
 const Function = require("./modules/functions");
@@ -29,7 +31,6 @@ const Server = require("./modules/server");
 const SpawnZone = require("./modules/spawnzone");
 const Streamer = require("./modules/streamer");
 const Teleport = require("./modules/teleport");
-const Discord = require("./modules/discordbot");
 
 /* Server Maps */
 const Maps = require("./maps");
@@ -1773,7 +1774,7 @@ CMD.on("capture", (player, params) => {
             break;
         }
         case "leave": {
-            if(Player.Info[player.playerid].Gang_Data.Capturing) return SendError(player, "You are already joined in a territory war!");
+            if(!Player.Info[player.playerid].Gang_Data.Capturing) return SendError(player, "You are not joined to a capture!");
             Player.Info[player.playerid].Gang_Data.Capturing = false;
             HideCapturingLabelFor(player);
             break;
@@ -3154,7 +3155,7 @@ function startCapture(player, zone) {
 
     Gang.Info[GangID].capturing.interval = setInterval(() => {
         if(!samp.IsPlayerConnected(PlayerID)) return loseCapture(GangID);
-        //if(Player.Info[PlayerID].Gang != GangID) return loseCapture(GangID);
+        if(samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == GangID && Player.Info[f.playerid].Gang_Data.Capturing).length == 0) return loseCapture(GangID);
         if(Gang.Info[GangID].capturing.time == 0) winCapture(GangID);
         else Gang.Info[GangID].capturing.time--;
     }, 1000);
@@ -3917,20 +3918,26 @@ function SetupPlayerForSpawn(player, type=0) {
                 player.SetPlayerPos(position[0], position[1], position[2]);
                 player.SetPlayerFacingAngle(position[3]);
             }
+
             player.SetPlayerColor(Clan.Info[Player.Info[player.playerid].Clan].color);
             player.SetPlayerSkin(Player.Info[player.playerid].Clan_Rank == 3 || Player.Info[player.playerid].Clan_Rank == 2 ? Clan.Info[Player.Info[player.playerid].Clan].skin.leader : Clan.Info[Player.Info[player.playerid].Clan].skin.member);
-            Clan.Info[Player.Info[player.playerid].Clan].weapons.forEach((i) => {
-                player.GivePlayerWeapon(i, 9999);
-            });
+            
+            for(let i = 0; i < Clan.Info[Player.Info[player.playerid].Clan].weapons.length; i++) {
+                player.GivePlayerWeapon(Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
+                DropWeapon.SetPlayerDropWeaponData(player, i, Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
+            }
         }
         else if(Player.Info[player.playerid].Gang) { /* Gang Spawn */
             let position = Gang.Info[Player.Info[player.playerid].Gang].position;
             player.SetPlayerPos(position[0], position[1], position[2]);
             player.SetPlayerFacingAngle(position[3]);
+            
             player.SetPlayerColor(Gang.Info[Player.Info[player.playerid].Gang].color);
-            Gang.Info[Player.Info[player.playerid].Gang].weapons.forEach((i) => {
-                player.GivePlayerWeapon(i, 9999);
-            });
+
+            for(let i = 0; i < Gang.Info[Player.Info[player.playerid].Gang].weapons.length; i++) {
+                player.GivePlayerWeapon(Gang.Info[Player.Info[player.playerid].Gang].weapons[i], 9999);
+                DropWeapon.SetPlayerDropWeaponData(player, i, Gang.Info[Player.Info[player.playerid].Gang].weapons[i], 9999);
+            }
 
             let AttackGangZone = Gang.Get().filter(f => f.territory.GangZone == Gang.Info[Player.Info[player.playerid].Gang].capturing.turf)[0];
             let DefendGangZone = Gang.Get().filter(f => Gang.GetOwnedGangZones(Player.Info[player.playerid].Gang).some(s => s == f.capturing.turf) && f.capturing.turf != -1)[0];
@@ -4503,28 +4510,22 @@ function LoadPlayerStats(player) {
     });
 }
 
+/* =================== */
 /* SA:MP Custom Events */
-/*samp.registerEvent("findPositionZResponse", "sfff");
-samp.on("findPositionZResponse", (RequestID, x, y, z) => {
-    Server.Info.Reuqest.FindPosZ[`${RequestID}`] = {x: x, y: y, z: z};
+/* =================== */
+samp.registerEvent("OnPlayerPickUpDroppedWeapon", "iiii");
+samp.on("OnPlayerPickUpDroppedWeapon", (playerid, weaponid, ammo, pickupid) => {
+    let player = samp.getPlayers().find(f => f.playerid == playerid);
+    if(!player) return;
+    player.SendClientMessage(data.colors.YELLOW, `You have picked up weapon: {FF0000}${weaponid}{FFFF00}, Ammo: {FF0000}${ammo}{FFFF00}, PickupId: {FF0000}${pickupid}{FFFF00}.`);
+    player.GivePlayerWeapon(weaponid, ammo);
+    Streamer.DestroyDynamicPickup(pickupid);
 });
-function getPositionZ(x, y) {
-    let RequestID = `${x},${y}`;
-    samp.callPublic("findPositionZ", "sff", RequestID, x, y);
-    return new Promise((resolve, reject) => {
-        let temp_interval = setInterval(() => {
-            if(Server.Info.Reuqest.FindPosZ[`${RequestID}`]) {
-                resolve(Server.Info.Reuqest.FindPosZ[`${RequestID}`]);
-                clearInterval(temp_interval);
-                delete Server.Info.Reuqest.FindPosZ[`${RequestID}`];
-            }
-        }, 1);
-    });
-}*/
 
-let stdin = process.openStdin();
-
-stdin.addListener("data", function(d) {
+/* ============ */
+/* Console Read */
+/* ============ */
+process.openStdin().addListener("data", function(d) {
     let command = d.toString().trim();
     if(command == "restart" || command == "rr") {
         process.exit();
@@ -4688,6 +4689,9 @@ samp.OnPlayerClickPlayer((player, clickedplayer) => {
 });
 
 samp.OnPlayerDeath((player, killerid, reason) => {
+    DropWeapon.DropPlayerWeapons(player);
+    DropWeapon.ClearPlayerDropWeaponData(player);
+
     if(samp.IsPlayerConnected(killerid.playerid)) {
         samp.SendDeathMessage(killerid.playerid, player.playerid, killerid.GetPlayerWeapon());
         Player.Info[killerid.playerid].Kills_Data.Kills++;
@@ -5544,6 +5548,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                     player.SetPlayerSkin(Player.Info[player.playerid].Creating_Clan.skin.leader);
                     for(let i = 0; i < 6; i++) {
                         player.GivePlayerWeapon(Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
+                        DropWeapon.SetPlayerDropWeaponData(player, i, Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
                     }
                     ResetPlayerClanCreateVariables(player);
                 }

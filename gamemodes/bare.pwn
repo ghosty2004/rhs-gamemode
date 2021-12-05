@@ -4,6 +4,7 @@
 #include <streamer>
 #include <mapandreas>
 #include <CPLoader>
+#include <dropgun>
 
 #define event:%0(%1) forward %0(%1); public %0(%1)
 
@@ -17,7 +18,6 @@ event:findPositionZ(RequestID[], Float:x, Float:y) {
     MapAndreas_Init(1);
 	MapAndreas_FindZ_For2DCoord(x, y, z);
 	SAMPNode_CallEvent("findPositionZResponse", RequestID, x, y, z);
-	return true;
 }
 event:getLocationData(RequestID[], Float:x, Float:y, Float:z) {
     new place[24];
@@ -25,7 +25,17 @@ event:getLocationData(RequestID[], Float:x, Float:y, Float:z) {
     if(zone == INVALID_MAP_ZONE_ID) format(place, sizeof(place), "Unknown");
     else { GetMapZoneName(zone, place); }
     SAMPNode_CallEvent("locationResponse", RequestID, place);
-    return true;
+}
+
+/* ======================= */
+/* Drop Weapon Node Events */
+/* ======================= */
+event:_SetPlayerDropWeaponData(playerid, slot, weaponid, ammo) { return SetPlayerDropWeaponData(playerid, slot, weaponid, ammo); }
+event:_ClearPlayerDropWeaponSlot(playerid, slot) { return ClearPlayerDropWeaponSlot(playerid, slot); }
+event:_ClearPlayerDropWeaponData(playerid) { return ClearPlayerDropWeaponData(playerid); }
+event:_DropPlayerWeapons(playerid) { DropPlayerWeapons(playerid); }
+event:OnPlayerPickUpDroppedWeapon(playerid, weaponid, ammo, pickupid) {
+    SAMPNode_CallEvent("OnPlayerPickUpDroppedWeapon", playerid, weaponid, ammo, pickupid);
 }
 
 /* ==================== */
