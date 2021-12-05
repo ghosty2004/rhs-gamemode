@@ -14,11 +14,11 @@ const hastebin = require("hastebin-gen");
 require("youtube-audio-server").listen(7777);
 
 /* Custom Modules */
-const Clan = require("./modules/clan");
 const Checkpoint = require("./modules/checkpoint");
+const Circle = require("./modules/circle");
+const Clan = require("./modules/clan");
 const Dialog = require("./modules/dialog");
 const Discord = require("./modules/discordbot");
-const DropWeapon = require("./modules/dropweapon");
 const Errors = require("./modules/errors");
 const events = require("./modules/events");
 const Function = require("./modules/functions");
@@ -2558,6 +2558,21 @@ CMD.on("clearchat", (player) => {
 });
 CMD.on("cc", (player) => { CMD.emit("clearchat", player); });
 
+CMD.on("spawncars", (player, params) => {
+    if(!isNumber(params[0]) || !isNumber(params[1])) return SendUsage(player, "/spawncars [Model] [Count]");
+    params[0] = parseInt(params[0]);
+    params[1] = parseInt(params[1]);
+    if(params[0] < 400 || params[0] > 611) return SendError(player, "Invalid Vehicle ID!");
+    let cars = []; for(let i = 0; i < params[1]; i++) cars.push(params[0]);
+    Circle.CreateCars(player, cars);
+    SendACMD(player, "SpawnCars");
+});
+
+CMD.on("despawncars", (player) => {
+    Circle.DeleteCreateCarsFromPlayerId(player.playerid);
+    SendACMD(player, "DespawnCars");
+});
+
 /* ===================== */
 /* ADMIN SENIOR COMMANDS */
 /* ===================== */
@@ -2695,10 +2710,8 @@ CMD.on("gethere", (player, params) => {
 
 CMD.on("getall", (player) => {
     if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-    samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
-        i.SetPlayerPos(player.position.x, player.position.y, player.position.z);
-        i.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has teleported all players to his location{FFFF00}!`);
-    });
+    samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => { i.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has teleported all players to his location{FFFF00}!`); });
+    Circle.GetAll(player);
     SendACMD(player, "GetAll");
 });
 
@@ -3924,7 +3937,6 @@ function SetupPlayerForSpawn(player, type=0) {
             
             for(let i = 0; i < Clan.Info[Player.Info[player.playerid].Clan].weapons.length; i++) {
                 player.GivePlayerWeapon(Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
-                DropWeapon.SetPlayerDropWeaponData(player, i, Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
             }
         }
         else if(Player.Info[player.playerid].Gang) { /* Gang Spawn */
@@ -3936,7 +3948,6 @@ function SetupPlayerForSpawn(player, type=0) {
 
             for(let i = 0; i < Gang.Info[Player.Info[player.playerid].Gang].weapons.length; i++) {
                 player.GivePlayerWeapon(Gang.Info[Player.Info[player.playerid].Gang].weapons[i], 9999);
-                DropWeapon.SetPlayerDropWeaponData(player, i, Gang.Info[Player.Info[player.playerid].Gang].weapons[i], 9999);
             }
 
             let AttackGangZone = Gang.Get().filter(f => f.territory.GangZone == Gang.Info[Player.Info[player.playerid].Gang].capturing.turf)[0];
@@ -4513,13 +4524,7 @@ function LoadPlayerStats(player) {
 /* =================== */
 /* SA:MP Custom Events */
 /* =================== */
-samp.registerEvent("OnPlayerPickUpDroppedWeapon", "iiii");
-samp.on("OnPlayerPickUpDroppedWeapon", (playerid, weaponid, ammo, pickupid) => {
-    let player = samp.getPlayers().find(f => f.playerid == playerid);
-    if(!player) return;
-    player.GivePlayerWeapon(weaponid, ammo);
-    Streamer.DestroyDynamicPickup(pickupid);
-});
+// null
 
 /* ============ */
 /* Console Read */
@@ -4687,9 +4692,14 @@ samp.OnPlayerClickPlayer((player, clickedplayer) => {
     return true;
 });
 
+samp.OnPlayerPickUpPickup((player, pickupid) => {
+    Circle.WeaponPickup(player, pickupid); 
+});
+
 samp.OnPlayerDeath((player, killerid, reason) => {
-    DropWeapon.DropPlayerWeapons(player);
-    DropWeapon.ClearPlayerDropWeaponData(player);
+    player.GameTextForPlayer("~r~~h~You Died", 2000, 2);
+
+    if(!isPlayerInSpecialZone(player)) Circle.DropWeapons(player);
 
     if(samp.IsPlayerConnected(killerid.playerid)) {
         samp.SendDeathMessage(killerid.playerid, player.playerid, killerid.GetPlayerWeapon());
@@ -4767,6 +4777,9 @@ samp.OnPlayerDisconnect((player, reason) => {
     HideRankLabelFor(player);
     HideCapturingLabelFor(player);
     UnLoadPlayerPersonalCars(player);
+
+    Circle.DeleteWeaponsPickupsFromPlayerId(player.playerid);
+    Circle.DeleteCreateCarsFromPlayerId(player.playerid);
 
     if(Player.Info[player.playerid].SpawnedCar) samp.DestroyVehicle(Player.Info[player.playerid].SpawnedCar);
 
@@ -5547,7 +5560,6 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                     player.SetPlayerSkin(Player.Info[player.playerid].Creating_Clan.skin.leader);
                     for(let i = 0; i < 6; i++) {
                         player.GivePlayerWeapon(Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
-                        DropWeapon.SetPlayerDropWeaponData(player, i, Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
                     }
                     ResetPlayerClanCreateVariables(player);
                 }
