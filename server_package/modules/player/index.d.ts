@@ -146,7 +146,20 @@ export declare const Info: {
     Need_Mail_Showed: boolean,
     Rank_Label: null|number,
     In_DM: "none"|"minigun"|"de"|"m4"|"os"|"sniper"|"mrf"|"garena"|"oh"|"prodm"|"helldm"|"gunwar",
-    Selected_MRF_Weapon: null|38|35|37
-}[]
+    Selected_MRF_Weapon: null|38|35|37,
+    Holds: {
+        index: number,
+        used: boolean,
+        model: number,
+        bone: number,
+        offsetposition: Array<number>,
+        offsetrotation: Array<number>,
+        offsetscale: Array<number>
+    }[],
+    HoldsData: {
+        Editing: null|number,
+        CreatingId: number
+    }
+}[];
 
 export declare function ResetVariables(playerid: number): void;

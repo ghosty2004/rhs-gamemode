@@ -6,6 +6,7 @@ const WeaponsModels = [-1, 331, 333, 334, 335, 336, 337, 338, 339, 341, 321, 322
 module.exports = {
 	DropWeaponsData: [],
     DropWeapons: function(player) { /* position: Array<number>, weapons: Array<number> */
+		this.DeleteWeaponsPickupsFromPlayerId(player.playerid);
         let weapons = [];
 		for(let i = 0; i <= 12; i++) {
 			let data = player.GetPlayerWeaponData(i);

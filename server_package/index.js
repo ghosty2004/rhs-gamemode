@@ -494,7 +494,14 @@ CMD.on("pm", (player, params) => {
 });
 
 CMD.on("hold", (player) => {
-
+    let info = "";
+    info += "{0072FF}Create hold\n";
+    info += "{0072FF}Player holds list\n";
+    info += "{FFFF00}Save holds\n";
+    info += "{FFFF00}Settings / Preferences\n";
+    info += "{FF0000}Load holds ({FFFFFF}/holdon{FF0000})\n";
+    info += "{FF0000}Remove holds ({FFFFFF}/holdoff{FF0000})";
+    player.ShowPlayerDialog(Dialog.HOLD, samp.DIALOG_STYLE.LIST, "{BBFF00}Create, edit, use holds {00BBF6}Have fun!", info, "Select", "Close");
 });
 
 CMD.on("report", (player, params) => {
@@ -2559,11 +2566,14 @@ CMD.on("clearchat", (player) => {
 CMD.on("cc", (player) => { CMD.emit("clearchat", player); });
 
 CMD.on("spawncars", (player, params) => {
-    if(!isNumber(params[0]) || !isNumber(params[1])) return SendUsage(player, "/spawncars [Model] [Count]");
+    if(!isNumber(params[0]) || !params.slice(1).join(" ")) return SendUsage(player, "/spawncars [Count] [Model(s)]");
     params[0] = parseInt(params[0]);
-    params[1] = parseInt(params[1]);
-    if(params[0] < 400 || params[0] > 611) return SendError(player, "Invalid Vehicle ID!");
-    let cars = []; for(let i = 0; i < params[1]; i++) cars.push(params[0]);
+    let vehicles = params.splice(1).join(" ").split(",");
+    if(vehicles.some(s => s < 400 || s > 611)) return SendError(player, "Invalid Vehicle ID!");
+    let cars = [];
+    for(let i = 0; i < vehicles.length; i++) {
+        for(let d = 0; d < params[0]; d++) cars.push(vehicles[i]);
+    }
     Circle.CreateCars(player, cars);
     SendACMD(player, "SpawnCars");
 });
@@ -3072,6 +3082,38 @@ function BuySpecificCar(player, type, index) {
                 player.SendClientMessage(data.colors.YELLOW, `You have successfully purchased vehicle {FF0000}${samp.vehicleNames[result[i].model-400]} {FFFF00}with {FF0000}${Function.numberWithCommas(result[i].cost)} {FFFF00}coins!`);
                 GivePersonalCar(player, result[i].model, 0);
                 break;
+            }
+        }
+    });
+}
+
+function RemovePlayerHoldIndex(player, index) {
+    Player.Info[player.playerid].Holds[index].used = false;
+    Player.Info[player.playerid].Holds[index].model = 0;
+    Player.Info[player.playerid].Holds[index].bone = 0;
+    Player.Info[player.playerid].Holds[index].offsetposition = [0, 0, 0];
+    Player.Info[player.playerid].Holds[index].offsetrotation = [0, 0, 0];
+    Player.Info[player.playerid].Holds[index].offsetscale = [0, 0, 0];
+    con.query("DELETE FROM holds WHERE owner = ? AND index = ?", [Player.Info[player.playerid].AccID, index]);
+}
+
+function ResetPlayerHoldCreateVariables(player) {
+    Player.Info[player.playerid].HoldsData.Editing = null;
+    Player.Info[player.playerid].HoldsData.CreatingId = 0;
+}
+
+function LoadPlayerHolds(player) {
+    con.query("SELECT * FROM holds WHERE owner = ?", [Player.Info[player.playerid]], function(err, result) {
+        if(err || result == 0) return;
+        for(let i = 0; i < result.length; i++) {
+            let index = Player.Info[player.playerid].Holds.findIndex(f => f.index == result[i].index);
+            if(index != -1) {
+                Player.Info[player.playerid].Holds[index].used = true;
+                Player.Info[player.playerid].Holds[index].model = result[i].model;
+                Player.Info[player.playerid].Holds[index].bone = result[i].bone;
+                Player.Info[player.playerid].Holds[index].offsetposition = JSON.parse(result[i].offsetposition);
+                Player.Info[player.playerid].Holds[index].offsetrotation = JSON.parse(result[i].offsetrotation);
+                Player.Info[player.playerid].Holds[index].offsetscale = JSON.parse(result[i].offsetscale);
             }
         }
     });
@@ -4497,6 +4539,7 @@ function LoadPlayerStats(player) {
                 checkReportsTD(player);
 
                 LoadPlayerPersonalCars(player);
+                LoadPlayerHolds(player);
 
                 let info = "";
                 info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
@@ -4678,6 +4721,14 @@ samp.OnPlayerRequestSpawn((player) => {
     return true;
 });
 
+samp.OnPlayerEditObject((player, playerobject, objectid, response, fX, fY, fZ, fRotX, fRotY, fRotZ) => {
+    return true;
+});
+
+samp.OnPlayerEditAttachedObject((player, response, index, modelid, boneid, fOffsetX, fOffsetY, fOffsetZ, fRotX, fRotY, fRotZ, fScaleX, fSclaeY, fScaleZ) => {
+    return true;
+});
+
 samp.OnPlayerClickPlayer((player, clickedplayer) => {
     Player.Info[player.playerid].ClickedPlayer = clickedplayer.playerid;
 
@@ -4705,6 +4756,7 @@ samp.OnPlayerDeath((player, killerid, reason) => {
         samp.SendDeathMessage(killerid.playerid, player.playerid, killerid.GetPlayerWeapon());
         Player.Info[killerid.playerid].Kills_Data.Kills++;
     }
+
     Player.Info[player.playerid].Kills_Data.Deaths++;
     return true;
 });
@@ -4814,6 +4866,91 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.HOLD: {
+            if(response) {
+                switch(listitem) {
+                    case 0: {
+                        let info = "";
+                        for(let i = 0; i < Player.Info[player.playerid].Holds.length; i++) {
+                            info += `{0072FF}Slot ${i} - {BBFF00}${Player.Info[player.playerid].Holds[i].used ? "Used" : "Free"}\n`;
+                        }
+                        player.ShowPlayerDialog(Dialog.HOLD_SELECT, samp.DIALOG_STYLE.LIST, "{BBFF00}You can hold 10 objects! Choose slot for hold!", info, "Select", "Back");
+                        break;
+                    }
+                }
+            }
+            else ResetPlayerHoldCreateVariables(player);
+            break;
+        }
+        case Dialog.HOLD_SELECT: {
+            if(response) {
+                for(let i = 0; i < Player.Info[player.playerid].Holds.length; i++) {
+                    if(i == listitem) {
+                        Player.Info[player.playerid].HoldsData.Editing = Player.Info[player.playerid].Holds[i].index;
+                        switch(Player.Info[player.playerid].Holds[i].used) {
+                            case true: {
+                                player.ShowPlayerDialog(Dialog.HOLD_REMOVE_OR_EDIT, samp.DIALOG_STYLE.MSGBOX, "", "{0072FF}Sorry but this slot is curently used!\n{0072FF}Do you wish to edit the hold in that slot or remove it ?", "Edit", "Remove");
+                                break;
+                            }
+                            case false: {
+                                player.ShowPlayerDialog(Dialog.HOLD_CREATE_INSERT_ID, samp.DIALOG_STYLE.INPUT, "{BBFF00}Object ID", "{0072FF}Please insert below the ID of the Object that you want to attach on you!", "Select", "Back");
+                                break;
+                            }
+                        }
+                        break;
+                    } 
+                }
+            }
+            else CMD.emit("hold", player);
+            break;
+        }
+        case Dialog.HOLD_REMOVE_OR_EDIT: {
+            if(response) player.EditAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
+            else {
+                player.RemovePlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
+                let index = Player.Info[player.playerid].Holds.find(f => f.index == Player.Info[player.playerid].HoldsData.Editing);
+                if(index != -1) {
+                    RemovePlayerHoldIndex(player, Player.Info[player.playerid].HoldsData.Editing);
+                    ResetPlayerHoldCreateVariables(player);
+                }
+            }
+            break;
+        }
+        case Dialog.HOLD_CREATE_INSERT_ID: {
+            if(response) {
+                Player.Info[player.playerid].HoldsData.CreatingId = parseInt(inputtext);
+                let info = "";
+                info += "{BBFF00}Spine\n";
+                info += "{BBFF00}Head\n";
+                info += "{BBFF00}Left Upper Arm\n";
+                info += "{BBFF00}Right Upper Arm\n";
+                info += "{BBFF00}Left Hand\n";
+                info += "{BBFF00}Right Hand\n";
+                info += "{BBFF00}Left Thigh\n";
+                info += "{BBFF00}Right Thigh\n";
+                info += "{BBFF00}Left Foot\n";
+                info += "{BBFF00}Right Foot\n";
+                info += "{BBFF00}Left Calf\n";
+                info += "{BBFF00}Right Calf\n";
+                info += "{BBFF00}Left Forearm\n";
+                info += "{BBFF00}Right Forearm\n";
+                info += "{BBFF00}Left Clavicle\n";
+                info += "{BBFF00}Right Clavicle\n";
+                info += "{BBFF00}Neck\n";
+                info += "{BBFF00}Jaw";
+                player.ShowPlayerDialog(Dialog.HOLD_CREATE_SELECT_BODY, samp.DIALOG_STYLE.LIST, "{BBFF00}Choose on which side of the body the object will apparen", info, "Select", "Back");
+            }
+            else CMD.emit("hold", player);  
+            break;
+        }
+        case Dialog.HOLD_CREATE_SELECT_BODY: {
+            if(response) {
+                player.SetPlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing, Player.Info[player.playerid].HoldsData.CreatingId, listitem, 0, 0, 0, 0, 0, 0);
+                player.EditAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
+            }
+            else CMD.emit("hold", player);  
+            break;
+        }
         case Dialog.MY_COLOR: {
             if(response) {
                 switch(listitem) {
@@ -5971,7 +6108,7 @@ samp.OnPlayerCommandText((player, cmdtext) => {
         Player.Info[player.playerid].Last_Command = Math.floor(Date.now() / 1000);
 
         cmdtext = cmdtext.replace("/", "");
-        let params = cmdtext.split(/[ ]+/);
+        let params = cmdtext.split(/[ ]+/); 
         cmdtext = params[0].toLowerCase();
         params.shift();
 

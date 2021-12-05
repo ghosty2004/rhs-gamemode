@@ -150,7 +150,27 @@ module.exports = {
             Need_Mail_Showed: false,
             Rank_Label: null,
             In_DM: "none",
-            Selected_MRF_Weapon: null
+            Selected_MRF_Weapon: null,
+            Holds: [],
+            HoldsData: {
+                Editing: null,
+                CreatingId: 0
+            }
+        }
+
+        /* ===================== */
+        /* Reset Holds Variables */
+        /* ===================== */
+        for(let i = 0; i < 10; i++) {
+            this.Info[playerid].Holds.push({
+                index: i,
+                used: false,
+                model: 0,
+                bone: 0,
+                offsetposition: [0, 0, 0],
+                offsetrotation: [0, 0, 0],
+                offsetscale: [0, 0, 0]
+            });
         }
     }
 };
