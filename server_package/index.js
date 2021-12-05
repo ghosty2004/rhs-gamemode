@@ -3931,7 +3931,7 @@ function SetupPlayerForSpawn(player, type=0) {
             let position = Gang.Info[Player.Info[player.playerid].Gang].position;
             player.SetPlayerPos(position[0], position[1], position[2]);
             player.SetPlayerFacingAngle(position[3]);
-            
+
             player.SetPlayerColor(Gang.Info[Player.Info[player.playerid].Gang].color);
 
             for(let i = 0; i < Gang.Info[Player.Info[player.playerid].Gang].weapons.length; i++) {
@@ -4517,7 +4517,6 @@ samp.registerEvent("OnPlayerPickUpDroppedWeapon", "iiii");
 samp.on("OnPlayerPickUpDroppedWeapon", (playerid, weaponid, ammo, pickupid) => {
     let player = samp.getPlayers().find(f => f.playerid == playerid);
     if(!player) return;
-    player.SendClientMessage(data.colors.YELLOW, `You have picked up weapon: {FF0000}${weaponid}{FFFF00}, Ammo: {FF0000}${ammo}{FFFF00}, PickupId: {FF0000}${pickupid}{FFFF00}.`);
     player.GivePlayerWeapon(weaponid, ammo);
     Streamer.DestroyDynamicPickup(pickupid);
 });
