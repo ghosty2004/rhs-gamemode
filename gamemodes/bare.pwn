@@ -4,6 +4,7 @@
 #include <streamer>
 #include <mapandreas>
 #include <CPLoader>
+#include <YSF>
 
 #define event:%0(%1) forward %0(%1); public %0(%1)
 
@@ -25,6 +26,11 @@ event:getLocationData(RequestID[], Float:x, Float:y, Float:z) {
     else { GetMapZoneName(zone, place); }
     SAMPNode_CallEvent("locationResponse", RequestID, place);
 }
+
+/* ================== */
+/* Server Node Events */
+/* ================== */
+event:_SetMaxPlayers(maxplayers) return SetMaxPlayers(maxplayers);
 
 /* ==================== */
 /* CPLoader Node Events */

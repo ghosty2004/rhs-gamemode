@@ -1,3 +1,5 @@
+const { callPublic } = require("samp-node-lib");
+
 module.exports = {
     Info: {
         StartTime: Math.floor(Date.now() / 1000),
@@ -7,5 +9,8 @@ module.exports = {
         Reuqest: {
             FindPosZ: {}
         }
+    },
+    SetMaxPlayers: function(maxplayers) {
+        return callPublic("_SetMaxPlayers", "i", maxplayers);
     }
 }

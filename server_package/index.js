@@ -2832,6 +2832,14 @@ CMD.on("saveall", (player) => {
     SendACMD(player, "SaveAll");
 });
 
+CMD.on("setmaxplayers", (player, params) => {
+    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!isNumber(params[0])) return SendUsage(player, "/SetMaxPlayers [Max Players]");
+    params[0] = parseInt(params[0]);
+    Server.SetMaxPlayers(params[0]);
+    player.SendClientMessage(data.colors.YELLOW, `Max players was successfully modified to {FF0000}${params[0]}{FFFF00}.`);
+});
+
 CMD.on("clearlogs", (player) => {
     if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     for(let i = 0; i < 3; i++) AddToTDLogs("");
