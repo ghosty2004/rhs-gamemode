@@ -47,6 +47,7 @@ const { getPlayer, isNumber } = require("./modules/functions");
 const data = {
     animations: require("./data/animations"),
     colors: require("./data/colors"),
+    holds: require("./data/holds"),
     position: require("./data/positions"),
     settings: require("./data/settings")
 }
@@ -508,15 +509,21 @@ CMD.on("hold", (player) => {
     player.ShowPlayerDialog(Dialog.HOLD, samp.DIALOG_STYLE.LIST, "{BBFF00}Create, edit, use holds {00BBF6}Have fun!", info, "Select", "Close");
 });
 
-CMD.on("holdon", (player) => {
-    Player.Info[player.playerid].Holds.filter(f => f.used).forEach((i) => {
-        player.SetPlayerAttachedObject(i.index, i.model, i.bone, i.offsetposition[0], i.offsetposition[1], i.offsetposition[2], i.offsetrotation[0], i.offsetrotation[1], i.offsetrotation[2], i.offsetscale[0], i.offsetscale[1], i.offsetscale[2]);
+CMD.on("holdon", async (player) => {
+    LoadPlayerHolds(player).then(() => {
+        Player.Info[player.playerid].Holds.filter(f => f.used).forEach((i) => {
+            player.SetPlayerAttachedObject(i.index, i.model, i.bone, i.offsetposition[0], i.offsetposition[1], i.offsetposition[2], i.offsetrotation[0], i.offsetrotation[1], i.offsetrotation[2], i.offsetscale[0], i.offsetscale[1], i.offsetscale[2]);
+        });
+        player.GameTextForPlayer("~w~~h~Holds ~r~~h~on", 3000, 4);
     });
-    player.GameTextForPlayer("~w~~h~Holds ~r~~h~on", 3000, 4);
 });
 
 CMD.on("holdoff", (player) => {
-    for(let i = 0; i < 10; i++) player.RemovePlayerAttachedObject();
+    for(let i = 0; i < 10; i++) {
+        let result = Player.Info[player.playerid].Holds.find(f => f.index == i && f.used);
+        if(result) RemovePlayerHoldIndex(player, result.index);
+        player.RemovePlayerAttachedObject(i);
+    }
     player.GameTextForPlayer("~w~~h~Holds ~r~~h~removed", 3000, 4);
 });
 
@@ -3111,15 +3118,14 @@ function BuySpecificCar(player, type, index) {
     });
 }
 
-function RemovePlayerHoldIndex(player, index) {
+function RemovePlayerHoldIndex(player, index, from_db=false) {
     Player.Info[player.playerid].Holds[index].used = false;
     Player.Info[player.playerid].Holds[index].model = 0;
     Player.Info[player.playerid].Holds[index].bone = 0;
     Player.Info[player.playerid].Holds[index].offsetposition = [0, 0, 0];
     Player.Info[player.playerid].Holds[index].offsetrotation = [0, 0, 0];
     Player.Info[player.playerid].Holds[index].offsetscale = [0, 0, 0];
-    con.query("DELETE FROM holds WHERE owner = ? AND index_number = ?", [Player.Info[player.playerid].AccID, index]);
-    player.GameTextForPlayer("~w~~h~Hold ~r~~h~removed", 3000, 4);
+    if(from_db) con.query("DELETE FROM holds WHERE owner = ? AND index_number = ?", [Player.Info[player.playerid].AccID, index]);
 }
 
 function ResetPlayerHoldCreateVariables(player) {
@@ -3128,19 +3134,22 @@ function ResetPlayerHoldCreateVariables(player) {
 }
 
 function LoadPlayerHolds(player) {
-    con.query("SELECT * FROM holds WHERE owner = ?", [Player.Info[player.playerid].AccID], function(err, result) {
-        if(err || result == 0) return;
-        for(let i = 0; i < result.length; i++) {
-            let index = Player.Info[player.playerid].Holds.findIndex(f => f.index == result[i].index_number);
-            if(index != -1) {
-                Player.Info[player.playerid].Holds[index].used = true;
-                Player.Info[player.playerid].Holds[index].model = result[i].model;
-                Player.Info[player.playerid].Holds[index].bone = result[i].bone;
-                Player.Info[player.playerid].Holds[index].offsetposition = JSON.parse(result[i].offsetposition);
-                Player.Info[player.playerid].Holds[index].offsetrotation = JSON.parse(result[i].offsetrotation);
-                Player.Info[player.playerid].Holds[index].offsetscale = JSON.parse(result[i].offsetscale);
+    return new Promise((resolve, reject) => {
+        con.query("SELECT * FROM holds WHERE owner = ?", [Player.Info[player.playerid].AccID], function(err, result) {
+            if(err || result == 0) return resolve(false);
+            for(let i = 0; i < result.length; i++) {
+                let index = Player.Info[player.playerid].Holds.findIndex(f => f.index == result[i].index_number);
+                if(index != -1) {
+                    Player.Info[player.playerid].Holds[index].used = true;
+                    Player.Info[player.playerid].Holds[index].model = result[i].model;
+                    Player.Info[player.playerid].Holds[index].bone = result[i].bone;
+                    Player.Info[player.playerid].Holds[index].offsetposition = JSON.parse(result[i].offsetposition);
+                    Player.Info[player.playerid].Holds[index].offsetrotation = JSON.parse(result[i].offsetrotation);
+                    Player.Info[player.playerid].Holds[index].offsetscale = JSON.parse(result[i].offsetscale);
+                }
             }
-        }
+            resolve(true);
+        });
     });
 }
 
@@ -4771,7 +4780,10 @@ samp.OnPlayerEditAttachedObject((player, response, index, modelid, boneid, fOffs
             player.SetPlayerAttachedObject(index, modelid, boneid, fOffsetX, fOffsetY, fOffsetZ, fRotX, fRotY, fRotZ, fScaleX, fSclaeY, fScaleZ);
             player.GameTextForPlayer("~w~~h~Hold ~r~~h~Created~n~~w~~h~type ~r~~h~/hold~w~~h~ for more!", 3000, 3);
         }
-        else RemovePlayerHoldIndex(player, index);
+        else {
+            RemovePlayerHoldIndex(player, index);
+            player.GameTextForPlayer("~w~~h~Hold ~r~~h~removed", 3000, 4);
+        }
         ResetPlayerHoldCreateVariables(player);
     }
     return true;
@@ -4932,6 +4944,10 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         break;
                     }
                     case 1: {
+                        let info = "";
+                        data.holds.forEach((i) => { info += `{BBFF00}${i.name}\n`; });
+                        info += "{FF0000}Remove Holds ({FFFFFF}/holdoff{FF0000})";
+                        player.ShowPlayerDialog(Dialog.HOLD_LIST, samp.DIALOG_STYLE.LIST, "{00BBF6}Hold List", info, "Select", "Close");
                         break;
                     }
                     case 2: {
@@ -4983,14 +4999,40 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             else CMD.emit("hold", player);
             break;
         }
+        case Dialog.HOLD_LIST: {
+            if(response) {
+                for(let i = 0; i < data.holds.length; i++) {
+                    if(i == listitem) {
+                        Player.Info[player.playerid].Holds.filter(f => f.used).forEach((i) => {
+                            player.RemovePlayerAttachedObject(i.index);
+                            RemovePlayerHoldIndex(player, i.index);
+                        });
+                        for(let d = 0; d < data.holds[i].objects.length; d++) {
+                            Player.Info[player.playerid].Holds[d].index = d;
+                            Player.Info[player.playerid].Holds[d].used = true;
+                            Player.Info[player.playerid].Holds[d].model = data.holds[i].objects[d][0];
+                            Player.Info[player.playerid].Holds[d].bone = data.holds[i].objects[d][1];
+                            Player.Info[player.playerid].Holds[d].offsetposition = [data.holds[i].objects[d][2], data.holds[i].objects[d][3], data.holds[i].objects[d][4]];
+                            Player.Info[player.playerid].Holds[d].offsetrotation = [data.holds[i].objects[d][5], data.holds[i].objects[d][6], data.holds[i].objects[d][7]];
+                            Player.Info[player.playerid].Holds[d].offsetscale = [data.holds[i].objects[d][8], data.holds[i].objects[d][9], data.holds[i].objects[d][10]];
+                            player.SetPlayerAttachedObject(d, data.holds[i].objects[d][0], data.holds[i].objects[d][1], data.holds[i].objects[d][2], data.holds[i].objects[d][3], data.holds[i].objects[d][4], data.holds[i].objects[d][5], data.holds[i].objects[d][6], data.holds[i].objects[d][7], data.holds[i].objects[d][8], data.holds[i].objects[d][9], data.holds[i].objects[d][10]);
+                        }
+                        break;
+                    }
+                }
+                if(listitem == data.holds.length) CMD.emit("holdoff", player);
+            }
+            break;
+        }
         case Dialog.HOLD_REMOVE_OR_EDIT: {
             if(response) player.EditAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
             else {
                 player.RemovePlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
                 let index = Player.Info[player.playerid].Holds.find(f => f.index == Player.Info[player.playerid].HoldsData.Editing);
                 if(index != -1) {
-                    RemovePlayerHoldIndex(player, Player.Info[player.playerid].HoldsData.Editing);
+                    RemovePlayerHoldIndex(player, Player.Info[player.playerid].HoldsData.Editing, true);
                     ResetPlayerHoldCreateVariables(player);
+                    player.GameTextForPlayer("~w~~h~Hold ~r~~h~removed", 3000, 4);
                 }
             }
             break;

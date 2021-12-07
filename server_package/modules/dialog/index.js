@@ -68,9 +68,10 @@ module.exports = {
     SELECT_MRF_WEAPON:          67,
     MY_COLOR:                   68,
     HOLD:                       69,
-    HOLD_SELECT:                70,
-    HOLD_REMOVE_OR_EDIT:        71,
-    HOLD_CREATE_INSERT_ID:      72,
-    HOLD_CREATE_SELECT_BODY:    73,
-    HOLD_SETTINGS:              74
+    HOLD_LIST:                  70,
+    HOLD_SELECT:                71,
+    HOLD_REMOVE_OR_EDIT:        72,
+    HOLD_CREATE_INSERT_ID:      73,
+    HOLD_CREATE_SELECT_BODY:    74,
+    HOLD_SETTINGS:              75
 }
