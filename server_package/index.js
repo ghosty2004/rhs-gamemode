@@ -509,11 +509,15 @@ CMD.on("hold", (player) => {
 });
 
 CMD.on("holdon", (player) => {
-
+    Player.Info[player.playerid].Holds.filter(f => f.used).forEach((i) => {
+        player.SetPlayerAttachedObject(i.index, i.model, i.bone, i.offsetposition[0], i.offsetposition[1], i.offsetposition[2], i.offsetrotation[0], i.offsetrotation[1], i.offsetrotation[2], i.offsetscale[0], i.offsetscale[1], i.offsetscale[2]);
+    });
+    player.GameTextForPlayer("~w~~h~Holds ~r~~h~on", 3000, 4);
 });
 
 CMD.on("holdoff", (player) => {
-
+    for(let i = 0; i < 10; i++) player.RemovePlayerAttachedObject();
+    player.GameTextForPlayer("~w~~h~Holds ~r~~h~removed", 3000, 4);
 });
 
 CMD.on("report", (player, params) => {
@@ -3114,7 +3118,8 @@ function RemovePlayerHoldIndex(player, index) {
     Player.Info[player.playerid].Holds[index].offsetposition = [0, 0, 0];
     Player.Info[player.playerid].Holds[index].offsetrotation = [0, 0, 0];
     Player.Info[player.playerid].Holds[index].offsetscale = [0, 0, 0];
-    con.query("DELETE FROM holds WHERE owner = ? AND index = ?", [Player.Info[player.playerid].AccID, index]);
+    con.query("DELETE FROM holds WHERE owner = ? AND index_number = ?", [Player.Info[player.playerid].AccID, index]);
+    player.GameTextForPlayer("~w~~h~Hold ~r~~h~removed", 3000, 4);
 }
 
 function ResetPlayerHoldCreateVariables(player) {
@@ -3941,7 +3946,8 @@ function savePlayer(player) {
     admin_bans = ?, admin_reactiontests = ?, admin_mathtests = ?, admin_jails = ?, admin_mutes = ?, admin_clearchats = ?, admin_since = ?, VIP = ?, VIP_Expire = ?, clan = ?, clan_rank = ?, gang = ?, gang_rank = ?,\
     gang_kills = ?, gang_deaths = ?, gang_captures = ?, gang_points = ?, gang_warns = ?, gang_hours = ?, gang_minutes = ?, gang_seconds = ?, gang_membersince = ?, kills = ?, headshots = ?, killingspree = ?,\
     bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?, month_minutes = ?, month_seconds = ?, month_kills = ?, month_headshots = ?, month_killingspree = ?,\
-    month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?, month_racepoints = ?, description1 = ?, description2 = ?, description3 = ?, laston = ?, jailed = ?, caged = ?, kicks = ?, discord = ? WHERE ID = ?", [
+    month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?, month_racepoints = ?, description1 = ?, description2 = ?, description3 = ?, laston = ?, jailed = ?, caged = ?, kicks = ?,\
+    discord = ?, hold_settings = ? WHERE ID = ?", [
         Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
         OnlineTime.hours, OnlineTime.minutes, OnlineTime.seconds, Player.Info[player.playerid].Admin, Player.Info[player.playerid].AdminActivity.Points, Player.Info[player.playerid].AdminActivity.Kicks,
         Player.Info[player.playerid].AdminActivity.Warns, Player.Info[player.playerid].AdminActivity.Bans, Player.Info[player.playerid].AdminActivity.ReactionTests, Player.Info[player.playerid].AdminActivity.MathTests,
@@ -3954,7 +3960,7 @@ function savePlayer(player) {
         Player.Info[player.playerid].Month.Kills_Data.Kills, Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, 
         Player.Info[player.playerid].Month.Kills_Data.Deaths, Player.Info[player.playerid].Month.Driving_Data.DriftPoints, Player.Info[player.playerid].Month.Driving_Data.StuntPoints, Player.Info[player.playerid].Month.Driving_Data.RacePoints, 
         Player.Info[player.playerid].Description[1], Player.Info[player.playerid].Description[2], Player.Info[player.playerid].Description[3], Function.getDateForLastOn(), Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Caged, 
-        Player.Info[player.playerid].Kicks, Player.Info[player.playerid].Discord, Player.Info[player.playerid].AccID
+        Player.Info[player.playerid].Kicks, Player.Info[player.playerid].Discord, Player.Info[player.playerid].HoldsData.Settings, Player.Info[player.playerid].AccID
     ]);
 }
 
@@ -4032,6 +4038,13 @@ function SetupPlayerForSpawn(player, type=0) {
 
     /* Check if the player is Caged */
     if(Player.Info[player.playerid].Caged) CagePlayer(player);
+
+    /* Check if the hold settings is setted for spawn */
+    if(Player.Info[player.playerid].HoldsData.Settings == 1) {
+        Player.Info[player.playerid].Holds.filter(f => f.used).forEach((i) => {
+            player.SetPlayerAttachedObject(i.index, i.model, i.bone, i.offsetposition[0], i.offsetposition[1], i.offsetposition[2], i.offsetrotation[0], i.offsetrotation[1], i.offsetrotation[2], i.offsetscale[0], i.offsetscale[1], i.offsetscale[2]);
+        });
+    }
 
     /* Check if the player is in DeathMatch */
     if(Player.Info[player.playerid].In_DM != "none") spawnPlayerInDM(player);
@@ -4547,6 +4560,7 @@ function LoadPlayerStats(player) {
                 Player.Info[player.playerid].Caged = result[0].caged;
                 Player.Info[player.playerid].Kicks = result[0].kicks;
                 Player.Info[player.playerid].Discord = result[0].discord;
+                Player.Info[player.playerid].HoldsData.Settings = result[0].hold_settings;
 
                 player.GivePlayerMoney(Player.Info[player.playerid].Money);
                 player.SetPlayerScore(getPlayerStatsNote(player));
@@ -4754,12 +4768,10 @@ samp.OnPlayerEditAttachedObject((player, response, index, modelid, boneid, fOffs
             Player.Info[player.playerid].Holds[index].offsetposition = [fOffsetX, fOffsetY, fOffsetZ];
             Player.Info[player.playerid].Holds[index].offsetrotation = [fRotX, fRotY, fRotZ];
             Player.Info[player.playerid].Holds[index].offsetscale = [fScaleX, fSclaeY, fScaleZ];
+            player.SetPlayerAttachedObject(index, modelid, boneid, fOffsetX, fOffsetY, fOffsetZ, fRotX, fRotY, fRotZ, fScaleX, fSclaeY, fScaleZ);
             player.GameTextForPlayer("~w~~h~Hold ~r~~h~Created~n~~w~~h~type ~r~~h~/hold~w~~h~ for more!", 3000, 3);
         }
-        else {
-            RemovePlayerHoldIndex(player, index);
-            player.GameTextForPlayer("~w~~h~Hold ~r~~h~removed", 3000, 4);
-        }
+        else RemovePlayerHoldIndex(player, index);
         ResetPlayerHoldCreateVariables(player);
     }
     return true;
@@ -4806,6 +4818,12 @@ samp.OnPlayerTakeDamage((player, issuerid, amount, weaponid, bodypart) => {
 });
 
 samp.OnPlayerEnterVehicle((player, vehicleid, ispassenger) => {
+    /* Check if the hold settings is setted for vehicle enter */
+    if(Player.Info[player.playerid].HoldsData.Settings == 2) {
+        Player.Info[player.playerid].Holds.filter(f => f.used).forEach((i) => {
+            player.SetPlayerAttachedObject(i.index, i.model, i.bone, i.offsetposition[0], i.offsetposition[1], i.offsetposition[2], i.offsetrotation[0], i.offsetrotation[1], i.offsetrotation[2], i.offsetscale[0], i.offsetscale[1], i.offsetscale[2]);
+        });
+    }
     return true;
 });
 
@@ -4929,6 +4947,11 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         break;
                     }
                     case 3: {
+                        let info = "";
+                        info += "{00BBF6}Show holds everytime you spawn\n";
+                        info += "{00BBF6}Show holds inside every vehicle\n";
+                        info += "{00BBF6}Hide holds";
+                        player.ShowPlayerDialog(Dialog.HOLD_SETTINGS, samp.DIALOG_STYLE.LIST, "{BBFF00}Settings / Preferences Hold", info, "Select", "Back");
                         break;
                     }
                     case 4: CMD.emit("holdon", player); break;
@@ -4968,7 +4991,6 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                 if(index != -1) {
                     RemovePlayerHoldIndex(player, Player.Info[player.playerid].HoldsData.Editing);
                     ResetPlayerHoldCreateVariables(player);
-                    player.GameTextForPlayer("~w~~h~Hold ~r~~h~removed", 3000, 4);
                 }
             }
             break;
@@ -5002,10 +5024,22 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.HOLD_CREATE_SELECT_BODY: {
             if(response) {
-                player.SetPlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing, Player.Info[player.playerid].HoldsData.CreatingId, listitem+1);
+                player.SetPlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing, Player.Info[player.playerid].HoldsData.CreatingId, listitem+1, 0, 0, 0, 0, 0, 0, 1, 1, 1);
                 player.EditAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
             }
             else CMD.emit("hold", player);  
+            break;
+        }
+        case Dialog.HOLD_SETTINGS: {
+            if(response) {
+                switch(listitem) {
+                    case 0: Player.Info[player.playerid].HoldsData.Settings = 1; break;
+                    case 1: Player.Info[player.playerid].HoldsData.Settings = 2; break;
+                    case 2: Player.Info[player.playerid].HoldsData.Settings = 0; break;
+                }
+                if(Player.Info[player.playerid].HoldsData.Settings == 0) for(let i = 0; i < 10; i++) player.RemovePlayerAttachedObject(i);
+                player.GameTextForPlayer("~w~~h~Hold Settings ~r~~h~saved", 3000, 3);
+            }
             break;
         }
         case Dialog.MY_COLOR: {

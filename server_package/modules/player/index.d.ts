@@ -158,7 +158,8 @@ export declare const Info: {
     }[],
     HoldsData: {
         Editing: null|number,
-        CreatingId: number
+        CreatingId: number,
+        Settings: number
     }
 }[];
 

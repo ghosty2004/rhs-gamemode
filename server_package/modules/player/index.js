@@ -154,7 +154,8 @@ module.exports = {
             Holds: [],
             HoldsData: {
                 Editing: null,
-                CreatingId: 0
+                CreatingId: 0,
+                Settings: 0
             }
         }
 

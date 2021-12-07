@@ -71,5 +71,6 @@ module.exports = {
     HOLD_SELECT:                70,
     HOLD_REMOVE_OR_EDIT:        71,
     HOLD_CREATE_INSERT_ID:      72,
-    HOLD_CREATE_SELECT_BODY:    73
+    HOLD_CREATE_SELECT_BODY:    73,
+    HOLD_SETTINGS:              74
 }
