@@ -2587,6 +2587,7 @@ CMD.on("cc", (player) => { CMD.emit("clearchat", player); });
 CMD.on("spawncars", (player, params) => {
     if(!isNumber(params[0]) || !params.slice(1).join(" ")) return SendUsage(player, "/spawncars [Count] [Model(s)]");
     params[0] = parseInt(params[0]);
+    if(params[0] < 1 || params[0] > 100) return SendError(player, "Invalid count (1-100)!");
     let vehicles = params.splice(1).join(" ").split(",");
     if(vehicles.some(s => s < 400 || s > 611)) return SendError(player, "Invalid Vehicle ID!");
     let cars = [];
