@@ -10,10 +10,6 @@ const md5 = require("md5");
 const YouTubeSearch = require("youtube-search-without-api-key");
 const hastebin = require("hastebin-gen");
 
-let TDInfo = {
-    PlayerInfo: {}
-};
-
 /* YouTube Audio Stream Module */
 require("youtube-audio-server").listen(7777);
 
@@ -2899,203 +2895,6 @@ CMD.on("givepcar", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
-function loadPlayerTD(playerid) {
-    TDInfo.PlayerInfo[playerid] = [];
-    // => Player Info TD (OnPlayerClickPlayer)
-    TDInfo.PlayerInfo[playerid][0] = samp.CreatePlayerTextDraw(playerid, 315.000000, 147.000000, "_");
-    samp.PlayerTextDrawFont(playerid, TDInfo.PlayerInfo[playerid][0], 1);
-    samp.PlayerTextDrawLetterSize(playerid, TDInfo.PlayerInfo[playerid][0], 0.600000, 16.800008);
-    samp.PlayerTextDrawTextSize(playerid, TDInfo.PlayerInfo[playerid][0], 302.500000, 209.500000);
-    samp.PlayerTextDrawSetOutline(playerid, TDInfo.PlayerInfo[playerid][0], 1);
-    samp.PlayerTextDrawSetShadow(playerid, TDInfo.PlayerInfo[playerid][0], 0);
-    samp.PlayerTextDrawAlignment(playerid, TDInfo.PlayerInfo[playerid][0], 2);
-    samp.PlayerTextDrawColor(playerid, TDInfo.PlayerInfo[playerid][0], -1);
-    samp.PlayerTextDrawBackgroundColor(playerid, TDInfo.PlayerInfo[playerid][0], 255);
-    samp.PlayerTextDrawBoxColor(playerid, TDInfo.PlayerInfo[playerid][0], 135);
-    samp.PlayerTextDrawUseBox(playerid, TDInfo.PlayerInfo[playerid][0], 1);
-    samp.PlayerTextDrawSetProportional(playerid, TDInfo.PlayerInfo[playerid][0], 1);
-    samp.PlayerTextDrawSetSelectable(playerid, TDInfo.PlayerInfo[playerid][0], 0);
-
-    TDInfo.PlayerInfo[playerid][1] = samp.CreatePlayerTextDraw(playerid, 209.000000, 146.000000, "TextDraw");
-    samp.PlayerTextDrawFont(playerid, TDInfo.PlayerInfo[playerid][1], 5);
-    samp.PlayerTextDrawLetterSize(playerid, TDInfo.PlayerInfo[playerid][1], 0.600000, 2.000000);
-    samp.PlayerTextDrawTextSize(playerid, TDInfo.PlayerInfo[playerid][1], 86.000000, 153.500000);
-    samp.PlayerTextDrawSetOutline(playerid, TDInfo.PlayerInfo[playerid][1], 1);
-    samp.PlayerTextDrawSetShadow(playerid, TDInfo.PlayerInfo[playerid][1], 0);
-    samp.PlayerTextDrawAlignment(playerid, TDInfo.PlayerInfo[playerid][1], 1);
-    samp.PlayerTextDrawColor(playerid, TDInfo.PlayerInfo[playerid][1], -1);
-    samp.PlayerTextDrawBackgroundColor(playerid, TDInfo.PlayerInfo[playerid][1], 1195853823);
-    samp.PlayerTextDrawBoxColor(playerid, TDInfo.PlayerInfo[playerid][1], -764862926);
-    samp.PlayerTextDrawUseBox(playerid, TDInfo.PlayerInfo[playerid][1], 0);
-    samp.PlayerTextDrawSetProportional(playerid, TDInfo.PlayerInfo[playerid][1], 1);
-    samp.PlayerTextDrawSetSelectable(playerid, TDInfo.PlayerInfo[playerid][1], 0);
-    samp.PlayerTextDrawSetPreviewModel(playerid, TDInfo.PlayerInfo[playerid][1], 0);
-    samp.PlayerTextDrawSetPreviewRot(playerid, TDInfo.PlayerInfo[playerid][1], -10.000000, 0.000000, -20.000000, 1.000000);
-    samp.PlayerTextDrawSetPreviewVehCol(playerid, TDInfo.PlayerInfo[playerid][1], 1, 1);
-
-    TDInfo.PlayerInfo[playerid][2] = samp.CreatePlayerTextDraw(playerid, 329.000000, 144.000000, "Player Info:");
-    samp.PlayerTextDrawFont(playerid, TDInfo.PlayerInfo[playerid][2], 2);
-    samp.PlayerTextDrawLetterSize(playerid, TDInfo.PlayerInfo[playerid][2], 0.183333, 2.000000);
-    samp.PlayerTextDrawTextSize(playerid, TDInfo.PlayerInfo[playerid][2], 400.000000, 17.000000);
-    samp.PlayerTextDrawSetOutline(playerid, TDInfo.PlayerInfo[playerid][2], 1);
-    samp.PlayerTextDrawSetShadow(playerid, TDInfo.PlayerInfo[playerid][2], 0);
-    samp.PlayerTextDrawAlignment(playerid, TDInfo.PlayerInfo[playerid][2], 1);
-    samp.PlayerTextDrawColor(playerid, TDInfo.PlayerInfo[playerid][2], 16777215);
-    samp.PlayerTextDrawBackgroundColor(playerid, TDInfo.PlayerInfo[playerid][2], 255);
-    samp.PlayerTextDrawBoxColor(playerid, TDInfo.PlayerInfo[playerid][2], 50);
-    samp.PlayerTextDrawUseBox(playerid, TDInfo.PlayerInfo[playerid][2], 0);
-    samp.PlayerTextDrawSetProportional(playerid, TDInfo.PlayerInfo[playerid][2], 1);
-    samp.PlayerTextDrawSetSelectable(playerid, TDInfo.PlayerInfo[playerid][2], 0);
-
-    TDInfo.PlayerInfo[playerid][3] = samp.CreatePlayerTextDraw(playerid, 298.000000, 170.000000, "Name: ~r~~h~Ghosty");
-    samp.PlayerTextDrawFont(playerid, TDInfo.PlayerInfo[playerid][3], 1);
-    samp.PlayerTextDrawLetterSize(playerid, TDInfo.PlayerInfo[playerid][3], 0.179167, 2.049999);
-    samp.PlayerTextDrawTextSize(playerid, TDInfo.PlayerInfo[playerid][3], 400.000000, 17.000000);
-    samp.PlayerTextDrawSetOutline(playerid, TDInfo.PlayerInfo[playerid][3], 1);
-    samp.PlayerTextDrawSetShadow(playerid, TDInfo.PlayerInfo[playerid][3], 0);
-    samp.PlayerTextDrawAlignment(playerid, TDInfo.PlayerInfo[playerid][3], 1);
-    samp.PlayerTextDrawColor(playerid, TDInfo.PlayerInfo[playerid][3], 1097458175);
-    samp.PlayerTextDrawBackgroundColor(playerid, TDInfo.PlayerInfo[playerid][3], 255);
-    samp.PlayerTextDrawBoxColor(playerid, TDInfo.PlayerInfo[playerid][3], 50);
-    samp.PlayerTextDrawUseBox(playerid, TDInfo.PlayerInfo[playerid][3], 0);
-    samp.PlayerTextDrawSetProportional(playerid, TDInfo.PlayerInfo[playerid][3], 1);
-    samp.PlayerTextDrawSetSelectable(playerid, TDInfo.PlayerInfo[playerid][3], 0);
-
-    TDInfo.PlayerInfo[playerid][4] = samp.CreatePlayerTextDraw(playerid, 298.000000, 189.000000, "Location: ~r~~h~Las Venturas");
-    samp.PlayerTextDrawFont(playerid, TDInfo.PlayerInfo[playerid][4], 1);
-    samp.PlayerTextDrawLetterSize(playerid, TDInfo.PlayerInfo[playerid][4], 0.179167, 2.049999);
-    samp.PlayerTextDrawTextSize(playerid, TDInfo.PlayerInfo[playerid][4], 400.000000, 17.000000);
-    samp.PlayerTextDrawSetOutline(playerid, TDInfo.PlayerInfo[playerid][4], 1);
-    samp.PlayerTextDrawSetShadow(playerid, TDInfo.PlayerInfo[playerid][4], 0);
-    samp.PlayerTextDrawAlignment(playerid, TDInfo.PlayerInfo[playerid][4], 1);
-    samp.PlayerTextDrawColor(playerid, TDInfo.PlayerInfo[playerid][4], 1097458175);
-    samp.PlayerTextDrawBackgroundColor(playerid, TDInfo.PlayerInfo[playerid][4], 255);
-    samp.PlayerTextDrawBoxColor(playerid, TDInfo.PlayerInfo[playerid][4], 50);
-    samp.PlayerTextDrawUseBox(playerid, TDInfo.PlayerInfo[playerid][4], 0);
-    samp.PlayerTextDrawSetProportional(playerid, TDInfo.PlayerInfo[playerid][4], 1);
-    samp.PlayerTextDrawSetSelectable(playerid, TDInfo.PlayerInfo[playerid][4], 0);
-
-    TDInfo.PlayerInfo[playerid][5] = samp.CreatePlayerTextDraw(playerid, 298.000000, 207.000000, "Level: ~r~~h~0");
-    samp.PlayerTextDrawFont(playerid, TDInfo.PlayerInfo[playerid][5], 1);
-    samp.PlayerTextDrawLetterSize(playerid, TDInfo.PlayerInfo[playerid][5], 0.179167, 2.049999);
-    samp.PlayerTextDrawTextSize(playerid, TDInfo.PlayerInfo[playerid][5], 400.000000, 17.000000);
-    samp.PlayerTextDrawSetOutline(playerid, TDInfo.PlayerInfo[playerid][5], 1);
-    samp.PlayerTextDrawSetShadow(playerid, TDInfo.PlayerInfo[playerid][5], 0);
-    samp.PlayerTextDrawAlignment(playerid, TDInfo.PlayerInfo[playerid][5], 1);
-    samp.PlayerTextDrawColor(playerid, TDInfo.PlayerInfo[playerid][5], 1097458175);
-    samp.PlayerTextDrawBackgroundColor(playerid, TDInfo.PlayerInfo[playerid][5], 255);
-    samp.PlayerTextDrawBoxColor(playerid, TDInfo.PlayerInfo[playerid][5], 50);
-    samp.PlayerTextDrawUseBox(playerid, TDInfo.PlayerInfo[playerid][5], 0);
-    samp.PlayerTextDrawSetProportional(playerid, TDInfo.PlayerInfo[playerid][5], 1);
-    samp.PlayerTextDrawSetSelectable(playerid, TDInfo.PlayerInfo[playerid][5], 0);
-
-    TDInfo.PlayerInfo[playerid][6] = samp.CreatePlayerTextDraw(playerid, 298.000000, 225.000000, "Vehicles: ~r~~h~0");
-    samp.PlayerTextDrawFont(playerid, TDInfo.PlayerInfo[playerid][6], 1);
-    samp.PlayerTextDrawLetterSize(playerid, TDInfo.PlayerInfo[playerid][6], 0.179167, 2.049999);
-    samp.PlayerTextDrawTextSize(playerid, TDInfo.PlayerInfo[playerid][6], 400.000000, 17.000000);
-    samp.PlayerTextDrawSetOutline(playerid, TDInfo.PlayerInfo[playerid][6], 1);
-    samp.PlayerTextDrawSetShadow(playerid, TDInfo.PlayerInfo[playerid][6], 0);
-    samp.PlayerTextDrawAlignment(playerid, TDInfo.PlayerInfo[playerid][6], 1);
-    samp.PlayerTextDrawColor(playerid, TDInfo.PlayerInfo[playerid][6], 1097458175);
-    samp.PlayerTextDrawBackgroundColor(playerid, TDInfo.PlayerInfo[playerid][6], 255);
-    samp.PlayerTextDrawBoxColor(playerid, TDInfo.PlayerInfo[playerid][6], 50);
-    samp.PlayerTextDrawUseBox(playerid, TDInfo.PlayerInfo[playerid][6], 0);
-    samp.PlayerTextDrawSetProportional(playerid, TDInfo.PlayerInfo[playerid][6], 1);
-    samp.PlayerTextDrawSetSelectable(playerid, TDInfo.PlayerInfo[playerid][6], 0);
-
-    TDInfo.PlayerInfo[playerid][7] = samp.CreatePlayerTextDraw(playerid, 298.000000, 243.000000, "Houses: ~r~~h~0");
-    samp.PlayerTextDrawFont(playerid, TDInfo.PlayerInfo[playerid][7], 1);
-    samp.PlayerTextDrawLetterSize(playerid, TDInfo.PlayerInfo[playerid][7], 0.179167, 2.049999);
-    samp.PlayerTextDrawTextSize(playerid, TDInfo.PlayerInfo[playerid][7], 400.000000, 17.000000);
-    samp.PlayerTextDrawSetOutline(playerid, TDInfo.PlayerInfo[playerid][7], 1);
-    samp.PlayerTextDrawSetShadow(playerid, TDInfo.PlayerInfo[playerid][7], 0);
-    samp.PlayerTextDrawAlignment(playerid, TDInfo.PlayerInfo[playerid][7], 1);
-    samp.PlayerTextDrawColor(playerid, TDInfo.PlayerInfo[playerid][7], 1097458175);
-    samp.PlayerTextDrawBackgroundColor(playerid, TDInfo.PlayerInfo[playerid][7], 255);
-    samp.PlayerTextDrawBoxColor(playerid, TDInfo.PlayerInfo[playerid][7], 50);
-    samp.PlayerTextDrawUseBox(playerid, TDInfo.PlayerInfo[playerid][7], 0);
-    samp.PlayerTextDrawSetProportional(playerid, TDInfo.PlayerInfo[playerid][7], 1);
-    samp.PlayerTextDrawSetSelectable(playerid, TDInfo.PlayerInfo[playerid][7], 0);
-
-    TDInfo.PlayerInfo[playerid][8] = samp.CreatePlayerTextDraw(playerid, 298.000000, 261.000000, "Money: ~r~~h~0");
-    samp.PlayerTextDrawFont(playerid, TDInfo.PlayerInfo[playerid][8], 1);
-    samp.PlayerTextDrawLetterSize(playerid, TDInfo.PlayerInfo[playerid][8], 0.179167, 2.049999);
-    samp.PlayerTextDrawTextSize(playerid, TDInfo.PlayerInfo[playerid][8], 400.000000, 17.000000);
-    samp.PlayerTextDrawSetOutline(playerid, TDInfo.PlayerInfo[playerid][8], 1);
-    samp.PlayerTextDrawSetShadow(playerid, TDInfo.PlayerInfo[playerid][8], 0);
-    samp.PlayerTextDrawAlignment(playerid, TDInfo.PlayerInfo[playerid][8], 1);
-    samp.PlayerTextDrawColor(playerid, TDInfo.PlayerInfo[playerid][8], 1097458175);
-    samp.PlayerTextDrawBackgroundColor(playerid, TDInfo.PlayerInfo[playerid][8], 255);
-    samp.PlayerTextDrawBoxColor(playerid, TDInfo.PlayerInfo[playerid][8], 50);
-    samp.PlayerTextDrawUseBox(playerid, TDInfo.PlayerInfo[playerid][8], 0);
-    samp.PlayerTextDrawSetProportional(playerid, TDInfo.PlayerInfo[playerid][8], 1);
-    samp.PlayerTextDrawSetSelectable(playerid, TDInfo.PlayerInfo[playerid][8], 0);
-
-    TDInfo.PlayerInfo[playerid][9] = samp.CreatePlayerTextDraw(playerid, 321.000000, 157.000000, "-");
-    samp.PlayerTextDrawFont(playerid, TDInfo.PlayerInfo[playerid][9], 1);
-    samp.PlayerTextDrawLetterSize(playerid, TDInfo.PlayerInfo[playerid][9], 4.650001, 0.849999);
-    samp.PlayerTextDrawTextSize(playerid, TDInfo.PlayerInfo[playerid][9], 400.000000, 17.000000);
-    samp.PlayerTextDrawSetOutline(playerid, TDInfo.PlayerInfo[playerid][9], 1);
-    samp.PlayerTextDrawSetShadow(playerid, TDInfo.PlayerInfo[playerid][9], 0);
-    samp.PlayerTextDrawAlignment(playerid, TDInfo.PlayerInfo[playerid][9], 1);
-    samp.PlayerTextDrawColor(playerid, TDInfo.PlayerInfo[playerid][9], 2094792959);
-    samp.PlayerTextDrawBackgroundColor(playerid, TDInfo.PlayerInfo[playerid][9], 255);
-    samp.PlayerTextDrawBoxColor(playerid, TDInfo.PlayerInfo[playerid][9], 50);
-    samp.PlayerTextDrawUseBox(playerid, TDInfo.PlayerInfo[playerid][9], 0);
-    samp.PlayerTextDrawSetProportional(playerid, TDInfo.PlayerInfo[playerid][9], 1);
-    samp.PlayerTextDrawSetSelectable(playerid, TDInfo.PlayerInfo[playerid][9], 0);
-
-    TDInfo.PlayerInfo[playerid][10] = samp.CreatePlayerTextDraw(playerid, 191.000000, 293.000000, "-");
-    samp.PlayerTextDrawFont(playerid, TDInfo.PlayerInfo[playerid][10], 2);
-    samp.PlayerTextDrawLetterSize(playerid, TDInfo.PlayerInfo[playerid][10], 20.099933, 1.249999);
-    samp.PlayerTextDrawTextSize(playerid, TDInfo.PlayerInfo[playerid][10], 400.000000, 17.000000);
-    samp.PlayerTextDrawSetOutline(playerid, TDInfo.PlayerInfo[playerid][10], 0);
-    samp.PlayerTextDrawSetShadow(playerid, TDInfo.PlayerInfo[playerid][10], 0);
-    samp.PlayerTextDrawAlignment(playerid, TDInfo.PlayerInfo[playerid][10], 1);
-    samp.PlayerTextDrawColor(playerid, TDInfo.PlayerInfo[playerid][10], 2094792959);
-    samp.PlayerTextDrawBackgroundColor(playerid, TDInfo.PlayerInfo[playerid][10], 255);
-    samp.PlayerTextDrawBoxColor(playerid, TDInfo.PlayerInfo[playerid][10], 50);
-    samp.PlayerTextDrawUseBox(playerid, TDInfo.PlayerInfo[playerid][10], 0);
-    samp.PlayerTextDrawSetProportional(playerid, TDInfo.PlayerInfo[playerid][10], 1);
-    samp.PlayerTextDrawSetSelectable(playerid, TDInfo.PlayerInfo[playerid][10], 0);
-
-    TDInfo.PlayerInfo[playerid][11] = samp.CreatePlayerTextDraw(playerid, 408.000000, 142.000000, "LD_CHAT:thumbdn");
-    samp.PlayerTextDrawFont(playerid, TDInfo.PlayerInfo[playerid][11], 4);
-    samp.PlayerTextDrawLetterSize(playerid, TDInfo.PlayerInfo[playerid][11], 0.550000, 1.700000);
-    samp.PlayerTextDrawTextSize(playerid, TDInfo.PlayerInfo[playerid][11], 16.000000, 18.000000);
-    samp.PlayerTextDrawSetOutline(playerid, TDInfo.PlayerInfo[playerid][11], 1);
-    samp.PlayerTextDrawSetShadow(playerid, TDInfo.PlayerInfo[playerid][11], 0);
-    samp.PlayerTextDrawAlignment(playerid, TDInfo.PlayerInfo[playerid][11], 1);
-    samp.PlayerTextDrawColor(playerid, TDInfo.PlayerInfo[playerid][11], -1);
-    samp.PlayerTextDrawBackgroundColor(playerid, TDInfo.PlayerInfo[playerid][11], 255);
-    samp.PlayerTextDrawBoxColor(playerid, TDInfo.PlayerInfo[playerid][11], 50);
-    samp.PlayerTextDrawUseBox(playerid, TDInfo.PlayerInfo[playerid][11], 0);
-    samp.PlayerTextDrawSetProportional(playerid, TDInfo.PlayerInfo[playerid][11], 1);
-    samp.PlayerTextDrawSetSelectable(playerid, TDInfo.PlayerInfo[playerid][11], 1);
-}
-
-async function showPlayerPlayerInfoTD(player, target) {
-    player.PlayerTextDrawSetPreviewModel(TDInfo.PlayerInfo[player.playerid][1], target.GetPlayerSkin());
-    player.PlayerTextDrawSetString(TDInfo.PlayerInfo[player.playerid][3], `Name: ~r~~h~${target.GetPlayerName(24)}`);
-    player.PlayerTextDrawSetString(TDInfo.PlayerInfo[player.playerid][4], `Location: ~r~~h~re`);
-    player.PlayerTextDrawSetString(TDInfo.PlayerInfo[player.playerid][6], `Vehicles: ~r~~h~0`);
-    player.PlayerTextDrawSetString(TDInfo.PlayerInfo[player.playerid][7], `Houses: ~r~~h~0`);
-    player.PlayerTextDrawSetString(TDInfo.PlayerInfo[player.playerid][8], `Money: ~r~~h~0`);
-    for(let i = 0; i <= 11; i++) player.PlayerTextDrawShow(TDInfo.PlayerInfo[player.playerid][i]);
-    player.SelectTextDraw(0xFF0000AA);
-}
-
-function hidePlayerPlayerInfoTD(player) {
-    for(let i = 0; i <= 11; i++) player.PlayerTextDrawHide(TDInfo.PlayerInfo[player.playerid][i]);
-    player.CancelSelectTextDraw();
-}
-
-samp.OnPlayerClickPlayerTextDraw((player, textdraw) => {
-    if(textdraw == TDInfo.PlayerInfo[player.playerid][11]) {
-        hidePlayerPlayerInfoTD(player);
-    }
-});
-
 function ResetAdminVariables(player) {
     Player.Info[player.playerid].AdminActivity.Points = 0;
     Player.Info[player.playerid].AdminActivity.Kicks = 0;
@@ -4992,9 +4791,7 @@ samp.OnPlayerEditAttachedObject((player, response, index, modelid, boneid, fOffs
 });
 
 samp.OnPlayerClickPlayer((player, clickedplayer) => {
-    showPlayerPlayerInfoTD(player, clickedplayer);
-
-    /*Player.Info[player.playerid].ClickedPlayer = clickedplayer.playerid;
+    Player.Info[player.playerid].ClickedPlayer = clickedplayer.playerid;
 
     let info = "";
     info += `{0072FF}${Lang(player, "Vezi statistici", "Show Stats")} - {00FF00}/stats\n`;
@@ -5003,7 +4800,7 @@ samp.OnPlayerClickPlayer((player, clickedplayer) => {
     info += `{0072FF}${Lang(player, "Vezi statistici admin", "Show Admin Stats")} - {00FF00}/astats\n`;
     info += `{0072FF}${Lang(player, "Trimite PM", "Send PM")} - {00FF00}/PM\n`;
     info += `{0072FF}${Lang(player, "Urmareste jucator", "Spectate him")} - {00FF00}/spec`;
-    player.ShowPlayerDialog(Dialog.PLAYER_CLICK, samp.DIALOG_STYLE.LIST, Lang(player, `{AAAAAA}Ai dat click pe {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`, `{AAAAAA}You have clicked {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`), info, "Select", "Close");*/
+    player.ShowPlayerDialog(Dialog.PLAYER_CLICK, samp.DIALOG_STYLE.LIST, Lang(player, `{AAAAAA}Ai dat click pe {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`, `{AAAAAA}You have clicked {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`), info, "Select", "Close");
     return true;
 });
 
@@ -5071,7 +4868,6 @@ samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
 
 samp.OnPlayerConnect(async(player) => {
     Player.ResetVariables(player.playerid);
-    loadPlayerTD(player.playerid);
     if(await checkPlayerBanStatus(player, false)) kickPlayer(player);
     else {
         ShowConnectTextDraw(player); 
