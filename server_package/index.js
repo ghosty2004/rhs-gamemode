@@ -3125,7 +3125,7 @@ function GetPersonalCarPrice(model) {
 
 function GivePersonalCar(player, model, from_admin) {
     let cartext = [];
-    for(let i = 0; i < 4; i++) cartext.push({text: "{00FF00}re mane", fontsize: 20, offsetposition: [0, 0, 0], offsetrotation: [0, 0, 0]});
+    for(let i = 0; i < 4; i++) cartext.push({text: "null", fontsize: 20, offsetposition: [0, 0, 0], offsetrotation: [0, 0, 0]});
     con.query("INSERT INTO personalcars (owner, model, color, position, cartext, from_admin) VALUES(?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].AccID, model, JSON.stringify([0, 0]), JSON.stringify(player.GetPlayerPos()), JSON.stringify(cartext), from_admin], function(err, result) {
         PCar.Create(result.insertId, Player.Info[player.playerid].AccID, model, [0, 0], player.GetPlayerPos(), cartext, from_admin);
         LoadPlayerPersonalCars(player);
@@ -4821,8 +4821,8 @@ samp.OnPlayerEditObject((player, playerobject, objectid, response, fX, fY, fZ, f
             let ofy = fY-position.y;
             let ofz = fZ-position.z;
             let ofaz = fRotZ-angle;
-            let finalx = ofx*Math.cos(toDegrees(angle))+ofy*Math.sin(toDegrees(angle));
-            let finaly = -ofx*Math.sin(toDegrees(angle))+ofy*Math.cos(toDegrees(angle));
+            let finalx = ofx*Math.cos(angle)+ofy*Math.sin(angle);
+            let finaly = -ofx*Math.sin(angle)+ofy*Math.cos(angle);
 
             data.offsetposition = [finalx, finaly, ofz];
             data.offsetrotation = [fRotX, fRotY, ofaz];
