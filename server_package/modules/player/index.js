@@ -156,6 +156,10 @@ module.exports = {
                 Editing: null,
                 CreatingId: 0,
                 Settings: 0
+            },
+            EditingCarText: {
+                Fontsize: 5,
+                Index: 0
             }
         }
 

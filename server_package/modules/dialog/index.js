@@ -73,5 +73,9 @@ module.exports = {
     HOLD_REMOVE_OR_EDIT:        72,
     HOLD_CREATE_INSERT_ID:      73,
     HOLD_CREATE_SELECT_BODY:    74,
-    HOLD_SETTINGS:              75
+    HOLD_SETTINGS:              75,
+    CARTEXT:                    76,
+    CARTEXT_EDIT_OR_REMOVE:     77,
+    CARTEXT_SELECT_SIZE:        78,
+    CARTEXT_INPUT_TEXT:         79
 }

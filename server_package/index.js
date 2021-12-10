@@ -1117,6 +1117,9 @@ CMD.on("sellcar", (player) => {
         player.SendClientMessage(data.colors.YELLOW, `You have successfully sold your vehicle! You got {FF0000}+${Function.numberWithCommas(price_back)} {FFFF00}coins back!`);
         Player.Info[player.playerid].Coins += price_back;
         samp.DestroyVehicle(car.vehicle);
+        car.cartext.forEach((data) => {
+            if(data.object) samp.DestroyObject(data.object);
+        });
         PCar.Delete(car.id);
     });
 });
@@ -1603,7 +1606,17 @@ CMD.on("vweapons", (player) => {
 
 CMD.on("cartext", (player) => {
     if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
-});
+    let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
+    if(!car) return SendError(player, "You don't have any personal vehicle to use this command!");
+    if(player.IsPlayerInAnyVehicle()) return SendError(player, "You can't be in a vehicle!");
+    let position = samp.GetVehiclePos(car.vehicle);
+    if(!player.IsPlayerInRangeOfPoint(5, position.x, position.y, position.z)) return SendError(player, "You are not in range of point with your vehicle!");
+    let info = "";
+    for(let i = 0; i < car.cartext.length; i++) {
+        info += `{BBFF00}Slot {00BBF6}${i+1}{BBFF00} - ${car.cartext[i].text != "null" ? `Used | Text: {00BBF6}${car.cartext[i].text}{BBFF00} | Style {00BBF6}- ${getCarTextSize(car.cartext[i].fontsize)}` : "Free"}\n`;
+    }
+    player.ShowPlayerDialog(Dialog.CARTEXT, samp.DIALOG_STYLE.LIST, "Personal Vehicle Holds - Slot", info, "Select", "Close");
+}); 
 
 CMD.on("tags", (player) => {
     if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
@@ -2895,6 +2908,20 @@ CMD.on("givepcar", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function toDegrees(angle) {
+    return angle * (180 / Math.PI);
+}
+
+function getCarTextSize(size) {
+    let string = "None";
+    switch(size) {
+        case 5: string = "Small"; break;
+        case 10: string = "Medium"; break;
+        case 20: string = "Big"; break;
+    }
+    return string;
+}
+
 function ResetAdminVariables(player) {
     Player.Info[player.playerid].AdminActivity.Points = 0;
     Player.Info[player.playerid].AdminActivity.Kicks = 0;
@@ -3097,8 +3124,10 @@ function GetPersonalCarPrice(model) {
 }
 
 function GivePersonalCar(player, model, from_admin) {
-    con.query("INSERT INTO personalcars (owner, model, color, position, from_admin) VALUES(?, ?, ?, ?, ?)", [Player.Info[player.playerid].AccID, model, JSON.stringify([0, 0]), JSON.stringify(player.GetPlayerPos()), from_admin], function(err, result) {
-        PCar.Create(result.insertId, Player.Info[player.playerid].AccID, model, [0, 0], player.GetPlayerPos(), from_admin);
+    let cartext = [];
+    for(let i = 0; i < 4; i++) cartext.push({text: "{00FF00}re mane", fontsize: 20, offsetposition: [0, 0, 0], offsetrotation: [0, 0, 0]});
+    con.query("INSERT INTO personalcars (owner, model, color, position, cartext, from_admin) VALUES(?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].AccID, model, JSON.stringify([0, 0]), JSON.stringify(player.GetPlayerPos()), JSON.stringify(cartext), from_admin], function(err, result) {
+        PCar.Create(result.insertId, Player.Info[player.playerid].AccID, model, [0, 0], player.GetPlayerPos(), cartext, from_admin);
         LoadPlayerPersonalCars(player);
     });
 }
@@ -3157,12 +3186,21 @@ function LoadPlayerHolds(player) {
 function LoadPlayerPersonalCars(player) {
     PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID && f.vehicle == null).forEach((i) => {
         i.vehicle = samp.CreateVehicle(i.model, i.position[0], i.position[1], i.position[2], 0, i.color[0], i.color[1]);
+        i.cartext.forEach((data) => {
+            if(data.text == "null") return;
+            data.object = samp.CreateObject(19477, 0, 0, 0, 0, 0, 0);
+            samp.SetObjectMaterialText(data.object, data.text, 0, 40, "Quartz MS", data.fontsize, true, 0xFFFFFFAA, 0, 1);
+            samp.AttachObjectToVehicle(data.object, i.vehicle, data.offsetposition[0], data.offsetposition[1], data.offsetposition[2], data.offsetrotation[0], data.offsetrotation[1], data.offsetrotation[2]);
+        });
     });
 }
 
 function UnLoadPlayerPersonalCars(player) {
     PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID && f.vehicle != null).forEach((i) => {
         samp.DestroyVehicle(i.vehicle);
+        i.cartext.forEach((data) => {
+            if(data.object) samp.DestroyObject(data.object);
+        });
         i.vehicle = null;
     });
 }
@@ -4074,9 +4112,11 @@ function LoadPersonalCars() {
         for(let i = 0; i < result.length; i++) {
             let color = JSON.parse(result[i].color);
             let position = JSON.parse(result[i].position);
-            PCar.Create(result[i].ID, result[i].owner, result[i].model, color, position, result[i].from_admin);
+            let cartext = JSON.parse(result[i].cartext);
+            PCar.Create(result[i].ID, result[i].owner, result[i].model, color, position, cartext, result[i].from_admin);
         }
         console.log(`Loaded ${result.length} personal cars.`);
+        console.log(PCar.Info);
     });
 }
 
@@ -4766,6 +4806,42 @@ samp.OnPlayerRequestSpawn((player) => {
 });
 
 samp.OnPlayerEditObject((player, playerobject, objectid, response, fX, fY, fZ, fRotX, fRotY, fRotZ) => {
+    if(playerobject) return;
+    /* ================= */
+    /* Personal Car Text */
+    /* ================= */
+    let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
+    let data = car.cartext.at(Player.Info[player.playerid].EditingCarText.Index);
+    if(car) {
+        if(response == 1) { /* Finsih */
+            let position = samp.GetVehiclePos(car.vehicle);
+            let angle = samp.GetVehicleZAngle(car.vehicle);
+
+            let ofx = fX-position.x;
+            let ofy = fY-position.y;
+            let ofz = fZ-position.z;
+            let ofaz = fRotZ-angle;
+            let finalx = ofx*Math.cos(toDegrees(angle))+ofy*Math.sin(toDegrees(angle));
+            let finaly = -ofx*Math.sin(toDegrees(angle))+ofy*Math.cos(toDegrees(angle));
+
+            data.offsetposition = [finalx, finaly, ofz];
+            data.offsetrotation = [fRotX, fRotY, ofaz];
+
+            samp.AttachObjectToVehicle(data.object, car.vehicle, data.offsetposition[0], data.offsetposition[1], data.offsetposition[2], data.offsetrotation[0], data.offsetrotation[1], data.offsetrotation[2]);
+        }
+        if(response == 0) { /* Cancel */
+            data.text = "null";
+            data.fontsize = 5;
+            data.offsetposition = [0, 0, 0];
+            data.offsetrotation = [0, 0, 0];
+            samp.DestroyObject(data.object);
+            delete data.object;
+        }
+
+        const cartext = [];
+        car.cartext.forEach((i) => { cartext.push({text: i.text, fontsize: i.fontsize, offsetposition: i.offsetposition, offsetrotation: i.offsetrotation}); });
+        con.query("UPDATE personalcars SET cartext = ? WHERE ID = ?", [JSON.stringify(cartext), car.id]);
+    }
     return true;
 });
 
@@ -4792,7 +4868,6 @@ samp.OnPlayerEditAttachedObject((player, response, index, modelid, boneid, fOffs
 
 samp.OnPlayerClickPlayer((player, clickedplayer) => {
     Player.Info[player.playerid].ClickedPlayer = clickedplayer.playerid;
-
     let info = "";
     info += `{0072FF}${Lang(player, "Vezi statistici", "Show Stats")} - {00FF00}/stats\n`;
     info += `{0072FF}${Lang(player, "Vezi statistici gang", "Show Gang Stats")} - {00FF00}/gstats\n`;
@@ -4933,6 +5008,74 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.CARTEXT: {
+            if(response) {
+                let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
+                if(!car) return;
+                for(let i = 0; i < car.cartext.length; i++) {
+                    if(i == listitem) {
+                        Player.Info[player.playerid].EditingCarText.Index = i;
+                        if(car.cartext[i].text != "null") {
+                            player.ShowPlayerDialog(Dialog.CARTEXT_EDIT_OR_REMOVE, samp.DIALOG_STYLE.MSGBOX, "Personal Vehicle Holds - Slot in use", "{BBFF00}This slot is already in use!\n{BBFF00}If you want to edit this slot click on 'Edit' or to remove click on 'Remove'.", "Edit", "Remove");
+                        }
+                        else {
+                            let info = "";
+                            info += "{BBFF00}Text {00BBF6}- Small\n";
+                            info += "{BBFF00}Text {00BBF6}- Medium\n";
+                            info += "{BBFF00}Text {00BBF6}- Big";
+                            player.ShowPlayerDialog(Dialog.CARTEXT_SELECT_SIZE, samp.DIALOG_STYLE.LIST, "Personal Vehicle Holds - Style Text", info, "Select", "Close");
+                        }
+                        break;
+                    }
+                }
+            }
+            break;
+        }
+        case Dialog.CARTEXT_EDIT_OR_REMOVE: {
+            let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
+            if(!car) return;
+            car.cartext[Player.Info[player.playerid].EditingCarText.Index].text = "null";
+            car.cartext[Player.Info[player.playerid].EditingCarText.Index].fontsize = 5;
+            car.cartext[Player.Info[player.playerid].EditingCarText.Index].offsetposition = [0, 0, 0];
+            car.cartext[Player.Info[player.playerid].EditingCarText.Index].offsetrotation = [0, 0, 0];
+            samp.DestroyObject(car.cartext[Player.Info[player.playerid].EditingCarText.Index].object);
+            delete car.cartext[Player.Info[player.playerid].EditingCarText.Index].object;
+            con.query("UPDATE personalcars SET cartext = ? WHERE ID = ?", [JSON.stringify(car.cartext), car.id]);
+
+            if(response) {
+                player.ShowPlayerDialog(Dialog.CARTEXT_INPUT_TEXT, samp.DIALOG_STYLE.INPUT, "Personal Vehicle Holds - Text", "{BBFF00}Insert your text!\n{BBFF00}If you want to color the text insert hex color!", "Select", "Close");
+            }
+            break;
+        }
+        case Dialog.CARTEXT_SELECT_SIZE: {
+            if(response) {
+                let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
+                if(!car) return;
+                let size = 0;
+                switch(listitem) {
+                    case 0: size = 5; break;
+                    case 1: size = 10; break;
+                    case 2: size = 20; break;
+                }
+                Player.Info[player.playerid].EditingCarText.Fontsize = size;
+                player.ShowPlayerDialog(Dialog.CARTEXT_INPUT_TEXT, samp.DIALOG_STYLE.INPUT, "Personal Vehicle Holds - Text", "{BBFF00}Insert your text!\n{BBFF00}If you want to color the text insert hex color!", "Select", "Close");
+            }
+            break;
+        }
+        case Dialog.CARTEXT_INPUT_TEXT: {
+            if(response) {
+                let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
+                if(!car) return;
+                let data = car.cartext.at(Player.Info[player.playerid].EditingCarText.Index);
+                let position = samp.GetVehiclePos(car.vehicle);
+                data.text = inputtext;
+                data.fontsize = Player.Info[player.playerid].EditingCarText.Fontsize;
+                data.object = samp.CreateObject(19477, position.x, position.y, position.z, 0, 0, 0);
+                samp.SetObjectMaterialText(data.object, data.text, 0, 40, "Quartz MS", data.fontsize, true, 0xFFFFFFAA, 0, 1);
+                player.EditObject(data.object);
+            }
+            break;
+        }
         case Dialog.HOLD: {
             if(response) {
                 switch(listitem) {

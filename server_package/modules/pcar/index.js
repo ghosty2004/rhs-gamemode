@@ -1,6 +1,6 @@
 module.exports = {
     Info: [],
-    Create: function(id, owner, model, color, position, from_admin) {
+    Create: function(id, owner, model, color, position, cartext, from_admin) {
         let index = this.Info.findIndex(f => f.id == id);
         if(index == -1) {
             this.Info.push({
@@ -9,6 +9,7 @@ module.exports = {
                 model: model,
                 color: color,
                 position: position,
+                cartext: cartext,
                 from_admin: from_admin,
                 vehicle: null
             });

@@ -160,6 +160,10 @@ export declare const Info: {
         Editing: null|number,
         CreatingId: number,
         Settings: number
+    },
+    EditingCarText: {
+        Fontsize: number,
+        Index: number
     }
 }[];
 
