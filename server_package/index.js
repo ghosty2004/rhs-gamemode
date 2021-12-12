@@ -3,17 +3,19 @@
 /*      Made by Ghosty2004 <3      */
 /* =============================== */
 
-/* Modules */
+/* ==================== */
+/* Node Package Modules */
+/* ==================== */
 const samp = require("samp-node-lib");
 const colors = require("colors");
 const md5 = require("md5");
 const YouTubeSearch = require("youtube-search-without-api-key");
 const hastebin = require("hastebin-gen");
-
-/* YouTube Audio Stream Module */
 require("youtube-audio-server").listen(7777);
 
+/* ============== */
 /* Custom Modules */
+/* ============== */
 const Checkpoint = require("./modules/checkpoint");
 const Circle = require("./modules/circle");
 const Clan = require("./modules/clan");
@@ -32,18 +34,25 @@ const SpawnZone = require("./modules/spawnzone");
 const Streamer = require("./modules/streamer");
 const Teleport = require("./modules/teleport");
 
+/* =========== */
 /* Server Maps */
+/* =========== */
 const Maps = require("./maps");
 
+/* ================ */
 /* Server TextDraws */
+/* ================ */
 const TextDraws = require("./textdraws");
-
 const ServerLogs = ["", "", ""];
 
+/* ========= */
 /* Functions */
+/* ========= */
 const { getPlayer, isNumber } = require("./modules/functions");
 
+/* ====== */
 /* Data's */
+/* ====== */
 const data = {
     animations: require("./data/animations"),
     colors: require("./data/colors"),
@@ -52,7 +61,9 @@ const data = {
     settings: require("./data/settings")
 }
 
+/* =================== */
 /* MYSQL Connect Event */
+/* =================== */
 con.on("mysqlConnect", (err) => {
     if(!err) {
         console.log("MYSQL:".yellow + ` Connection successfully established.`.green);
@@ -4116,7 +4127,6 @@ function LoadPersonalCars() {
             PCar.Create(result[i].ID, result[i].owner, result[i].model, color, position, cartext, result[i].from_admin);
         }
         console.log(`Loaded ${result.length} personal cars.`);
-        console.log(PCar.Info);
     });
 }
 

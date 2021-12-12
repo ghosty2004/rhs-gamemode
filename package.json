@@ -17,9 +17,11 @@
   },
   "homepage": "https://github.com/Ghosty2004/rhs-gamemode#readme",
   "dependencies": {
+    "@discordjs/rest": "^0.1.0-canary.0",
     "@sa-mp/node": "^0.2.0",
     "colors": "^1.4.0",
-    "discord.js": "^13.0.0",
+    "discord-api-types": "^0.25.2",
+    "discord.js": "^13.2.0",
     "events": "^3.3.0",
     "hastebin-gen": "^2.0.5",
     "md5": "^2.3.0",

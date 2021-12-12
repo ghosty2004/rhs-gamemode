@@ -1,4 +1,9 @@
+/* Modules */
 const Discord = require("discord.js");
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
+const fs = require("fs");
+
 const bot = new Discord.Client({
     intents: [
         Discord.Intents.FLAGS.GUILDS,
@@ -25,7 +30,9 @@ bot.login(DISCORD_BOT.TOKEN).catch((error) => {
     console.log(error);
 });
 
+/* ============== */
 /* Custom Modules */
+/* ============== */
 const { DiscordCommand } = require("../events");
 const con = require("../mysql");
 const { getPlayer, numberWithCommas } = require("../functions");
@@ -33,6 +40,19 @@ const { getPlayer, numberWithCommas } = require("../functions");
 const Errors = require("../errors");
 const Player = require("../player");
 const { getPlayers } = require("samp-node-lib");
+
+/* ======================= */
+/* Slash Command Variables */
+/* ======================= */
+const commandFiles = fs.readdirSync('./server_package/modules/discordbot/commands').filter(file => file.endsWith('.js'));
+const commands = [];
+bot.commands = new Discord.Collection();
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+    commands.push(command.data.toJSON());
+    bot.commands.set(command.data.name, command);
+}
+const TEST_GUILD_ID = "873994029816242198";
 
 /* ========= */
 /* Functions */
@@ -78,15 +98,6 @@ function getStatsEmbed(user) {
 /* Bot Commands */
 /* ============ */
 const CMD = new DiscordCommand();
-
-CMD.on("stats", async (message, params) => {
-    let user = await getUserLoginSession(message.author.id);
-    if(params[0]) user = params[0];
-    if(!user) return SendUsage(message, "stats [ID/Name]");
-    const embed = await getStatsEmbed(user);
-    if(!embed) return SendError(message, "This user not exists in our database.");
-    message.channel.send({embeds: [embed]});
-});
 
 CMD.on("login", (message, params) => {
     if(!params[0]) return SendUsage(message, "login [Server ID]");
@@ -137,43 +148,100 @@ CMD.on("servercommands", (message) => {
 /* ========== */
 bot.once("ready", () => {
     console.log(`Discord BOT: ${bot.user.tag} is ready.`);
+    /* ======================= */
+    /* Slash Commands Register */
+    /* ======================= */
+    const CLIENT_ID = bot.user.id;
+    const rest = new REST({version: '9'}).setToken(DISCORD_BOT.TOKEN);
+    const removeCommands = require("./removeCommands.json");
+    (async () => {
+        try {
+            if(!TEST_GUILD_ID) {
+                await rest.put(
+                    Routes.applicationCommands(CLIENT_ID), {
+                        body: commands
+                    },
+                );
+                console.log('Successfully registered application commands globally');
+            } else {
+                rest.get(Routes.applicationGuildCommands(CLIENT_ID, TEST_GUILD_ID)).then(async(data) => {
+                    /* ====================== */
+                    /* Command pending delete */
+                    /* ====================== */
+                    data.forEach(async(i) => {
+                        if(removeCommands.some(s => s == i.name)) {
+                            await rest.delete(
+                                Routes.applicationGuildCommand(i.application_id, TEST_GUILD_ID, i.id)
+                            ).then(() => {
+                                console.log(`Successfully removed command ${i.name} from developer guild.`);
+                            }).catch(() => {
+                                console.log(`Could not remove command ${i.name} from developer guild`);
+                            });
+                        }
+                    });
+                    /* ============ */
+                    /* Add commandS */
+                    /* ============ */
+                    await rest.put(
+                        Routes.applicationGuildCommands(CLIENT_ID, TEST_GUILD_ID), {
+                            body: commands
+                        },
+                    ).then(() => {
+                        console.log("Successfully updated developer guild slash commands.")
+                    }).catch((e) => {
+                        console.log("Could not update developer guild slash commands.");
+                        console.log(e)
+                    });           
+                }); 
+            }
+        } catch(e) {
+            console.error(e.stack);
+        }
+    })();
 });
 
 bot.on("messageCreate", (message) => {
-    try {
-        if(message.author.bot) return;
+    if(message.author.bot) return;
 
-        if(message.channel.type == "DM") {
-            let player = getPlayers().filter(f => Player.Info[f.playerid].DiscordLoginRequest.From == message.author.id);
-            if(player) {
-                if(message.content == Player.Info[player[0].playerid].DiscordLoginRequest.Code) {
-                    message.channel.send(`You have logged in with **${player[0].GetPlayerName(24)}**!`);
-                    player[0].SendClientMessage(0x5865F2AA, `[DISCORD]: {FFFFFF}You have successfully logged in with your discord account {5865F2}${message.author.tag}{FFFFFF}!`)
-                    Player.Info[player[0].playerid].DiscordLoginRequest.From = null;
-                    Player.Info[player[0].playerid].DiscordLoginRequest.Code = 0;
-                    Player.Info[player[0].playerid].Discord = message.author.id;
-                    con.query("UPDATE users SET discord = ? WHERE ID = ?", [Player.Info[player[0].playerid].Discord, Player.Info[player[0].playerid].AccID])
-                }
-                else {
-                    message.channel.send("Invalid code provided.");
-                }
+    if(message.channel.type == "DM") {
+        let player = getPlayers().filter(f => Player.Info[f.playerid].DiscordLoginRequest.From == message.author.id);
+        if(player) {
+            if(message.content == Player.Info[player[0].playerid].DiscordLoginRequest.Code) {
+                message.channel.send(`You have logged in with **${player[0].GetPlayerName(24)}**!`);
+                player[0].SendClientMessage(0x5865F2AA, `[DISCORD]: {FFFFFF}You have successfully logged in with your discord account {5865F2}${message.author.tag}{FFFFFF}!`)
+                Player.Info[player[0].playerid].DiscordLoginRequest.From = null;
+                Player.Info[player[0].playerid].DiscordLoginRequest.Code = 0;
+                Player.Info[player[0].playerid].Discord = message.author.id;
+                con.query("UPDATE users SET discord = ? WHERE ID = ?", [Player.Info[player[0].playerid].Discord, Player.Info[player[0].playerid].AccID])
             }
-        }
-        else if(message.channel.type == "GUILD_TEXT") {
-            let params = message.content.substring().split(" ");
-            params[0] = params[0].toLowerCase();
-
-            if(params[0].startsWith(DISCORD_BOT.PREFIX)) {
-                params[0] = params[0].replace(DISCORD_BOT.PREFIX, "");
-                if(CMD.eventNames().some(s => s == params[0])) {
-                    CMD.emit(params[0], message, parseArgs());
-                    function parseArgs() { params.splice(0, 1); return params; }
-                }  
+            else {
+                message.channel.send("Invalid code provided.");
             }
         }
     }
-    catch(e) {
-        console.log(e.stack);
+    else if(message.channel.type == "GUILD_TEXT") {
+        let params = message.content.substring().split(" ");
+        params[0] = params[0].toLowerCase();
+
+        if(params[0].startsWith(DISCORD_BOT.PREFIX)) {
+            params[0] = params[0].replace(DISCORD_BOT.PREFIX, "");
+            if(CMD.eventNames().some(s => s == params[0])) {
+                CMD.emit(params[0], message, parseArgs());
+                function parseArgs() { params.splice(0, 1); return params; }
+            }  
+        }
+    }
+});
+
+bot.on("interactionCreate", async (interaction) => {
+    if (!interaction.isCommand()) return;
+    const command = bot.commands.get(interaction.commandName);
+    if (!command) return;
+    try {
+        await command.execute(interaction);
+    } catch (error) {
+        if (error) console.error(error);
+        await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
     }
 });
 

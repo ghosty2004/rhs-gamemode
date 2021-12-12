@@ -12,4 +12,4 @@ class DiscordCommand {
     }
 }
 
-module.exports = {Command, DiscordCommand}
+module.exports = { Command, DiscordCommand }
