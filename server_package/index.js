@@ -68,6 +68,7 @@ con.on("mysqlConnect", (err) => {
     if(!err) {
         console.log("MYSQL:".yellow + ` Connection successfully established.`.green);
         LoadFromDB();
+        con.emit("finishedLoad");
     }
     else {
         console.log("MYSQL:".yellow + ` Connection have been refused.`.red);
@@ -2058,7 +2059,7 @@ CMD.on("cinfo", async (player, params) => {
     info += "{BBFF00}Total deaths: {49FFFF}0\n";
     info += `{BBFF00}Leaders skin: {49FFFF}${Clan.Info[Player.Info[target.playerid].Clan].skin.leader}\n`;
     info += `{BBFF00}Members skin: {49FFFF}${Clan.Info[Player.Info[target.playerid].Clan].skin.member}\n`;
-    info += `{BBFF00}Creator: {33FFFF}${await getNameByAccID(Clan.Info[Player.Info[target.playerid].Clan].owner)}\n`;
+    info += `{BBFF00}Creator: {33FFFF}${await Function.getNameByAccID(Clan.Info[Player.Info[target.playerid].Clan].owner)}\n`;
     info += `{BBFF00}${player.GetPlayerName(24)}'s Rank: {33FFFF}${getClanRank(Player.Info[target.playerid].Clan_Rank)}\n`;
     info += "{BBFF00}Weapons:\n";
     info += "{FFFFFF}none, none, none, none, none, none\n";
@@ -2947,7 +2948,7 @@ function ResetAdminVariables(player) {
 }
 
 function UpdateAdminVariables(player) {
-    Player.Info[player.playerid].AdminActivity.Since = Function.getBeatifulDate();
+    Player.Info[player.playerid].AdminActivity.Since = Function.getBeatifulDate(); 
 }
 
 function spawnPlayerInDM(player, first_time=false) {
@@ -3649,8 +3650,8 @@ function checkPlayerBanStatus(player, check_acc_id=true) {
                     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "", "", "", "");
                     let difference = timeDifference(result[0].to_timestamp);
                     player.SendClientMessage(data.colors.LIGHT_BLUE, "================(Ban Details)================");
-                    player.SendClientMessage(data.colors.GRAY, `Sorry, but {FF0000}${await getNameByAccID(result[0].acc_id)} {CEC8C8}is banned on our server!`);
-                    player.SendClientMessage(data.colors.GRAY, `By Admin {00BBF6}${await getNameByAccID(result[0].admin_acc_id)}. {CEC8C8}Reason: {00BBF6}${result[0].reason}`);
+                    player.SendClientMessage(data.colors.GRAY, `Sorry, but {FF0000}${await Function.getNameByAccID(result[0].acc_id)} {CEC8C8}is banned on our server!`);
+                    player.SendClientMessage(data.colors.GRAY, `By Admin {00BBF6}${await Function.getNameByAccID(result[0].admin_acc_id)}. {CEC8C8}Reason: {00BBF6}${result[0].reason}`);
                     player.SendClientMessage(data.colors.GRAY, `This ban will expire in {FF0000}${difference.value} {CEC8C8}${difference.type}!`);
                     player.SendClientMessage(data.colors.LIGHT_BLUE, "==========================================");
                     resolve(true);
@@ -3957,15 +3958,6 @@ function getClanRank(RankID) {
         case 3: string = "Founder"; break;
     }
     return string;
-}
-
-function getNameByAccID(AccID) {
-    return new Promise((resolve, reject) => {
-        con.query("SELECT * FROM users WHERE ID = ?", [AccID], function(err, result) {
-            if(err || !result) return resolve("none");
-            resolve(result[0].name);
-        });
-    });
 }
 
 function getIDByAccName(AccName) {

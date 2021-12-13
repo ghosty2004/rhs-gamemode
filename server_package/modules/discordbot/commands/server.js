@@ -1,16 +1,17 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require("@discordjs/builders");
 const { CommandInteraction, MessageEmbed } = require("discord.js");
+const { getPlayers } = require("samp-node-lib");
 
 const con = require("../../mysql");
-
 const Gang = require("../../gang");
 const Clan = require("../../clan");
-const { getPlayers } = require('samp-node-lib');
+
+const slashCommand = new SlashCommandBuilder();
+slashCommand.setName("server");
+slashCommand.setDescription("About server");
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName("server")
-        .setDescription("About server"),
+    data: slashCommand,
     /**
      * @param {CommandInteraction} interaction 
      */

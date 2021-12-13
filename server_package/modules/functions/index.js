@@ -1,5 +1,7 @@
 const { getPlayers } = require("samp-node-lib");
 
+const con = require("../mysql");
+
 module.exports = {
     getRandomInt: function(min, max) {
         min = Math.ceil(min);
@@ -50,5 +52,13 @@ module.exports = {
     isNumber: function(value) {
         if(typeof(value) == "number" || !isNaN(value)) return true;
         else return false;
+    },
+    getNameByAccID: function(AccID) {
+        return new Promise((resolve, reject) => {
+            con.query("SELECT * FROM users WHERE ID = ?", [AccID], function(err, result) {
+                if(err || !result) return resolve("none");
+                resolve(result[0].name);
+            });
+        });
     }
 }

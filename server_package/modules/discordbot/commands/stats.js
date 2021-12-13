@@ -1,17 +1,27 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { CommandInteraction, MessageEmbed } = require('discord.js');
-const { numberWithCommas } = require('../../functions');
+const { SlashCommandBuilder, SlashCommandStringOption } = require("@discordjs/builders");
+const { CommandInteraction, MessageEmbed } = require("discord.js");
+const { numberWithCommas } = require("../../functions");
+
 const con = require("../../mysql");
 
+const getSlashCommand = () => {
+    const slashCommand = new SlashCommandBuilder();
+    const stringOptions = new SlashCommandStringOption();
+
+    slashCommand.setName("stats");
+    slashCommand.setDescription("Show someone's stats"); 
+
+    stringOptions.setName("user");
+    stringOptions.setDescription("ID/Name of the specific user");
+    stringOptions.setRequired(true);
+
+    slashCommand.addStringOption(stringOptions);
+    
+    return slashCommand;
+}
+
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName("stats")
-        .setDescription("Show someone's stats")
-        .addStringOption(option => 
-            option.setName("user")
-            .setDescription("ID/Name of the specific user")
-            .setRequired(true)
-        ),
+    data: getSlashCommand(),
     /**
      * @param {CommandInteraction} interaction 
      */
