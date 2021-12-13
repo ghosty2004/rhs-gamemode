@@ -60,5 +60,13 @@ module.exports = {
                 resolve(result[0].name);
             });
         });
+    },
+    getTotalUsersCount: function() {
+        return new Promise((resolve, reject) => {
+            con.query("SELECT COUNT(*) AS count FROM users", function(err, result) { 
+                if(err || result == 0) return resolve(0);
+                resolve(result[0].count); 
+            });
+        }); 
     }
 }

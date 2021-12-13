@@ -16,7 +16,7 @@ const getSlashCommand = () => {
     stringOptions.setRequired(true);
 
     slashCommand.addStringOption(stringOptions);
-    
+
     return slashCommand;
 }
 
