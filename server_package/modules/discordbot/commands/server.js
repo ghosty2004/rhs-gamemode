@@ -2,10 +2,11 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { CommandInteraction, MessageEmbed } = require("discord.js");
 const { getPlayers, GetServerTickRate } = require("samp-node-lib");
 
-const Gang = require("../../gang");
 const Clan = require("../../clan");
+const Gang = require("../../gang");
+const Server = require("../../server");
 
-const { getTotalUsersCount } = require("../../functions");
+const { timestampToHMS, getTotalUsersCount } = require("../../functions");
 
 const getSlashCommand = () => {
     const slashCommand = new SlashCommandBuilder();
@@ -20,6 +21,7 @@ module.exports = {
      * @param {CommandInteraction} interaction 
      */
     async execute(interaction) {
+        const OnlineTime = timestampToHMS(Server.Info.StartTime);
         const embed = new MessageEmbed();
         embed.setColor("RANDOM");
         embed.addField("Gangs:", `${Gang.Get().length}`);
@@ -27,6 +29,7 @@ module.exports = {
         embed.addField("Online players:", `${getPlayers().length}`);
         embed.addField("Total users:", `${await getTotalUsersCount()}`);
         embed.addField("Server ticks:", `${GetServerTickRate()}`);
+        embed.addField("Server uptime:", `${OnlineTime.hours} hrs, ${OnlineTime.minutes} mins and ${OnlineTime.seconds} secs`);
         interaction.reply({embeds: [embed]});
     }
 }
