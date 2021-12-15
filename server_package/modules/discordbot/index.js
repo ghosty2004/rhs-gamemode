@@ -109,19 +109,9 @@ function getStatsEmbed(user) {
 /* ============ */
 const CMD = new DiscordCommand();
 
-CMD.on("login", (message, params) => {
-    if(!params[0]) return SendUsage(message, "login [Server ID]");
-    let target = getPlayer(params[0]);
-    if(!target) return SendError(message, Errors.PLAYER_NOT_CONNECTED);
-    if(!Player.Info[target.playerid].LoggedIn) return SendError(message, Errors.PLAYER_NOT_LOGGED);
-    if(Player.Info[target.playerid].Discord != "0") return SendError(message, "This player already logged in to a discord account. Use /discordsignout for logout.");
-    message.channel.send(`Login request have been sent to **${target.GetPlayerName(24)}(${target.playerid})**!`);
-    target.SendClientMessage(0x5865F2AA, `[DISCORD]: {FFFFFF}${message.author.tag} {5865F2}has sent a login request. Use {FFFFFF}/acceptlogin {5865F2}or {FFFFFF}/declinelogin {5865F2}for response!`);
-    Player.Info[target.playerid].DiscordLoginRequest.From = message.author.id;
-});
-
 CMD.on("users", (message) => {
-    con.query("SELECT * FROM users", function(err, result) {
+    con.query("SELECT * FROM users ORDER BY ", function(err, result) {
+        result.slice(0, 25);
         const row = new Discord.MessageActionRow();
         const select = new Discord.MessageSelectMenu();
         select.setCustomId("users");
@@ -147,10 +137,6 @@ CMD.on("users", (message) => {
             });
         });
     });
-});
-
-CMD.on("servercommands", (message) => {
-    bot.emit("showCommands", message);
 });
 
 /* ========== */

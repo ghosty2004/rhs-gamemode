@@ -49,6 +49,7 @@ const ServerLogs = ["", "", ""];
 /* Functions */
 /* ========= */
 const { getPlayer, isNumber } = require("./modules/functions");
+const { CommandInteraction } = require("discord.js");
 
 /* ====== */
 /* Data's */
@@ -6407,9 +6408,8 @@ samp.OnPlayerCommandText((player, cmdtext) => {
     return true;
 });  
 
-/* Small part of Discord BOT */
-Discord.bot.on("showCommands", (message) => {
+Discord.bot.on("showCommands", (interaction) => {
     hastebin("/" + replaceAll(CMD.eventNames().toString(), ",", "\n/"), "txt").then((result) => {
-        message.channel.send(result);
+        interaction.reply(result);
     });
 });
