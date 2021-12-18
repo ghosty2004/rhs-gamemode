@@ -33,6 +33,7 @@ const Server = require("./modules/server");
 const SpawnZone = require("./modules/spawnzone");
 const Streamer = require("./modules/streamer");
 const Teleport = require("./modules/teleport");
+const Web = require("./modules/web");
 
 /* =========== */
 /* Server Maps */
