@@ -5,14 +5,12 @@ SA:MP RHS GameMode in NodeJS
 
 <details> 
   <summary>TextDraws:</summary>
-    - Connect:<br>
-    ![Connect TextDraw](https://i.imgur.com/tPOduxY.png)<br>
-
-    - Spawn:<br>
-    ![Spawn TextDraw](https://i.imgur.com/MDa35SA.png)<br>
-
-    - Logs:<br>
-    ![Logs TextDraw](https://i.imgur.com/ZkUuGSU.png)<br>
+    Connect:<br>
+    <img src="https://i.imgur.com/tPOduxY.png"><br>
+    Spawn:<br>
+    <img src="https://i.imgur.com/MDa35SA.png"><br>
+    Logs:<br>
+    <img src="https://i.imgur.com/ZkUuGSU.png"><br>
 </details>
 
 **Commands:**
