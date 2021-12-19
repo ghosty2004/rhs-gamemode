@@ -4,20 +4,24 @@ SA:MP RHS GameMode in NodeJS
 # Images
 
 <details> 
-  <summary>TextDraws:</summary>
-    Connect:<br>
+    <summary>TextDraws:</summary>
+    Connect<br>
     <img src="https://i.imgur.com/tPOduxY.png"><br>
-    Spawn:<br>
+    Spawn<br>
     <img src="https://i.imgur.com/MDa35SA.png"><br>
-    Logs:<br>
+    Logs<br>
     <img src="https://i.imgur.com/ZkUuGSU.png"><br>
 </details>
 
-**Commands:**
-- /Cmds:<br>
-![Commands 1 Command](https://i.imgur.com/Wu6D3fj.png)<br>
-![Commands 2 Command](https://i.imgur.com/9FSBO3m.png)<br>
-![Commands 3 Command](https://i.imgur.com/EDy8sbm.png)<br>
+<details> 
+    <summary>Commands:</summary>
+    <details>
+        <summary>/Cmds</summary>
+        <img src="https://i.imgur.com/Wu6D3fj.png"><br>
+        <img src="https://i.imgur.com/9FSBO3m.png"><br>
+        <img src="https://i.imgur.com/EDy8sbm.png"><br>
+    </details>
+</details>
 
 - /CreateClan:<br>
 ![CreateClan 1 Command](https://i.imgur.com/G9a9hs9.png)<br>
