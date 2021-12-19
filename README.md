@@ -12,6 +12,7 @@
 
 <details> 
     <summary>Commands</summary>
+    <br><br>
     <details>
         <summary>/Cmds</summary>
         <img src="https://i.imgur.com/Wu6D3fj.png"><br>
@@ -65,4 +66,5 @@
         <summary>/Vips</summary>
         <img src="https://i.imgur.com/NtHbaAM.png">
     </details>
+    <br><br>
 </details>
