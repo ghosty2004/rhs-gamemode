@@ -86,6 +86,19 @@
         <img src="https://i.imgur.com/NtHbaAM.png">
     </details>
     <details>
+        <summary>/StatsServer</summary>
+        <img src="https://i.imgur.com/TliAG1c.png">
+    </details>
+    <details>
+        <summary>/Important</summary>
+        <img src="https://i.imgur.com/uFaKN85.png"><br>
+        <img src="https://i.imgur.com/7sI85WL.png">
+    </details>
+    <details>
+        <summary>/Ranks</summary>
+        <img src="https://i.imgur.com/rAHuwOi.png">
+    </details>
+    <details>
         <summary>Clan System</summary>
         <br><br>
         <details>
@@ -139,6 +152,43 @@
             <img src="https://i.imgur.com/FcPil5X.png">
         </details>
         <br><br>
+    </details>
+    <br><br>
+</details>
+
+<details> 
+    <summary>Discord Commands</summary>
+    <br><br>
+    <details>
+        <summary>/claninfo</summary>
+        <img src="https://imgur.com/a/A6XoBwI"><br>
+        <img src="https://i.imgur.com/1XM8EbA.png">
+    </details>
+    <details>
+        <summary>/commands</summary>
+        <img src="https://i.imgur.com/jioTV4i.png"><br>
+        <img src="https://i.imgur.com/rXfrfoh.png"><br>
+        <img src="https://i.imgur.com/sLcQ7Lj.png">
+    </details>
+    <details>
+        <summary>/ganginfo</summary>
+        <img src="https://i.imgur.com/Z7GNdbp.png"><br>
+        <img src="https://i.imgur.com/4rJXeFo.png">
+    </details>
+    <details>
+        <summary>/server</summary>
+        <img src="https://i.imgur.com/MV8cmiX.png"><br>
+        <img src="https://i.imgur.com/ISErAfL.png">
+    </details>
+    <details>
+        <summary>/stats</summary>
+        <img src="https://i.imgur.com/dnRcHLB.png"><br>
+        <img src="https://i.imgur.com/89EnwnD.png">
+    </details>
+    <details>
+        <summary>/turfs</summary>
+        <img src="https://i.imgur.com/zPU9VOi.png"><br>
+        <img src="https://i.imgur.com/NR3A0NY.png">
     </details>
     <br><br>
 </details>
