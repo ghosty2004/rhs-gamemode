@@ -8,15 +8,23 @@
     <br><br>
     <details>
         <summary>Connect</summary>
-        <img src="https://i.imgur.com/tPOduxY.png">
+        <img src="https://i.imgur.com/PN28RZN.png">
     </details>
     <details>
         <summary>Spawn</summary>
-        <img src="https://i.imgur.com/MDa35SA.png">
+        <img src="https://i.imgur.com/KaqVz64.png">
     </details>
     <details>
         <summary>Logs</summary>
-        <img src="https://i.imgur.com/ZkUuGSU.png">
+        <img src="https://i.imgur.com/va6Ov4i.png">
+    </details>
+    <details>
+        <summary>Date</summary>
+        <img src="https://i.imgur.com/l9S1cj1.png">
+    </details>
+    <details>
+        <summary>Reports</summary>
+        <img src="https://i.imgur.com/bTqmoPI.png">
     </details>
     <br><br>
 </details>
@@ -78,7 +86,7 @@
         <img src="https://i.imgur.com/NtHbaAM.png">
     </details>
     <details>
-        <summary>Clans System</summary>
+        <summary>Clan System</summary>
         <br><br>
         <details>
             <summary>/Clan</summary>
@@ -87,7 +95,7 @@
         <br><br>
     </details>
     <details>
-        <summary>Gangs System</summary>
+        <summary>Gang System</summary>
         <br><br>
         <details>
             <summary>/Gang</summary>
@@ -112,6 +120,23 @@
         <details>
             <summary>/gTop</summary>
             <img src="https://i.imgur.com/7oUmuE3.png">
+        </details>
+        <br><br>
+    </details>
+    <details>
+        <summary>Admin System</summary>
+        <br><br>
+        <details>
+            <summary>/Report</summary>
+            <img src="https://i.imgur.com/AbDwLcX.png">
+        </details>
+        <details>
+            <summary>/Reports</summary>
+            <img src="https://i.imgur.com/8GYTBr7.png">
+        </details>
+        <details>
+            <summary>/Res</summary>
+            <img src="https://i.imgur.com/FcPil5X.png">
         </details>
         <br><br>
     </details>
