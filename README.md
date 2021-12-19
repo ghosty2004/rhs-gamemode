@@ -5,9 +5,20 @@
 
 <details> 
     <summary>TextDraws</summary>
-    <img src="https://i.imgur.com/tPOduxY.png"><br>
-    <img src="https://i.imgur.com/MDa35SA.png"><br>
-    <img src="https://i.imgur.com/ZkUuGSU.png">
+    <br><br>
+    <details>
+        <summary>Connect</summary>
+        <img src="https://i.imgur.com/tPOduxY.png">
+    </details>
+    <details>
+        <summary>Spawn</summary>
+        <img src="https://i.imgur.com/MDa35SA.png">
+    </details>
+    <details>
+        <summary>Logs</summary>
+        <img src="https://i.imgur.com/ZkUuGSU.png">
+    </details>
+    <br><br>
 </details>
 
 <details> 
