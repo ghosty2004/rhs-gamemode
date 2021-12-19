@@ -13,6 +13,8 @@ const YouTubeSearch = require("youtube-search-without-api-key");
 const hastebin = require("hastebin-gen");
 require("youtube-audio-server").listen(7777);
 
+const package_json = require("../package.json");
+
 /* ============== */
 /* Custom Modules */
 /* ============== */
@@ -1833,8 +1835,8 @@ CMD.on("capture", (player, params) => {
             break;
         }
         case "info": {
-            let AttackGangZone = Gang.Get().filter(f => f.territory.GangZone == Gang.Info[Player.Info[player.playerid].Gang].capturing.turf)[0];
-            let DefendGangZone = Gang.Get().filter(f => Gang.GetOwnedGangZones(Player.Info[player.playerid].Gang).some(s => s == f.capturing.turf) && f.capturing.turf != -1)[0];
+            let AttackGangZone = Gang.Get().find(f => f.territory.GangZone == Gang.Info[Player.Info[player.playerid].Gang].capturing.turf);
+            let DefendGangZone = Gang.Get().find(f => Gang.GetOwnedGangZones(Player.Info[player.playerid].Gang).some(s => s == f.capturing.turf) && f.capturing.turf != -1);
 
             if(AttackGangZone) { 
                 player.SendClientMessage(0x00BBF6AA, `Gang-ul tau ataca un teritoriu al gang-ului: {FFFFFF}${Gang.Info[AttackGangZone.territory.owner].name}`); 
@@ -4671,11 +4673,13 @@ process.openStdin().addListener("data", function(d) {
 /* SA:MP Events */
 /* ============ */
 samp.OnGameModeInit(() => {
+    console.log("================================================".white);
+    console.log(`${data.settings.SV_NAME[1]}`.blue + ` ${data.settings.SV_NAME[2]}`.yellow + ` ${data.settings.SV_NAME[3]}`.red + " gamemode successfully loaded.".white);
+    console.log("Gamemode creator: ".white + `${package_json.author}`.green);
+    console.log("Gamemode version: ".white + `${package_json.version}`.green);
+    console.log("NodeJS Version: ".white + `${process.version}`.green);
+    console.log("================================================".white);
     console.log("\n");
-    console.log("Romania HarD Stunt GameMode successfully loaded.");
-    console.log("Gamemode creator: Ghosty2004");
-    console.log("Have Fun with this shit :)");
-    console.log(`NodeJS Version: ${process.version}`);
 
     Maps.Load(); /* Load Server Maps */
     TextDraws.server.Load(); /* Load Server TextDraws */
@@ -4712,6 +4716,9 @@ samp.OnGameModeInit(() => {
     data.settings.BUSTER_ACTOR = samp.CreateActor(149, 2016.1802978516, 1531.201171875, 10.838399887085, 266.51278686523);
     samp.SetActorInvulnerable(data.settings.BUSTER_ACTOR, false);
     data.settings.BUSTER_LABEL = samp.Create3DTextLabel("RHSBuster", -16776961, 2016.1802978516, 1531.201171875, 12.838399887085, 50);
+    
+    /* Web Server */
+    Web.Start();
     return true;
 });
 
