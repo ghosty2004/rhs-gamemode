@@ -1,25 +1,25 @@
-# rhs-gamemode
-SA:MP RHS GameMode in NodeJS
+# Romania HarD Stunt (SA:MP GameMode)
+- Language: **NodeJS**
 
 # Images
 
 <details> 
-    <summary>TextDraws:</summary>
+    <summary>TextDraws</summary>
     <img src="https://i.imgur.com/tPOduxY.png"><br>
     <img src="https://i.imgur.com/MDa35SA.png"><br>
     <img src="https://i.imgur.com/ZkUuGSU.png">
 </details>
 
 <details> 
-    <summary>Commands:</summary>
+    <summary>Commands</summary>
     <details>
-        <summary>&nbsp;&nbsp;&nbsp;/Cmds</summary>
+        <summary>/Cmds</summary>
         <img src="https://i.imgur.com/Wu6D3fj.png"><br>
         <img src="https://i.imgur.com/9FSBO3m.png"><br>
         <img src="https://i.imgur.com/EDy8sbm.png">
     </details>
     <details>
-        <summary>&nbsp;&nbsp;&nbsp;/CreateClan</summary>
+        <summary>/CreateClan</summary>
         <img src="https://i.imgur.com/G9a9hs9.png"><br>
         <img src="https://i.imgur.com/cctJFmG.png"><br>
         <img src="https://i.imgur.com/PCxDnHA.png"><br>
@@ -33,36 +33,36 @@ SA:MP RHS GameMode in NodeJS
         <img src="https://i.imgur.com/uxzrkXX.png">
     </details>
     <details>
-        <summary>&nbsp;&nbsp;&nbsp;/Stats</summary>
+        <summary>/Stats</summary>
         <img src="https://i.imgur.com/6FGtuRt.png">
     </details>
     <details>
-        <summary>&nbsp;&nbsp;&nbsp;/vCmds</summary>
+        <summary>/vCmds</summary>
         <img src="https://i.imgur.com/U9g4KMn.png">
     </details>
     <details>
-        <summary>&nbsp;&nbsp;&nbsp;/aCmds</summary>
+        <summary>/aCmds</summary>
         <img src="https://i.imgur.com/HKVEUe0.png">
     </details>
     <details>
-        <summary>&nbsp;&nbsp;&nbsp;/aStats</summary>
+        <summary>/aStats</summary>
         <img src="https://i.imgur.com/nrJurXJ.png">
     </details>
     <details>
-        <summary>&nbsp;&nbsp;&nbsp;/sPassword</summary>
+        <summary>/sPassword</summary>
         <img src="https://i.imgur.com/MHThkY9.png"><br>
         <img src="https://i.imgur.com/yl9ipCf.png">
     </details>
     <details>
-        <summary>&nbsp;&nbsp;&nbsp;/Anim list</summary>
+        <summary>/Anim list</summary>
         <img src="https://i.imgur.com/PFofSvx.png">
     </details>
     <details>
-        <summary>&nbsp;&nbsp;&nbsp;/Admins</summary>
+        <summary>/Admins</summary>
         <img src="https://i.imgur.com/mBJVvZj.png">
     </details>
     <details>
-        <summary>&nbsp;&nbsp;&nbsp;/Vips</summary>
+        <summary>/Vips</summary>
         <img src="https://i.imgur.com/NtHbaAM.png">
     </details>
 </details>
