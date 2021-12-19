@@ -77,5 +77,43 @@
         <summary>/Vips</summary>
         <img src="https://i.imgur.com/NtHbaAM.png">
     </details>
+    <details>
+        <summary>Clans System</summary>
+        <br><br>
+        <details>
+            <summary>/Clan</summary>
+            <img src="https://i.imgur.com/KH7i5S6.png">
+        </details>
+        <br><br>
+    </details>
+    <details>
+        <summary>Gangs System</summary>
+        <br><br>
+        <details>
+            <summary>/Gang</summary>
+            <img src="https://i.imgur.com/V9Mo4HF.png">
+        </details>
+        <details>
+            <summary>/gInfo</summary>
+            <img src="https://i.imgur.com/dO60c2H.png">
+        </details>
+        <details>
+            <summary>/gStats</summary>
+            <img src="https://i.imgur.com/GP0gHUO.png">
+        </details>
+        <details>
+            <summary>/Gm</summary>
+            <img src="https://i.imgur.com/j4gGYjJ.png">
+        </details>
+        <details>
+            <summary>/gCmds</summary>
+            <img src="https://i.imgur.com/oRsp5Bp.png">
+        </details>
+        <details>
+            <summary>/gTop</summary>
+            <img src="https://i.imgur.com/7oUmuE3.png">
+        </details>
+        <br><br>
+    </details>
     <br><br>
 </details>
