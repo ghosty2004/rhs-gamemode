@@ -161,7 +161,7 @@
     <br><br>
     <details>
         <summary>/claninfo</summary>
-        <img src="https://imgur.com/a/A6XoBwI"><br>
+        <img src="https://i.imgur.com/ppPiAEt.png"><br>
         <img src="https://i.imgur.com/1XM8EbA.png">
     </details>
     <details>
