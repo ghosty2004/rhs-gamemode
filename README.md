@@ -3,18 +3,36 @@ SA:MP RHS GameMode in NodeJS
 
 # Images
 
-**TextDraws:**
+<details> 
+  <summary>TextDraws:</summary>
+    - Connect:<br>
+    ![Connect TextDraw](https://i.imgur.com/tPOduxY.png)<br>
 
-- Connect:<br>
-![Connect TextDraw](https://i.imgur.com/tPOduxY.png)<br>
+    - Spawn:<br>
+    ![Spawn TextDraw](https://i.imgur.com/MDa35SA.png)<br>
 
-- Spawn:<br>
-![Spawn TextDraw](https://i.imgur.com/MDa35SA.png)<br>
-
-- Logs:<br>
-![Logs TextDraw](https://i.imgur.com/ZkUuGSU.png)<br>
+    - Logs:<br>
+    ![Logs TextDraw](https://i.imgur.com/ZkUuGSU.png)<br>
+</details>
 
 **Commands:**
+- /Cmds:<br>
+![Commands 1 Command](https://i.imgur.com/Wu6D3fj.png)<br>
+![Commands 2 Command](https://i.imgur.com/9FSBO3m.png)<br>
+![Commands 3 Command](https://i.imgur.com/EDy8sbm.png)<br>
+
+- /CreateClan:<br>
+![CreateClan 1 Command](https://i.imgur.com/G9a9hs9.png)<br>
+![CreateClan 2 Command](https://i.imgur.com/cctJFmG.png)<br>
+![CreateClan 3 Command](https://i.imgur.com/PCxDnHA.png)<br>
+![CreateClan 4 Command](https://i.imgur.com/DYwvMGr.png)<br>
+![CreateClan 5 Command](https://i.imgur.com/jXaixdu.png)<br>
+![CreateClan 6 Command](https://i.imgur.com/qsTNXVV.png)<br>
+![CreateClan 7 Command](https://i.imgur.com/koPDE43.png)<br>
+![CreateClan 8 Command](https://i.imgur.com/T65Mavd.png)<br>
+![CreateClan 9 Command](https://i.imgur.com/cfgO3aN.png)<br>
+![CreateClan 10 Command](https://i.imgur.com/XkD2iz7.png)<br>
+![CreateClan 11 Command](https://i.imgur.com/uxzrkXX.png)<br>
 
 - /Stats:<br>
 ![Stats Command](https://i.imgur.com/6FGtuRt.png)<br>
