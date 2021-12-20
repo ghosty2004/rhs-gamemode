@@ -44,7 +44,6 @@ const Jail = require("./others/jail");
 const LS = require("./others/ls");
 const LV = require("./others/lv");
 const LVTrans = require("./others/lvtrans");
-const Pimps = require("./others/pimps");
 const Quarry = require("./others/quarry.js");
 const SF = require("./others/sf");
 const Spawn = require("./others/spawn");
@@ -58,6 +57,7 @@ const PlayerObj_Class_Select = require("./player/class_select");
 const AA = require("./stuntzones/aa");
 const BMX = require("./stuntzones/bmx");
 const Chrome = require("./stuntzones/chrome");
+const Jizzy = require("./stuntzones/jizzy");
 const LSAir = require("./stuntzones/lsair");
 const LVAir = require("./stuntzones/lvair");
 const SFAir = require("./stuntzones/sfair");
@@ -98,7 +98,6 @@ module.exports = {
         LS.Load();
         LV.Load();
         LVTrans.Load();
-        Pimps.Load();
         Quarry.Load();
         SF.Load();
         Spawn.Load();
@@ -109,6 +108,7 @@ module.exports = {
         AA.Load();
         BMX.Load();
         Chrome.Load();
+        Jizzy.Load();
         LSAir.Load();
         LVAir.Load();
         SFAir.Load();
@@ -134,7 +134,6 @@ module.exports = {
         LS.RemoveBuilding(player);
         LV.RemoveBuilding(player);
         LVTrans.RemoveBuilding(player);
-        Pimps.RemoveBuilding(player);
         SF.RemoveBuilding(player);
         VIPClub.RemoveBuilding(player);
         Voller.RemoveBuilding(player);
@@ -142,6 +141,7 @@ module.exports = {
         /* Stunt Zones */
         AA.RemoveBuilding(player);
         BMX.RemoveBuilding(player);
+        Jizzy.RemoveBuilding(player);
         LSAir.RemoveBuilding(player);
         LVAir.RemoveBuilding(player);
         SFAir.RemoveBuilding(player);
