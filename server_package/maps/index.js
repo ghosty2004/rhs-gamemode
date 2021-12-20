@@ -56,6 +56,7 @@ const PlayerObj_Class_Select = require("./player/class_select");
 
 /* Stunt Zones */
 const AA = require("./stuntzones/aa");
+const BMX = require("./stuntzones/bmx");
 const Chrome = require("./stuntzones/chrome");
 const LSAir = require("./stuntzones/lsair");
 const LVAir = require("./stuntzones/lvair");
@@ -106,6 +107,7 @@ module.exports = {
 
         /* Stunt Zones */
         AA.Load();
+        BMX.Load();
         Chrome.Load();
         LSAir.Load();
         LVAir.Load();
@@ -139,6 +141,7 @@ module.exports = {
 
         /* Stunt Zones */
         AA.RemoveBuilding(player);
+        BMX.RemoveBuilding(player);
         LSAir.RemoveBuilding(player);
         LVAir.RemoveBuilding(player);
         SFAir.RemoveBuilding(player);
