@@ -37,6 +37,7 @@ const Gang6 = require("./gangs/6");
 const Targets = require("./minigames/targets");
 
 /* Others */
+const Area51 = require("./others/area51");
 const Beach = require("./others/beach");
 const Chilliad = require("./others/chilliad");
 const Jail = require("./others/jail");
@@ -89,6 +90,7 @@ module.exports = {
         Targets.Load();
 
         /* Others */
+        Area51.Load();
         Beach.Load();
         Chilliad.Load();
         Jail.Load();
@@ -124,6 +126,7 @@ module.exports = {
         Gang4.RemoveBuilding(player);
 
         /* Others */
+        Area51.RemoveBuilding(player);
         Beach.RemoveBuilding(player);
         Chilliad.RemoveBuilding(player);
         LS.RemoveBuilding(player);
