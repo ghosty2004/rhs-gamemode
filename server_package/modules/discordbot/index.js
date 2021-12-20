@@ -34,10 +34,9 @@ bot.login(DISCORD_BOT.TOKEN).catch((error) => {
 /* Custom Modules */
 /* ============== */
 const { DiscordCommand } = require("../events");
-const { getPlayer, numberWithCommas } = require("../functions");
+const { numberWithCommas } = require("../functions");
 const { getPlayers } = require("samp-node-lib");
 
-const Errors = require("../errors");
 const con = require("../mysql");
 const Player = require("../player");
 

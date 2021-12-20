@@ -3,6 +3,8 @@
 /* ================ */
 
 const { CreateObject, SetObjectMaterial } = require("samp-node-lib");
+const fs = require("fs");
+
 global.CreateObject = CreateObject;
 global.SetObjectMaterial = SetObjectMaterial;
 const { CreateDynamicObject, SetDynamicObjectMaterial, SetDynamicObjectMaterialText } = require("../modules/streamer");
@@ -10,143 +12,44 @@ global.CreateDynamicObject = CreateDynamicObject;
 global.SetDynamicObjectMaterial = SetDynamicObjectMaterial;
 global.SetDynamicObjectMaterialText = SetDynamicObjectMaterialText;
 
-/* Death Match */
-const DE = require("./deathmatch/de");
-const GunWar = require("./deathmatch/gunwar");
-const Hell = require("./deathmatch/hell");
-const M4 = require("./deathmatch/m4");
-const Minigun = require("./deathmatch/minigun");
-const MRF = require("./deathmatch/mrf");
-const OH = require("./deathmatch/oh");
-const OS = require("./deathmatch/os");
-const Pro = require("./deathmatch/pro");
-const Sniper = require("./deathmatch/sniper");
-
-/* Drifts */
-const Drift1 = require("./drifts/1");
-
-/* Gangs */
-const Gang1 = require("./gangs/1");
-const Gang2 = require("./gangs/2");
-const Gang3 = require("./gangs/3");
-const Gang4 = require("./gangs/4");
-const Gang5 = require("./gangs/5");
-const Gang6 = require("./gangs/6");
-
-/* Minigames */
-const Targets = require("./minigames/targets");
-
-/* Others */
-const Area51 = require("./others/area51");
-const Beach = require("./others/beach");
-const Chilliad = require("./others/chilliad");
-const Jail = require("./others/jail");
-const LS = require("./others/ls");
-const LV = require("./others/lv");
-const LVTrans = require("./others/lvtrans");
-const Quarry = require("./others/quarry.js");
-const SF = require("./others/sf");
-const Spawn = require("./others/spawn");
-const VIPClub = require("./others/vipclub");
-const Voller = require("./others/voller");
-
 /* Player's Objects */
 const PlayerObj_Class_Select = require("./player/class_select");
 
-/* Stunt Zones */
-const AA = require("./stuntzones/aa");
-const BMX = require("./stuntzones/bmx");
-const Chrome = require("./stuntzones/chrome");
-const Jizzy = require("./stuntzones/jizzy");
-const LSAir = require("./stuntzones/lsair");
-const LVAir = require("./stuntzones/lvair");
-const MC = require("./stuntzones/mc");
-const SFAir = require("./stuntzones/sfair");
+function getMaps() {
+    return new Promise((resolve, reject) => { 
+        fs.readdir("./server_package/maps", function (err, files) {
+            const maps = [];
+            files.forEach((i) => {
+                if(i != "index.js" && i != "player") {
+                    maps.push([i, fs.readdirSync(`./server_package/maps/${i}`).filter(file => file.endsWith('.js'))]);
+                }
+            });
+            resolve(maps);
+        });
+    });
+}
 
 module.exports = {
-    Load: function() {
-        /* Death Match */
-        DE.Load();
-        GunWar.Load();
-        Hell.Load();
-        M4.Load();
-        Minigun.Load();
-        MRF.Load();
-        OH.Load();
-        OS.Load();
-        Pro.Load();
-        Sniper.Load();
-
-        /* Drifts */
-        Drift1.Load();
-
-        /* Gangs */
-        Gang1.Load();
-        Gang2.Load();
-        Gang3.Load();
-        Gang4.Load();
-        Gang5.Load();
-        Gang6.Load();
-
-        /* Minigames */
-        Targets.Load();
-
-        /* Others */
-        Area51.Load();
-        Beach.Load();
-        Chilliad.Load();
-        Jail.Load();
-        LS.Load();
-        LV.Load();
-        LVTrans.Load();
-        Quarry.Load();
-        SF.Load();
-        Spawn.Load();
-        VIPClub.Load();
-        Voller.Load();
-
-        /* Stunt Zones */
-        AA.Load();
-        BMX.Load();
-        Chrome.Load();
-        Jizzy.Load();
-        LSAir.Load();
-        LVAir.Load();
-        MC.Load();
-        SFAir.Load();
-    },
-    RemoveBuildings: function(player) {
-        /* Death Match */
-        GunWar.RemoveBuilding(player);
-        M4.RemoveBuilding(player);
-
-        /* Drifts */
-        Drift1.RemoveBuilding(player);
-
-        /* Gangs */
-        Gang1.RemoveBuilding(player);
-        Gang2.RemoveBuilding(player);
-        Gang3.RemoveBuilding(player);
-        Gang4.RemoveBuilding(player);
-
-        /* Others */
-        Area51.RemoveBuilding(player);
-        Beach.RemoveBuilding(player);
-        Chilliad.RemoveBuilding(player);
-        LS.RemoveBuilding(player);
-        LV.RemoveBuilding(player);
-        LVTrans.RemoveBuilding(player);
-        SF.RemoveBuilding(player);
-        VIPClub.RemoveBuilding(player);
-        Voller.RemoveBuilding(player);
-
-        /* Stunt Zones */
-        AA.RemoveBuilding(player);
-        BMX.RemoveBuilding(player);
-        Jizzy.RemoveBuilding(player);
-        LSAir.RemoveBuilding(player);
-        LVAir.RemoveBuilding(player);
-        SFAir.RemoveBuilding(player);
+    Load: async function() {
+        getMaps().then((data) => {
+            console.log(data)
+            data.forEach((i) => {
+                for(const file of i[1]) {
+                    const Data = require(`./${i[0]}/${file}`);
+                    if(Data.Load) Data.Load();
+                }
+            });
+        });
+    }, 
+    RemoveBuildings: async function(player) {
+        getMaps().then((data) => {
+            data.forEach((i) => {
+                for(const file of i[1]) {
+                    const Data = require(`./${i[0]}/${file}`);
+                    if(Data.RemoveBuilding) Data.RemoveBuilding(player);
+                }
+            });
+        });
     },
     Custom: { PlayerObj_Class_Select }
 }
