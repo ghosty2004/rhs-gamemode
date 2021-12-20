@@ -60,6 +60,7 @@ const Chrome = require("./stuntzones/chrome");
 const Jizzy = require("./stuntzones/jizzy");
 const LSAir = require("./stuntzones/lsair");
 const LVAir = require("./stuntzones/lvair");
+const MC = require("./stuntzones/mc");
 const SFAir = require("./stuntzones/sfair");
 
 module.exports = {
@@ -111,6 +112,7 @@ module.exports = {
         Jizzy.Load();
         LSAir.Load();
         LVAir.Load();
+        MC.Load();
         SFAir.Load();
     },
     RemoveBuildings: function(player) {
