@@ -32,7 +32,6 @@ function getMaps() {
 module.exports = {
     Load: async function() {
         getMaps().then((data) => {
-            console.log(data)
             data.forEach((i) => {
                 for(const file of i[1]) {
                     const Data = require(`./${i[0]}/${file}`);
