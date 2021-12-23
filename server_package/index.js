@@ -2924,6 +2924,18 @@ CMD.on("givepcar", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function getPlayerWeapons(player) {
+    let weapons = [];
+    for(let i = 0; i <= 12; i++) {
+        let data = player.GetPlayerWeaponData(i);
+        if(data) if(data[0]) weapons.push({
+            id: data[0],
+            ammo: data[1]
+        });
+    }
+    return weapons;
+}
+
 function toDegrees(angle) {
     return angle * (180 / Math.PI);
 }
@@ -3117,11 +3129,12 @@ function spawnPlayerInDM(player, first_time=false) {
 }
 
 function CheckAntiCheat(player) {
-    if(Player.Info[player.playerid].Admin > 0 || Player.Info[player.playerid].RconType > 0) return;
     /* ======== */
     /* Fly Hack */
     /* ======== */
-    if(player.GetPlayerAnimationIndex() == 958) {
+    const AnimIndex = player.GetPlayerAnimationIndex();
+    const AnimName = samp.GetAnimationName(AnimIndex, 32, 32);
+    if(AnimName[0] == "PARACHUTE" && AnimName[1] == "FALL_SKYDIVE" && player.GetPlayerWeapon() != 46) {
         SendMessageToAdmins(data.colors.RED, `${data.settings.BUSTER_PREFIX}: ${player.GetPlayerName(24)}(${player.playerid}) possible use Fly Hack!`);
     }
 }
