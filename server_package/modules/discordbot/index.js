@@ -34,11 +34,12 @@ bot.login(DISCORD_BOT.TOKEN).catch((error) => {
 /* Custom Modules */
 /* ============== */
 const { DiscordCommand } = require("../events");
-const { numberWithCommas } = require("../functions");
 const { getPlayers } = require("samp-node-lib");
 
+const Function = require("../functions");
 const con = require("../mysql");
 const Player = require("../player");
+const Server = require("../server");
 
 /* ======================= */
 /* Slash Command Variables */
@@ -92,8 +93,8 @@ function getStatsEmbed(user) {
                 embed.setTitle(`${result[0].name}'s stats:`, true);
                 embed.addField("ID:", `${result[0].ID}`, true);
                 embed.addField("Name:", `${result[0].name}`, true);
-                embed.addField("Money:", `$${numberWithCommas(result[0].money)}`, true);
-                embed.addField("Coins:", `${numberWithCommas(result[0].coins)}`, true);
+                embed.addField("Money:", `$${Function.numberWithCommas(result[0].money)}`, true);
+                embed.addField("Coins:", `${Function.numberWithCommas(result[0].coins)}`, true);
                 embed.addField("Respect:", `+${result[0].respect_positive} / -${result[0].respect_negative}`, true);
                 embed.addField("Online Time:", `${result[0].hours} hrs, ${result[0].minutes} mins, ${result[0].seconds} secs`, true);
                 resolve(embed);
@@ -143,6 +144,14 @@ CMD.on("users", (message) => {
 /* ========== */
 bot.once("ready", () => {
     console.log(`Discord BOT: ${bot.user.tag} is ready.`);
+
+    /* Interval */
+    setInterval(() => {
+        const OnlineTime = Function.timestampToHMS(Server.Info.StartTime);
+        bot.user.setStatus("dnd");
+        bot.user.setActivity({name: `${getPlayers().length} players | ${OnlineTime.hours} hrs and ${OnlineTime.minutes} mins uptime`, type: "PLAYING"});
+    }, 10 * 1000);
+
     /* ======================= */
     /* Slash Commands Register */
     /* ======================= */

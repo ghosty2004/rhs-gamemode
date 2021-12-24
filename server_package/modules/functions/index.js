@@ -68,5 +68,17 @@ module.exports = {
                 resolve(result[0].count); 
             });
         }); 
+    },
+    getGangFounders: function(GangID) {
+        return new Promise((resolve, reject) => {
+            con.query("SELECT name FROM users WHERE gang = ? AND gang_rank = ?", [GangID, 5], function(err, result) {
+                if(err || result == 0) resolve("None");
+                else {
+                    let names = [];
+                    for(let i = 0; i < result.length; i++) names.push(result[i].name);
+                    resolve(`${names.toString().replace(new RegExp(",", 'g'), ", ")}`);
+                }
+            });
+        });
     }
 }

@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, SlashCommandStringOption } = require("@discordjs/builders");
 const { CommandInteraction, MessageEmbed } = require("discord.js");
+const { getGangFounders } = require("../../functions");
 
 const Gang = require("../../gang");
 
@@ -41,6 +42,7 @@ module.exports = {
             embed.addField("Captures:", `${result.captures}`, true);
             embed.addField("Kills:", `${result.kills}`, true);
             embed.addField("Deaths:", `${result.deaths}`, true);
+            embed.addField("Founders:", `${await getGangFounders(result.id)}`);
             interaction.reply({embeds: [embed]});
         }
         else interaction.reply(`This gang not exists.`);

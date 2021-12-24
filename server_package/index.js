@@ -1932,7 +1932,7 @@ CMD.on("ginfo", async (player, params) => {
     info += `{BBFF00}Gang has {33CCFF}${Gang.Info[gang].kills}{BBFF00} kills.\n`;
     info += `{BBFF00}Gang has {33CCFF}${Gang.Info[gang].deaths}{BBFF00} deaths.\n`;
     info += `{BBFF00}Gang Weapons: {33CCFF}${getGangWeapons(gang)}\n`;
-    info += `{BBFF00}Gang Founders: {33CCFF}${await getGangFounders(gang)}\n`;
+    info += `{BBFF00}Gang Founders: {33CCFF}${await Function.getGangFounders(gang)}\n`;
     info += "\n";
     info += "{BBFF00}If you want to view other gang's stats, type {FFFF00}/GInfo [GangID]";
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Gang Info", info, "Ok", "");
@@ -3401,19 +3401,6 @@ function GetPlayerGangZone(player) {
     if(data) return data.territory;
     else return null;
 } 
-
-function getGangFounders(GangID) {
-    return new Promise((resolve, reject) => {
-        con.query("SELECT name FROM users WHERE gang = ? AND gang_rank = ?", [GangID, 5], function(err, result) {
-            if(err || result == 0) resolve("None");
-            else {
-                let names = [];
-                for(let i = 0; i < result.length; i++) names.push(result[i].name);
-                resolve(`${replaceAll(names.toString(), ",", ", ")}`)
-            }
-        });
-    });
-}
 
 function getGangWeapons(GangID) {
     let names = [];
