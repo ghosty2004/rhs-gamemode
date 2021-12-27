@@ -4681,6 +4681,8 @@ samp.OnGameModeInit(() => {
     console.log("================================================".white);
     console.log("\n");
 
+    Server.AddServerRule("gamemode by", package_json.author);
+
     Maps.Load(); /* Load Server Maps */
     TextDraws.server.Load(); /* Load Server TextDraws */
     Minigames.Load(); /* Load Server Minigames */

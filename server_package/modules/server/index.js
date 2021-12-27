@@ -12,5 +12,8 @@ module.exports = {
     },
     SetMaxPlayers: function(maxplayers) {
         return callPublic("_SetMaxPlayers", "i", maxplayers);
+    },
+    AddServerRule: function(name, value) {
+        return callPublic("_AddServerRule", "ss", name, value);
     }
 }

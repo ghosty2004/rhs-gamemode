@@ -31,6 +31,7 @@ event:getLocationData(RequestID[], Float:x, Float:y, Float:z) {
 /* Server Node Events */
 /* ================== */
 event:_SetMaxPlayers(maxplayers) return SetMaxPlayers(maxplayers);
+event:_AddServerRule(const name[], const value[]) return AddServerRule(name, value);
 
 /* ==================== */
 /* CPLoader Node Events */
