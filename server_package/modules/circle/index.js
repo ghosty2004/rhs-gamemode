@@ -1,12 +1,18 @@
-const { CreatePickup, DestroyPickup, CreateVehicle, DestroyVehicle, getPlayers, SetPlayerPos, SetPlayerFacingAngle } = require("samp-node-lib");
+const { CreatePickup, DestroyPickup, CreateVehicle, DestroyVehicle, getPlayers, SetPlayerPos, SetPlayerFacingAngle, SampPlayer } = require("samp-node-lib");
 const Player = require("../player");
 
 const WeaponsModels = [-1, 331, 333, 334, 335, 336, 337, 338, 339, 341, 321, 322, 323,	324, 325, 326, 342, 343, 344, -1, -1, -1, 346, 347, 348, 349, 350, 351, 352, 353, 355, 356, 372, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 371];
 
-module.exports = {
+module.exports = { 
+	/** 
+	 * @type {[{player: SampPlayer, pickup: Number, weaponId: Number, weaponAmmo: Number}]} 
+	*/ 
 	DropWeaponsData: [],
-    DropWeapons: function(player) { /* position: Array<number>, weapons: Array<number> */
-		this.DeleteWeaponsPickupsFromPlayerId(player.playerid);
+	/**
+	 * @param {SampPlayer} player 
+	 */
+    DropWeapons: function(player) { 
+		this.DeleteWeaponsPickupsFromPlayer(player);
         let weapons = [];
 		for(let i = 0; i <= 12; i++) {
 			let data = player.GetPlayerWeaponData(i);
@@ -26,19 +32,26 @@ module.exports = {
 			let tempY = position[1] + WEAPON_DROP_RADIUS * Math.sin(radianAngle);
 
 			this.DropWeaponsData.push({
-				owner: player.playerid,
+				player: player,
 				pickup: CreatePickup(WeaponsModels[weapons[i][0]], 1, tempX, tempY, position[2]),
 				weaponId: weapons[i][0],
 				weaponAmmo: weapons[i][1]
 			});
         }
     },
-	DeleteWeaponsPickupsFromPlayerId: function(playerid) {
-		this.DropWeaponsData.filter(f => f.owner == playerid).forEach((i, index) => {
+	/**
+	 * @param {SampPlayer} player 
+	 */
+	DeleteWeaponsPickupsFromPlayer: function(player) {
+		this.DropWeaponsData.filter(f => f.player == player).forEach((i, index) => {
 			DestroyPickup(i.pickup);
 			this.DropWeaponsData.splice(index, 1);
 		});
 	},
+	/**
+	 * @param {SampPlayer} player 
+	 * @param {Number} pickupid 
+	 */
 	WeaponPickup(player, pickupid) {
 		let index = this.DropWeaponsData.findIndex(f => f.pickup == pickupid);
 		if(index != -1) {
@@ -47,8 +60,15 @@ module.exports = {
 			this.DropWeaponsData.splice(index, 1);
 		}
 	},
+	/** 
+	 * @type {[{player: SampPlayer, vehicle: Number}]} 
+	 */ 
 	CreateCarsData: [],
-	CreateCars: function(player, vehicles) { /* vehicles: Array<number> */
+	/**
+	 * @param {SampPlayer} player 
+	 * @param {Array} vehicles 
+	 */
+	CreateCars: function(player, vehicles) {
 		const VEHICLES_RADIUS = vehicles.length * 1.5;
         let dots = vehicles.length;
         let radianAngle, interval = (Math.PI * 2) / dots;
@@ -66,17 +86,25 @@ module.exports = {
 			let deg = rad * (180 / Math.PI) + 90;
 
 			this.CreateCarsData.push({
-				owner: player.playerid,
+				player: player,
 				vehicle: CreateVehicle(vehicles[i], tempX, tempY, position[2], deg)
 			});
         }
 	},
-	DeleteCreateCarsFromPlayerId: function(owner) {
-		this.CreateCarsData.filter(f => f.owner == owner).forEach((i, index) => {
-			DestroyVehicle(i.vehicle);
-			this.CreateCarsData.splice(index, 1);
-		});
+	/**
+	 * @param {SampPlayer} player 
+	 */
+	DeleteCreateCarsFromPlayer: function(player) {
+		for(let i = this.CreateCarsData.length - 1; i >= 0; i--) {
+			if(this.CreateCarsData[i].player == player) {
+				DestroyVehicle(this.CreateCarsData[i].vehicle);
+				this.CreateCarsData.splice(i, 1);
+			}
+		}
 	},
+	/**
+	 * @param {SampPlayer} player 
+	 */
 	GetAll: function(player) {
 		let result = getPlayers().filter(f => Player.Info[f.playerid].LoggedIn && f.playerid != player.playerid);
 

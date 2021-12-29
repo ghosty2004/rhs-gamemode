@@ -786,7 +786,7 @@ CMD.on("credits", async (player) => {
     info += `{00BBF6}${Player.Info[player.playerid].Language == 1 ? "Mai jos ai o lista cu cei ce au contribuit la crearea acestui server:" : "Before is a list with server's creators:"}\n`;
     info += "\n";
     info += "{FF0000}Scripter:\n";
-    info += "{15FF00}ghosty\n";
+    info += `{15FF00}${package_json.author}\n`;
     info += "\n";
     info += `{0072FF}${Player.Info[player.playerid].Language == 1 ? "Proprietari:" : "Owners:"}\n`;
     info += `{15FF00}${await getServerFounders()}\n`;
@@ -2628,7 +2628,7 @@ CMD.on("spawncars", (player, params) => {
 });
 
 CMD.on("despawncars", (player) => {
-    Circle.DeleteCreateCarsFromPlayerId(player.playerid);
+    Circle.DeleteCreateCarsFromPlayer(player);
     SendACMD(player, "DespawnCars");
 });
 
@@ -4985,8 +4985,8 @@ samp.OnPlayerDisconnect((player, reason) => {
     HideCapturingLabelFor(player);
     UnLoadPlayerPersonalCars(player);
 
-    Circle.DeleteWeaponsPickupsFromPlayerId(player.playerid);
-    Circle.DeleteCreateCarsFromPlayerId(player.playerid);
+    Circle.DeleteWeaponsPickupsFromPlayer(player);
+    Circle.DeleteCreateCarsFromPlayer(player);
 
     if(Player.Info[player.playerid].SpawnedCar) samp.DestroyVehicle(Player.Info[player.playerid].SpawnedCar);
 
