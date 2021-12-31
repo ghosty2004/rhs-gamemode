@@ -25,6 +25,7 @@ const Dialog = require("./modules/dialog");
 const Discord = require("./modules/discordbot");
 const Errors = require("./modules/errors");
 const events = require("./modules/events");
+const Firework = require("./modules/firework");
 const Function = require("./modules/functions");
 const Gang = require("./modules/gang");
 const Minigames = require("./modules/minigames");
@@ -2871,6 +2872,15 @@ CMD.on("saveall", (player) => {
     Clan.Get().forEach((i) => { saveClan(i.id); });
     Gang.Get().forEach((i) => { saveGang(i.id); });
     SendACMD(player, "SaveAll");
+});
+
+CMD.on("fireworks", (player, params) => {
+    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    let count = 1;
+    if(!isNaN(params[0])) count = parseInt(params[0]);
+    Firework.Plant(player, count);
+    samp.SendClientMessageToAll(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has launched {FF0000}Fireworks {FFFF00}at his position!`);
+    SendACMD(player, "Fireworks");
 });
 
 CMD.on("setmaxplayers", (player, params) => {
