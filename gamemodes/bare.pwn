@@ -27,11 +27,15 @@ event:getLocationData(RequestID[], Float:x, Float:y, Float:z) {
     SAMPNode_CallEvent("locationResponse", RequestID, place);
 }
 
-/* ================== */
-/* Server Node Events */
-/* ================== */
+/* =============== */
+/* YSF Node Events */
+/* =============== */
 event:_SetMaxPlayers(maxplayers) return SetMaxPlayers(maxplayers);
 event:_AddServerRule(const name[], const value[]) return AddServerRule(name, value);
+event:_EnableConsoleMSGsForPlayer(playerid, color) return EnableConsoleMSGsForPlayer(playerid, color);
+event:_IsValidNickName(const name[]) return IsValidNickName(name);
+event:_AllowNickNameCharacter(const character[], bool:allow) return AllowNickNameCharacter(character[0], allow);
+event:_IsNickNameCharacterAllowed(const character[]) return IsNickNameCharacterAllowed(character[0]);
 
 /* ==================== */
 /* CPLoader Node Events */

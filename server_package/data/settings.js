@@ -38,5 +38,6 @@ module.exports = {
     BUSTER_LABEL: null,
     GANGS: {
         CAPTURE_TIME: 5 * 60 // 5 Minutes
-    }
+    },
+    ALLOWED_NICKNAME_CHARACTERS: [" ", "`", "~", "!", "#", "$", "%", "^", "&", "*", "-", "+", "{", "}", ";", ":", "'", "\"\"", "|", ",", "<", ">", "/", "?"]
 }

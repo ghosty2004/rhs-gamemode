@@ -37,6 +37,7 @@ const SpawnZone = require("./modules/spawnzone");
 const Streamer = require("./modules/streamer");
 const Teleport = require("./modules/teleport");
 const Web = require("./modules/web");
+const YSF = require("./modules/YSF");
 
 /* =========== */
 /* Server Maps */
@@ -2887,7 +2888,7 @@ CMD.on("setmaxplayers", (player, params) => {
     if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!isNumber(params[0])) return SendUsage(player, "/SetMaxPlayers [Max Players]");
     params[0] = parseInt(params[0]);
-    Server.SetMaxPlayers(params[0]);
+    YSF.SetMaxPlayers(params[0]);
     player.SendClientMessage(data.colors.YELLOW, `Max players was successfully modified to {FF0000}${params[0]}{FFFF00}.`);
 });
 
@@ -4691,7 +4692,11 @@ samp.OnGameModeInit(() => {
     console.log("================================================".white);
     console.log("\n");
 
-    Server.AddServerRule("gamemode by", package_json.author);
+    YSF.AddServerRule("gamemode by", package_json.author);
+
+    data.settings.ALLOWED_NICKNAME_CHARACTERS.forEach((character) => {
+        YSF.AllowNickNameCharacter(character, true);
+    });
 
     Maps.Load(); /* Load Server Maps */
     TextDraws.server.Load(); /* Load Server TextDraws */
