@@ -2947,16 +2947,12 @@ function getPlayerWeapons(player) {
     return weapons;
 }
 
-function toDegrees(angle) {
-    return angle * (180 / Math.PI);
-}
-
 function getCarTextSize(size) {
     let string = "None";
     switch(size) {
-        case 5: string = "Small"; break;
-        case 10: string = "Medium"; break;
-        case 20: string = "Big"; break;
+        case 15: string = "Small"; break;
+        case 20: string = "Medium"; break;
+        case 25: string = "Big"; break;
     }
     return string;
 }
@@ -3165,7 +3161,7 @@ function GetPersonalCarPrice(model) {
 
 function GivePersonalCar(player, model, from_admin) {
     let cartext = [];
-    for(let i = 0; i < 4; i++) cartext.push({text: "null", fontsize: 20, offsetposition: [0, 0, 0], offsetrotation: [0, 0, 0]});
+    for(let i = 0; i < 4; i++) cartext.push({text: "null", fontsize: 15, offsetposition: [0, 0, 0], offsetrotation: [0, 0, 0]});
     con.query("INSERT INTO personalcars (owner, model, color, position, cartext, from_admin) VALUES(?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].AccID, model, JSON.stringify([0, 0]), JSON.stringify(player.GetPlayerPos()), JSON.stringify(cartext), from_admin], function(err, result) {
         PCar.Create(result.insertId, Player.Info[player.playerid].AccID, model, [0, 0], player.GetPlayerPos(), cartext, from_admin);
         LoadPlayerPersonalCars(player);
@@ -4847,25 +4843,24 @@ samp.OnPlayerEditObject((player, playerobject, objectid, response, fX, fY, fZ, f
     let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
     let data = car.cartext.at(Player.Info[player.playerid].EditingCarText.Index);
     if(car) {
-        if(response == 1) { /* Finsih */
+        if(response == 1) { /* Finish */
             let position = samp.GetVehiclePos(car.vehicle);
             let angle = samp.GetVehicleZAngle(car.vehicle);
 
-            let ofx = fX-position.x;
-            let ofy = fY-position.y;
-            let ofz = fZ-position.z;
-            let ofaz = fRotZ-angle;
-            let finalx = ofx*Math.cos(angle)+ofy*Math.sin(angle);
-            let finaly = -ofx*Math.sin(angle)+ofy*Math.cos(angle);
+            let offsetX = fX-position.x;
+            let offsetY = fY-position.y;
+            let offsetZ = fZ-position.z;
 
-            data.offsetposition = [finalx, finaly, ofz];
-            data.offsetrotation = [fRotX, fRotY, ofaz];
+            fRotZ-= angle;
+
+            data.offsetposition = [offsetX, offsetY, offsetZ];
+            data.offsetrotation = [fRotX, fRotY, fRotZ];
 
             samp.AttachObjectToVehicle(data.object, car.vehicle, data.offsetposition[0], data.offsetposition[1], data.offsetposition[2], data.offsetrotation[0], data.offsetrotation[1], data.offsetrotation[2]);
         }
         if(response == 0) { /* Cancel */
             data.text = "null";
-            data.fontsize = 5;
+            data.fontsize = 15;
             data.offsetposition = [0, 0, 0];
             data.offsetrotation = [0, 0, 0];
             samp.DestroyObject(data.object);
@@ -5069,7 +5064,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
             if(!car) return;
             car.cartext[Player.Info[player.playerid].EditingCarText.Index].text = "null";
-            car.cartext[Player.Info[player.playerid].EditingCarText.Index].fontsize = 5;
+            car.cartext[Player.Info[player.playerid].EditingCarText.Index].fontsize = 15;
             car.cartext[Player.Info[player.playerid].EditingCarText.Index].offsetposition = [0, 0, 0];
             car.cartext[Player.Info[player.playerid].EditingCarText.Index].offsetrotation = [0, 0, 0];
             samp.DestroyObject(car.cartext[Player.Info[player.playerid].EditingCarText.Index].object);
@@ -5087,9 +5082,9 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                 if(!car) return;
                 let size = 0;
                 switch(listitem) {
-                    case 0: size = 5; break;
-                    case 1: size = 10; break;
-                    case 2: size = 20; break;
+                    case 0: size = 15; break;
+                    case 1: size = 20; break;
+                    case 2: size = 25; break;
                 }
                 Player.Info[player.playerid].EditingCarText.Fontsize = size;
                 player.ShowPlayerDialog(Dialog.CARTEXT_INPUT_TEXT, samp.DIALOG_STYLE.INPUT, "Personal Vehicle Holds - Text", "{BBFF00}Insert your text!\n{BBFF00}If you want to color the text insert hex color!", "Select", "Close");
