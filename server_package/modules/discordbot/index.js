@@ -193,36 +193,38 @@ bot.once("ready", () => {
                 });
             } 
             else {
-                rest.get(Routes.applicationGuildCommands(CLIENT_ID, DEVELOPER_GUILD_ID)).then(async(data) => {
-                    /* ====================== */
-                    /* Command pending delete */
-                    /* ====================== */
-                    data.forEach(async(i) => {
-                        if(removeCommands.some(s => s == i.name)) {
-                            await rest.delete(
-                                Routes.applicationGuildCommand(i.application_id, DEVELOPER_GUILD_ID, i.id)
+                bot.guilds.cache.forEach((guild) => {
+                    rest.get(Routes.applicationGuildCommands(CLIENT_ID, guild.id)).then(async(data) => {
+                        /* ====================== */
+                        /* Command pending delete */
+                        /* ====================== */
+                        data.forEach(async(i) => {
+                            if(removeCommands.some(s => s == i.name)) {
+                                await rest.delete(
+                                    Routes.applicationGuildCommand(i.application_id, guild.id, i.id)
+                                ).then(() => {
+                                    console.log(`Successfully removed slash command ${i.name} from guild: ${guild.name}.`);
+                                }).catch(() => {
+                                    console.log(`Could not remove slash command ${i.name} from guild: ${guild.name}.`);
+                                });
+                            }
+                        });
+                        if(Add_Slash_Commands_To_API) {
+                            /* ============ */
+                            /* Add commandS */
+                            /* ============ */
+                            await rest.put(
+                                Routes.applicationGuildCommands(CLIENT_ID, guild.id), {
+                                    body: commands
+                                },
                             ).then(() => {
-                                console.log(`Successfully removed slash command ${i.name} from developer guild.`);
-                            }).catch(() => {
-                                console.log(`Could not remove slash command ${i.name} from developer guild`);
-                            });
+                                console.log(`Successfully updated slash commands from guild: ${guild.name}.`);
+                            }).catch((e) => {
+                                console.log(`Could not update slash commands from developer guild: ${guild.name}.`);
+                            });   
                         }
-                    });
-                    if(Add_Slash_Commands_To_API) {
-                        /* ============ */
-                        /* Add commandS */
-                        /* ============ */
-                        await rest.put(
-                            Routes.applicationGuildCommands(CLIENT_ID, DEVELOPER_GUILD_ID), {
-                                body: commands
-                            },
-                        ).then(() => {
-                            console.log("Successfully updated slash commands from developer guild.")
-                        }).catch((e) => {
-                            console.log("Could not update slash commands from developer guild.");
-                        });   
-                    }
-                }); 
+                    }); 
+                });
             }
         } catch(e) {
             console.error(e.stack);
