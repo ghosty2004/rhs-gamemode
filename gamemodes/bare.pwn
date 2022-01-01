@@ -32,6 +32,7 @@ event:getLocationData(RequestID[], Float:x, Float:y, Float:z) {
 /* =============== */
 event:_SetMaxPlayers(maxplayers) return SetMaxPlayers(maxplayers);
 event:_AddServerRule(const name[], const value[]) return AddServerRule(name, value);
+event:_SetServerRule(const name[], const value[]) return SetServerRule(name, value);
 event:_EnableConsoleMSGsForPlayer(playerid, color) return EnableConsoleMSGsForPlayer(playerid, color);
 event:_IsValidNickName(const name[]) return IsValidNickName(name);
 event:_AllowNickNameCharacter(const character[], bool:allow) return AllowNickNameCharacter(character[0], allow);

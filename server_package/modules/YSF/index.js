@@ -15,6 +15,13 @@ module.exports = {
         return callPublic("_AddServerRule", "ss", name, value);
     },
     /**
+     * @param {String} name 
+     * @param {String} value 
+     */
+    SetServerRule: function(name, value) {
+        return callPublic("_SetServerRule", "ss", name, value);
+    },
+    /**
      * @param {SampPlayer} player 
      * @param {Number} color 
      */

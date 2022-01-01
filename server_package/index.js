@@ -4692,7 +4692,13 @@ samp.OnGameModeInit(() => {
     console.log("================================================".white);
     console.log("\n");
 
-    YSF.AddServerRule("gamemode by", package_json.author);
+    YSF.AddServerRule("* gamemode by", package_json.author);
+    YSF.AddServerRule("* server uptime", "00:00:00");
+
+    setInterval(() => {
+        let OnlineTime = Function.timestampToHMS(Server.Info.StartTime);
+        YSF.SetServerRule("* server uptime", `${OnlineTime.hours}:${OnlineTime.minutes}:${OnlineTime.seconds}`);
+    }, 1000); 
 
     data.settings.ALLOWED_NICKNAME_CHARACTERS.forEach((character) => {
         YSF.AllowNickNameCharacter(character, true);
