@@ -2879,6 +2879,8 @@ CMD.on("fireworks", (player, params) => {
     if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     let count = 1;
     if(!isNaN(params[0])) count = parseInt(params[0]);
+    if(Firework.List.some(s => s.owner == player)) return SendError(player, "You already planted fireworks.");
+    if(count < 1 || count > 30) return SendError(player, "Max fireworks count reached. Use another from 1 to 30.");
     Firework.Plant(player, count);
     samp.SendClientMessageToAll(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has launched {FF0000}Fireworks {FFFF00}at his position!`);
     SendACMD(player, "Fireworks");
