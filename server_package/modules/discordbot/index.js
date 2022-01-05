@@ -40,6 +40,7 @@ const Function = require("../functions");
 const con = require("../mysql");
 const Player = require("../player");
 const Server = require("../server");
+const logTypes = require("../../data/logTypes");
 
 /* ======================= */
 /* Slash Command Variables */
@@ -152,6 +153,19 @@ bot.once("ready", () => {
         bot.user.setActivity({name: `${getPlayers().length} players | ${OnlineTime.hours} hrs and ${OnlineTime.minutes} mins uptime`, type: "PLAYING"});
     }, 10 * 1000);
 
+    /* ============================================== */
+    /* Chcek if channels exists in discordChannelLogs */
+    /* ============================================== */
+    con.query("SELECT * FROM discordChannelLogs", function(err, result) {
+        if(err) return;
+        for(let i = 0; i < result.length; i++) {
+            let guild = bot.guilds.cache.get(result[i].guildId);
+            if(!guild) return con.query("DELETE FROM discordChannelLogs WHERE guildId = ?", [result[i].guildId]);
+            let channel = guild.channels.cache.get(result[i].channelId);
+            if(!channel) return con.query("DELETE FROM discordChannelLogs WHERE guildId = ? AND channelId = ?", [result[i].guildId, result[i].channelId]);
+        }
+    });
+
     /* ======================= */
     /* Slash Commands Register */
     /* ======================= */
@@ -194,36 +208,39 @@ bot.once("ready", () => {
             } 
             else {
                 bot.guilds.cache.forEach((guild) => {
-                    rest.get(Routes.applicationGuildCommands(CLIENT_ID, guild.id)).then(async(data) => {
-                        /* ====================== */
-                        /* Command pending delete */
-                        /* ====================== */
-                        data.forEach(async(i) => {
-                            if(removeCommands.some(s => s == i.name)) {
-                                await rest.delete(
-                                    Routes.applicationGuildCommand(i.application_id, guild.id, i.id)
+                    if(guild.id == DEVELOPER_GUILD_ID) {
+                        rest.get(Routes.applicationGuildCommands(CLIENT_ID, guild.id)).then(async(data) => {
+                            /* ====================== */
+                            /* Command pending delete */
+                            /* ====================== */
+                            data.forEach(async(i) => {
+                                if(removeCommands.some(s => s == i.name)) {
+                                    await rest.delete(
+                                        Routes.applicationGuildCommand(i.application_id, guild.id, i.id)
+                                    ).then(() => {
+                                        console.log(`Successfully removed slash command ${i.name} from guild: ${guild.name}.`);
+                                    }).catch((e) => {
+                                        console.log(`Could not remove slash command ${i.name} from guild: ${guild.name}.`);
+                                    });
+                                }
+                            });
+                            if(Add_Slash_Commands_To_API) {
+                                /* ============ */
+                                /* Add commandS */
+                                /* ============ */
+                                await rest.put(
+                                    Routes.applicationGuildCommands(CLIENT_ID, guild.id), {
+                                        body: commands
+                                    },
                                 ).then(() => {
-                                    console.log(`Successfully removed slash command ${i.name} from guild: ${guild.name}.`);
-                                }).catch(() => {
-                                    console.log(`Could not remove slash command ${i.name} from guild: ${guild.name}.`);
-                                });
+                                    console.log(`Successfully updated slash commands from guild: ${guild.name}.`);
+                                }).catch((e) => {
+                                    console.log(`Could not update slash commands from developer guild: ${guild.name}.`);
+                                    console.log(e.rawError.errors.options[1]);
+                                });   
                             }
-                        });
-                        if(Add_Slash_Commands_To_API) {
-                            /* ============ */
-                            /* Add commandS */
-                            /* ============ */
-                            await rest.put(
-                                Routes.applicationGuildCommands(CLIENT_ID, guild.id), {
-                                    body: commands
-                                },
-                            ).then(() => {
-                                console.log(`Successfully updated slash commands from guild: ${guild.name}.`);
-                            }).catch((e) => {
-                                console.log(`Could not update slash commands from developer guild: ${guild.name}.`);
-                            });   
-                        }
-                    }); 
+                        }); 
+                    }
                 });
             }
         } catch(e) {
@@ -277,4 +294,28 @@ bot.on("interactionCreate", async (interaction) => {
     }
 });
 
-module.exports = {bot};
+/**
+ * @param {"joinLeve"|"changeName"|"trade"|"give"|"buster"|"reports"|"ban"|"kick"|"adminCommands"} type 
+ * @param {String} title 
+ * @param {Discord.ColorResolvable} color 
+ * @param {String} description
+ */
+function sendLog(type, color, description) {
+    //Discord.sendLog("joinLeve", "RED", `${player.GetPlayerName(24)} [${player.playerid}] has been disconnected`);
+    con.query("SELECT * FROM discordChannelLogs WHERE type = ?", [type], function(err, result) {
+        if(err || result == 0) return;
+        for(let i = 0; i < result.length; i++) {
+            let guild = bot.guilds.cache.get(result[i].guildId);
+            if(!guild) return;
+            let channel = guild.channels.cache.get(result[i].channelId);
+            if(!channel) return;
+            const embed = new Discord.MessageEmbed();
+            embed.setColor(color);
+            embed.setTitle(`${type} LOG`);
+            embed.setDescription(description);
+            channel.send() // to be continued ...
+        }
+    });
+}
+
+module.exports = {bot, sendLog};

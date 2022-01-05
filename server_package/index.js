@@ -4973,6 +4973,7 @@ samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
 });
 
 samp.OnPlayerConnect(async(player) => {
+    Discord.sendLog("joinLeve", "GREEM", `${player.GetPlayerName(24)} [${player.playerid}] has been connected`);
     Player.ResetVariables(player.playerid);
     if(await checkPlayerBanStatus(player, false)) kickPlayer(player);
     else {
@@ -4997,6 +4998,7 @@ samp.OnPlayerConnect(async(player) => {
 });
 
 samp.OnPlayerDisconnect((player, reason) => {
+    Discord.sendLog("joinLeve", "RED", `${player.GetPlayerName(24)} [${player.playerid}] has been disconnected`);
     savePlayer(player);
 
     HideRankLabelFor(player);

@@ -28,6 +28,7 @@
     "md5": "^2.3.0",
     "mysql": "^2.18.1",
     "samp-node-lib": "^1.0.5",
+    "slash-command-builder": "^0.1.1",
     "youtube-audio-server": "^2.8.2",
     "youtube-search-without-api-key": "^1.0.6",
     "ytdl-core": "^4.9.1"
