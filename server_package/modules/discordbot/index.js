@@ -295,13 +295,12 @@ bot.on("interactionCreate", async (interaction) => {
 });
 
 /**
- * @param {"joinLeve"|"changeName"|"trade"|"give"|"buster"|"reports"|"ban"|"kick"|"adminCommands"} type 
+ * @param {"joinLeave"|"changeName"|"trade"|"give"|"buster"|"reports"|"ban"|"kick"|"adminCommands"} type 
  * @param {String} title 
  * @param {Discord.ColorResolvable} color 
  * @param {String} description
  */
 function sendLog(type, color, description) {
-    //Discord.sendLog("joinLeve", "RED", `${player.GetPlayerName(24)} [${player.playerid}] has been disconnected`);
     con.query("SELECT * FROM discordChannelLogs WHERE type = ?", [type], function(err, result) {
         if(err || result == 0) return;
         for(let i = 0; i < result.length; i++) {
@@ -313,7 +312,7 @@ function sendLog(type, color, description) {
             embed.setColor(color);
             embed.setTitle(`${type} LOG`);
             embed.setDescription(description);
-            channel.send() // to be continued ...
+            channel.send({embeds: [embed]})
         }
     });
 }

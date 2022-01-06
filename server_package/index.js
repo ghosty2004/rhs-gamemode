@@ -4973,7 +4973,7 @@ samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
 });
 
 samp.OnPlayerConnect(async(player) => {
-    Discord.sendLog("joinLeve", "GREEM", `${player.GetPlayerName(24)} [${player.playerid}] has been connected`);
+    Discord.sendLog("joinLeve", "GREEN", `${player.GetPlayerName(24)} [${player.playerid}] has been connected`);
     Player.ResetVariables(player.playerid);
     if(await checkPlayerBanStatus(player, false)) kickPlayer(player);
     else {

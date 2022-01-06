@@ -1,5 +1,5 @@
 module.exports = [
-    "joinLeve",
+    "joinLeave",
     "changeName",
     "trade",
     "give",
