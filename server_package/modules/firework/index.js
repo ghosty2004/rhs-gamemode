@@ -13,7 +13,7 @@ module.exports = {
     /**
      * @param {Number} object 
      * @param {Number} x 
-     * @param {Number y 
+     * @param {Number} y 
      * @param {Number} z 
      * @param {Number} radius 
      */
