@@ -1766,7 +1766,7 @@ CMD.on("gstats", (player, params) => {
     if(params[0]) target = getPlayer(params[0]);
     if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
     if(!Player.Info[target.playerid].Gang) return SendError(player, target == player ? Errors.NOT_MEMBER_OF_ANY_GANG : Errors.PLAYER_NOT_IN_ANY_GANG);
-    let OnlineTimeGang = TotalGameTimeGang(target);
+    let OnlineTimeGang = Function.totalGameTime(target, "gang");
     let info = "";
     info += `{BBFF00}Gang: {49FFFF}${Gang.Info[Player.Info[target.playerid].Gang].name}\n`;
     info += `{BBFF00}Kills: {49FFFF}${Player.Info[target.playerid].Gang_Data.Kills}\n`;
@@ -2019,7 +2019,7 @@ CMD.on("setspawn", (player, params) => {
             break;
         }
     }
-    saveClan(Player.Info[player.playerid].Clan);
+    Function.saveClan(Player.Info[player.playerid].Clan);
 });
 
 CMD.on("setcskin", (player, params) => {
@@ -2859,12 +2859,7 @@ CMD.on("setall", (player, params) => {
 /* ============== */
 CMD.on("saveall", (player) => {
     if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-    samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
-        savePlayer(i);
-        i.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has saved your {FF0000}account{FFFF00}!`);
-    });
-    Clan.Get().forEach((i) => { saveClan(i.id); });
-    Gang.Get().forEach((i) => { saveGang(i.id); });
+    Function.saveAll(player);
     SendACMD(player, "SaveAll");
 });
 
@@ -3708,7 +3703,7 @@ function SendMessageToAdmins(color, message) {
 }
 
 function showStats(player, target, offline_check=false) {
-    let OnlineTime = offline_check ? {hours: target.hours, minutes: target.minutes, seconds: target.seconds} : TotalGameTime(target);
+    let OnlineTime = offline_check ? {hours: target.hours, minutes: target.minutes, seconds: target.seconds} : Function.totalGameTime(target, "default");
     let info = "";
     info += "{FF4800}General statistics\n";
     info += `{BBFF00}Money: {49FFFF}$${Function.numberWithCommas(offline_check ? target.money : Player.Info[target.playerid].Money)}\n`;
@@ -3758,34 +3753,10 @@ function getPlayerStatsNote(player, offline_check=false) {
     if((offline_check ? player.driftpoints : Player.Info[player.playerid].Driving_Data.DriftPoints) >= 1000) note += 1;
     if((offline_check ? player.racepoints : Player.Info[player.playerid].Driving_Data.RacePoints) >= 100) note += 1;
     if((offline_check ? player.bestkillingspree : Player.Info[player.playerid].Kills_Data.BestKillingSpree) >= 100) note += 1;
-    if((offline_check ? player.hours : TotalGameTime(player).hours) >= 100) note += 1;
+    if((offline_check ? player.hours : Function.totalGameTime(player, "default").hours) >= 100) note += 1;
     if((offline_check ? player.respect_positive : Player.Info[player.playerid].Respect.Positive) >= 50) note += 1;
     if((offline_check ? player.coins : Player.Info[player.playerid].Coins) >= 25000) note += 1;
     return note;
-}
-
-function TotalGameTimeMonth(player) {
-    let total_time = ((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].ConnectTime) + (Player.Info[player.playerid].Month.OnlineTime.Hours*60*60) + (Player.Info[player.playerid].Month.OnlineTime.Minutes*60) + (Player.Info[player.playerid].Month.OnlineTime.Seconds));
-    let hours = Math.floor(total_time / 3600);
-    let minutes = Math.floor(total_time / 60) % 60;
-    let seconds = Math.floor(total_time % 60);
-    return {hours: hours, minutes: minutes, seconds: seconds};
-}
-
-function TotalGameTimeGang(player) {
-    let total_time = ((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].Gang_Data.ConnectTime) + (Player.Info[player.playerid].Gang_Data.OnlineTime.Hours*60*60) + (Player.Info[player.playerid].Gang_Data.OnlineTime.Minutes*60) + (Player.Info[player.playerid].Gang_Data.OnlineTime.Seconds));
-    let hours = Math.floor(total_time / 3600);
-    let minutes = Math.floor(total_time / 60) % 60;
-    let seconds = Math.floor(total_time % 60);
-    return {hours: hours, minutes: minutes, seconds: seconds};
-}
-
-function TotalGameTime(player) {
-    let total_time = ((Math.floor(Date.now() / 1000) - Player.Info[player.playerid].ConnectTime) + (Player.Info[player.playerid].OnlineTime.Hours*60*60) + (Player.Info[player.playerid].OnlineTime.Minutes*60) + (Player.Info[player.playerid].OnlineTime.Seconds));
-    let hours = Math.floor(total_time / 3600);
-    let minutes = Math.floor(total_time / 60) % 60;
-    let seconds = Math.floor(total_time % 60);
-    return {hours: hours, minutes: minutes, seconds: seconds};
 }
 
 function SendACMD(player, cmdtext) {
@@ -3940,52 +3911,6 @@ function getIDByAccName(AccName) {
             else resolve(null);
         });
     });
-}
-
-function saveClan(clanId) {
-    if(!Clan.Exists(clanId)) return;
-    con.query("UPDATE clans SET name = ?, owner = ?, position = ?, weapon = ?, color = ?, member_skin = ?, leader_skin = ?, kills = ?, deaths = ? WHERE ID = ?", [
-        Clan.Info[clanId].name, Clan.Info[clanId].owner, JSON.stringify(Clan.Info[clanId].position), JSON.stringify(Clan.Info[clanId].weapons), Clan.Info[clanId].color,
-        Clan.Info[clanId].skin.member, Clan.Info[clanId].skin.leader, Clan.Info[clanId].kills, Clan.Info[clanId].deaths, clanId
-    ]);
-}
-
-function saveGang(gangId) {
-    if(!Gang.Exists(gangId)) return;
-    con.query("UPDATE gangs SET name = ?, position = ?, weapon = ?, color = ?, alliance = ?, points = ?, captures = ?, kills = ?, deaths = ?, territory_position = ? WHERE ID = ?", [
-        Gang.Info[gangId].name, JSON.stringify(Gang.Info[gangId].position), JSON.stringify(Gang.Info[gangId].weapons), Gang.Info[gangId].color, Gang.Info[gangId].alliance, Gang.Info[gangId].points, Gang.Info[gangId].captures, 
-        Gang.Info[gangId].kills, Gang.Info[gangId].deaths, JSON.stringify([Gang.Info[gangId].territory.MinX, Gang.Info[gangId].territory.MinY, Gang.Info[gangId].territory.MaxX, Gang.Info[gangId].territory.MaxY]), gangId
-    ], function(err, result) {
-        if(err) console.log(err);
-    });
-}
-
-function savePlayer(player) {
-    if(!Player.Info[player.playerid].LoggedIn) return;
-    let OnlineTime = TotalGameTime(player);
-    let OnlineTimeGang = TotalGameTimeGang(player);
-    let OnlineTimeMonth = TotalGameTimeMonth(player);
-
-    con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, hours = ?, minutes = ?, seconds = ?, admin = ?, admin_points = ?, admin_kicks = ?, admin_warns = ?,\
-    admin_bans = ?, admin_reactiontests = ?, admin_mathtests = ?, admin_jails = ?, admin_mutes = ?, admin_clearchats = ?, admin_since = ?, VIP = ?, VIP_Expire = ?, clan = ?, clan_rank = ?, gang = ?, gang_rank = ?,\
-    gang_kills = ?, gang_deaths = ?, gang_captures = ?, gang_points = ?, gang_warns = ?, gang_hours = ?, gang_minutes = ?, gang_seconds = ?, gang_membersince = ?, kills = ?, headshots = ?, killingspree = ?,\
-    bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?, month_minutes = ?, month_seconds = ?, month_kills = ?, month_headshots = ?, month_killingspree = ?,\
-    month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?, month_racepoints = ?, description1 = ?, description2 = ?, description3 = ?, laston = ?, jailed = ?, caged = ?, kicks = ?,\
-    discord = ?, hold_settings = ? WHERE ID = ?", [
-        Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
-        OnlineTime.hours, OnlineTime.minutes, OnlineTime.seconds, Player.Info[player.playerid].Admin, Player.Info[player.playerid].AdminActivity.Points, Player.Info[player.playerid].AdminActivity.Kicks,
-        Player.Info[player.playerid].AdminActivity.Warns, Player.Info[player.playerid].AdminActivity.Bans, Player.Info[player.playerid].AdminActivity.ReactionTests, Player.Info[player.playerid].AdminActivity.MathTests,
-        Player.Info[player.playerid].AdminActivity.Jails, Player.Info[player.playerid].AdminActivity.Mutes, Player.Info[player.playerid].AdminActivity.ClearChats, Player.Info[player.playerid].AdminActivity.Since,  
-        Player.Info[player.playerid].VIP, Player.Info[player.playerid].VIP_Expire, Player.Info[player.playerid].Clan, Player.Info[player.playerid].Clan_Rank, Player.Info[player.playerid].Gang, Player.Info[player.playerid].Gang_Data.Rank, 
-        Player.Info[player.playerid].Gang_Data.Kills, Player.Info[player.playerid].Gang_Data.Deaths, Player.Info[player.playerid].Gang_Data.Captures, Player.Info[player.playerid].Gang_Data.Points, Player.Info[player.playerid].Gang_Data.Warns, 
-        OnlineTimeGang.hours, OnlineTimeGang.minutes, OnlineTimeGang.seconds, Player.Info[player.playerid].Gang_Data.MemberSince, Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, 
-        Player.Info[player.playerid].Kills_Data.KillingSpree, Player.Info[player.playerid].Kills_Data.BestKillingSpree, Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, 
-        Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].AdminPoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds,
-        Player.Info[player.playerid].Month.Kills_Data.Kills, Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, 
-        Player.Info[player.playerid].Month.Kills_Data.Deaths, Player.Info[player.playerid].Month.Driving_Data.DriftPoints, Player.Info[player.playerid].Month.Driving_Data.StuntPoints, Player.Info[player.playerid].Month.Driving_Data.RacePoints, 
-        Player.Info[player.playerid].Description[1], Player.Info[player.playerid].Description[2], Player.Info[player.playerid].Description[3], Function.getDateForLastOn(), Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Caged, 
-        Player.Info[player.playerid].Kicks, Player.Info[player.playerid].Discord, Player.Info[player.playerid].HoldsData.Settings, Player.Info[player.playerid].AccID
-    ]);
 }
 
 function ResetPlayerClanCreateVariables(player) {
@@ -4955,7 +4880,7 @@ samp.OnPlayerConnect(async(player) => {
 
 samp.OnPlayerDisconnect((player, reason) => {
     Discord.sendLog("joinLeave", "RED", `${player.GetPlayerName(24)} [${player.playerid}] has been disconnected`);
-    savePlayer(player);
+    Function.savePlayer(player);
 
     HideRankLabelFor(player);
     HideCapturingLabelFor(player);
