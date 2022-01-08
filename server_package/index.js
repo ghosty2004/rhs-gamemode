@@ -184,18 +184,18 @@ CMD.on("spassword", (player) => {
     con.query("SELECT spassword FROM users WHERE ID = ?", [Player.Info[player.playerid].AccID], function(err, result) {
         let info = "";
         if(result[0].spassword == "null") {
-            info += `${Lang(player, "{FF0000}Atentie!:", "{FF0000}Attention!:")}\n`;
+            info += `${Function.Lang(player, "{FF0000}Atentie!:", "{FF0000}Attention!:")}\n`;
             info += "\n";
-            info += `${Lang(player, "{FFCC00}Adaugandu-ti o Parola Secundara in cont, vei ridica cu mult gradul de securitate al acestuia!", "{FFCC00}By adding a Secondary Password in your Account, you will rise up it's security!")}\n`;
-            info += `${Lang(player, "{FFCC00}De cate ori vei intra pe server, va trebuii sa te loghezi cu ambele parole.", "{FFCC00}Each time you will join our server, you must login with both passwords.")}\n`;
+            info += `${Function.Lang(player, "{FFCC00}Adaugandu-ti o Parola Secundara in cont, vei ridica cu mult gradul de securitate al acestuia!", "{FFCC00}By adding a Secondary Password in your Account, you will rise up it's security!")}\n`;
+            info += `${Function.Lang(player, "{FFCC00}De cate ori vei intra pe server, va trebuii sa te loghezi cu ambele parole.", "{FFCC00}Each time you will join our server, you must login with both passwords.")}\n`;
             info += "\n";
-            info += `${Lang(player, "{BBFF00}Te rugam sa introduci {FF0000}Parola Secundara{BBFF00}:", "{BBFF00}Please enter before the {FF0000}Secondary Password{BBFF00}:")}`;
-            player.ShowPlayerDialog(Dialog.SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Parola Secundara", "Secondary Password"), info, "Ok", Lang(player, "Renunta", "Cancel"));
+            info += `${Function.Lang(player, "{BBFF00}Te rugam sa introduci {FF0000}Parola Secundara{BBFF00}:", "{BBFF00}Please enter before the {FF0000}Secondary Password{BBFF00}:")}`;
+            player.ShowPlayerDialog(Dialog.SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Parola Secundara", "Secondary Password"), info, "Ok", Function.Lang(player, "Renunta", "Cancel"));
         }
         else {
-            info += `${Lang(player, "{49FFFF}Schimba Parola Secundara", "{49FFFF}Change Secondary Password")}\n`;
-            info += `${Lang(player, "{FF0000}Dezactiveaza Parola Secundara", "{FF0000}Remove Secondary Password")}\n`;
-            player.ShowPlayerDialog(Dialog.SPASSWORD_OPTIONS, samp.DIALOG_STYLE.LIST, Lang(player, "Parola Secundara", "Secondary Password"), info, Lang(player, "Selecteaza", "Select"), Lang(player, "Renunta", "Cancel"));
+            info += `${Function.Lang(player, "{49FFFF}Schimba Parola Secundara", "{49FFFF}Change Secondary Password")}\n`;
+            info += `${Function.Lang(player, "{FF0000}Dezactiveaza Parola Secundara", "{FF0000}Remove Secondary Password")}\n`;
+            player.ShowPlayerDialog(Dialog.SPASSWORD_OPTIONS, samp.DIALOG_STYLE.LIST, Function.Lang(player, "Parola Secundara", "Secondary Password"), info, Function.Lang(player, "Selecteaza", "Select"), Function.Lang(player, "Renunta", "Cancel"));
         }
     });
 });
@@ -324,14 +324,14 @@ CMD.on("vworld", (player, params) => {
     player.SetPlayerVirtualWorld(params[0]);
     player.SendClientMessage(data.colors.LIGHT_BLUE, `You have setted your virtual world to ${params[0]}.`);
     let info = "";
-    info += `${Lang(player, "Commanda /vw te ajuta sa schimbi lumea in care te joci!", "Command /vw help you to change the world where you play!")}\n`;
-    info += `${Lang(player, "In aceasta lume esti singur! Toate vehiculele au disparut de pe harta!", "In this new world you are alone! All vehicles have disappeared off the map!")}\n`;
-    info += `${Lang(player, "Pentru alte vehicule foloseste /car <numele masini>!", "For other vehicle use the command /car <car name>!")}\n`;
+    info += `${Function.Lang(player, "Commanda /vw te ajuta sa schimbi lumea in care te joci!", "Command /vw help you to change the world where you play!")}\n`;
+    info += `${Function.Lang(player, "In aceasta lume esti singur! Toate vehiculele au disparut de pe harta!", "In this new world you are alone! All vehicles have disappeared off the map!")}\n`;
+    info += `${Function.Lang(player, "Pentru alte vehicule foloseste /car <numele masini>!", "For other vehicle use the command /car <car name>!")}\n`;
     info += "\n";
-    info += `${Lang(player, "Iti poti invita prietenii in aceasta lume folosind /pm pentru a avea un duel sau o cursa!", "You can invite your friends with /pm in this world for have a duel or a race!")}\n`;
+    info += `${Function.Lang(player, "Iti poti invita prietenii in aceasta lume folosind /pm pentru a avea un duel sau o cursa!", "You can invite your friends with /pm in this world for have a duel or a race!")}\n`;
     info += "\n";
-    info += `${Lang(player, "Pentru a te intoarce inapoi in lumea normala cu toti jucatori foloseste /vw 0 sau teleporteazate! Exemplu /lv", "To return to the normal world with other players use /vw 0 or teleport in one place! For example /lv")}`;
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Lumea mea virtuala", "My Virutal World"), info, "Ok", "");
+    info += `${Function.Lang(player, "Pentru a te intoarce inapoi in lumea normala cu toti jucatori foloseste /vw 0 sau teleporteazate! Exemplu /lv", "To return to the normal world with other players use /vw 0 or teleport in one place! For example /lv")}`;
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Lumea mea virtuala", "My Virutal World"), info, "Ok", "");
 });
 CMD.on("vw", (player, params) => { CMD.emit("vworld", player, params); });
 
@@ -390,12 +390,12 @@ CMD.on("bweapons", (player) => {
 
 CMD.on("para", (player) => {
     player.GivePlayerWeapon(46, 1);
-    player.SendClientMessage(data.colors.GREEN, Lang(player, "Ai primit o {00BBF6}Parasuta{00FF00}!", "You took a {00BBF6}Parachute{00FF00}!"));
+    player.SendClientMessage(data.colors.GREEN, Function.Lang(player, "Ai primit o {00BBF6}Parasuta{00FF00}!", "You took a {00BBF6}Parachute{00FF00}!"));
 });
 
 CMD.on("camera", (player) => {
     player.GivePlayerWeapon(43, 9999);
-    player.SendClientMessage(data.colors.GREEN, Lang(player, "Ai primit un {00BBF6}Aparat foto{00FF00}!", "You took a {00BBF6}Camera{00FF00}!"));
+    player.SendClientMessage(data.colors.GREEN, Function.Lang(player, "Ai primit un {00BBF6}Aparat foto{00FF00}!", "You took a {00BBF6}Camera{00FF00}!"));
 });
 
 CMD.on("dick", (player) => {
@@ -567,7 +567,7 @@ CMD.on("up", (player, params) => {
     if(params[0] < 0 || params[0] > 3000) return SendError(player, "Invalid height (0-3000)!");
     player.GivePlayerWeapon(46, 1);
     player.SetPlayerPos(player.position.x, player.position.y, player.position.z + params[0]);
-    player.SendClientMessage(data.colors.GREEN, Lang(player, `Te-ai teleportat la {00BBF6}${params[0]} metri {00FF00}altitudine!`, `You have been teleported to {00BBF6}${params[0]} meters {00FF00}altitude!`));
+    player.SendClientMessage(data.colors.GREEN, Function.Lang(player, `Te-ai teleportat la {00BBF6}${params[0]} metri {00FF00}altitudine!`, `You have been teleported to {00BBF6}${params[0]} meters {00FF00}altitude!`));
 });
 
 CMD.on("dive", (player) => {
@@ -688,12 +688,12 @@ CMD.on("email", (player) => {
 });
 
 CMD.on("buyvip", (player) => {
-    let info = `${Lang(player, "Item\tPret\tValabilitate", "Item\tPrice\tValidity")}\n`;
-    info += `${Lang(player, "{FF0000}Rosu\t{00BBF6}Gratis!\t{00FF00}Permanent!", "{FF0000}Red\t{00BBF6}Free!\t{00FF00}Permanent!")}\n`;
-    info += `${Lang(player, "{FFFF00}Galben\t{BBFF00}20.000 Coins + 20 Ore\t{00FF00}Permanent!", "{FFFF00}Yellow\t{BBFF00}20.000 Coins + 20 Hours\t{00FF00}Permanent!")}\n`;
-    info += `${Lang(player, "{0077FF}Albastru\t{BBFF00}80.000 Coins + 80 Ore\t{00FF00}Permanent!", "{0077FF}Blue\t{BBFF00}80.000 Coins + 80 Hours\t{00FF00}Permanent!")}\n`;
-    info += `${Lang(player, "{FFFFFF}Alb\t{BBFF00}150.000 Coins + 150 Ore\t{00BBF6}30 Zile!", "{FFFFFF}White\t{BBFF00}150.000 Coins + 150 Hours\t{00BBF6}30 Days!")}`;
-    player.ShowPlayerDialog(Dialog.BUYVIP, samp.DIALOG_STYLE.TABLIST_HEADERS, Lang(player, "Cumpara VIP - Scrie {FF0000}/vcmds {D1D1D1}pentru comenzi.", "Buy VIP - Type {FF0000}/vcmds {D1D1D1}for commands."), info, Lang(player, "Cumpara", "Buy"), Lang(player, "Inchide", "Close"));
+    let info = `${Function.Lang(player, "Item\tPret\tValabilitate", "Item\tPrice\tValidity")}\n`;
+    info += `${Function.Lang(player, "{FF0000}Rosu\t{00BBF6}Gratis!\t{00FF00}Permanent!", "{FF0000}Red\t{00BBF6}Free!\t{00FF00}Permanent!")}\n`;
+    info += `${Function.Lang(player, "{FFFF00}Galben\t{BBFF00}20.000 Coins + 20 Ore\t{00FF00}Permanent!", "{FFFF00}Yellow\t{BBFF00}20.000 Coins + 20 Hours\t{00FF00}Permanent!")}\n`;
+    info += `${Function.Lang(player, "{0077FF}Albastru\t{BBFF00}80.000 Coins + 80 Ore\t{00FF00}Permanent!", "{0077FF}Blue\t{BBFF00}80.000 Coins + 80 Hours\t{00FF00}Permanent!")}\n`;
+    info += `${Function.Lang(player, "{FFFFFF}Alb\t{BBFF00}150.000 Coins + 150 Ore\t{00BBF6}30 Zile!", "{FFFFFF}White\t{BBFF00}150.000 Coins + 150 Hours\t{00BBF6}30 Days!")}`;
+    player.ShowPlayerDialog(Dialog.BUYVIP, samp.DIALOG_STYLE.TABLIST_HEADERS, Function.Lang(player, "Cumpara VIP - Scrie {FF0000}/vcmds {D1D1D1}pentru comenzi.", "Buy VIP - Type {FF0000}/vcmds {D1D1D1}for commands."), info, Function.Lang(player, "Cumpara", "Buy"), Function.Lang(player, "Inchide", "Close"));
 });
 
 CMD.on("stats", (player, params) => {
@@ -722,20 +722,20 @@ CMD.on("ajutor", (player) => { CMD.emit("help", player); });
 
 CMD.on("rules", (player) => {
     let info = "";
-    info += `${Lang(player, "{FFEB7B}REGULAMENT {FF0000}- Ce iti este interzis sa faci pe server!", "{FFEB7B}RULES {FF0000}- What you are forbidden to do on server!")}\n`;
+    info += `${Function.Lang(player, "{FFEB7B}REGULAMENT {FF0000}- Ce iti este interzis sa faci pe server!", "{FFEB7B}RULES {FF0000}- What you are forbidden to do on server!")}\n`;
     info += "\n";
-    info += `{FF0000}1 - {00BBF6}${Lang(player, "Utilizarea programelor/modurilor ce iti ofera avantaje fata de restul jucatorilor este strict interizsa!", "Use of programs/mods that gives you advantages in front of other players are forbidden!")}\n`;
-    info += `{FF0000}2 - {00BBF6}${Lang(player, "Te rugam sa pastrezi un limbaj decent pe chat si respecta pe ceilalti altfel vei primii /mute sau chiar /ban.", "We ask you to keep a decent language on chat and respect others otherwise you will get muted or banned!")}\n`;
-    info += `{FF0000}3 - {00BBF6}${Lang(player, "Nu ai voie sa faci spam in chat!Pentru anunturi te rog sa folosesti doar /ad /vad.", "You are not allowed to spam the chat!For announces use /ad or /vad only.")}\n`;
-    info += `{FF0000}4 - {00BBF6}${Lang(player, "Nu abuzati de buguri. Daca ai gasit un bug, raporteaza-l imediat unui Owner.", "Dont abuse of server bugs.If you find any bug,please report it as fast as you can to a Owner.")}\n`;
-    info += `{FF0000}5 - {00BBF6}${Lang(player, "Nu faceti DM/Death Match in zonele cu mod de joc diferit fata de deathmatch.(ex:/aa /plaja /drag...etc)", "Dont kill players outside the deatmatch zones like /aa /beach /drag...and so on.")}\n`;
-    info += `{FF0000}6 - {00BBF6}${Lang(player, "Nu ai voie sa faci reclama altor servere comunitati sau canale de youtube unde jucatorii pot fi indrumati spre alte servere.", "You are not allowed to advertise other servers,communities or youtube channels that might lead players to other servers.")}\n`;
+    info += `{FF0000}1 - {00BBF6}${Function.Lang(player, "Utilizarea programelor/modurilor ce iti ofera avantaje fata de restul jucatorilor este strict interizsa!", "Use of programs/mods that gives you advantages in front of other players are forbidden!")}\n`;
+    info += `{FF0000}2 - {00BBF6}${Function.Lang(player, "Te rugam sa pastrezi un limbaj decent pe chat si respecta pe ceilalti altfel vei primii /mute sau chiar /ban.", "We ask you to keep a decent language on chat and respect others otherwise you will get muted or banned!")}\n`;
+    info += `{FF0000}3 - {00BBF6}${Function.Lang(player, "Nu ai voie sa faci spam in chat!Pentru anunturi te rog sa folosesti doar /ad /vad.", "You are not allowed to spam the chat!For announces use /ad or /vad only.")}\n`;
+    info += `{FF0000}4 - {00BBF6}${Function.Lang(player, "Nu abuzati de buguri. Daca ai gasit un bug, raporteaza-l imediat unui Owner.", "Dont abuse of server bugs.If you find any bug,please report it as fast as you can to a Owner.")}\n`;
+    info += `{FF0000}5 - {00BBF6}${Function.Lang(player, "Nu faceti DM/Death Match in zonele cu mod de joc diferit fata de deathmatch.(ex:/aa /plaja /drag...etc)", "Dont kill players outside the deatmatch zones like /aa /beach /drag...and so on.")}\n`;
+    info += `{FF0000}6 - {00BBF6}${Function.Lang(player, "Nu ai voie sa faci reclama altor servere comunitati sau canale de youtube unde jucatorii pot fi indrumati spre alte servere.", "You are not allowed to advertise other servers,communities or youtube channels that might lead players to other servers.")}\n`;
     info += "\n";
-    info += `{FFFF00}${Lang(player, "Acestea sunt doar cateva din regulile generale ale serverului!", "Those are only a few rules that you should know!")}\n`;
-    info += `{FFFF00}${Lang(player, "Pentru mai multe reguli si informatii despre ce ai si ce nu ai voie sa faci pe server foloseste comanda {FFEB7B}/important{FFFF00}.", "For more rules and infos about what you are allowed to do and not, use {FFEB7B}/important {FFFF00}cmd.")}\n`;
+    info += `{FFFF00}${Function.Lang(player, "Acestea sunt doar cateva din regulile generale ale serverului!", "Those are only a few rules that you should know!")}\n`;
+    info += `{FFFF00}${Function.Lang(player, "Pentru mai multe reguli si informatii despre ce ai si ce nu ai voie sa faci pe server foloseste comanda {FFEB7B}/important{FFFF00}.", "For more rules and infos about what you are allowed to do and not, use {FFEB7B}/important {FFFF00}cmd.")}\n`;
     info += "\n";
-    info += `{FFEB7B}${Lang(player, "Iti multumim pentru ca ti-ai dedicat un minut din viata citind aceste reguli! Iti dorim distractie placuta!", "Thank you for dedicating a minute of your life to read these rules! Have fun!")}`;
-    player.ShowPlayerDialog(Dialog.RULES, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- ${Lang(player, "Reguli", "Rules")}!`, info, Lang(player, "Inchide", "Close"), "Important");
+    info += `{FFEB7B}${Function.Lang(player, "Iti multumim pentru ca ti-ai dedicat un minut din viata citind aceste reguli! Iti dorim distractie placuta!", "Thank you for dedicating a minute of your life to read these rules! Have fun!")}`;
+    player.ShowPlayerDialog(Dialog.RULES, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- ${Function.Lang(player, "Reguli", "Rules")}!`, info, Function.Lang(player, "Inchide", "Close"), "Important");
 });
 
 CMD.on("tutorial", (player) => {
@@ -780,7 +780,7 @@ CMD.on("tutorial", (player) => {
             break;
         }
     }
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Tutorial - Cum poti face 10/10 stats!", "Tutorial - How to make 10/10 stats!"), info, "Ok", "");
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Tutorial - Cum poti face 10/10 stats!", "Tutorial - How to make 10/10 stats!"), info, "Ok", "");
 });
 
 CMD.on("credits", async (player) => {
@@ -1262,7 +1262,7 @@ CMD.on("vcmds", (player, params) => {
         }
     }
 
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Lang(player, "{FFCC00}Comenzi VIP - {FF0000}/BuyVIP, /Vips.", "{FFCC00}VIP Commands - {FF0000}/BuyVIP, /Vips."), info, Lang(player, "Inchide", "Close"), "");
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "{FFCC00}Comenzi VIP - {FF0000}/BuyVIP, /Vips.", "{FFCC00}VIP Commands - {FF0000}/BuyVIP, /Vips."), info, Function.Lang(player, "Inchide", "Close"), "");
 });
 
 /* ================ */
@@ -1436,7 +1436,7 @@ CMD.on("mycolor", (player) => {
             break;
         }
     }
-    player.ShowPlayerDialog(Dialog.MY_COLOR, samp.DIALOG_STYLE.LIST, "Color {FF0000}Menu", info, Lang(player, "Schimba", "Change"), Lang(player, "Inchide", "Close"));
+    player.ShowPlayerDialog(Dialog.MY_COLOR, samp.DIALOG_STYLE.LIST, "Color {FF0000}Menu", info, Function.Lang(player, "Schimba", "Change"), Function.Lang(player, "Inchide", "Close"));
 });
 
 CMD.on("vbike", (player) => {
@@ -3877,11 +3877,11 @@ function replaceAll(string, search, replace) {
 function SendAntiSpam(player, time, type) {
     switch(type) {
         case 0: {
-            player.SendClientMessage(data.colors.LIGHT_YELLOW, Lang(player, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${time}{BBFF00} secunde pentru a scrie ceva din nou!`, `ANTI-SPAM: {BBFF00}Please wait {00BBF6}${time}{BBFF00} seconds to write something again!`));
+            player.SendClientMessage(data.colors.LIGHT_YELLOW, Function.Lang(player, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${time}{BBFF00} secunde pentru a scrie ceva din nou!`, `ANTI-SPAM: {BBFF00}Please wait {00BBF6}${time}{BBFF00} seconds to write something again!`));
             break;
         }
         case 1: {
-            player.SendClientMessage(data.colors.LIGHT_YELLOW, Lang(player, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${time}{BBFF00} secunde pentru a folosi comenzi din nou!`, `ANTI-SPAM: {BBFF00}Please wait {00BBF6}${time}{BBFF00} seconds to use commands again!`));
+            player.SendClientMessage(data.colors.LIGHT_YELLOW, Function.Lang(player, `ANTI-SPAM: {BBFF00}Te rugam asteapta {00BBF6}${time}{BBFF00} secunde pentru a folosi comenzi din nou!`, `ANTI-SPAM: {BBFF00}Please wait {00BBF6}${time}{BBFF00} seconds to use commands again!`));
             break;
         }
     }
@@ -4295,16 +4295,12 @@ function validateEmail(email) {
     return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email);
 }
 
-function Lang(player, ro_string, en_string) {
-    return Player.Info[player.playerid].Language == 1 ? ro_string : en_string;
-}
-
 function SendUsage(player, text) {
     player.SendClientMessage(0xFF0000AA, `USAGE: {49FFFF}${text}`);
 }
 
 function SendError(player, ro_error, en_error=ro_error /* Set default value for en error if it's missing */) {
-    player.SendClientMessage(0xFF0000AA, `ERROR: ${Lang(player, ro_error, en_error)}`);
+    player.SendClientMessage(0xFF0000AA, `ERROR: ${Function.Lang(player, ro_error, en_error)}`);
 }
 
 function ShowImportant(player, page) {
@@ -4343,7 +4339,7 @@ function ShowImportant(player, page) {
                     break;
                 }
             }
-            player.ShowPlayerDialog(Dialog.IMPORTANT_1, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- Important!`, info, Lang(player, "Pagina 2", "Page 2"), Lang(player, "Reguli", "Rules"));
+            player.ShowPlayerDialog(Dialog.IMPORTANT_1, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- Important!`, info, Function.Lang(player, "Pagina 2", "Page 2"), Function.Lang(player, "Reguli", "Rules"));
             break;
         }
         case 2: {
@@ -4379,7 +4375,7 @@ function ShowImportant(player, page) {
                     break;
                 }
             }
-            player.ShowPlayerDialog(Dialog.IMPORTANT_2, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- Important!`, info, "Accept", Lang(player, "Pagina 1", "Page 1"));
+            player.ShowPlayerDialog(Dialog.IMPORTANT_2, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- Important!`, info, "Accept", Function.Lang(player, "Pagina 1", "Page 1"));
             break;
         }
     }
@@ -4418,7 +4414,7 @@ function ShowCMDS(player, page) {
             info += `{FFCC00}/weapons {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "Cumpara-ti niste 'jucarii'." : "Buy some 'toys'."}\n`;
             info += `{FFCC00}/fweapons {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "Cumpara-ti niste 'jucarii' de copii mici." : "Buy some kids 'toys'."}\n`;
             info += `{FFCC00}/bweapons {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "Cumpara-ti niste 'jucarii' de baieti mari. :))" : "Buy some big boys 'toys'. :))"}\n`;
-            player.ShowPlayerDialog(Dialog.CMDS_1, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Comenzi - Pagina {FF0000}1", "Commands - Page {FF0000}1"), info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", Player.Info[player.playerid].Language == 1 ? "Pagina 2" : "Page 2");
+            player.ShowPlayerDialog(Dialog.CMDS_1, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Comenzi - Pagina {FF0000}1", "Commands - Page {FF0000}1"), info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", Player.Info[player.playerid].Language == 1 ? "Pagina 2" : "Page 2");
             break;
         }
         case 2: {
@@ -4450,7 +4446,7 @@ function ShowCMDS(player, page) {
             info += `{FF0000}/hidetag {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Ascunde-ti tie sau celorlalti jucatori tag-ul!" : "Hide your/others' tag."}\n`;
             info += `{FF0000}/vCmds {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Vezi o lista cu comenzile de VIP." : "View a list with all VIP Commands."}\n`;
             info += `{FF0000}/vup {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Activeaza/Dezactiveaza functia de VUP a vehiculului." : "Activate/Deactivate Vehicle's VUP Function."}\n`;
-            player.ShowPlayerDialog(Dialog.CMDS_2, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Comenzi - Pagina {FF0000}2", "Commands - Page {FF0000}2"), info, Lang(player, "Pagina 1", "Page 1"), Lang(player, "Pagina 3", "Page 3"));
+            player.ShowPlayerDialog(Dialog.CMDS_2, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Comenzi - Pagina {FF0000}2", "Commands - Page {FF0000}2"), info, Function.Lang(player, "Pagina 1", "Page 1"), Function.Lang(player, "Pagina 3", "Page 3"));
             break;
         }
         case 3: {
@@ -4479,7 +4475,7 @@ function ShowCMDS(player, page) {
             info += `{FF0000}/wtime {05C81F}- ${Player.Info[player.playerid].Language == 1 ? "Pentru a vedea cat este ceasul!" : "To see what the clock is!"}\n`;
             info += `{FF0000}/blacklisted {05C81F}- ${Player.Info[player.playerid].Language == 1 ? "Pentru a vedea cine se afla pe lista neagra!" : "To see who is blacklisted!"}\n`;
             info += `{FF0000}/email {05C81F}- ${Player.Info[player.playerid].Language == 1 ? "Pentru a schimba sau adauga un e-mail in contul tau!" : "To change or add a e-mail to your account!"}\n`;
-            player.ShowPlayerDialog(Dialog.CMDS_3, samp.DIALOG_STYLE.MSGBOX, Lang(player, "Comenzi - Pagina {FF0000}3", "Commands - Page {FF0000}3"), info, Lang(player, "Inchide", "Close"), Lang(player, "Pagina 2", "Page 2"));
+            player.ShowPlayerDialog(Dialog.CMDS_3, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Comenzi - Pagina {FF0000}3", "Commands - Page {FF0000}3"), info, Function.Lang(player, "Inchide", "Close"), Function.Lang(player, "Pagina 2", "Page 2"));
             break;
         }
     }
@@ -4494,19 +4490,19 @@ function PreparatePlayerLogin(player) {
         if(err) return player.Kick();
         if(result == 0) { /* Register */
             let info = "";
-            info += `{FFFF00}${Lang(player, `Salut, {FF0000}${player.GetPlayerName(24)}{FFFF00}!`, `Hi, {FF0000}${player.GetPlayerName(24)}{FFFF00}!`)}\n`;
+            info += `{FFFF00}${Function.Lang(player, `Salut, {FF0000}${player.GetPlayerName(24)}{FFFF00}!`, `Hi, {FF0000}${player.GetPlayerName(24)}{FFFF00}!`)}\n`;
             info += "\n";
-            info += `{FFCC00}${Lang(player, "Numele tau nu este inregistrat. Te rugam sa-l inregistrezi pentru a-ti salva statisticile!", "Your name is not registered. Please register it to save your statistics!")}\n`;
-            info += `{FFFF00}${Lang(player, "Introdu o parola grea pe care doar tu sa o stii pentru a te autentifica! ({FF0000}intre 3-25 de caractere{FFFF00}):", "Enter a hard password before ({FF0000}Min. 3 - Max. 25 characters{FFFF00}):")}`;
-            player.ShowPlayerDialog(Dialog.REGISTER, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Inregistreaza-ti numele!", "Register your name!"), info, "Register", Lang(player, "Nume Nou", "New Name"));
+            info += `{FFCC00}${Function.Lang(player, "Numele tau nu este inregistrat. Te rugam sa-l inregistrezi pentru a-ti salva statisticile!", "Your name is not registered. Please register it to save your statistics!")}\n`;
+            info += `{FFFF00}${Function.Lang(player, "Introdu o parola grea pe care doar tu sa o stii pentru a te autentifica! ({FF0000}intre 3-25 de caractere{FFFF00}):", "Enter a hard password before ({FF0000}Min. 3 - Max. 25 characters{FFFF00}):")}`;
+            player.ShowPlayerDialog(Dialog.REGISTER, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Inregistreaza-ti numele!", "Register your name!"), info, "Register", Function.Lang(player, "Nume Nou", "New Name"));
         }
         else { /* Login */
             let info = "";
-            info += `{FFFF00}${Lang(player, `Bine ai revenit {FF0000}${player.GetPlayerName(24)}{FFFF00}!`, `Welcome back {FF0000}${player.GetPlayerName(24)}{FFFF00}!`)}\n`;
+            info += `{FFFF00}${Function.Lang(player, `Bine ai revenit {FF0000}${player.GetPlayerName(24)}{FFFF00}!`, `Welcome back {FF0000}${player.GetPlayerName(24)}{FFFF00}!`)}\n`;
             info += "\n";
-            info += `{FFCC00}${Lang(player, "Trebuie sa te autentifici cu parola acestui cont inainte de a continua!", "Please login password for this account before continuing!")}\n`;
-            info += `{FFFF00}${Lang(player, "Daca acesta nu este numele contului tau, apasa pe butonul {FF0000}Nume Nou{FFFF00}!", "If this is not your account name, click on the {FF0000}New Name{FFFF00}!")}`;
-            player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Autentificare", "Login"), info, Lang(player, "Autentificare", "Login"), Lang(player, "Nume Nou", "New Name"));
+            info += `{FFCC00}${Function.Lang(player, "Trebuie sa te autentifici cu parola acestui cont inainte de a continua!", "Please login password for this account before continuing!")}\n`;
+            info += `{FFFF00}${Function.Lang(player, "Daca acesta nu este numele contului tau, apasa pe butonul {FF0000}Nume Nou{FFFF00}!", "If this is not your account name, click on the {FF0000}New Name{FFFF00}!")}`;
+            player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Autentificare", "Login"), info, Function.Lang(player, "Autentificare", "Login"), Function.Lang(player, "Nume Nou", "New Name"));
         }
     });
 }
@@ -4860,13 +4856,13 @@ samp.OnPlayerEditAttachedObject((player, response, index, modelid, boneid, fOffs
 samp.OnPlayerClickPlayer((player, clickedplayer) => {
     Player.Info[player.playerid].ClickedPlayer = clickedplayer.playerid;
     let info = "";
-    info += `{0072FF}${Lang(player, "Vezi statistici", "Show Stats")} - {00FF00}/stats\n`;
-    info += `{0072FF}${Lang(player, "Vezi statistici gang", "Show Gang Stats")} - {00FF00}/gstats\n`;
-    info += `{0072FF}${Lang(player, "Vezi statistici clan", "Show Clan Stats")} - {00FF00}/cinfo\n`;
-    info += `{0072FF}${Lang(player, "Vezi statistici admin", "Show Admin Stats")} - {00FF00}/astats\n`;
-    info += `{0072FF}${Lang(player, "Trimite PM", "Send PM")} - {00FF00}/PM\n`;
-    info += `{0072FF}${Lang(player, "Urmareste jucator", "Spectate him")} - {00FF00}/spec`;
-    player.ShowPlayerDialog(Dialog.PLAYER_CLICK, samp.DIALOG_STYLE.LIST, Lang(player, `{AAAAAA}Ai dat click pe {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`, `{AAAAAA}You have clicked {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`), info, "Select", "Close");
+    info += `{0072FF}${Function.Lang(player, "Vezi statistici", "Show Stats")} - {00FF00}/stats\n`;
+    info += `{0072FF}${Function.Lang(player, "Vezi statistici gang", "Show Gang Stats")} - {00FF00}/gstats\n`;
+    info += `{0072FF}${Function.Lang(player, "Vezi statistici clan", "Show Clan Stats")} - {00FF00}/cinfo\n`;
+    info += `{0072FF}${Function.Lang(player, "Vezi statistici admin", "Show Admin Stats")} - {00FF00}/astats\n`;
+    info += `{0072FF}${Function.Lang(player, "Trimite PM", "Send PM")} - {00FF00}/PM\n`;
+    info += `{0072FF}${Function.Lang(player, "Urmareste jucator", "Spectate him")} - {00FF00}/spec`;
+    player.ShowPlayerDialog(Dialog.PLAYER_CLICK, samp.DIALOG_STYLE.LIST, Function.Lang(player, `{AAAAAA}Ai dat click pe {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`, `{AAAAAA}You have clicked {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`), info, "Select", "Close");
     return true;
 });
 
@@ -5755,11 +5751,11 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                             if(Player.Info[player.playerid].Fail_Logins == 4) player.Kick();
                             else {
                                 let info = "";
-                                info += `{FF0000}${Lang(player, `Autentificare esuata (${Player.Info[player.playerid].Fail_Logins}/4)!`, `Login failed (${Player.Info[player.playerid].Fail_Logins}/4)!`)}\n`;
+                                info += `{FF0000}${Function.Lang(player, `Autentificare esuata (${Player.Info[player.playerid].Fail_Logins}/4)!`, `Login failed (${Player.Info[player.playerid].Fail_Logins}/4)!`)}\n`;
                                 info += "\n";
-                                info += `{FFCC00}${Lang(player, "Ai introdus o parola secundara gresita! Te rugam sa incerci din nou!", "You have entered a wrong secondary password! Please try again!")}\n`;
-                                info += `{FFFF00}${Lang(player, `Daca ti-ai uitat parola secundara, viziteaza {FF0000}${data.settings.SERVER_WEB} {FFFF00}pentru a o reseta!`, `If you forgot your secondary password, visit {FF0000}${data.settings.SERVER_WEB} {FFFF00}to reset it!`)}`
-                                player.ShowPlayerDialog(Dialog.LOGIN_SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Autentificare - Parola Secundara", "Login - Secondary Password"), info, Lang(player, "Autentificare", "Login"), Lang(player, "Nume Nou", "New Name"));
+                                info += `{FFCC00}${Function.Lang(player, "Ai introdus o parola secundara gresita! Te rugam sa incerci din nou!", "You have entered a wrong secondary password! Please try again!")}\n`;
+                                info += `{FFFF00}${Function.Lang(player, `Daca ti-ai uitat parola secundara, viziteaza {FF0000}${data.settings.SERVER_WEB} {FFFF00}pentru a o reseta!`, `If you forgot your secondary password, visit {FF0000}${data.settings.SERVER_WEB} {FFFF00}to reset it!`)}`
+                                player.ShowPlayerDialog(Dialog.LOGIN_SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Autentificare - Parola Secundara", "Login - Secondary Password"), info, Function.Lang(player, "Autentificare", "Login"), Function.Lang(player, "Nume Nou", "New Name"));
                             }
                         }
                         else {
@@ -5776,7 +5772,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             if(response) {
                 con.query("UPDATE users SET spassword = ? WHERE ID = ?", [md5(inputtext), Player.Info[player.playerid].AccID], function(err, result) {
                     if(!err) {
-                        player.SendClientMessage(-1, Lang(player, "{FF0000}Parola Secundara {FFFF00}a fost inregistrata! Scrie {FF0000}/SPassword {FFFF00}pentru detalii si optiuni!", "{FFFF00}The {FF0000}Secondary Password {FFFF00}was registered! Type {FF0000}/SPassword {FFFF00}for details and options!"));
+                        player.SendClientMessage(-1, Function.Lang(player, "{FF0000}Parola Secundara {FFFF00}a fost inregistrata! Scrie {FF0000}/SPassword {FFFF00}pentru detalii si optiuni!", "{FFFF00}The {FF0000}Secondary Password {FFFF00}was registered! Type {FF0000}/SPassword {FFFF00}for details and options!"));
                     }
                 });
             }
@@ -5786,13 +5782,13 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             if(response) {
                 switch(listitem) {
                     case 0: {
-                        player.ShowPlayerDialog(Dialog.SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Parola Secundara", "Secondary Password"), Lang(player, "{FFFF00}Te rugam sa introduci {FF0000}Parola Secundara{FFFF00}:", "{FFFF00}Please enter below the {FF0000}Secondary Password{FFFF00}:"), "Ok", Lang(player, "Renunta", "Cancel"));
+                        player.ShowPlayerDialog(Dialog.SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Parola Secundara", "Secondary Password"), Function.Lang(player, "{FFFF00}Te rugam sa introduci {FF0000}Parola Secundara{FFFF00}:", "{FFFF00}Please enter below the {FF0000}Secondary Password{FFFF00}:"), "Ok", Function.Lang(player, "Renunta", "Cancel"));
                         break;
                     }
                     case 1: {
                         con.query("UPDATE users SET spassword = ? WHERE ID = ?", ["null", Player.Info[player.playerid].AccID], function(err, result) {
                             if(!err) {
-                                player.SendClientMessage(-1, Lang(player, "{FF0000}Parola Secundara {FFFF00}a fost scoasa! Scrie {FF0000}/SPassword {FFFF00}pentru a adauga alta!", "{FFFF00}The {FF0000}Secondary Password {FFFF00}was removed! Type {FF0000}/SPassword {FFFF00}to add another!"));
+                                player.SendClientMessage(-1, Function.Lang(player, "{FF0000}Parola Secundara {FFFF00}a fost scoasa! Scrie {FF0000}/SPassword {FFFF00}pentru a adauga alta!", "{FFFF00}The {FF0000}Secondary Password {FFFF00}was removed! Type {FF0000}/SPassword {FFFF00}to add another!"));
                             }
                         });
                         break;
@@ -6155,17 +6151,17 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.STATS: {
             if(!response) {
                 let info = "";
-                info += `{0072FF}${Lang(player, "Descriere Linia 1", "Description Line 1")}\n`;
-                info += `{FFFF00}${Lang(player, "Descriere Linia 2", "Description Line 2")}\n`;
-                info += `{FF0000}${Lang(player, "Descriere Linia 3", "Description Line 3")}`;
-                player.ShowPlayerDialog(Dialog.STATS_DESCRIPTION, samp.DIALOG_STYLE.LIST, Lang(player, "Descriere", "Description"), info, Lang(player, "Selecteaza", "Select"), Lang(player, "Inapoi", "Back"));
+                info += `{0072FF}${Function.Lang(player, "Descriere Linia 1", "Description Line 1")}\n`;
+                info += `{FFFF00}${Function.Lang(player, "Descriere Linia 2", "Description Line 2")}\n`;
+                info += `{FF0000}${Function.Lang(player, "Descriere Linia 3", "Description Line 3")}`;
+                player.ShowPlayerDialog(Dialog.STATS_DESCRIPTION, samp.DIALOG_STYLE.LIST, Function.Lang(player, "Descriere", "Description"), info, Function.Lang(player, "Selecteaza", "Select"), Function.Lang(player, "Inapoi", "Back"));
             }
             break;
         }
         case Dialog.STATS_DESCRIPTION: {
             if(response) {
                 Player.Info[player.playerid].Editing_Stats_Description_Line = listitem + 1;
-                player.ShowPlayerDialog(Dialog.STATS_DESCRIPTION_INPUT, samp.DIALOG_STYLE.INPUT, Lang(player, "Descriere", "Description"), Lang(player, "{FFFF00}Te rugam sa iti introduci {FF0000}Descrierea{FFFF00}:", "{FFFF00}Please enter your {FF0000}Description{FFFF00}:"), Lang(player, "Ok", "Update"), Lang(player, "Renunta", "Cancel"));
+                player.ShowPlayerDialog(Dialog.STATS_DESCRIPTION_INPUT, samp.DIALOG_STYLE.INPUT, Function.Lang(player, "Descriere", "Description"), Function.Lang(player, "{FFFF00}Te rugam sa iti introduci {FF0000}Descrierea{FFFF00}:", "{FFFF00}Please enter your {FF0000}Description{FFFF00}:"), Function.Lang(player, "Ok", "Update"), Function.Lang(player, "Renunta", "Cancel"));
             }
             else CMD.emit("stats", player, []);
             break;
@@ -6173,7 +6169,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.STATS_DESCRIPTION_INPUT: {
             if(response) {
                 Player.Info[player.playerid].Description[Player.Info[player.playerid].Editing_Stats_Description_Line] = inputtext;
-                player.SendClientMessage(data.colors.YELLOW, Lang(player, "Ti-ai modificat Descrierea! Scrie {FF0000}/Stats {FFFF00}pentru a o vedea!", "You have updated your Description! Type {FF0000}/Stats {FFFF00}to see it!"));
+                player.SendClientMessage(data.colors.YELLOW, Function.Lang(player, "Ti-ai modificat Descrierea! Scrie {FF0000}/Stats {FFFF00}pentru a o vedea!", "You have updated your Description! Type {FF0000}/Stats {FFFF00}to see it!"));
                 Player.Info[player.playerid].Editing_Stats_Description_Line = 0;
             }
             else Player.Info[player.playerid].Editing_Stats_Description_Line = 0;
@@ -6190,7 +6186,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         let info = "";
                         info += "{00FF00}Ai cumparat cu succes {FF0000}VIP Red{00FF00} Gratis!\n";
                         info += "{00FF00}Scrie {00BBF6}/vCmds {00FF00}pentru a vedea {FF0000}Comenzile de VIP{00FF00}!";
-                        player.ShowPlayerDialog(Dialog.BUYVIP_AFTER, samp.DIALOG_STYLE.MSGBOX, Lang(player, "VIP {FF0000}Cumparat{AFAFAF}!", ""), info, "Ok", "VCmds");
+                        player.ShowPlayerDialog(Dialog.BUYVIP_AFTER, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "VIP {FF0000}Cumparat{AFAFAF}!", ""), info, "Ok", "VCmds");
                         break;
                     }
                     case 1: {
@@ -6237,12 +6233,12 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         case Dialog.ADD_MAIL: {
             if(response) {
                 if(validateEmail(inputtext)) {
-                    player.SendClientMessage(data.colors.YELLOW, Lang(player, `Ti-ai adaugat cu succes E-Mail-ul {FF0000}${inputtext} {FFFF00}in Cont!`, `You have successfully added the {FF0000}${inputtext} {FFFF00}E-Mail in your Account!`));
+                    player.SendClientMessage(data.colors.YELLOW, Function.Lang(player, `Ti-ai adaugat cu succes E-Mail-ul {FF0000}${inputtext} {FFFF00}in Cont!`, `You have successfully added the {FF0000}${inputtext} {FFFF00}E-Mail in your Account!`));
                     Player.Info[player.playerid].Mail = inputtext;
                 }
-                else player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
+                else player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Function.Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Function.Lang(player, "Adauga", "Add"), Function.Lang(player, "Mai tarziu", "Later"));
             }
-            else player.SendClientMessage(data.colors.YELLOW, Lang(player, "Ai refuzat sa iti adaugi un {FF0000}E-Mail {FFFF00}in cont! Cont-ul tau este vulnerabil!", "You refused to add an {FF0000}E-Mail {FFFF00}in your Account! Your Account is vulnerable!"));
+            else player.SendClientMessage(data.colors.YELLOW, Function.Lang(player, "Ai refuzat sa iti adaugi un {FF0000}E-Mail {FFFF00}in cont! Cont-ul tau este vulnerabil!", "You refused to add an {FF0000}E-Mail {FFFF00}in your Account! Your Account is vulnerable!"));
             break;
         }
         case Dialog.CMDS_1: {
@@ -6280,11 +6276,11 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                             if(Player.Info[player.playerid].Fail_Logins == 4) player.Kick();
                             else {
                                 let info = "";
-                                info += `{FF0000}${Lang(player, `Autentificare nereusita (${Player.Info[player.playerid].Fail_Logins}/4)!`, `Login failed (${Player.Info[player.playerid].Fail_Logins}/4)!`)}\n`;
+                                info += `{FF0000}${Function.Lang(player, `Autentificare nereusita (${Player.Info[player.playerid].Fail_Logins}/4)!`, `Login failed (${Player.Info[player.playerid].Fail_Logins}/4)!`)}\n`;
                                 info += "\n";
-                                info += `{FFFF00}${Lang(player, "Ai introdus parola gresita. Te rugam sa incerci din nou!", "You entered the wrong password. Please try again!")}\n`;
-                                info += `{00FF00}${Lang(player, `Daca ti-ai uitat parola intra pe {FF0000}${data.settings.SERVER_WEB}{00FF00} pentru a o reseta!`, `If you forgot your password enter the {FF0000}${data.settings.SERVER_WEB} {00FF00}to reset it!`)}`
-                                player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Autentificare {FF0000}Nereusita", "Login {FF0000}Failed"), info, Lang(player, "Autentificare", "Login"), Lang(player, "Nume Nou", "New Name"));
+                                info += `{FFFF00}${Function.Lang(player, "Ai introdus parola gresita. Te rugam sa incerci din nou!", "You entered the wrong password. Please try again!")}\n`;
+                                info += `{00FF00}${Function.Lang(player, `Daca ti-ai uitat parola intra pe {FF0000}${data.settings.SERVER_WEB}{00FF00} pentru a o reseta!`, `If you forgot your password enter the {FF0000}${data.settings.SERVER_WEB} {00FF00}to reset it!`)}`
+                                player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Autentificare {FF0000}Nereusita", "Login {FF0000}Failed"), info, Function.Lang(player, "Autentificare", "Login"), Function.Lang(player, "Nume Nou", "New Name"));
                             }
                         }   
                         else {
@@ -6292,11 +6288,11 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                             if(result[0].spassword == "null") LoadPlayerStats(player);
                             else {
                                 let info = "";
-                                info += `${Lang(player, "{FF0000}Acest cont are o parola secundara!", "{FF0000}This account has a secondary password!")}\n`;
-                                info += `${Lang(player, "{FFCC00}Autentifica-te cu parola secundara pentru a putea continua!", "{FFCC00}Please login with the secondary password in order to continue!")}\n`;
+                                info += `${Function.Lang(player, "{FF0000}Acest cont are o parola secundara!", "{FF0000}This account has a secondary password!")}\n`;
+                                info += `${Function.Lang(player, "{FFCC00}Autentifica-te cu parola secundara pentru a putea continua!", "{FFCC00}Please login with the secondary password in order to continue!")}\n`;
                                 info += "\n";
-                                info += `${Lang(player, "{FFFF00}Scrie mai jos {FF0000}Parola Secundara{FFFF00}:", "{FFFF00}Enter below the {FF0000}Secondary Password{FFFF00}:")}`;
-                                player.ShowPlayerDialog(Dialog.LOGIN_SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Lang(player, "Autentificare - Parola Secundara", "Login - Secondary Password"), info, Lang(player, "Autentificare", "Login"), Lang(player, "Nume Nou", "New Name"));
+                                info += `${Function.Lang(player, "{FFFF00}Scrie mai jos {FF0000}Parola Secundara{FFFF00}:", "{FFFF00}Enter below the {FF0000}Secondary Password{FFFF00}:")}`;
+                                player.ShowPlayerDialog(Dialog.LOGIN_SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Autentificare - Parola Secundara", "Login - Secondary Password"), info, Function.Lang(player, "Autentificare", "Login"), Function.Lang(player, "Nume Nou", "New Name"));
                             }
                         }
                     }
@@ -6317,7 +6313,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
                         Player.Info[player.playerid].AccID = result.insertId;
                         LoadPlayerStats(player);
                         Server.Info.NewRegistredPlayers++;
-                        samp.SendClientMessageToAll(data.colors.ORANGE, `INFO: {00BBF6}${player.GetPlayerName(24)}(${player.playerid}){BBFF00} ${Lang(player, `s-a inregistrat pe server-ul nostru!`, `has registered on our server!`)}`);
+                        samp.SendClientMessageToAll(data.colors.ORANGE, `INFO: {00BBF6}${player.GetPlayerName(24)}(${player.playerid}){BBFF00} ${Function.Lang(player, `s-a inregistrat pe server-ul nostru!`, `has registered on our server!`)}`);
                         player.ShowPlayerDialog(Dialog.AFTER_REGISTER, samp.DIALOG_STYLE.MSGBOX, "Inregistrare {BBFF00}Reusita!", `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n{BBFF00}Te-ai inregistrat cu succes pe server-ul ${data.settings.SERVER_NAME}{BBFF00}!\n{BBFF00}Tine minte! De cate ori vei reveni, va trebuii sa te autentifici cu parola: {FF0000}${inputtext}{BBFF00}!\n\n{FFFF00}Pentru mai multe informatii, click pe buton-ul {FF0000}Ajutor{FFFF00}.\n{FFFF00}De asemenea, nu uita sa ne vizitezi si website-ul si forum-ul nostru la adresa {FF0000}${data.settings.SERVER_WEB}{FFFF00}!`, "Inchide", "Ajutor!");
                     }
                     else player.Kick();
@@ -6360,7 +6356,7 @@ samp.OnPlayerSpawn((player) => {
     ShowSpawnTextDraw(player);
     player.SetPlayerVirtualWorld(0);
     if(Player.Info[player.playerid].Mail == "none" && Player.Info[player.playerid].Need_Mail_Showed == false) {
-        player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Lang(player, "Adauga", "Add"), Lang(player, "Mai tarziu", "Later"));
+        player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Function.Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Function.Lang(player, "Adauga", "Add"), Function.Lang(player, "Mai tarziu", "Later"));
         Player.Info[player.playerid].Need_Mail_Showed = true;
     }
     SetupPlayerForSpawn(player);
@@ -6393,7 +6389,7 @@ samp.OnPlayerCommandText((player, cmdtext) => {
             let result = Teleport.Info.find(f => f.command == cmdtext);
             TelePlayer(player, cmdtext, result.name, result.position[0], result.position[1], result.position[2], result.position[3]);
         }
-        else player.SendClientMessage(data.colors.RED, Lang(player, `Comanda {BBFF00}/${cmdtext}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`, `Command {BBFF00}/${cmdtext}{FF0000} don't exist! Use {BBFF00}/help{FF0000} or {BBFF00}/cmds{FF0000}!`));
+        else player.SendClientMessage(data.colors.RED, Function.Lang(player, `Comanda {BBFF00}/${cmdtext}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`, `Command {BBFF00}/${cmdtext}{FF0000} don't exist! Use {BBFF00}/help{FF0000} or {BBFF00}/cmds{FF0000}!`));
     }
     return true;
 });  

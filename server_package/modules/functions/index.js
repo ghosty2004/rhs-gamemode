@@ -8,6 +8,15 @@ const Player = require("../player");
 module.exports = {
     /**
      * @param {SampPlayer} player 
+     * @param {String} ro_string 
+     * @param {String} en_string 
+     * @returns {String}
+     */
+    Lang: function(player, ro_string, en_string) {
+        return Player.Info[player.playerid].Language == 1 ? ro_string : en_string;
+    },
+    /**
+     * @param {SampPlayer} player 
      */
     kickPlayer: function(player) {
         setTimeout(() => {
@@ -203,7 +212,6 @@ module.exports = {
      * @param {SampPlayer} target 
      * @param {Number} days 
      * @param {String} reason
-     * @param {Boolean} discord
      */
     banTargetByAdmin: async function(adminData, target, days, reason) {
         SendClientMessageToAll(colors.LIGHT_BLUE, "================(Ban Details)================");
@@ -212,9 +220,9 @@ module.exports = {
         SendClientMessageToAll(colors.LIGHT_BLUE, "==========================================");
     
         for(let i = 0; i < 30; i++) target.SendClientMessage(-1, "");
-        target.SendClientMessage(colors.LIGHT_BLUE, `============(${Lang(target, "Detalii Ban", "Ban Details")})============`);
-        target.SendClientMessage(colors.GRAY, `${Lang(target, `Ai primit interdictie de la Admin {00BBF6}${adminData.name} {CEC8C8}pentru {FF0000}${days} {CEC8C8}zile!`, `You have been banned by Admin {00BBF6}${adminData.name} {CEC8C8}for {FF0000}${days} {CEC8C8}days!`)}`);
-        target.SendClientMessage(colors.GRAY, `${Lang(target, "Motiv", "Reason")}: {00BBF6}${reason}`);
+        target.SendClientMessage(colors.LIGHT_BLUE, `============(${this.Lang(target, "Detalii Ban", "Ban Details")})============`);
+        target.SendClientMessage(colors.GRAY, `${this.Lang(target, `Ai primit interdictie de la Admin {00BBF6}${adminData.name} {CEC8C8}pentru {FF0000}${days} {CEC8C8}zile!`, `You have been banned by Admin {00BBF6}${adminData.name} {CEC8C8}for {FF0000}${days} {CEC8C8}days!`)}`);
+        target.SendClientMessage(colors.GRAY, `${this.Lang(target, "Motiv", "Reason")}: {00BBF6}${reason}`);
         target.SendClientMessage(colors.LIGHT_BLUE, "=======================================");
     
         const status = await new Promise((resolve, reject) => {
@@ -222,7 +230,6 @@ module.exports = {
                 resolve({err: err, result: result});
             });
         });
-
         
         if(!status.err && status.result == 0) con.query("INSERT INTO bans (acc_id, ip, admin_acc_id, from_timestamp, to_timestamp, reason) VALUES(?, ?, ?, ?, ?, ?)", [Player.Info[target.playerid].AccID, target.GetPlayerIp(16), adminData.accId, this.getTimestamp(), this.getTimestamp(days), reason]);
         else con.query("UPDATE bans SET ip = ?, admin_acc_id = ?, from_timestamp = ?, to_timestamp = ?, reason = ?", [player.GetPlayerIp(16), adminData.accId, this.getTimestamp(), this.getTimestamp(days), reason]);
@@ -233,7 +240,6 @@ module.exports = {
      * @param {{name: String, accId: Number}} adminData 
      * @param {SampPlayer} target 
      * @param {String} reason 
-     * @param {Boolean} discord
      */
     kickTargetByAdmin: function(adminData, target, reason) {
         Player.Info[target.playerid].Kicks++;
