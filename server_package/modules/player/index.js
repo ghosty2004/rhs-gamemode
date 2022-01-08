@@ -1,6 +1,3 @@
-const { getBeatifulDate } = require("../functions");
-
-
 module.exports = {
     Info: {},
     ResetVariables: function(playerid) {

@@ -208,39 +208,37 @@ bot.once("ready", () => {
             } 
             else {
                 bot.guilds.cache.forEach((guild) => {
-                    if(guild.id == DEVELOPER_GUILD_ID) {
-                        rest.get(Routes.applicationGuildCommands(CLIENT_ID, guild.id)).then(async(data) => {
-                            /* ====================== */
-                            /* Command pending delete */
-                            /* ====================== */
-                            data.forEach(async(i) => {
-                                if(removeCommands.some(s => s == i.name)) {
-                                    await rest.delete(
-                                        Routes.applicationGuildCommand(i.application_id, guild.id, i.id)
-                                    ).then(() => {
-                                        console.log(`Successfully removed slash command ${i.name} from guild: ${guild.name}.`);
-                                    }).catch((e) => {
-                                        console.log(`Could not remove slash command ${i.name} from guild: ${guild.name}.`);
-                                    });
-                                }
-                            });
-                            if(Add_Slash_Commands_To_API) {
-                                /* ============ */
-                                /* Add commandS */
-                                /* ============ */
-                                await rest.put(
-                                    Routes.applicationGuildCommands(CLIENT_ID, guild.id), {
-                                        body: commands
-                                    },
+                    rest.get(Routes.applicationGuildCommands(CLIENT_ID, guild.id)).then(async(data) => {
+                        /* ====================== */
+                        /* Command pending delete */
+                        /* ====================== */
+                        data.forEach(async(i) => {
+                            if(removeCommands.some(s => s == i.name)) {
+                                await rest.delete(
+                                    Routes.applicationGuildCommand(i.application_id, guild.id, i.id)
                                 ).then(() => {
-                                    console.log(`Successfully updated slash commands from guild: ${guild.name}.`);
+                                    console.log(`Successfully removed slash command ${i.name} from guild: ${guild.name}.`);
                                 }).catch((e) => {
-                                    console.log(`Could not update slash commands from developer guild: ${guild.name}.`);
-                                    console.log(e.rawError.errors.options[1]);
-                                });   
+                                    console.log(`Could not remove slash command ${i.name} from guild: ${guild.name}.`);
+                                });
                             }
-                        }); 
-                    }
+                        });
+                        if(Add_Slash_Commands_To_API) {
+                            /* ============ */
+                            /* Add commandS */
+                            /* ============ */
+                            await rest.put(
+                                Routes.applicationGuildCommands(CLIENT_ID, guild.id), {
+                                    body: commands
+                                },
+                            ).then(() => {
+                                console.log(`Successfully updated slash commands from guild: ${guild.name}.`);
+                            }).catch((e) => {
+                                console.log(`Could not update slash commands from developer guild: ${guild.name}.`);
+                                console.log(e.rawError.errors.options[1]);
+                            });   
+                        }
+                    }); 
                 });
             }
         } catch(e) {
@@ -312,7 +310,9 @@ function sendLog(type, color, description) {
             embed.setColor(color);
             embed.setTitle(`${type} LOG`);
             embed.setDescription(description);
-            channel.send({embeds: [embed]})
+            channel.send({embeds: [embed]}).catch(() => {
+                channel.send(description);
+            });
         }
     });
 }

@@ -2192,16 +2192,8 @@ CMD.on("kick", (player, params) => {
     if(!params[0] && !params.slice(1).join(" ")) return SendUsage(player, "/Kick [ID/Name] [Reason]");
     let target = getPlayer(params[0]);
     if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
-    Player.Info[target.playerid].Kicks++;
-    if(Player.Info[target.playerid].Kicks < 3) {
-        samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been kicked by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
-        samp.SendClientMessageToAll(0x00A6FFAA, `Reason: {D1D1D1}${params.slice(1).join(" ")} {FF0000}(Kicks: ${Player.Info[target.playerid].Kicks}/3)`);
-        kickPlayer(target);
-    }
-    else {
-        Player.Info[target.playerid].Kicks = 0;
-        banPlayer(target, player, 1, "3/3 Kicks");
-    }
+    Function.kickTargetByAdmin({name: player.GetPlayerName(24), accId: Player.Info[player.playerid].AccID } ,target, params.slice(1).join(" "));
+    SendACMD(admin, "Kick");
 });
 
 CMD.on("warn", (player, params) => {
@@ -2649,7 +2641,8 @@ CMD.on("ban", (player, params) => {
         if(!Player.Info[target.playerid].LoggedIn) return SendError(player, Errors.PLAYER_NOT_LOGGED);
         params[1] = parseInt(params[1]);
         if(params[1] < 1 || params[1] > 99) return SendError(player, "Invalid day(s) (1-99)!");
-        banPlayer(target, player, params[1], params.slice(2).join(" "));
+        Function.banTargetByAdmin({name: player.GetPlayerName(24), accId: Player.Info[player.playerid].AccID}, target, params[1], params.slice(2).join(" "));
+        SendACMD(player, "Ban");
     }
     else SendUsage(player, "/Ban [ID/Name] [Day(s)] [Reason]");
 });
@@ -3632,33 +3625,11 @@ function Updater() {
     samp.SendRconCommand(`hostname ${data.settings.RANDOM_SERVER_NAMES[Function.getRandomInt(0, data.settings.RANDOM_SERVER_NAMES.length)]}`);
 }
 
-function banPlayer(player, admin, days, reason) {
-    samp.SendClientMessageToAll(data.colors.LIGHT_BLUE, "================(Ban Details)================");
-    samp.SendClientMessageToAll(data.colors.RED, `${player.GetPlayerName(24)} {CEC8C8}has been banned by Admin {00BBF6}${admin.GetPlayerName(24)} {CEC8C8}for {FF0000}${days} {CEC8C8}day(s)!`);
-    samp.SendClientMessageToAll(data.colors.GRAY, `Reason: {00BBF6}${reason}`);
-    samp.SendClientMessageToAll(data.colors.LIGHT_BLUE, "==========================================");
-
-    for(let i = 0; i < 30; i++) player.SendClientMessage(-1, "");
-    player.SendClientMessage(data.colors.LIGHT_BLUE, `============(${Lang(player, "Detalii Ban", "Ban Details")})============`);
-    player.SendClientMessage(data.colors.GRAY, `${Lang(player, `Ai primit interdictie de la Admin {00BBF6}${admin.GetPlayerName(24)} {CEC8C8}pentru {FF0000}${days} {CEC8C8}zile!`, `You have been banned by Admin {00BBF6}${admin.GetPlayerName(24)} {CEC8C8}for {FF0000}${days} {CEC8C8}days!`)}`);
-    player.SendClientMessage(data.colors.GRAY, `${Lang(player, "Motiv", "Reason")}: {00BBF6}${reason}`);
-    player.SendClientMessage(data.colors.LIGHT_BLUE, "=======================================");
-    
-    SendACMD(admin, "Ban");
-
-    con.query("SELECT * FROM bans WHERE acc_id = ?", [Player.Info[player.playerid].AccID], function(err, result) {
-        if(!err && result == 0) con.query("INSERT INTO bans (acc_id, ip, admin_acc_id, from_timestamp, to_timestamp, reason) VALUES(?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].AccID, player.GetPlayerIp(16), Player.Info[admin.playerid].AccID, getTimestamp(), getTimestamp(days), reason]);
-        else con.query("UPDATE bans SET ip = ?, admin_acc_id = ?, from_timestamp = ?, to_timestamp = ?, reason = ?", [player.GetPlayerIp(16), Player.Info[admin.playerid].AccID, getTimestamp(), getTimestamp(days), reason]);
-    });
-
-    kickPlayer(player);
-}
-
 function checkPlayerBanStatus(player, check_acc_id=true) {
     return new Promise((resolve, reject) => {
         con.query(`SELECT * FROM bans WHERE ${check_acc_id ? `acc_id = '${Player.Info[player.playerid].AccID}' OR ip = '${player.GetPlayerIp(16)}'` : `ip = '${player.GetPlayerIp(16)}'`}`, async function(err, result) {
             if(!err && result != 0) {
-                if(getTimestamp() < result[0].to_timestamp) {
+                if(Function.getTimestamp() < result[0].to_timestamp) {
                     HideConnectTextDraw(player);
                     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "", "", "", "");
                     let difference = timeDifference(result[0].to_timestamp);
@@ -3708,10 +3679,6 @@ function timeDifference(timestamp) {
         difference.type = "Second(s)";
     }
     return difference;
-}
-
-function getTimestamp(days=0) {
-    return days == 0 ? Math.round(new Date() / 1000) : Math.round(new Date() / 1000) + (days * 86400);
 }
 
 function CheckPlayerAka(player) {
@@ -3819,13 +3786,6 @@ function TotalGameTime(player) {
     let minutes = Math.floor(total_time / 60) % 60;
     let seconds = Math.floor(total_time % 60);
     return {hours: hours, minutes: minutes, seconds: seconds};
-}
-
-function kickPlayer(player) {
-    setTimeout(() => {
-        try { player.Kick(); }
-        catch {}
-    }, 200);
 }
 
 function SendACMD(player, cmdtext) {
@@ -4561,7 +4521,7 @@ function LoadPlayerStats(player) {
             Player.Info[player.playerid].LoggedIn = true;
             Player.Info[player.playerid].AccID = result[0].ID;
 
-            if(await checkPlayerBanStatus(player)) kickPlayer(player);
+            if(await checkPlayerBanStatus(player)) Function.kickPlayer(player);
             else {
                 Player.Info[player.playerid].Mail = result[0].mail;
                 Player.Info[player.playerid].Money = result[0].money;
@@ -4770,7 +4730,7 @@ samp.OnRconLoginAttempt((ip, password, success) => {
                 Player.Info[i.playerid].RconType = result[0].rcontype;
                 if(Player.Info[i.playerid].RconType == 0) {
                     SendMessageToAdmins(-1, `RCON LOGIN: ${i.GetPlayerName(24)}(${i.playerid}) has tried to login without RCON PERMISSION!`);
-                    kickPlayer(i);
+                    Function.kickPlayer(i);
                 }
                 else {
                     SendMessageToAdmins(-1, `RCON LOGIN: ${i.GetPlayerName(24)}(${i.playerid}) has logged in as a ${getRconRank(Player.Info[i.playerid].RconType)} successfully with permission enabled!`);
@@ -4973,9 +4933,9 @@ samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
 });
 
 samp.OnPlayerConnect(async(player) => {
-    Discord.sendLog("joinLeve", "GREEN", `${player.GetPlayerName(24)} [${player.playerid}] has been connected`);
+    Discord.sendLog("joinLeave", "GREEN", `${player.GetPlayerName(24)} [${player.playerid}] has been connected`);
     Player.ResetVariables(player.playerid);
-    if(await checkPlayerBanStatus(player, false)) kickPlayer(player);
+    if(await checkPlayerBanStatus(player, false)) Function.kickPlayer(player);
     else {
         ShowConnectTextDraw(player); 
 
@@ -4998,7 +4958,7 @@ samp.OnPlayerConnect(async(player) => {
 });
 
 samp.OnPlayerDisconnect((player, reason) => {
-    Discord.sendLog("joinLeve", "RED", `${player.GetPlayerName(24)} [${player.playerid}] has been disconnected`);
+    Discord.sendLog("joinLeave", "RED", `${player.GetPlayerName(24)} [${player.playerid}] has been disconnected`);
     savePlayer(player);
 
     HideRankLabelFor(player);

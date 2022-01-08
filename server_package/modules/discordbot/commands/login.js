@@ -23,7 +23,6 @@ const getSlashCommand = () => {
 module.exports = {
     data: getSlashCommand(),
     /**
-     * 
      * @param {CommandInteraction} interaction 
      */
     async execute(interaction) {
