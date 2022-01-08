@@ -34,7 +34,7 @@ module.exports = {
     async execute(interaction) {
         let accId = await Function.discordUserData.loginSessionId(interaction.user);
         if(!accId) return interaction.reply("You need to have a login session. Use /login !");
-        if(await Function.discordUserData.columnValue(interaction.user, "admin") < 3) return interaction.reply(NOT_ENOUGH_ADMIN);
+        if(await Function.discordUserData.columnValue(interaction.user, "admin") < 3) return interaction.reply(NOT_ENOUGH_ADMIN.ENG);
         let target = Function.getPlayer(interaction.options.get("target").value);
         if(!target) return interaction.reply(PLAYER_NOT_CONNECTED);
         let days = parseInt(interaction.options.get("days").value);

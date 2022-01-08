@@ -14,7 +14,7 @@ module.exports = {
     async execute(interaction) {
         let accId = await Function.discordUserData.loginSessionId(interaction.user);
         if(!accId) return interaction.reply("You need to have a login session. Use /login !");
-        if(await Function.discordUserData.columnValue(interaction.user, "rcontype") < 3) return interaction.reply(NOT_ENOUGH_ADMIN);
+        if(await Function.discordUserData.columnValue(interaction.user, "rcontype") < 2) return interaction.reply(NOT_ENOUGH_ADMIN.ENG);
         let maxplayers = parseInt(interaction.options.get("maxplayers").value);
         if(maxplayers < 1 || maxplayers > 1000) return interaction.reply("Invalid maxplayers value (1-1000) !");
         SetMaxPlayers(maxplayers);
