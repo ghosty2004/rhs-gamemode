@@ -2875,7 +2875,7 @@ CMD.on("fireworks", (player, params) => {
 });
 
 CMD.on("setmaxplayers", (player, params) => {
-    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!isNumber(params[0])) return SendUsage(player, "/SetMaxPlayers [Max Players]");
     params[0] = parseInt(params[0]);
     YSF.SetMaxPlayers(params[0]);
