@@ -4135,16 +4135,6 @@ function getRanksRankName(rank_name, rank) {
     return string;
 }
 
-function getRconRank(rank) {
-    let string = "";
-    switch(rank) {
-        case 1: string = "RCON"; break;
-        case 2: string = "Caretaker"; break;
-        case 3: string = "Founder"; break;
-    }
-    return string;
-}
-
 function getAdminRank(rank, hex=true) {
     let string = "";
     switch(rank) {
@@ -4170,9 +4160,9 @@ function getVIPRank(rank, hex=true) {
 
 function getPlayerRankInLabel(player) {
     let tag = "";
-    if(Player.Info[player.playerid].RconType == 3) tag = `{FFFFFF}${getRconRank(3)}`;
-    else if(Player.Info[player.playerid].RconType == 2) tag = `{FFFFFF}${getRconRank(2)}`;
-    else if(Player.Info[player.playerid].RconType == 1) tag = `{FFFFFF}${getRconRank(1)}`;
+    if(Player.Info[player.playerid].RconType == 3) tag = `{FFFFFF}${Function.getRconRank(3)}`;
+    else if(Player.Info[player.playerid].RconType == 2) tag = `{FFFFFF}${Function.getRconRank(2)}`;
+    else if(Player.Info[player.playerid].RconType == 1) tag = `{FFFFFF}${Function.getRconRank(1)}`;
     else if(Player.Info[player.playerid].Admin == 3) tag = "{0072FF}Master";
     else if(Player.Info[player.playerid].Admin == 2) tag = "{FFFF00}Senior";
     else if(Player.Info[player.playerid].Admin == 1) tag = "{FF0000}Junior";
@@ -4185,9 +4175,9 @@ function getPlayerRankInLabel(player) {
 
 function getPlayerRankInChat(player) {
     let tag = "";
-    if(Player.Info[player.playerid].RconType == 3) tag = `{FF0000}({FFFFFF}${getRconRank(3)}{FF0000})`;
-    else if(Player.Info[player.playerid].RconType == 2) tag = `{FF0000}({FFFFFF}${getRconRank(2)}{FF0000})`;
-    else if(Player.Info[player.playerid].RconType == 1) tag = `{FF0000}({FFFFFF}${getRconRank(1)}{FF0000})`;
+    if(Player.Info[player.playerid].RconType == 3) tag = `{FF0000}({FFFFFF}${Function.getRconRank(3)}{FF0000})`;
+    else if(Player.Info[player.playerid].RconType == 2) tag = `{FF0000}({FFFFFF}${Function.getRconRank(2)}{FF0000})`;
+    else if(Player.Info[player.playerid].RconType == 1) tag = `{FF0000}({FFFFFF}${Function.getRconRank(1)}{FF0000})`;
     else if(Player.Info[player.playerid].Admin == 3) tag = "{0072FF}(Master)";
     else if(Player.Info[player.playerid].Admin == 2) tag = "{FFFF00}(Senior)";
     else if(Player.Info[player.playerid].Admin == 1) tag = "{FF0000}(Junior)";
@@ -4654,7 +4644,7 @@ samp.OnRconLoginAttempt((ip, password, success) => {
                     Function.kickPlayer(i);
                 }
                 else {
-                    SendMessageToAdmins(-1, `RCON LOGIN: ${i.GetPlayerName(24)}(${i.playerid}) has logged in as a ${getRconRank(Player.Info[i.playerid].RconType)} successfully with permission enabled!`);
+                    SendMessageToAdmins(-1, `RCON LOGIN: ${i.GetPlayerName(24)}(${i.playerid}) has logged in as a ${Function.getRconRank(Player.Info[i.playerid].RconType)} successfully with permission enabled!`);
                     UpdateRankLabelFor(i);
                 }
             });

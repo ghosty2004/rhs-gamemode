@@ -343,5 +343,18 @@ module.exports = {
         });
         Clan.Get().forEach((i) => { this.saveClan(i.id); });
         Gang.Get().forEach((i) => { this.saveGang(i.id); });
+    },
+    /**
+     * @param {Number} rank 
+     * @returns {String}
+     */
+    getRconRank: function(rank) {
+        let string = "None";
+        switch(rank) {
+            case 1: string = "RCON"; break;
+            case 2: string = "Caretaker"; break;
+            case 3: string = "Founder"; break;
+        }
+        return string;
     }
 }
