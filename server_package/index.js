@@ -3841,10 +3841,6 @@ function CheckCustomChat(player, text) {
    return true;
 }
 
-function replaceAll(string, search, replace) {
-    return string.replace(new RegExp(search, 'g'), replace);
-}
-
 function SendAntiSpam(player, time, type) {
     switch(type) {
         case 0: {
@@ -4642,10 +4638,12 @@ samp.OnRconLoginAttempt((ip, password, success) => {
                 if(Player.Info[i.playerid].RconType == 0) {
                     SendMessageToAdmins(-1, `RCON LOGIN: ${i.GetPlayerName(24)}(${i.playerid}) has tried to login without RCON PERMISSION!`);
                     Function.kickPlayer(i);
+                    Discord.sendTTSLog("ro-ro", `Jucătorul ${i.GetPlayerName(24)} s-a logat RCON fără permisiune`);
                 }
                 else {
                     SendMessageToAdmins(-1, `RCON LOGIN: ${i.GetPlayerName(24)}(${i.playerid}) has logged in as a ${Function.getRconRank(Player.Info[i.playerid].RconType)} successfully with permission enabled!`);
                     UpdateRankLabelFor(i);
+                    Discord.sendTTSLog("ro-ro", `Jucătorul ${i.GetPlayerName(24)} s-a logat RCON cu permisiune`);
                 }
             });
         });
@@ -4844,7 +4842,9 @@ samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
 });
 
 samp.OnPlayerConnect(async(player) => {
-    Discord.sendLog("joinLeave", "GREEN", `${player.GetPlayerName(24)} [${player.playerid}] has been connected`);
+    Discord.sendLog("joinLeave", "GREEN", `${player.GetPlayerName(24)} [ID: ${player.playerid}] has been connected`);
+    Discord.sendTTSLog("ro-ro", `Jucătorul ${player.GetPlayerName(24)} cu id-ul ${player.playerid} a intrat pe servăr`);
+
     Player.ResetVariables(player.playerid);
     if(await checkPlayerBanStatus(player, false)) Function.kickPlayer(player);
     else {
@@ -4869,7 +4869,9 @@ samp.OnPlayerConnect(async(player) => {
 });
 
 samp.OnPlayerDisconnect((player, reason) => {
-    Discord.sendLog("joinLeave", "RED", `${player.GetPlayerName(24)} [${player.playerid}] has been disconnected`);
+    Discord.sendLog("joinLeave", "RED", `${player.GetPlayerName(24)} [ID: ${player.playerid}] has been disconnected`);
+    Discord.sendTTSLog("ro-ro", `Jucătorul ${player.GetPlayerName(24)} cu id-ul ${player.playerid} a ieșit din servăr`);
+
     Function.savePlayer(player);
 
     HideRankLabelFor(player);

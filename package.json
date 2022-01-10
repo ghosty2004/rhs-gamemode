@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/Ghosty2004/rhs-gamemode#readme",
   "dependencies": {
+    "@discordjs/opus": "^0.5.3",
     "@discordjs/rest": "^0.1.0-canary.0",
+    "@discordjs/voice": "^0.7.5",
     "@sa-mp/node": "^0.2.0",
     "colors": "^1.4.0",
     "discord-api-types": "^0.25.2",
@@ -27,6 +29,7 @@
     "hastebin-gen": "^2.0.5",
     "md5": "^2.3.0",
     "mysql": "^2.18.1",
+    "opusscript": "^0.0.8",
     "samp-node-lib": "^1.0.5",
     "slash-command-builder": "^0.1.1",
     "youtube-audio-server": "^2.8.2",

@@ -1,6 +1,8 @@
 /* Modules */
 const Discord = require("discord.js");
 const { REST } = require('@discordjs/rest');
+const { getVoiceConnection, createAudioPlayer, createAudioResource} = require("@discordjs/voice");
+
 const { Routes } = require('discord-api-types/v9');
 const fs = require("fs");
 
@@ -317,4 +319,18 @@ function sendLog(type, color, description) {
     });
 }
 
-module.exports = {bot, sendLog};
+/**
+ * @param {"ro-ro"|"en-us"} language
+ * @param {String} text 
+ */
+function sendTTSLog(language, text) {
+    bot.guilds.cache.filter(f => getVoiceConnection(f.id)).forEach((i) => {
+        let connection = getVoiceConnection(i.id);
+        const player = createAudioPlayer();
+        const resource = createAudioResource(`https://api.voicerss.org/?key=7b5a58d4adf04c9e8b362c0f5e15352e&hl=${language}&src=${text.split(" ").join("%")}`);
+        player.play(resource);
+        connection.subscribe(player);
+    });
+}
+
+module.exports = {bot, sendLog, sendTTSLog};
