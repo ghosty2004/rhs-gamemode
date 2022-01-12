@@ -36,6 +36,6 @@ module.exports = {
         let reason = interaction.options.get("reason").value;
         if(!reason) return interaction.reply("You need to provide a reason !");
         Function.kickTargetByAdmin({name: interaction.user.tag, accId: accId}, target, reason);
-        interaction.reply(`You have succesfully banned **${target.GetPlayerName(24)} [${target.playerid}]**.\nReason: **${reason}**.`);
+        interaction.reply(`You have succesfully kicked **${target.GetPlayerName(24)} [${target.playerid}]**.\nReason: **${reason}**.`);
     }
 }
