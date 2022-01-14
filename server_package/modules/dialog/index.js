@@ -77,5 +77,6 @@ module.exports = {
     CARTEXT:                    76,
     CARTEXT_EDIT_OR_REMOVE:     77,
     CARTEXT_SELECT_SIZE:        78,
-    CARTEXT_INPUT_TEXT:         79
+    CARTEXT_INPUT_TEXT:         79,
+    SPEED:                      80
 }

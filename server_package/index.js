@@ -478,7 +478,11 @@ CMD.on("respect", (player, params) => {
 });
 
 CMD.on("speed", (player) => {
-
+    let info = "";
+    info += "Info\tCooldown\n";
+    info += "{00BBF6}Enable Speed Boost\t{FFFFFF}15 seconds\n";
+    info += "{FF0000}Disable Speed Boost";
+    player.ShowPlayerDialog(Dialog.SPEED, samp.DIALOG_STYLE.TABLIST_HEADERS, "{00BBF6}Vehicle Speed Boost{FFFFFF} - Activate with Key {FF0000}", info, "Ok", "Close");
 });
 
 CMD.on("fix", (player) => {
