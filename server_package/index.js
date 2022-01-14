@@ -4913,7 +4913,7 @@ samp.OnPlayerDisconnect((player, reason) => {
     switch(reason) {
         case 0: motiv = "crașh"; break;
         case 1: motiv = "ieșire"; break;
-        case 2: motiv = "kick / ban"; break;
+        case 2: motiv = "kick sau ban"; break;
     }
     Discord.sendTTSLog("ro-ro", `Jucătorul ${player.GetPlayerName(24)} cu id-ul ${player.playerid} a ieșit din servăr motiv: ${motiv}`);
 
