@@ -514,7 +514,14 @@ CMD.on("hidetag", (player) => {
 });
 
 CMD.on("vup", (player) => {
-
+    let info = "";
+    info += "Info\tCooldown\n";
+    info += "{00BBF6}VUP Level 1\t{FFFFFF}1 second\n"
+    info += "{00BBF6}VUP Level 2\t{FFFFFF}2 seconds\n"
+    info += "{00BBF6}VUP Level 3\t{FFFFFF}3 seconds\n"
+    info += "{00BBF6}VUP Level 4 {FF0000}- Only VIP Blue\t{FFFFFF}3 seconds\n"
+    info += "{FF0000}Disable Vehicle Jump";
+    player.ShowPlayerDialog(Dialog.VUP, samp.DIALOG_STYLE.TABLIST_HEADERS, "{00BBF6}Vehicle Jump", info, "Select", "Close");
 });
 
 CMD.on("pm", (player, params) => {
@@ -4946,6 +4953,18 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.VUP: {
+            if(response) {
+                
+            }
+            break;
+        }
+        case Dialog.SPEED: {
+            if(response) {
+
+            }
+            break;
+        }
         case Dialog.CARTEXT: {
             if(response) {
                 let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
