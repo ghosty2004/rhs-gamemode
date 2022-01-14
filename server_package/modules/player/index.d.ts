@@ -1,5 +1,3 @@
-import { SampPlayer } from "samp-node-lib";
-
 export declare const Info: {
     LoggedIn: boolean,
     Language: number,
@@ -107,9 +105,7 @@ export declare const Info: {
     Kicks: number,
     Last_Chat_Message: number,
     Last_Command: number,
-    SpecialZone: {
-        Targets: boolean
-    },
+    In_Minigame: "none"|"gifts"|"hns"|"lastman"|"targets",
     TargetsPoints: number,
     TargetsLastShot: number,
     ClickedPlayer: number,

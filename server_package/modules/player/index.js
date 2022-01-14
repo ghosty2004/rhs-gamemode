@@ -108,9 +108,7 @@ module.exports = {
             Kicks: 0,
             Last_Chat_Message: Math.floor(Date.now() / 1000),
             Last_Command: Math.floor(Date.now() / 1000),
-            SpecialZone: {
-                Targets: false
-            },
+            In_Minigame: "none",
             TargetsPoints: 0,
             TargetsLastShot: Math.floor(Date.now() / 1000),
             ClickedPlayer: playerid,

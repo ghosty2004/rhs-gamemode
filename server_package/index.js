@@ -354,14 +354,19 @@ CMD.on("business", (player) => {
 
 CMD.on("leave", (player) => {
     if(isPlayerInSpecialZone(player)) {
-        if(Player.Info[player.playerid].SpecialZone.Targets) {
-            player.PlayerTextDrawHide(TextDraws.player.targets_points[player.playerid]);
-            player.PlayerTextDrawSetString(TextDraws.player.targets_points[player.playerid], "~r~~h~Points: ~w~~h~0");
-            let coins = Math.round(Player.Info[player.playerid].TargetsPoints / 2);
-            let money = Math.round(Player.Info[player.playerid].TargetsPoints * 50);
-            player.GameTextForPlayer(`~r~~h~you won ${coins} coins and $${money}~n~~w~~h~for making ~g~~h~${Player.Info[player.playerid].TargetsPoints} ~w~~h~points`, 5000, 3);
-            Player.Info[player.playerid].SpecialZone.Targets = false;
-            Player.Info[player.playerid].TargetsPoints = 0;
+        if(Player.Info[player.playerid].In_Minigame != "none") {
+            switch(Player.Info[player.playerid].In_Minigame) {
+                case "targets": {
+                    player.PlayerTextDrawHide(TextDraws.player.targets_points[player.playerid]);
+                    player.PlayerTextDrawSetString(TextDraws.player.targets_points[player.playerid], "~r~~h~Points: ~w~~h~0");
+                    let coins = Math.round(Player.Info[player.playerid].TargetsPoints / 2);
+                    let money = Math.round(Player.Info[player.playerid].TargetsPoints * 50);
+                    player.GameTextForPlayer(`~r~~h~you won ${coins} coins and $${money}~n~~w~~h~for making ~g~~h~${Player.Info[player.playerid].TargetsPoints} ~w~~h~points`, 5000, 3);
+                    Player.Info[player.playerid].TargetsPoints = 0;
+                    break;
+                }
+            }
+            Player.Info[player.playerid].In_Minigame = "none";
         }
         if(Player.Info[player.playerid].In_DM != "none") {
             if(Player.Info[player.playerid].In_DM == "mrf") Player.Info[player.playerid].Selected_MRF_Weapon = null;
@@ -983,7 +988,19 @@ CMD.on("minigames", (player) => {
 });
 
 CMD.on("gifts", (player) => {
-
+    Player.Info[player.playerid].In_Minigame = "gifts";
+    player.ResetPlayerWeapons();
+    player.SetPlayerVirtualWorld(1000);
+    TelePlayer(player, "gifts", "Gifts Minigame", -781.4520, 2298.7214, 66.5803, 269.9289);
+    let info = "";
+    info += "{11FF00}Hi and welcome to the {ff0000}Gifts Minigame{11FF00}!\n";
+    info += "\n";
+    info += "{FA4205}» {04FB21}In this {12FFFF}\"MiniGame\"{15FF00} you must find the lucky present which will give you a prize and will send you to the next level!\n";
+    info += "{FA4205}» {04FB21}In case you will not find the lucky present you will die!\n";
+    info += "{FA4205}» {04FB21}Remember that there's only one lucky present at each level of this minigame!\n";
+    info += "\n";
+    info += "{FA4205}» {ffff00}Have Fun!";
+    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Gifts Minigame", info, "Ok", "");
 });
 
 CMD.on("lastman", (player) => {
@@ -1003,11 +1020,11 @@ CMD.on("sfparkour", (player) => {
 });
 
 CMD.on("targets", (player) => {
-    Player.Info[player.playerid].SpecialZone.Targets = true;
+    Player.Info[player.playerid].In_Minigame = "targets";
     player.ResetPlayerWeapons();
     player.GivePlayerWeapon(Minigames.Targets.Weapon, 9999);
     player.SetPlayerVirtualWorld(1000);
-    TelePlayer(player, "targets", "Targets", -498.7933, -2675.3245, 1081.9259, 271.9457);
+    TelePlayer(player, "targets", "Targets Minigame", -498.7933, -2675.3245, 1081.9259, 271.9457);
     player.PlayerTextDrawShow(TextDraws.player.targets_points[player.playerid]);
 });
 
@@ -3769,7 +3786,7 @@ function SendACMD(player, cmdtext) {
 
 function isPlayerInSpecialZone(player) {
     let value = false;
-    if(Player.Info[player.playerid].SpecialZone.Targets) value = true;
+    if(Player.Info[player.playerid].In_Minigame != "none") value = true;
     if(Player.Info[player.playerid].In_DM != "none") value = true;
     return value;
 }
@@ -3785,6 +3802,17 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ * @param {String} cmdtext
+ * @param {String} name 
+ * @param {Number} x 
+ * @param {Number} y 
+ * @param {Number} z 
+ * @param {Number} angle 
+ * @param {Boolean} dm 
+ * @param {Boolean} gametext
+ */
 function TelePlayer(player, cmdtext, name, x, y, z, angle, dm=false, gametext=true) {
     switch(dm) {
         case false: {
@@ -4824,7 +4852,7 @@ samp.OnPlayerGiveDamageActor((player, damaged_actorid, amount, weaponid, bodypar
 
 samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
     /* Targets Minigame */
-    if(Player.Info[player.playerid].SpecialZone.Targets) {
+    if(Player.Info[player.playerid].In_Minigame == "targets") {
         if(weaponid == Minigames.Targets.Weapon) {
             if(hittype == samp.BULLET_HIT_TYPE.OBJECT) {
                 if(hitid == Minigames.Targets.HitObject) {
