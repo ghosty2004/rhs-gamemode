@@ -4909,7 +4909,13 @@ samp.OnPlayerConnect(async(player) => {
 
 samp.OnPlayerDisconnect((player, reason) => {
     Discord.sendLog("joinLeave", "RED", `${player.GetPlayerName(24)} [ID: ${player.playerid}] has been disconnected`);
-    Discord.sendTTSLog("ro-ro", `Jucătorul ${player.GetPlayerName(24)} cu id-ul ${player.playerid} a ieșit din servăr`);
+    let motiv = "";
+    switch(reason) {
+        case 0: motiv = "crașh"; break;
+        case 1: motiv = "ieșire"; break;
+        case 2: motiv = "kick / ban"; break;
+    }
+    Discord.sendTTSLog("ro-ro", `Jucătorul ${player.GetPlayerName(24)} cu id-ul ${player.playerid} a ieșit din servăr motiv: ${motiv}`);
 
     Function.savePlayer(player);
 
