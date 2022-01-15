@@ -126,6 +126,10 @@ CMD.on("discordsignout", (player) => {
 /* ================ */
 /* Players Commands */
 /* ================ */
+CMD.on("gpci", (player) => {
+    player.SendClientMessage(-1, `Your gpci: {FF0000}${player.gpci(41)} {FFFFFF}!`);
+});
+
 CMD.on("cmds", (player) => {
     ShowCMDS(player, 1);
 });
