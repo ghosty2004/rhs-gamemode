@@ -4024,9 +4024,6 @@ function SetupPlayerForSpawn(player, type=0) {
         player.SetPlayerFacingAngle(position[3]);
     }
 
-    /* Check if the player is Caged */
-    if(Player.Info[player.playerid].Caged) CagePlayer(player);
-
     /* Check if the hold settings is setted for spawn */
     if(Player.Info[player.playerid].HoldsData.Settings == 1) {
         Player.Info[player.playerid].Holds.filter(f => f.used).forEach((i) => {
@@ -4036,6 +4033,9 @@ function SetupPlayerForSpawn(player, type=0) {
 
     /* Check if the player is in DeathMatch */
     if(Player.Info[player.playerid].In_DM != "none") spawnPlayerInDM(player);
+
+    /* Check if the player is Caged */
+    if(Player.Info[player.playerid].Caged) CagePlayer(player);
 }
 
 function LoadFromDB() {
@@ -4932,7 +4932,10 @@ samp.OnPlayerDisconnect((player, reason) => {
 
     if(Player.Info[player.playerid].SpawnedCar) samp.DestroyVehicle(Player.Info[player.playerid].SpawnedCar);
 
+    if(Player.Info[player.playerid].Caged) UnCagePlayer(player);
+
     Player.ResetVariables(player.playerid);
+
     checkReportsTD();
 
     HideConnectTextDraw(player);
