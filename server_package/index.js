@@ -2889,6 +2889,40 @@ CMD.on("setall", (player, params) => {
 /* ============== */
 /* Rcons Commands */
 /* ============== */
+CMD.on("setaccess", async (player, params) => {
+    if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0] || !params[1]) return SendUsage(player, "/setaccess [ID/Name] [demote/rcon/caretaker/founder]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    if(await GetPlayerValueFromDB(target, "rcontype") >= await GetPlayerValueFromDB(player, "rcontype")) return SendError(player, "Your RCON type is lower or equal that the player RCON type !");
+    let setValue = -1;
+    switch(params[1]) {
+        case "demote": setValue = 0; break;
+        case "rcon": setValue = 1; break;
+        case "caretaker": {
+            if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+            setValue = 2;
+            break;
+        }
+        case "founder": {
+            if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+            setValue = 3;
+            break;
+        }
+        default: {
+            successSeted = false;
+            SendError(player, "Invalid option !");
+        }
+    }
+    if(setValue != -1) {
+        UpdatePlayer(target, "rcontype", setValue);
+        target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has seted your RCON access to: {FF0000}${params[1].toUpperCase()}{FFFF00}!`);
+        player.SendClientMessage(data.colors.YELLOW, `You have successfully seted {FF0000}${target.GetPlayerName(24)}{FFFF00}'s RCON type to: {FF0000}${params[1].toUpperCase()}{FFFF00}!`);
+        if(target.IsPlayerAdmin() && setValue == 0) Function.kickPlayer(target);
+        SendACMD(player, "SetAccess");
+    }
+});
+
 CMD.on("saveall", (player) => {
     if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     Function.saveAll(player);
@@ -3170,6 +3204,14 @@ function CheckAntiCheat(player) {
 
 function UpdatePlayer(player, column, value) {
     con.query(`UPDATE users SET ${column} = ? WHERE ID = ?`, [value, Player.Info[player.playerid].AccID]);
+}
+
+function GetPlayerValueFromDB(player, column) {
+    return new Promise((resolve, reject) => {
+        con.query(`SELECT ${column} as value FROM users WHERE ID = ?`, [Player.Info[player.playerid].AccID], (err, result) => {
+            resolve(result[0].value);
+        });
+    });
 }
 
 function GetPersonalCarPrice(model) {
