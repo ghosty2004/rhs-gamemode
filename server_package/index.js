@@ -2889,6 +2889,24 @@ CMD.on("setall", (player, params) => {
 /* ============== */
 /* Rcons Commands */
 /* ============== */
+CMD.on("fakechat", (player, params) => {
+    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0] || !params.slice(1).join(" ")) return SendUsage(player, "/fakechat [ID/Name] [Text]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    OnPlayerText(target, params.slice(1).join(" "));
+    SendACMD(player, "FakeChat");
+});
+
+CMD.on("fakecmd", (player, params) => {
+    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0] || !params.slice(1).join(" ")) return SendUsage(player, "/fakecmd [ID/Name] [Command]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    OnPlayerCommandText(target, params.slice(1).join(" "));
+    SendACMD(player, "FakeCMD");
+});
+
 CMD.on("setaccess", async (player, params) => {
     if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!params[0] || !params[1]) return SendUsage(player, "/setaccess [ID/Name] [demote/rcon/caretaker/founder]");
@@ -2991,6 +3009,38 @@ CMD.on("givepcar", (player, params) => {
 /* =============== */
 /* SA:MP Functions */
 /* =============== */
+function OnPlayerText(player, text) {
+    if(!Player.Info[player.playerid].LoggedIn) return;
+    if(Player.Info[player.playerid].AFK) return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use the~n~~r~~h~Chat~w~~h~!", 4000, 4);
+    if(!checkAntiSpam(player, 0)) return false;
+    Player.Info[player.playerid].Last_Chat_Message = Math.floor(Date.now() / 1000);
+    Server.Info.Messages++;
+    if(!CheckCustomChat(player, text)) return false;
+    samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}${getPlayerRankInChat(player)}{00CCFF}(${player.playerid}):{FFFFFF} ${text}`);
+    if(text.toLowerCase().startsWith(data.settings.BUSTER_PREFIX.toLowerCase())) {
+        samp.SendClientMessageToAll(data.colors.RED, `${data.settings.BUSTER_PREFIX}: ${data.settings.BUSTER_RESPONSES[Function.getRandomInt(0, data.settings.BUSTER_RESPONSES.length)]}`);
+    }
+}
+
+function OnPlayerCommandText(player, cmdtext) {
+    if(!Player.Info[player.playerid].LoggedIn) return;
+    if(!checkAntiSpam(player, 1)) return true;
+    Player.Info[player.playerid].Last_Command = Math.floor(Date.now() / 1000);
+    cmdtext = cmdtext.replace("/", "");
+    let params = cmdtext.split(/[ ]+/); 
+    cmdtext = params[0].toLowerCase();
+    params.shift();
+    if(isPlayerInSpecialZone(player) && cmdtext != "leave") return player.GameTextForPlayer("~w~~h~Use ~r~~h~/Leave ~w~~h~to ~r~~h~Leave~w~~h~!", 4000, 4);
+    if(Player.Info[player.playerid].AFK && cmdtext != "back") return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use~n~~r~~h~Commands~w~~h~!", 3000, 4);
+    if(CMD.eventNames().some(s => s == cmdtext)) {
+        try { CMD.emit(cmdtext, player, params); }
+        catch(e) { console.log(e.stack); }
+    } else if(Teleport.Exists(cmdtext)) { 
+        let result = Teleport.Info.find(f => f.command == cmdtext);
+        TelePlayer(player, cmdtext, result.name, result.position[0], result.position[1], result.position[2], result.position[3]);
+    } else player.SendClientMessage(data.colors.RED, Function.Lang(player, `Comanda {BBFF00}/${cmdtext}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`, `Command {BBFF00}/${cmdtext}{FF0000} don't exist! Use {BBFF00}/help{FF0000} or {BBFF00}/cmds{FF0000}!`));
+}
+
 function getPlayerWeapons(player) {
     let weapons = [];
     for(let i = 0; i <= 12; i++) {
@@ -3351,7 +3401,6 @@ function UpdateRankLabelFor(player) {
 }
 
 function AfkBrb(player, type) {
-    /* Types: 0 = brb | 1 = afk */
     samp.GameTextForAll(`~n~~n~~n~~n~~n~~n~~r~~h~${player.GetPlayerName(24)} ~w~~h~will ~y~~h~${type == 0 ? "BRB" : "AFK"}`, 5000, 5);
     player.SetPlayerVirtualWorld(player.playerid);
     player.SetPlayerCameraPos(320.22311401367, -1874.7312011719, 63.627601623535);
@@ -6354,24 +6403,6 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     return true;
 });
 
-samp.OnPlayerText((player, text) => { 
-    if(Player.Info[player.playerid].AFK) return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use the~n~~r~~h~Chat~w~~h~!", 4000, 4);
-
-    if(!checkAntiSpam(player, 0)) return false;
-    Player.Info[player.playerid].Last_Chat_Message = Math.floor(Date.now() / 1000);
-
-    Server.Info.Messages++;
-    
-    if(!CheckCustomChat(player, text)) return false;
-
-    samp.SendClientMessageToAll(player.GetPlayerColor(), `${player.GetPlayerName(24)}${getPlayerRankInChat(player)}{00CCFF}(${player.playerid}):{FFFFFF} ${text}`);
-
-    if(text.toLowerCase().startsWith(data.settings.BUSTER_PREFIX.toLowerCase())) {
-        samp.SendClientMessageToAll(data.colors.RED, `${data.settings.BUSTER_PREFIX}: ${data.settings.BUSTER_RESPONSES[Function.getRandomInt(0, data.settings.BUSTER_RESPONSES.length)]}`);
-    }
-    return false;
-});
-
 samp.OnPlayerSpawn((player) => {
     if(!Player.Info[player.playerid].LoggedIn) return player.Kick();
 
@@ -6391,29 +6422,13 @@ samp.OnPlayerSpawn((player) => {
     return true;
 });
 
+samp.OnPlayerText((player, text) => { 
+    OnPlayerText(player, text);
+    return false;
+});
+
 samp.OnPlayerCommandText((player, cmdtext) => {
-    if(Player.Info[player.playerid].LoggedIn) {
-        if(!checkAntiSpam(player, 1)) return true;
-        Player.Info[player.playerid].Last_Command = Math.floor(Date.now() / 1000);
-
-        cmdtext = cmdtext.replace("/", "");
-        let params = cmdtext.split(/[ ]+/); 
-        cmdtext = params[0].toLowerCase();
-        params.shift();
-
-        if(isPlayerInSpecialZone(player) && cmdtext != "leave") return player.GameTextForPlayer("~w~~h~Use ~r~~h~/Leave ~w~~h~to ~r~~h~Leave~w~~h~!", 4000, 4);
-        if(Player.Info[player.playerid].AFK && cmdtext != "back") return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use~n~~r~~h~Commands~w~~h~!", 3000, 4);
-        
-        if(CMD.eventNames().some(s => s == cmdtext)) {
-            try { CMD.emit(cmdtext, player, params); }
-            catch(e) { console.log(e.stack); }
-        }
-        else if(Teleport.Exists(cmdtext)) { 
-            let result = Teleport.Info.find(f => f.command == cmdtext);
-            TelePlayer(player, cmdtext, result.name, result.position[0], result.position[1], result.position[2], result.position[3]);
-        }
-        else player.SendClientMessage(data.colors.RED, Function.Lang(player, `Comanda {BBFF00}/${cmdtext}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`, `Command {BBFF00}/${cmdtext}{FF0000} don't exist! Use {BBFF00}/help{FF0000} or {BBFF00}/cmds{FF0000}!`));
-    }
+    OnPlayerCommandText(player, cmdtext);
     return true;
 });  
 

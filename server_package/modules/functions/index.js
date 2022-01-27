@@ -7,20 +7,20 @@ const colors = require("../../data/colors");
 const con = require("../mysql");
 const Player = require("../player");
 
-module.exports = {
+module.exports = { 
     /**
      * @param {SampPlayer} player 
      * @param {String} ro_string 
      * @param {String} en_string 
      * @returns {String}
      */
-    Lang: function(player, ro_string, en_string) {
+    Lang(player, ro_string, en_string) {
         return Player.Info[player.playerid].Language == 1 ? ro_string : en_string;
     },
     /**
      * @param {SampPlayer} player 
      */
-    kickPlayer: function(player) {
+    kickPlayer(player) {
         setTimeout(() => {
             try { player.Kick(); }
             catch {}
@@ -31,7 +31,7 @@ module.exports = {
      * @param {Number} max 
      * @returns {Number}
      */
-    getRandomInt: function(min, max) {
+    getRandomInt(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
         return Math.floor(Math.random() * (max - min) + min); 
@@ -40,7 +40,7 @@ module.exports = {
      * @param {Number|String} IDOrName 
      * @returns {SampPlayer}
      */
-    getPlayer: function(IDOrName) {
+    getPlayer(IDOrName) {
         let result; 
         if(!isNaN(IDOrName)) result = getPlayers().filter(f => f.playerid == parseInt(IDOrName))[0];
         else result = getPlayers().filter(f => f.GetPlayerName(24).toLowerCase().includes(`${IDOrName}`.toLowerCase()))[0];
@@ -51,7 +51,7 @@ module.exports = {
      * @param {Number} d 
      * @returns {String}
      */
-    timestampToHMS: function(d) {
+    timestampToHMS(d) {
         let time = Math.floor(Date.now() / 1000) - d;
         let hours = Math.floor(time / 3600);
         let minutes = Math.floor(time / 60) % 60;
@@ -61,7 +61,7 @@ module.exports = {
     /**
      * @returns {String}
      */
-    getBeatifulDate: function() { 
+    getBeatifulDate() { 
         const d = new Date();
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         return `${("0" + d.getDate()).slice(-2)} ${monthNames[d.getMonth()]}, ${d.getFullYear()}`;
@@ -70,7 +70,7 @@ module.exports = {
      * @param {Number} number 
      * @returns {String}
      */
-    decimalToHexString: function(number) {
+    decimalToHexString(number) {
         if(number < 0) {
             number = 0xFFFFFFFF + number + 1;
         }
@@ -84,7 +84,7 @@ module.exports = {
      * @param {Number} time 
      * @returns {String}
      */
-    secondsToMinutesAndSeconds: function(time) {
+    secondsToMinutesAndSeconds(time) {
         let mins = ~~((time % 3600) / 60);
         let secs = ~~time % 60;
         return `${mins}:${secs}`;
@@ -93,13 +93,13 @@ module.exports = {
      * @param {Number} number 
      * @returns {String}
      */
-    numberWithCommas: function(number) {
+    numberWithCommas(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     },
     /**
      * @returns {String}
      */
-    getDateForLastOn: function() {
+    getDateForLastOn() {
         const d = new Date();
         return `${("0" + d.getDate()).slice(-2)}:${d.getMonth()+1}:${d.getFullYear()}`;
     },
@@ -107,14 +107,14 @@ module.exports = {
      * @param {Number|String} value 
      * @returns 
      */
-    isNumber: function(value) {
+    isNumber(value) {
         if(typeof(value) == "number" || !isNaN(value)) return true;
         else return false;
     },
     /**
      * @param {Number} AccID 
      */
-    getNameByAccID: function(AccID) {
+    getNameByAccID(AccID) {
         return new Promise((resolve, reject) => {
             con.query("SELECT * FROM users WHERE ID = ?", [AccID], function(err, result) {
                 if(err || !result) return resolve("none");
@@ -125,7 +125,7 @@ module.exports = {
     /**
      * @returns {Number}
      */
-    getTotalUsersCount: function() {
+    getTotalUsersCount() {
         return new Promise((resolve, reject) => {
             con.query("SELECT COUNT(*) AS count FROM users", function(err, result) { 
                 if(err || result == 0) return resolve(0);
@@ -137,7 +137,7 @@ module.exports = {
      * @param {Number} GangID 
      * @returns {String}
      */
-    getGangFounders: function(GangID) {
+    getGangFounders(GangID) {
         return new Promise((resolve, reject) => {
             con.query("SELECT name FROM users WHERE gang = ? AND gang_rank = ?", [GangID, 5], function(err, result) {
                 if(err || result == 0) resolve("None");
@@ -153,14 +153,14 @@ module.exports = {
      * @param {Number} degrees 
      * @returns {Number}
      */
-    degToRad: function(degrees) {
+    degToRad(degrees) {
         return degrees * (Math.PI / 180);
     },
     /**
      * @param {Number} rad 
      * @returns {Number}
      */
-    radToDeg: function(rad) {
+    radToDeg(rad) {
         return rad / (Math.PI / 180);
     },
     /**
@@ -180,7 +180,7 @@ module.exports = {
         /**
          * @param {User} user 
          */
-        loginSessionId: function(user) {
+        loginSessionId(user) {
             return new Promise((resolve, reject) => {
                 con.query("SELECT ID FROM users WHERE discord = ?", [user.id], function(err, result) {
                     if(err || result == 0) resolve(0);
@@ -192,7 +192,7 @@ module.exports = {
          * @param {User} user 
          * @param {String} column
          */
-        columnValue: function(user, column) {
+        columnValue(user, column) {
             return new Promise((resolve, reject) => {
                 con.query(`SELECT ${column} as value FROM users WHERE discord = ?`, [user.id], function(err, result) {
                     if(err || result == 0) resolve(0);
@@ -205,7 +205,7 @@ module.exports = {
      * @param {Number} days 
      * @returns {Number}
      */
-    getTimestamp: function(days=0) {
+    getTimestamp(days=0) {
         return days == 0 ? Math.round(new Date() / 1000) : Math.round(new Date() / 1000) + (days * 86400);
     },
     /**
@@ -242,7 +242,7 @@ module.exports = {
      * @param {SampPlayer} target 
      * @param {String} reason 
      */
-    kickTargetByAdmin: function(adminData, target, reason) {
+    kickTargetByAdmin(adminData, target, reason) {
         Player.Info[target.playerid].Kicks++;
         if(Player.Info[target.playerid].Kicks < 3) {
             SendClientMessageToAll(colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been kicked by Admin {00A6FF}${adminData.name}{D1D1D1}!`);
@@ -257,7 +257,7 @@ module.exports = {
     /**
      * @param {Number} clanId
      */
-    saveClan: function(clanId) {
+    saveClan(clanId) {
         if(!Clan.Exists(clanId)) return;
         con.query("UPDATE clans SET name = ?, owner = ?, position = ?, weapon = ?, color = ?, member_skin = ?, leader_skin = ?, kills = ?, deaths = ? WHERE ID = ?", [
             Clan.Info[clanId].name, Clan.Info[clanId].owner, JSON.stringify(Clan.Info[clanId].position), JSON.stringify(Clan.Info[clanId].weapons), Clan.Info[clanId].color,
@@ -267,7 +267,7 @@ module.exports = {
     /**
      * @param {Number} gangId
      */
-    saveGang: function(gangId) {
+    saveGang(gangId) {
         if(!Gang.Exists(gangId)) return;
         con.query("UPDATE gangs SET name = ?, position = ?, weapon = ?, color = ?, alliance = ?, points = ?, captures = ?, kills = ?, deaths = ?, territory_position = ? WHERE ID = ?", [
             Gang.Info[gangId].name, JSON.stringify(Gang.Info[gangId].position), JSON.stringify(Gang.Info[gangId].weapons), Gang.Info[gangId].color, Gang.Info[gangId].alliance, Gang.Info[gangId].points, Gang.Info[gangId].captures, 
@@ -279,7 +279,7 @@ module.exports = {
     /**
      * @param {SampPlayer} player 
      */
-    savePlayer: function(player) {
+    savePlayer(player) {
         if(!Player.Info[player.playerid].LoggedIn) return;
         let OnlineTime = this.totalGameTime(player, "default");
         let OnlineTimeGang = this.totalGameTime(player, "gang");
@@ -311,7 +311,7 @@ module.exports = {
      * @param {"default"|"gang"|"month"} type
      * @returns {{hours: Number, minutes: Number, seconds: Number}}
      */
-    totalGameTime: function(player, type) {
+    totalGameTime(player, type) {
         let total_time;
         switch(type) {
             case "default": {
@@ -336,7 +336,7 @@ module.exports = {
      * @param {SampPlayer} admin 
      * @param {Boolean} discord
      */
-    saveAll: function(admin, discod = false) {
+    saveAll(admin, discod = false) {
         getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
             this.savePlayer(i);
             i.SendClientMessage(colors.YELLOW, `Admin {FF0000}${discod ? admin : player.GetPlayerName(24)} {FFFF00}has saved your {FF0000}account{FFFF00}!`);
@@ -348,7 +348,7 @@ module.exports = {
      * @param {Number} rank 
      * @returns {String}
      */
-    getRconRank: function(rank) {
+    getRconRank(rank) {
         let string = "None";
         switch(rank) {
             case 1: string = "RCON"; break;
