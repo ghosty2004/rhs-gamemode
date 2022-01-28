@@ -28,6 +28,7 @@ const events = require("./modules/events");
 const Firework = require("./modules/firework");
 const Function = require("./modules/functions");
 const Gang = require("./modules/gang");
+const House = require("./modules/house");
 const Minigames = require("./modules/minigames");
 const con = require("./modules/mysql"); 
 const PCar = require("./modules/pcar");
@@ -54,7 +55,6 @@ const ServerLogs = ["", "", ""];
 /* Functions */
 /* ========= */
 const { getPlayer, isNumber } = require("./modules/functions");
-const { CommandInteraction } = require("discord.js");
 
 /* ====== */
 /* Data's */
@@ -63,6 +63,8 @@ const data = {
     animations: require("./data/animations"),
     colors: require("./data/colors"),
     holds: require("./data/holds"),
+    interiors: require("./data/interiors"),
+    logTypes: require("./data/logTypes"),
     position: require("./data/positions"),
     settings: require("./data/settings")
 }
@@ -2889,6 +2891,15 @@ CMD.on("setall", (player, params) => {
 /* ============== */
 /* Rcons Commands */
 /* ============== */
+CMD.on("createhouse", (player, params) => {
+    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    con.query("INSERT INTO houses")
+});
+
+CMD.on("deletehouse", (player, params) => {
+    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
 CMD.on("fakechat", (player, params) => {
     if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!params[0] || !params.slice(1).join(" ")) return SendUsage(player, "/fakechat [ID/Name] [Text]");
@@ -4130,12 +4141,21 @@ function SetupPlayerForSpawn(player, type=0) {
 }
 
 function LoadFromDB() {
+    LoadHouses();
     LoadPersonalCars();
     LoadGangs();
     LoadGangsTeleportsCheckpoints();
     LoadSpawnZones();
     LoadTeleports();
     LoadClans();
+}
+
+function LoadHouses() {
+    con.query("SELECT * FROM houses", function(err, result) {
+        for(let i = 0; i < result.length; i++) {
+            House.Create(result[i].ID, result[i].owner, JSON.parse(result[i].position), result[i].interiorType, result[i].cost);
+        }
+    });
 }
 
 function LoadPersonalCars() {
