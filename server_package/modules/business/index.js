@@ -25,7 +25,7 @@ module.exports = {
                 interiorType: interiorType,
                 cost: cost,
                 win: win,
-                label: CreateDynamic3DTextLabel(`{FFFF00}"${name}{FFFF00}"\n{6600FF}Owner: {00FF00}${owner == 0 ? "For Sale" : `${await getNameByAccID(owner)}`}\n{6600FF}Cost: {00FF00}${cost} Coins\n{6600FF}Win: {00FF00}${win} Coins\n{6666FF}/business`, -1, position[0], position[1], position[2], 50),
+                label: CreateDynamic3DTextLabel(`{FFFF00}"${name}{FFFF00}"\n{6600FF}Owner: {00FF00}${owner == 0 ? "For Sale" : `${await getNameByAccID(owner)}`}\n{6600FF}Cost: {00FF00}${cost} Coins\n{6600FF}Win: {00FF00}${win} Coins\n{6666FF}/business`, -1, position[0], position[1], position[2]+1, 50, -1, -1, true),
                 pickup: CreateDynamicPickup(1274, 1, position[0], position[1], position[2])
             }); 
         } 

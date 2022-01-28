@@ -352,12 +352,44 @@ CMD.on("godp", (player) => {
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.LIST, `{00FF00}There are {00BBF6}${result.length} {00FF00}players with God Mode On!`, info, "Close", "");
 });
 
-CMD.on("house", (player) => {
-
+CMD.on("house", async (player) => {
+    let result = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
+    if(!result) return SendError(player, "You are not in a House Pickup!");
+    let interiorResult = data.interiors.find(f => f.name == result.interiorType);
+    if(!interiorResult) return SendError(player, Errors.UNEXPECTED);
+    let ownerName = result.owner == 0 ? "For Sale" : await Function.getNameByAccID(result.owner);
+    let info = "";
+    info += `{00BBF6}Owner: {BBFF00}${ownerName}\n`;
+    info += `{00BBF6}Custom Interior: {BBFF00}No\n`;
+    info += `{00BBF6}Interior ID: {BBFF00}${interiorResult.value[3]}\n`;
+    info += `{00BBF6}Custom Interior ID: {BBFF00}0\n`;
+    info += `{00BBF6}Cost: {BBFF00}${result.cost} Coins\n`;
+    info += `{00BBF6}Sell Cost: {BBFF00}${result.cost / 2} Coins\n`;
+    info += `{00BBF6}Locked: {BBFF00}Yes\n`;
+    info += "\n";
+    info += "{00BBF6}Use {BBFF00}/MyH {00BBF6}to go back at your home.";
+    player.ShowPlayerDialog(Dialog.HOUSE, samp.DIALOG_STYLE.MSGBOX, `{BBFF00}${ownerName}{00BBF6}'s house stats!`, info, "Close", "Options");
 });
 
-CMD.on("business", (player) => {
-
+CMD.on("business", async (player) => {
+    let result = Business.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
+    if(!result) return SendError(player, "You are not in a Business Pickup!");
+    let interiorResult = data.interiors.find(f => f.name == result.interiorType);
+    if(!interiorResult) return SendError(player, Errors.UNEXPECTED);
+    let ownerName = result.owner == 0 ? "For Sale" : await Function.getNameByAccID(result.owner);
+    let info = "";
+    info += `{00BBF6}Owner: {BBFF00}${ownerName}.\n`;
+    info += `{00BBF6}Name: {BBFF00}${result.name}\n`;
+    info += `{00BBF6}Expires In: {BBFF00}0 days\n`;
+    info += `{00BBF6}Interior: {BBFF00}Yes (ID: ${interiorResult.value[3]})\n`;
+    info += `{00BBF6}Cost: {BBFF00}${result.cost} Coins\n`;
+    info += `{00BBF6}Sell Cost: {BBFF00}${result.cost / 2} Coins\n`;
+    info += `{00BBF6}Income: {BBFF00}${result.win} Coins\n`;
+    info += `{00BBF6}Level: {BBFF00}0\n`;
+    info += "\n";
+    info += "{00BBF6}Payday comes every 2 hours when you are online.\n";
+    info += "{00BBF6}Use {BBFF00}/MyBusiness {00BBF6}to go back at your Business.";
+    player.ShowPlayerDialog(Dialog.BUSINESS, samp.DIALOG_STYLE.MSGBOX, `{BBFF00}${ownerName}{00BBF6}'s business stats!`, info, "Close", "Options");
 });
 
 CMD.on("leave", (player) => {
@@ -1262,10 +1294,20 @@ CMD.on("myhouse", (player) => {
     let result = House.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
     if(!result) return SendError(player, "You don't have a House!");
 });
+CMD.on("myh", (player) => { CMD.emit("myhouse", player); })
 
 CMD.on("mybusiness", (player) => {
     let result = Business.Info.find(f => f.owner == Player.Info[f.playerid].AccID);
     if(!result) return SendError(player, "You don't have a Business!");
+});
+CMD.on("myb", (player) => { CMD.emit("mybusiness", player); });
+
+CMD.on("upgrade", (player) => {
+
+});
+
+CMD.on("bname", (player, params) => {
+
 });
 
 /**
@@ -4325,6 +4367,7 @@ function LoadHouses() {
         for(let i = 0; i < result.length; i++) {
             House.Create(result[i].ID, result[i].owner, JSON.parse(result[i].position), result[i].interiorType, result[i].cost);
         }
+        console.log(`Loaded ${result.length} houses.`);
     });
 }
 
@@ -4333,6 +4376,7 @@ function LoadBusiness() {
         for(let i = 0; i < result.length; i++) {
             Business.Create(result[i].ID, result[i].name, result[i].owner, JSON.parse(result[i].position), result[i].interiorType, result[i].cost, result[i].win);
         }
+        console.log(`Loaded ${result.length} business.`);
     });
 }
 
@@ -5250,6 +5294,64 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.HOUSE: {
+            if(!response) {
+                let info = "";
+                info += "{BBFF00}Buy {00BBF6}House\n";
+                info += "{BBFF00}Sell {FF0000}House\n";
+                info += "{BBFF00}Re-new {00BBF6}House\n";
+                info += "{BBFF00}Lock/UnLock {FF0000}House\n";
+                info += "{BBFF00}Enter {00BBF6}House\n";
+                info += "{BBFF00}Change {FF0000}Interior\n";
+                info += "{BBFF00}Spawn me at {00BBF6}House";
+                player.ShowPlayerDialog(Dialog.HOUSE_OPTIONS, samp.DIALOG_STYLE.LIST, "House {FF0000}Options", info, "Select", "Back");
+            }
+            break;
+        }
+        case Dialog.HOUSE_OPTIONS: {
+            if(response) {
+                switch(listitem) {
+                    case 0: CMD.emit("buy", player); break;
+                    case 1: CMD.emit("sell", player); break;
+                    case 2: CMD.emit("renew", player); break;
+                    case 3: CMD.emit("lock", player); break;
+                    case 4: CMD.emit("enter", player); break;
+                    case 5: CMD.emit("chint", player); break;
+                    case 6: CMD.emit("myhouse", player); break;
+                }
+            } 
+            else CMD.emit("house", player);
+            break;
+        }
+        case Dialog.BUSINESS: {
+            if(!response) {
+                let info = "";
+                info += "{BBFF00}Buy {00BBF6}Business\n";
+                info += "{BBFF00}Sell {FF0000}Business\n";
+                info += "{BBFF00}Re-new {00BBF6}Business\n";
+                info += "{BBFF00}Enter {FF0000}Business\n";
+                info += "{BBFF00}Upgrade {00BBF6}Business\n";
+                info += "{BBFF00}Change {FF0000}Name\n";
+                info += "{BBFF00}Spawn me at {00BBF6}Business";
+                player.ShowPlayerDialog(Dialog.BUSINESS_OPTIONS, samp.DIALOG_STYLE.LIST, "Business {FF0000}Options", info, "Select", "Back");
+            }
+            break;
+        }
+        case Dialog.BUSINESS_OPTIONS: {
+            if(response) {
+                switch(listitem) {
+                    case 0: CMD.emit("buy", player); break;
+                    case 1: CMD.emit("sell", player); break;
+                    case 2: CMD.emit("renew", player); break;
+                    case 3: CMD.emit("enter", player); break;
+                    case 4: CMD.emit("upgrade", player); break;
+                    case 5: CMD.emit("bname", player, []); break;
+                    case 6: CMD.emit("mybusiness", player); break;
+                }
+            }
+            else CMD.emit("business", player);
+            break;
+        }
         case Dialog.VUP: {
             if(response) {
                 

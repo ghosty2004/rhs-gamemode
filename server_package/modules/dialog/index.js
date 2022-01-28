@@ -79,5 +79,9 @@ module.exports = {
     CARTEXT_SELECT_SIZE:        78,
     CARTEXT_INPUT_TEXT:         79,
     SPEED:                      80,
-    VUP:                        81
+    VUP:                        81,
+    HOUSE:                      82,
+    HOUSE_OPTIONS:              83,
+    BUSINESS:                   84,
+    BUSINESS_OPTIONS:           85
 }
