@@ -1,11 +1,12 @@
-/* =============================== */
-/* SA:MP RHS GAMEMODE COPY VERSION */
-/*      Made by Ghosty2004 <3      */
-/* =============================== */
+/**
+ * SA:MP Romania Hard Stunt Gamemode
+ * By: @Ghosty2004
+ * Pwp Voller <3
+ */
 
-/* ==================== */
-/* Node Package Modules */
-/* ==================== */
+/**
+ * Node Package Modules
+ */
 const samp = require("samp-node-lib");
 const colors = require("colors");
 const md5 = require("md5");
@@ -15,9 +16,9 @@ require("youtube-audio-server").listen(7777);
 
 const package_json = require("../package.json");
 
-/* ============== */
-/* Custom Modules */
-/* ============== */
+/**
+ * Custom Modules
+ */
 const Checkpoint = require("./modules/checkpoint");
 const Circle = require("./modules/circle");
 const Clan = require("./modules/clan");
@@ -40,25 +41,25 @@ const Teleport = require("./modules/teleport");
 const Web = require("./modules/web");
 const YSF = require("./modules/YSF");
 
-/* =========== */
-/* Server Maps */
-/* =========== */
+/**
+ * Maps
+ */
 const Maps = require("./maps");
 
-/* ================ */
-/* Server TextDraws */
-/* ================ */
+/**
+ * TextDraws
+ */
 const TextDraws = require("./textdraws");
 const ServerLogs = ["", "", ""];
 
-/* ========= */
-/* Functions */
-/* ========= */
+/**
+ * Functions
+ */
 const { getPlayer, isNumber } = require("./modules/functions");
 
-/* ====== */
-/* Data's */
-/* ====== */
+/**
+ * Data's
+ */
 const data = {
     animations: require("./data/animations"),
     colors: require("./data/colors"),
@@ -69,9 +70,9 @@ const data = {
     settings: require("./data/settings")
 }
 
-/* =================== */
-/* MYSQL Connect Event */
-/* =================== */
+/**
+ * MySQL Connect Event
+ */
 con.on("mysqlConnect", (err) => {
     if(!err) {
         console.log("MYSQL:".yellow + ` Connection successfully established.`.green);
@@ -84,9 +85,9 @@ con.on("mysqlConnect", (err) => {
     } 
 });
 
-/* ============== */
-/* SA:MP Commands */
-/* ============== */
+/**
+ * Commands Handler
+ */
 const CMD = new events.Command();
 
 process.on('uncaughtException', function (err) {
@@ -94,9 +95,9 @@ process.on('uncaughtException', function (err) {
     console.log("Node NOT Exiting...");
 });
 
-/* ===================== */
-/* Discord Login Command */
-/* ===================== */
+/**
+ * Discord Login Commands
+ */
 CMD.on("acceptlogin", (player) => {
     if(!Player.Info[player.playerid].DiscordLoginRequest.From) return SendError(player, "You don't have a login request from discord!");
     let code = Function.getRandomInt(10000, 99999);
@@ -125,9 +126,9 @@ CMD.on("discordsignout", (player) => {
     con.query("UPDATE users SET discord = ? WHERE ID = ?", [Player.Info[player.playerid].Discord, Player.Info[player.playerid].AccID]);
 });
 
-/* ================ */
-/* Players Commands */
-/* ================ */
+/**
+ * Player's Commands
+ */
 CMD.on("gpci", (player) => {
     player.SendClientMessage(-1, `Your gpci: {FF0000}${player.gpci(41)} {FFFFFF}!`);
 });
@@ -1156,9 +1157,9 @@ CMD.on("sstunts", (player) => {
     player.ShowPlayerDialog(Dialog.TELES_SIMPLE_STUNTS, samp.DIALOG_STYLE.LIST, "Simple Stunts", info, "Teleport", "Back");
 });
 
-/* ====================== */
-/* Personal Cars Commands */
-/* ====================== */
+/**
+ * Personal Car Commands
+ */
 CMD.on("sellcar", (player) => {
     if(PCar.Info.filter(f => f.owner == Player.Info[player.playerid].AccID).length == 0) return SendError(player, "You don't have any personal vehicle to use this command!");
     let car = PCar.Info.filter(f => f.vehicle == player.vehicleId && f.owner == Player.Info[player.playerid].AccID && player.IsPlayerInAnyVehicle())[0];
@@ -1204,9 +1205,9 @@ CMD.on("buycar", (player) => {
     player.ShowPlayerDialog(Dialog.BUYCAR, samp.DIALOG_STYLE.LIST, "{FF0000}#DealerShip {FFFF00}#Select", info, "Select", "Close");
 });
 
-/* ============= */
-/* VIPS Commands */
-/* ============= */
+/**
+ * VIP Commands
+ */
 CMD.on("vcmds", (player, params) => {
     let info = "";
 
@@ -1299,9 +1300,10 @@ CMD.on("vcmds", (player, params) => {
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "{FFCC00}Comenzi VIP - {FF0000}/BuyVIP, /Vips.", "{FFCC00}VIP Commands - {FF0000}/BuyVIP, /Vips."), info, Function.Lang(player, "Inchide", "Close"), "");
 });
 
-/* ================ */
-/* VIP RED COMMANDS */
-/* ================ */
+/**
+ * VIP Commands
+ * RED
+ */
 CMD.on("astats", (player, params) => {
     if(Player.Info[player.playerid].VIP < 1 && Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
     let target = player;
@@ -1481,9 +1483,10 @@ CMD.on("vaccount", (player) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
 });
 
-/* =================== */
-/* VIP YELLOW COMMANDS */
-/* =================== */
+/**
+ * VIP Commands
+ * YELLOW
+ */
 CMD.on("admins", (player) => {
     if(Player.Info[player.playerid].VIP < 2) return player.SendClientMessage(data.colors.RED, "Use /report [id/name] [reason] | if you see a hacker or if you have a problem!");
     let info = "Name\tRank\n";
@@ -1561,9 +1564,10 @@ CMD.on("vcar", (player) => {
     if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
 });
 
-/* ================= */
-/* VIP BLUE COMMANDS */
-/* ================= */
+/**
+ * VIP Commands
+ * BLUE
+ */
 CMD.on("godcar", (player) => {
     if(Player.Info[player.playerid].VIP < 3) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
 });
@@ -1625,9 +1629,10 @@ CMD.on("eject", (player, params) => {
     if(Player.Info[player.playerid].VIP < 3) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
 });
 
-/* ================== */
-/* VIP WHITE COMMANDS */
-/* ================== */
+/**
+ * VIP Commands
+ * WHITE
+ */
 CMD.on("highlight", (player) => {
     if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
 });
@@ -1694,9 +1699,9 @@ CMD.on("songforme", (player, params) => {
     player.PlayAudioStreamForPlayer(params[0]);
 });
 
-/* ============== */
-/* Gangs Commands */
-/* ============== */
+/**
+ * Gang Commands
+ */
 CMD.on("gcmds", (player) => {
     if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
     let info = "";
@@ -1717,9 +1722,10 @@ CMD.on("gcmds", (player) => {
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `Gang - ${Gang.Info[Player.Info[player.playerid].Gang].name} ({FFFF00}${getGangRank(Player.Info[player.playerid].Gang_Data.Rank)}{AAAAAA})`, info, "Close", "");
 });
 
-/* =================== */
-/* Gang Owner Commands */
-/* =================== */
+/**
+ * Gang Commands
+ * Owner
+ */
 CMD.on("settings", (player) => {
 
 });
@@ -1740,9 +1746,10 @@ CMD.on("refreshall", (player) => {
 
 });
 
-/* ==================== */
-/* Gang Leader Commands */
-/* ==================== */
+/**
+ * Gang Commands
+ * Leader
+ */
 CMD.on("gwarn", (player, params) => {
 
 });
@@ -1755,9 +1762,10 @@ CMD.on("gresetwarns", (player, params) => {
 
 });
 
-/* ======================= */
-/* Gang Co-Leader Commands */
-/* ======================= */
+/**
+ * Gang Commands
+ * Co-Leader
+ */
 CMD.on("invite", (player, params) => {
 
 });
@@ -1782,9 +1790,10 @@ CMD.on("giveacces", (player, params) => {
 
 });
 
-/* ===================== */
-/* Gang Members Commands */
-/* ===================== */
+/**
+ * Gang Commands
+ * Members
+ */
 CMD.on("gm", (player) => {
     if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
     let info = "Name\tRank\n";
@@ -1987,9 +1996,9 @@ CMD.on("gtop", (player) => {
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Gangs", info, "Ok", "");
 });
 
-/* ============== */
-/* Clans Commands */
-/* ============== */
+/**
+ * Clan Commands
+ */
 CMD.on("chelp", (player) => {
     let info = "";
     info += "{FF0000}Founders/Owners Commands\n";
@@ -2127,9 +2136,9 @@ CMD.on("lclan", (player) => {
     }  
 });
 
-/* =============== */
-/* Admins Commands */
-/* =============== */
+/**
+ * Admins Commands
+ */
 CMD.on("acmds", (player) => {
     let info = "";
     info += "{FF0000}Junior:\n";
@@ -2155,9 +2164,10 @@ CMD.on("acmds", (player) => {
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Admin {FF0000}Commands", info, "Close", "");
 });
 
-/* ===================== */
-/* ADMIN JUNIOR COMMANDS */
-/* ===================== */
+/**
+ * Admins Commands
+ * Junior
+ */
 CMD.on("gotop", (player, params) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!isNaN(params[0]) && !isNaN(params[1]) && !isNaN(params[2])) {
@@ -2664,9 +2674,10 @@ CMD.on("ticks", (player) => {
     player.SendClientMessage(-1, `The server has {FF0000}${samp.GetServerTickRate()} {FFFFFF}ticks.`);
 });
 
-/* ===================== */
-/* ADMIN SENIOR COMMANDS */
-/* ===================== */
+/**
+ * Admins Commands
+ * Senior
+ */
 CMD.on("ban", (player, params) => {
     if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(params[0] && !isNaN(params[1]) && params.slice(2).join(" ")) {
@@ -2792,9 +2803,10 @@ CMD.on("teleplayer", (player, params) => {
     SendACMD(player, "TelePlayer");
 });
 
-/* ===================== */
-/* ADMIN MASTER COMMANDS */
-/* ===================== */
+/**
+ * Admins Commands
+ * Master
+ */
 CMD.on("gethere", (player, params) => {
     if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     CMD.emit("get", player, params);
@@ -2888,17 +2900,18 @@ CMD.on("setall", (player, params) => {
     if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
 });
 
-/* ============== */
-/* Rcons Commands */
-/* ============== */
+/**
+ * Admins Commands
+ * RCON
+ */
 CMD.on("createhouse", (player, params) => {
     if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!isNumber(params[0])) return SendUsage(player, "/createhouse [Cost]");
     params[0] = parseInt(params[0]);
     let interiorTypeTemp = data.interiors.filter(f => f.name.startsWith("HOUSE"));
-    let interiorType = interiorTypeTemp[Function.getRandomInt(0, interiorTypeTemp)].name;
+    let interiorType = interiorTypeTemp[Function.getRandomInt(0, interiorTypeTemp.length)].name;
     con.query("INSERT INTO houses (owner, position, interiorType, cost) VALUES(?, ?, ?, ?)", [0, JSON.stringify(player.GetPlayerPos()), interiorType, params[0]], (err, result) => {
-        if(err) return SendError(player, Errors.UNEXPECTED);
+        if(err) return SendError(player, Errors.UNEXPECTED), console.log(err);
         House.Create(result.insertId, 0, player.GetPlayerPos(), interiorType, params[0]);
         player.SendClientMessage(data.colors.YELLOW, `You have successfully created house with ID {FF0000}${result.insertId} {FFFF00}and cost {FF0000}${params[0]}{FFFF00}!`);
         SendACMD(player, "CreateHouse");
@@ -3034,9 +3047,9 @@ CMD.on("givepcar", (player, params) => {
     else SendUsage(player, "/GivePCar [ID/Name] [Vehicle ID]");
 });
 
-/* =============== */
-/* SA:MP Functions */
-/* =============== */
+/**
+ * Functions
+ */
 function OnPlayerText(player, text) {
     if(!Player.Info[player.playerid].LoggedIn) return;
     if(Player.Info[player.playerid].AFK) return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use the~n~~r~~h~Chat~w~~h~!", 4000, 4);
@@ -4701,14 +4714,9 @@ function LoadPlayerStats(player) {
     });
 }
 
-/* =================== */
-/* SA:MP Custom Events */
-/* =================== */
-// null
-
-/* ============ */
-/* Console Read */
-/* ============ */
+/**
+ * Console input read
+ */
 process.openStdin().addListener("data", function(d) {
     let command = d.toString().trim();
     if(command == "restart" || command == "rr") {
@@ -4716,9 +4724,9 @@ process.openStdin().addListener("data", function(d) {
     }
 });
 
-/* ============ */
-/* SA:MP Events */
-/* ============ */
+/**
+ * SA:MP Events
+ */
 samp.OnGameModeInit(() => {
     console.log("================================================".white);
     console.log(`${data.settings.SV_NAME[1]}`.blue + ` ${data.settings.SV_NAME[2]}`.yellow + ` ${data.settings.SV_NAME[3]}`.red + " gamemode successfully loaded.".white);
