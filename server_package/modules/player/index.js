@@ -156,7 +156,8 @@ module.exports = {
                 Fontsize: 5,
                 Index: 0
             },
-            InHouse: 0
+            InHouse: 0,
+            InBusiness: 0
         }
 
         /* ===================== */

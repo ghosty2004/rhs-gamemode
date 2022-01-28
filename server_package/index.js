@@ -19,6 +19,7 @@ const package_json = require("../package.json");
 /**
  * Custom Modules
  */
+const Business = require("./modules/business");
 const Checkpoint = require("./modules/checkpoint");
 const Circle = require("./modules/circle");
 const Clan = require("./modules/clan");
@@ -1159,25 +1160,112 @@ CMD.on("sstunts", (player) => {
 
 /**
  * Properties Commands
+ * House / Business
  */
 CMD.on("enter", (player) => {
-    let result = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
-    if(!result) return SendError(player, "You are not in a House/Business Pickup!");
-    let interiorResult = data.interiors.find(f => f.name == result.interiorType);
-    if(!interiorResult) return SendError(player, Errors.UNEXPECTED);
-    player.SetPlayerPos(interiorResult.value[0], interiorResult.value[1], interiorResult.value[2]);
-    player.SetPlayerInterior(interiorResult.value[3]);
-    player.SetPlayerVirtualWorld(1000 + result.id);
-    Player.Info[player.playerid].InHouse = result.id;
+    let resultHouse = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
+    let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(f.position[0], f.position[1], f.position[2]));
+    if(resultHouse) {
+        let interiorResult = data.interiors.find(f => f.name == resultHouse.interiorType);
+        if(!interiorResult) return SendError(player, Errors.UNEXPECTED);
+        player.SetPlayerPos(interiorResult.value[0], interiorResult.value[1], interiorResult.value[2]);
+        player.SetPlayerInterior(interiorResult.value[3]);
+        player.SetPlayerVirtualWorld(1000 + resultHouse.id);
+        Player.Info[player.playerid].InHouse = resultHouse.id;
+    } 
+    else if(resultBusiness) {
+        let interiorResult = data.interiors.find(f => f.name == resultBusiness.interiorType);
+        if(!interiorResult) return SendError(player, Errors.UNEXPECTED);
+        player.SetPlayerPos(interiorResult.value[0], interiorResult.value[1], interiorResult.value[2]);
+        player.SetPlayerInterior(interiorResult.value[3]);
+        player.SetPlayerVirtualWorld(1000 + resultBusiness.id);
+        Player.Info[player.playerid].InBusiness = resultBusiness.id;
+    } 
+    else SendError(player, "You are not in a House/Business Pickup!");
 });
 
 CMD.on("exit", (player) => {
-    let result = House.Info.find(f => f.id == Player.Info[player.playerid].InHouse);
-    if(!result) return SendError(player, "You don't have from where to exit!");
-    player.SetPlayerPos(result.position[0], result.position[1], result.position[2]);
-    player.SetPlayerInterior(0);
-    player.SetPlayerVirtualWorld(0);
-    Player.Info[player.playerid].InHouse = 0;
+    let resultHouse = House.Info.find(f => f.id == Player.Info[player.playerid].InHouse);
+    let resultBusiness = Business.Info.find(f => f.id == Player.Info[player.playerid].InBusiness);
+    if(resultHouse) {
+        player.SetPlayerPos(resultHouse.position[0], resultHouse.position[1], resultHouse.position[2]);
+        player.SetPlayerInterior(0);
+        player.SetPlayerVirtualWorld(0);
+        Player.Info[player.playerid].InHouse = 0;
+    } 
+    else if(resultBusiness) {
+        player.SetPlayerPos(resultBusiness.position[0], resultBusiness.position[1], resultBusiness.position[2]);
+        player.SetPlayerInterior(0);
+        player.SetPlayerVirtualWorld(0);
+        Player.Info[player.playerid].InBusiness = 0;
+    } 
+    else SendError(player, "You don't have from where to exit!");
+});
+
+CMD.on("buy", (player) => {
+    let resultHouse = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
+    let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(f.position[0], f.position[1], f.position[2]));
+    if(resultHouse) {
+        if(Function.totalGameTime(player, "default").hours < 5) return SendError(player, "You need to have 5 hours on the server to buy a House!");
+        if(Player.Info[player.playerid].Coins < resultBusiness.cost) return SendError(player, `You must have at least ${resultBusiness.cost} coins to buy this House!`);
+        con.query("UPDATE houses SET owner = ? WHERE ID = ?", [Player.Info[player.playerid].AccID, resultHouse.id], (err) => {
+            if(err) return SendError(player, Errors.UNEXPECTED);
+            resultHouse.owner = Player.Info[player.playerid].AccID;
+            House.Update(resultHouse.id);
+        });
+    } 
+    else if(resultBusiness) {
+        if(Function.totalGameTime(player, "default").hours < 5) return SendError(player, "You need to have 5 hours on the server to buy a Business!");
+        if(Player.Info[player.playerid].Coins < resultBusiness.cost) return SendError(player, `You must have at least ${resultBusiness.cost} coins to buy this Business!`);
+        con.query("UPDATE business SET owner = ? WHERE ID = ?", [Player.Info[player.playerid].AccID, resultBusiness.id], (err) => {
+            if(err) return SendError(player, Errors.UNEXPECTED);
+            resultBusiness.owner = Player.Info[player.playerid].AccID;
+            Business.Update(resultBusiness.id);
+        });
+    } 
+    else SendError(player, "You are not in a House/Business Pickup!");
+});
+
+CMD.on("sell", (player) => {
+    let resultHouse = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
+    let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(f.position[0], f.position[1], f.position[2]));
+    if(resultHouse) {
+        if(resultHouse.owner != Player.Info[player.playerid].AccID) return SendError(player, "You don't have what to sell!");
+    } 
+    else if(resultBusiness) {
+        if(resultBusiness.owner != Player.Info[player.playerid].AccID) return SendError(player, "You don't have what to sell!");
+    } 
+    else SendError(player, "You are not in a House/Business Pickup!");
+});
+
+CMD.on("renew", (player) => {
+    let resultHouse = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
+    let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(f.position[0], f.position[1], f.position[2]));
+    if(resultHouse) {
+
+    } 
+    else if(resultBusiness) {
+        
+    } 
+    else SendError(player, "You are not in a House/Business Pickup!");
+});
+
+CMD.on("lock", (player) => {
+
+});
+
+CMD.on("chint", (player) => {
+
+});
+
+CMD.on("myhouse", (player) => {
+    let result = House.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
+    if(!result) return SendError(player, "You don't have a House!");
+});
+
+CMD.on("mybusiness", (player) => {
+    let result = Business.Info.find(f => f.owner == Player.Info[f.playerid].AccID);
+    if(!result) return SendError(player, "You don't have a Business!");
 });
 
 /**
@@ -2928,13 +3016,13 @@ CMD.on("setall", (player, params) => {
  * RCON
  */
 CMD.on("createhouse", (player, params) => {
-    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!isNumber(params[0])) return SendUsage(player, "/createhouse [Cost]");
     params[0] = parseInt(params[0]);
     let interiorTypeTemp = data.interiors.filter(f => f.name.startsWith("HOUSE"));
     let interiorType = interiorTypeTemp[Function.getRandomInt(0, interiorTypeTemp.length)].name;
     con.query("INSERT INTO houses (owner, position, interiorType, cost) VALUES(?, ?, ?, ?)", [0, JSON.stringify(player.GetPlayerPos()), interiorType, params[0]], (err, result) => {
-        if(err) return SendError(player, Errors.UNEXPECTED), console.log(err);
+        if(err) return SendError(player, Errors.UNEXPECTED);
         House.Create(result.insertId, 0, player.GetPlayerPos(), interiorType, params[0]);
         player.SendClientMessage(data.colors.YELLOW, `You have successfully created house with ID {FF0000}${result.insertId} {FFFF00}and cost {FF0000}${params[0]}{FFFF00}!`);
         SendACMD(player, "CreateHouse");
@@ -2942,7 +3030,7 @@ CMD.on("createhouse", (player, params) => {
 });
 
 CMD.on("deletehouse", (player) => {
-    if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     let result = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
     if(!result) return SendError(player, "You are not close to any house!");
     con.query("DELETE FROM houses WHERE ID = ?", [result.id], (err) => {
@@ -2950,6 +3038,34 @@ CMD.on("deletehouse", (player) => {
         House.Delete(result.id);
         player.SendClientMessage(data.colors.YELLOW, `You have successfully deleted house with ID {FF0000}${result.id}{FFFF00}!`);
         SendACMD(player, "DeleteHouse");
+    });
+});
+
+CMD.on("createbusiness", (player, params) => {
+    if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!isNumber(params[0]) || !isNumber(params[1])) return SendUsage(player, "/createbusiness [Cost] [Win] [Name(Optional)]");
+    params[0] = parseInt(params[0]);
+    params[1] = parseInt(params[1]);
+    let interiorTypeTemp = data.interiors.filter(f => f.name.startsWith("BUSINESS"));
+    let interiorType = interiorTypeTemp[Function.getRandomInt(0, interiorTypeTemp.length)].name;
+    let name = params.splice(2).join(" ") ? params.splice(2).join(" ") : "ForSale";
+    con.query("INSERT INTO business (name, owner, position, interiorType, cost, win) VALUES(?, ?, ?, ?, ?, ?)", [name, 0, JSON.stringify(player.GetPlayerPos()), interiorType, params[0], params[1]], (err, result) => {
+        if(err) return SendError(player, Errors.UNEXPECTED);
+        Business.Create(result.insertId, name, 0, player.GetPlayerPos(), interiorType, params[0], params[1]);
+        player.SendClientMessage(data.colors.YELLOW, `You have successfully created business with ID {FF0000}${result.insertId}{FFFF00}, cost {FF0000}${params[0]} {FFFF00}and win {FF0000}${params[1]}{FFFF00}!`);
+        SendACMD(player, "CreateBusiness");
+    });
+});
+
+CMD.on("deletebusiness", (player) => {
+    if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    let result = Business.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
+    if(!result) return SendError(player, "You are not close to any business!");
+    con.query("DELETE FROM business WHERE ID = ?", [result.id], (err) => {
+        if(err) return SendError(player, Errors.UNEXPECTED);
+        Business.Delete(result.id);
+        player.SendClientMessage(data.colors.YELLOW, `You have successfully deleted business with ID {FF0000}${result.id}{FFFF00}!`);
+        SendACMD(player, "DeleteBusiness");
     });
 });
 
@@ -4195,6 +4311,7 @@ function SetupPlayerForSpawn(player, type=0) {
 
 function LoadFromDB() {
     LoadHouses();
+    LoadBusiness();
     LoadPersonalCars();
     LoadGangs();
     LoadGangsTeleportsCheckpoints();
@@ -4207,6 +4324,14 @@ function LoadHouses() {
     con.query("SELECT * FROM houses", function(err, result) {
         for(let i = 0; i < result.length; i++) {
             House.Create(result[i].ID, result[i].owner, JSON.parse(result[i].position), result[i].interiorType, result[i].cost);
+        }
+    });
+}
+
+function LoadBusiness() {
+    con.query("SELECT * FROM business", function(err, result) {
+        for(let i = 0; i < result.length; i++) {
+            Business.Create(result[i].ID, result[i].name, result[i].owner, JSON.parse(result[i].position), result[i].interiorType, result[i].cost, result[i].win);
         }
     });
 }

@@ -1,4 +1,4 @@
-const { CreateDynamicPickup, CreateDynamic3DTextLabel, DestroyDynamicPickup, DestroyDynamic3DTextLabel } = require("../streamer");
+const { CreateDynamicPickup, CreateDynamic3DTextLabel, DestroyDynamicPickup, DestroyDynamic3DTextLabel, UpdateDynamic3DTextLabelText } = require("../streamer");
 const { getNameByAccID } = require("../functions");
 
 module.exports = {
@@ -25,6 +25,14 @@ module.exports = {
                 pickup: CreateDynamicPickup(owner == 0 ? 19523 : 19522, 1, position[0], position[1], position[2])
             }); 
         } 
+    },
+    async Update(id) {
+        let index = this.Info.findIndex(f => f.id == id);
+        if(index != -1) {
+            UpdateDynamic3DTextLabelText(this.Info[index].label, -1, `{BBFF00}${this.Info[index].owner == 0 ? "House {00BBF6}For Sale" : `House owned by {00BBF6}${await getNameByAccID(this.Info[index].owner)}`}{BBFF00}!\n{BBFF00}Type {00BBF6}/house {BBFF00}for Help!`);
+            DestroyDynamicPickup(this.Info[index].pickup);
+            this.Info[index].pickup = CreateDynamicPickup(this.Info[index].owner == 0 ? 19523 : 19522, 1, this.Info[index].position[0], this.Info[index].position[1], this.Info[index].position[2]);
+        }
     },
     /**
      * @param {Number} id
