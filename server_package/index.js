@@ -1158,6 +1158,29 @@ CMD.on("sstunts", (player) => {
 });
 
 /**
+ * Properties Commands
+ */
+CMD.on("enter", (player) => {
+    let result = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
+    if(!result) return SendError(player, "You are not in a House/Business Pickup!");
+    let interiorResult = data.interiors.find(f => f.name == result.interiorType);
+    if(!interiorResult) return SendError(player, Errors.UNEXPECTED);
+    player.SetPlayerPos(interiorResult.value[0], interiorResult.value[1], interiorResult.value[2]);
+    player.SetPlayerInterior(interiorResult.value[3]);
+    player.SetPlayerVirtualWorld(1000 + result.id);
+    Player.Info[player.playerid].InHouse = result.id;
+});
+
+CMD.on("exit", (player) => {
+    let result = House.Info.find(f => f.id == Player.Info[player.playerid].InHouse);
+    if(!result) return SendError(player, "You don't have from where to exit!");
+    player.SetPlayerPos(result.position[0], result.position[1], result.position[2]);
+    player.SetPlayerInterior(0);
+    player.SetPlayerVirtualWorld(0);
+    Player.Info[player.playerid].InHouse = 0;
+});
+
+/**
  * Personal Car Commands
  */
 CMD.on("sellcar", (player) => {

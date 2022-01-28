@@ -160,7 +160,8 @@ export declare const Info: {
     EditingCarText: {
         Fontsize: number,
         Index: number
-    }
+    },
+    InHouse: number
 }[];
 
 export declare function ResetVariables(playerid: number): void;

@@ -155,7 +155,8 @@ module.exports = {
             EditingCarText: {
                 Fontsize: 5,
                 Index: 0
-            }
+            },
+            InHouse: 0
         }
 
         /* ===================== */
