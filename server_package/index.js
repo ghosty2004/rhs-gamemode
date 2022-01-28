@@ -2893,11 +2893,28 @@ CMD.on("setall", (player, params) => {
 /* ============== */
 CMD.on("createhouse", (player, params) => {
     if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
-    con.query("INSERT INTO houses")
+    if(!isNumber(params[0])) return SendUsage(player, "/createhouse [Cost]");
+    params[0] = parseInt(params[0]);
+    let interiorTypeTemp = data.interiors.filter(f => f.name.startsWith("HOUSE"));
+    let interiorType = interiorTypeTemp[Function.getRandomInt(0, interiorTypeTemp)].name;
+    con.query("INSERT INTO houses (owner, position, interiorType, cost) VALUES(?, ?, ?, ?)", [0, JSON.stringify(player.GetPlayerPos()), interiorType, params[0]], (err, result) => {
+        if(err) return SendError(player, Errors.UNEXPECTED);
+        House.Create(result.insertId, 0, player.GetPlayerPos(), interiorType, params[0]);
+        player.SendClientMessage(data.colors.YELLOW, `You have successfully created house with ID {FF0000}${result.insertId} {FFFF00}and cost {FF0000}${params[0]}{FFFF00}!`);
+        SendACMD(player, "CreateHouse");
+    });
 });
 
-CMD.on("deletehouse", (player, params) => {
+CMD.on("deletehouse", (player) => {
     if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    let result = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
+    if(!result) return SendError(player, "You are not close to any house!");
+    con.query("DELETE FROM houses WHERE ID = ?", [result.id], (err) => {
+        if(err) return SendError(player, Errors.UNEXPECTED);
+        House.Delete(result.id);
+        player.SendClientMessage(data.colors.YELLOW, `You have successfully deleted house with ID {FF0000}${result.id}{FFFF00}!`);
+        SendACMD(player, "DeleteHouse");
+    });
 });
 
 CMD.on("fakechat", (player, params) => {
