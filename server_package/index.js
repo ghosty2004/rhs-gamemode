@@ -1904,15 +1904,15 @@ CMD.on("refreshall", (player) => {
  * Leader
  */
 CMD.on("gwarn", (player, params) => {
-
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("gwar", (player) => {
-
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("gresetwarns", (player, params) => {
-
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 /**
@@ -1920,27 +1920,27 @@ CMD.on("gresetwarns", (player, params) => {
  * Co-Leader
  */
 CMD.on("invite", (player, params) => {
-
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("gangkick", (player, params) => {
-
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("gscreen", (player, params) => {
-
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("refresh", (player, params) => {
-    
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("setgskin", (player, params) => {
-
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("giveacces", (player, params) => {
-
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 /**
@@ -1978,7 +1978,7 @@ CMD.on("gstats", (player, params) => {
 });
 
 CMD.on("lgang", (player) => {
-
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("c4", (player) => {
@@ -1986,7 +1986,7 @@ CMD.on("c4", (player) => {
 });
 
 CMD.on("garena", (player) => {
-
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("capture", (player, params) => {
@@ -2054,11 +2054,11 @@ CMD.on("capture", (player, params) => {
 });
 
 CMD.on("refreshme", (player) => {
-
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("gtank", (player) => {
-
+    if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
 CMD.on("base", (player) => {
@@ -2757,8 +2757,8 @@ CMD.on("set", (player, params) => {
                 if(params[2] < 0 || params[2] > Gang.Get().length) return SendError(player, `Invalid Gang ID (0-${Gang.Get().length})!`);
                 if(params[2] == 0) {
                     if(!Player.Info[target.playerid].Gang) return SendError(player, Errors.PLAYER_NOT_IN_ANY_GANG);
-                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has Removed you from gang {FF0000}${Gang.Info[Player.Info[target.playerid].Gang].name}{FFFF00}!`);
-                    player.SendClientMessage(data.colors.YELLOW, `You have Removed {FF0000}${target.GetPlayerName(24)}{FFFF00}'s from gang {FF0000}${Gang.Info[Player.Info[target.playerid].Gang].name}{FFFF00}!`); 
+                    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has removed you from gang {FF0000}${Gang.Info[Player.Info[target.playerid].Gang].name}{FFFF00}!`);
+                    player.SendClientMessage(data.colors.YELLOW, `You have removed {FF0000}${target.GetPlayerName(24)}{FFFF00}'s from gang {FF0000}${Gang.Info[Player.Info[target.playerid].Gang].name}{FFFF00}!`); 
                     LeaveGang(target);
                 }
                 else {
