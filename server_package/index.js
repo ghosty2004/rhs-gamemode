@@ -12,6 +12,7 @@ const colors = require("colors");
 const md5 = require("md5");
 const YouTubeSearch = require("youtube-search-without-api-key");
 const hastebin = require("hastebin-gen");
+const ipInfo = require("ipinfo");
 require("youtube-audio-server").listen(7777);
 
 const package_json = require("../package.json");
@@ -1907,8 +1908,21 @@ CMD.on("gwarn", (player, params) => {
     if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
 });
 
-CMD.on("gwar", (player) => {
+CMD.on("gwar", (player, params) => {
     if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+    switch(params[0]) {
+        case "info": break;
+        case "invite": break;
+        case "list": break;
+        case "join": break;
+        case "kick": break;
+        case "map": break;
+        case "weaps": break;
+        case "skin": break;
+        case "points": break;
+        case "start": break;
+        case "stop": break;
+    }
 });
 
 CMD.on("gresetwarns", (player, params) => {
@@ -5221,6 +5235,11 @@ samp.OnPlayerConnect(async(player) => {
     else {
         ShowConnectTextDraw(player); 
 
+        ipInfo(player.GetPlayerIp(16), (err, result) => {
+            if(err) return;
+            SendMessageToAdmins(data.colors.RED, `${data.settings.BUSTER_PREFIX}: ${player.GetPlayerName(24)}(${player.playerid}) connected from (Country: ${result.country} City: ${result.city})`);
+        });
+        
         /* Language Select */
         player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English");
         

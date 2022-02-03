@@ -27,6 +27,7 @@
     "events": "^3.3.0",
     "express": "^4.17.2",
     "hastebin-gen": "^2.0.5",
+    "ipinfo": "^1.5.1",
     "md5": "^2.3.0",
     "mysql": "^2.18.1",
     "opusscript": "^0.0.8",
