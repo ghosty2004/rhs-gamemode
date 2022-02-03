@@ -178,8 +178,8 @@ module.exports = {
         TextDrawSetProportional(this.spawn[2], 1);
         TextDrawSetSelectable(this.spawn[2], 0);
 
-        this.spawn[3] = TextDrawCreate(7.000000, 436.000000, "~w~~h~/~y~~h~tutorial ~w~~h~/~y~~h~important ~w~~h~/~y~~h~rules ~w~~h~/~y~~h~cmds ~w~~h~/~y~~h~teles");
-        TextDrawLetterSize(this.spawn[3], 0.209994, 1.099995);
+        this.spawn[3] = TextDrawCreate(7.000000, 435.000000, "");
+        TextDrawLetterSize(this.spawn[3], 0.199994, 1.299995);
         TextDrawTextSize(this.spawn[3], 1280.000000, 1280.000000);
         TextDrawAlignment(this.spawn[3], 0);
         TextDrawColor(this.spawn[3], 0xFFFF00FF);
@@ -191,6 +191,20 @@ module.exports = {
         TextDrawFont(this.spawn[3], 1);
         TextDrawSetProportional(this.spawn[3], 1);
         TextDrawSetSelectable(this.spawn[3], 0);
+
+        /*this.spawn[3] = TextDrawCreate(7.000000, 436.000000, "~w~~h~/~y~~h~tutorial ~w~~h~/~y~~h~important ~w~~h~/~y~~h~rules ~w~~h~/~y~~h~cmds ~w~~h~/~y~~h~teles");
+        TextDrawLetterSize(this.spawn[3], 0.209994, 1.099995);
+        TextDrawTextSize(this.spawn[3], 1280.000000, 1280.000000);
+        TextDrawAlignment(this.spawn[3], 0);
+        TextDrawColor(this.spawn[3], 0xFFFF00FF);
+        TextDrawUseBox(this.spawn[3], 0);
+        TextDrawBoxColor(this.spawn[3], 0x80808080);
+        TextDrawSetShadow(this.spawn[3], 1);
+        TextDrawSetOutline(this.spawn[3], 0);
+        TextDrawBackgroundColor(this.spawn[3], 0x000000FF);
+        TextDrawFont(this.spawn[3], 1);
+        TextDrawSetProportional(this.spawn[3], 1);
+        TextDrawSetSelectable(this.spawn[3], 0);*/
 
         /* Connect TextDraw */
         this.connect[0] = TextDrawCreate(8.000000, 346.000000, SV_NAME[1]);

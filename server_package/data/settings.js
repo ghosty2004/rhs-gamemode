@@ -36,6 +36,14 @@ module.exports = {
     ],
     BUSTER_ACTOR: null,
     BUSTER_LABEL: null,
+    HINTS: [
+        "~w~~h~Do you want to see which ~r~~h~Admins~w~~h~ are connected? Check ~r~~h~/admins~w~~h~!",
+        "~w~~h~You don't know what to do? Type ~r~~h~/tutorial or /cmds~w~~h~!",
+        "~w~~h~Do you want to go up? Type ~r~~h~/vup~w~~h~!",
+        "~w~~h~Do you love ~r~~h~races~w~~h~? try ~r~~h~/races~w~~h~!",
+        "~w~~h~Do you want to see the best clans on our server? Check ~w~~h~/ctop~w~~h~!",
+        "~w~~h~Are you bored and do not know what to do? Try ~r~~h~/splaces~w~~h~!"
+    ],
     GANGS: {
         CAPTURE_TIME: 5 * 60 // 5 Minutes
     },

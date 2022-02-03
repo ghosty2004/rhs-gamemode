@@ -12,7 +12,7 @@ const colors = require("colors");
 const md5 = require("md5");
 const YouTubeSearch = require("youtube-search-without-api-key");
 const hastebin = require("hastebin-gen");
-const ipInfo = require("ipinfo");
+const ipInfo = require("ip-info-finder");
 require("youtube-audio-server").listen(7777);
 
 const package_json = require("../package.json");
@@ -1922,6 +1922,7 @@ CMD.on("gwar", (player, params) => {
         case "points": break;
         case "start": break;
         case "stop": break;
+        default: SendUsage(player, "/gwar [info/invite/list/join/kick/map/weaps/skin/points/start/stop]");
     }
 });
 
@@ -3977,6 +3978,7 @@ function getRegistredPlayersCount() {
 function Updater() {
     /* Server HostName Changer */
     samp.SendRconCommand(`hostname ${data.settings.RANDOM_SERVER_NAMES[Function.getRandomInt(0, data.settings.RANDOM_SERVER_NAMES.length)]}`);
+    samp.TextDrawSetString(TextDraws.server.spawn[3], `HINT: ${data.settings.HINTS[Function.getRandomInt(0, data.settings.HINTS.length)]}`);
 }
 
 function checkPlayerBanStatus(player, check_acc_id=true) {
@@ -4958,7 +4960,7 @@ samp.OnGameModeInit(() => {
     TextDraws.server.Load(); /* Load Server TextDraws */
     Minigames.Load(); /* Load Server Minigames */
 
-    setInterval(Updater, 10000); /* An interval */
+    Updater(); setInterval(Updater, 10000); /* An interval */
 
     samp.AddPlayerClass(217, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // stunt man
     samp.AddPlayerClass(122, 485.7206, -1532.5042, 19.4601, 213.3013, 0, 0, 0, 0, 0, 0); // pirate
@@ -5235,8 +5237,7 @@ samp.OnPlayerConnect(async(player) => {
     else {
         ShowConnectTextDraw(player); 
 
-        ipInfo(player.GetPlayerIp(16), (err, result) => {
-            if(err) return;
+        ipInfo.getIPInfo(player.GetPlayerIp(16)).then((result) => {
             SendMessageToAdmins(data.colors.RED, `${data.settings.BUSTER_PREFIX}: ${player.GetPlayerName(24)}(${player.playerid}) connected from (Country: ${result.country} City: ${result.city})`);
         });
         
