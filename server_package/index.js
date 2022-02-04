@@ -1912,8 +1912,15 @@ CMD.on("gwar", (player, params) => {
     if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
     switch(params[0]) {
         case "info": break;
-        case "invite": break;
-        case "list": break;
+        case "invite": {
+            let info = "";
+            Gang.Get().forEach((gang) => { info += `\n${gang.name}`; });
+            player.ShowPlayerDialog(Dialog.GANG_WAR_INVITE, samp.DIALOG_STYLE.LIST, "Select enemy gang", info, "Invite", "Cancel");
+            break;
+        }
+        case "list": {
+            break;
+        }
         case "join": break;
         case "kick": break;
         case "map": break;
@@ -5314,6 +5321,15 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.GANG_WAR_INVITE: {
+            if(!response) return;
+            Gang.Get().forEach((gang, index) => {
+                if(index == listitem) {
+                    if(gang.id == Player.Info[player.playerid].Gang) return SendError(player, "You can't invite this gang to gwar!");
+                }
+            });
+            break;
+        }
         case Dialog.HOUSE: {
             if(!response) {
                 let info = "";

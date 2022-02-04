@@ -83,5 +83,6 @@ module.exports = {
     HOUSE:                      82,
     HOUSE_OPTIONS:              83,
     BUSINESS:                   84,
-    BUSINESS_OPTIONS:           85
+    BUSINESS_OPTIONS:           85,
+    GANG_WAR_INVITE:            86
 }
