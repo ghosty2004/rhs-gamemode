@@ -3,107 +3,118 @@ const { GANGS } = require("../../data/settings");
 const { CreateCustomCheckpoint, DeleteCustomCheckpoint } = require("../checkpoint");
 
 module.exports = {
-    Info: {},
-    Create: function(id, name, position, weapons, color, alliance, points, captures, kills, deaths, base_position, gate_objectid, gate_position, territory_position) {
-        if(!this.Info[id]) {
-            this.Info[id] = {
-                id: id,
-                name: name,
-                position: position,
-                weapons: weapons,
-                color: color,
-                alliance: alliance,
-                points: points,
-                captures: captures,
-                kills: kills,
-                deaths: deaths,
-                base_position: base_position,
-                gate: {
-                    objectid: gate_objectid,
-                    position: gate_position,
-                    object: gate_position[0] == 0 && gate_position[1] == 0 && gate_position[2] == 0 ? null : CreateObject(gate_objectid, gate_position[0], gate_position[1], gate_position[2], gate_position[3], gate_position[4], gate_position[5]),
-                    label: gate_position[0] == 0 && gate_position[1] == 0 && gate_position[2] == 0 ? null : Create3DTextLabel("{BBFF00}if you are in this gang or in it's allied\n{BBFF00}use {00BBF6}/og{BBFF00} to open the gates and {00BBF6}/cg{BBFF00} to close the gates!\n{BBFF00}use {00BBF6}/g{BBFF00} to open and automatically close gates!\n{00BBF6}/blow | /repair", -1, gate_position[0], gate_position[1], gate_position[2], 20)
-                },
-                territory: {
-                    owner: id,
-                    MinX: territory_position[0],
-                    MinY: territory_position[1],
-                    MaxX: territory_position[2],
-                    MaxY: territory_position[3],
-                    GangZone: GangZoneCreate(territory_position[0], territory_position[1], territory_position[2], territory_position[3])
-                },
-                capturing: {
-                    time: GANGS.CAPTURE_TIME,
-                    turf: -1,
-                    interval: null
-                },
-                teleportcheckpoints: []
-            }
-            return true;
-        }
-        else return false;
+    /**
+     * @type {[{id: Number, name: String, position: Number[], weapons: Number[], color: Number, alliance: Number, points: Number, captures: Number, 
+     * kills: Number, deaths: Number, base_position: Number[], gate: {objectId: number, position: Number[], object: Number, label: Number},
+     * territory: {owner: Number, MinX: Number, MinY: Number, MaxX: Number, MaxY: Number, GangZone: Number}, capturing: {time: Number, turf: Number, interval: NodeJS.Timer}, 
+     * teleportcheckpoints: [{id: Number, position: Number[], positionTo: Number[], label: Number, checkpoint: Number}]}]}
+     */
+    Info: [],
+    /**
+     * @param {Number} id 
+     * @param {String} name 
+     * @param {Number[]} position 
+     * @param {Number[]} weapons 
+     * @param {Number} color 
+     * @param {Number} alliance 
+     * @param {Number} points 
+     * @param {Number} captures 
+     * @param {Number} kills 
+     * @param {Number} deaths 
+     * @param {Number[]} base_position 
+     * @param {Number} gate_objectid 
+     * @param {Number[]} gate_position 
+     * @param {Number[]} territory_position 
+     */
+    Create(id, name, position, weapons, color, alliance, points, captures, kills, deaths, base_position, gate_objectid, gate_position, territory_position) {
+        if(this.Info.some(s => s.id == id)) return;
+        this.Info.push({
+            id: id,
+            name: name,
+            position: position,
+            weapons: weapons,
+            color: color,
+            alliance: alliance,
+            points: points,
+            captures: captures,
+            kills: kills,
+            deaths: deaths,
+            base_position: base_position,
+            gate: {
+                objectid: gate_objectid,
+                position: gate_position,
+                object: gate_position[0] == 0 && gate_position[1] == 0 && gate_position[2] == 0 ? null : CreateObject(gate_objectid, gate_position[0], gate_position[1], gate_position[2], gate_position[3], gate_position[4], gate_position[5]),
+                label: gate_position[0] == 0 && gate_position[1] == 0 && gate_position[2] == 0 ? null : Create3DTextLabel("{BBFF00}if you are in this gang or in it's allied\n{BBFF00}use {00BBF6}/og{BBFF00} to open the gates and {00BBF6}/cg{BBFF00} to close the gates!\n{BBFF00}use {00BBF6}/g{BBFF00} to open and automatically close gates!\n{00BBF6}/blow | /repair", -1, gate_position[0], gate_position[1], gate_position[2], 20)
+            },
+            territory: {
+                owner: id,
+                MinX: territory_position[0],
+                MinY: territory_position[1],
+                MaxX: territory_position[2],
+                MaxY: territory_position[3],
+                GangZone: GangZoneCreate(territory_position[0], territory_position[1], territory_position[2], territory_position[3])
+            },
+            capturing: {
+                time: GANGS.CAPTURE_TIME,
+                turf: -1,
+                interval: null
+            },
+            teleportcheckpoints: []
+        });
     },
-    Delete: function(id) {
-        if(this.Info[id]) {
-            if(this.Info[id].gate.object) DestroyObject(this.Info[id].gate.object);
-            if(this.Info[id].gate.label) Delete3DTextLabel(this.Info[id].gate.label);
-            GangZoneDestroy(this.Info[id].territory.GangZone);
-            delete this.Info[id];
-            return true;
-        }
-        else return false;
+    /**
+     * @param {Number} id 
+     */
+    Delete(id) {
+        let index = this.Info.findIndex(f => f.id == id);
+        if(index == -1) return;
+        DestroyObject(this.Info[index].gate.object);
+        Delete3DTextLabel(this.Info[index].gate.label);
+        GangZoneDestroy(this.Info[index].territory.GangZone);
+        this.Info.splice(index, 1);
     },
-    Exists: function(id) {
-        if(this.Info[id]) return true;
-        else return false;
+    /**
+     * @param {Number} gangId 
+     * @param {Number} checkpointId 
+     * @param {*} position 
+     * @param {*} positionTo 
+     * @param {*} labelText 
+     */
+    CreateTeleportCheckpoint(gangId, checkpointId, position, positionTo, labelText) {
+        let result = this.Info.find(f => f.id == gangId);
+        if(!result) return;
+        result.teleportcheckpoints.push({
+            id: checkpointId,
+            position: position,
+            positionTo: positionTo,
+            label: Create3DTextLabel(`{BBFF00}Teleport to\n{00BBF6}${labelText}`, -1, position[0], position[1], position[2], 20),
+            checkpoint: CreateCustomCheckpoint(position[0], position[1], position[2], 1, 3)
+        });
     },
-    CreateTeleportCheckpoint: function(gang_id, id, position, position_to, textlabel) {
-        if(this.Info[gang_id]) {
-            if(!this.Info[gang_id].teleportcheckpoints.some(s => s.id == id)) {
-                this.Info[gang_id].teleportcheckpoints.push({
-                    id: id,
-                    position: position,
-                    position_to: position_to,
-                    textlabel: textlabel,
-                    label: Create3DTextLabel(`{BBFF00}Teleport to\n{00BBF6}${textlabel}`, -1, position[0], position[1], position[2], 20),
-                    checkpoint: CreateCustomCheckpoint(position[0], position[1], position[2], 1, 3)
-                });
-                return true;
-            }
-            else return false;
-        }
-        else return false;
+    /**
+     * @param {*} gangId 
+     * @param {*} checkpointId 
+     */
+    DeleteTeleportCheckpoint(gangId, checkpointId) {
+        let result = this.Info.find(f => f.id == gangId);
+        if(!result) return;
+        let index = result.teleportcheckpoints.findIndex(f => f.id == checkpointId);
+        if(index == -1) return;
+        Delete3DTextLabel(result.teleportcheckpoints[index].label);
+        DeleteCustomCheckpoint(result.teleportcheckpoints[index].checkpoint);
+        result.teleportcheckpoints.splice(index, 1);
     },
-    DeleteTeleportCheckpoint: function(gang_id, id) {
-        if(this.Info[gang_id]) {
-            let index = this.Info[gang_id].teleportcheckpoints.findIndex(f => f.id == id);
-            if(index != -1) {
-                Delete3DTextLabel(this.Info[gang_id].teleportcheckpoints[index].label);
-                DeleteCustomCheckpoint(this.Info[gang_id].teleportcheckpoints[index].checkpoint);
-                this.Info[gang_id].teleportcheckpoints.splice(index, 1);
-                return true;
-            }
-            else return false;
-        }
-        else return false;
-    },
-    ExistsTeleportCheckpoint: function(gang_id, id) {
-        if(this.Info[gang_id]) {
-            return this.Info[gang_id].teleportcheckpoints.some(s => s.id == id);
-        }
-        else return false;
-    },
-    Get: function() {
+    /*Get: function() {
         let data = Object.entries(this.Info);
         let value = [];
         for(let i = 0; i < data.length; i++) { value.push(data[i][1]); }
         return value;
-    },
-    GetOwnedGangZones: function(id) {
+    },*/
+    GetOwnedGangZones(gangId) {
         let zones = [];
-        this.Get().filter(f => f.territory.owner == id).forEach((i) => {
+        this.Info.filter(f => f.territory.owner == gangId).forEach((i) => {
             zones.push(i.territory.GangZone);
-        });
+        })
         return zones;
     }
 }
