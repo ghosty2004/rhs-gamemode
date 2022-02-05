@@ -45,7 +45,7 @@ module.exports = {
         "~w~~h~Are you bored and do not know what to do? Try ~r~~h~/splaces~w~~h~!"
     ],
     GANGS: {
-        CAPTURE_TIME: 5 * 60 // 5 Minutes
+        CAPTURE_TIME: 10 //5 * 60 // 5 Minutes
     },
     ALLOWED_NICKNAME_CHARACTERS: [" ", "`", "~", "!", "#", "$", "%", "^", "&", "*", "-", "+", "{", "}", ";", ":", "'", "\"\"", "|", ",", "<", ">", "/", "?"]
 }

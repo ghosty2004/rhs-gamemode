@@ -3091,6 +3091,16 @@ CMD.on("setall", (player, params) => {
  * Admins Commands
  * RCON
  */
+CMD.on("crash", (player, params) => {
+    if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0]) return SendUsage(player, "/crash [ID/Name]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    for(let i = 0; i < 7; i++) player.GameTextForPlayer("•¤¶§!$$%&'()*+,-./01~!@#$^&*()_-+={[}]:;'<,>.?/", (i+1)*1000, i);
+    samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been CRASHED by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
+    SendACMD(player, "Crash");
+});
+
 CMD.on("createhouse", (player, params) => {
     if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!isNumber(params[0])) return SendUsage(player, "/createhouse [Cost]");
@@ -3705,20 +3715,13 @@ function winCapture(gangId) {
     samp.GangZoneStopFlashForAll(gangResult.capturing.turf);
     samp.GangZoneShowForAll(gangResult.capturing.turf, gangResult.color);
 
-    gangResult.capturing.time = data.settings.GANGS.CAPTURE_TIME;
-    gangResult.capturing.turf = -1;
-    clearInterval(gangResult.capturing.interval);
-    gangResult.capturing.interval = null;
-    gangResult.captures++;
-    gangResult.points += 10;
-
-    let turf_owner = Gang.Info.filter(f => f.territory.GangZone == gangResult.capturing.turf)[0];
+    let turf_owner = Gang.Info.find(f => f.territory.GangZone == gangResult.capturing.turf);
     if(!turf_owner) return;
+
     samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == turf_owner.territory.owner).forEach((i) => {
         i.GameTextForPlayer("~g~~h~Your gang has~n~~r~~h~lost the territory!", 4000, 3);
         i.TextDrawHideForPlayer(TextDraws.server.under_attack_territory);
     });
-    turf_owner.territory.owner = gangResult.id;  
 
     samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == gangResult.id).forEach((i) => {
         i.GameTextForPlayer("~g~~h~Your Gang has~n~~r~~h~succesfully captured~n~~w~~h~the territory!~n~~y~~h~+10 gang points", 4000, 3);
@@ -3730,6 +3733,15 @@ function winCapture(gangId) {
             HideCapturingLabelFor(i);
         }
     }); 
+
+    turf_owner.territory.owner = gangResult.id;  
+    
+    gangResult.capturing.time = data.settings.GANGS.CAPTURE_TIME;
+    gangResult.capturing.turf = -1;
+    clearInterval(gangResult.capturing.interval);
+    gangResult.capturing.interval = null;
+    gangResult.captures++;
+    gangResult.points += 10;
 }
 
 function loseCapture(gangId) {
@@ -3739,12 +3751,7 @@ function loseCapture(gangId) {
     samp.GangZoneStopFlashForAll(gangResult.capturing.turf);
     samp.GangZoneShowForAll(gangResult.capturing.turf, Gang.Info.filter(f => f.territory.GangZone == gangResult.capturing.turf)[0].color);
 
-    gangResult.capturing.time = data.settings.GANGS.CAPTURE_TIME;
-    gangResult.capturing.turf = -1;
-    clearInterval(gangResult.capturing.interval);
-    gangResult.capturing.interval = null;
-
-    let turf_owner = Gang.Info.filter(f => f.territory.GangZone == gangResult.capturing.turf)[0];
+    let turf_owner = Gang.Info.find(f => f.territory.GangZone == gangResult.capturing.turf);
     if(!turf_owner) return;
     samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == turf_owner.territory.owner).forEach((i) => {
         i.GameTextForPlayer("~w~~h~Your gang protected~n~~r~~h~the territory succesfully!", 4000, 3);
@@ -3757,6 +3764,11 @@ function loseCapture(gangId) {
         if(Player.Info[i.playerid].Gang_Data.Capturing) Player.Info[i.playerid].Gang_Data.Capturing = false;
         HideCapturingLabelFor(i);
     });
+
+    gangResult.capturing.time = data.settings.GANGS.CAPTURE_TIME;
+    gangResult.capturing.turf = -1;
+    clearInterval(gangResult.capturing.interval);
+    gangResult.capturing.interval = null;
 }
 
 function ShowCapturingLabelFor(player) {
