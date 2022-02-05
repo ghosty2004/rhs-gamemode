@@ -1912,6 +1912,7 @@ CMD.on("gwarn", (player, params) => {
 
 CMD.on("gwar", (player, params) => {
     if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+    if(!params[0]) return SendUsage(player, "/gwar [info/invite/list/join/kick/map/weaps/skin/points/start/stop]");
     switch(params[0]) {
         case "info": {
             player.SendClientMessage(data.colors.LIGHT_GREEN, "No Gang War informations to show!");
@@ -1925,11 +1926,11 @@ CMD.on("gwar", (player, params) => {
         }
         case "list": {
             let info = "";
-            GangWar.Info.forEach((i, index) => { 
+            GangWar.Info.length ? GangWar.Info.forEach((i, index) => { 
                 let inviterGang = Gang.Info.find(f => f.id == i.inviterGang);
                 let invitedGang = Gang.Info.find(f => f.id == i.invitedGang);
-                info += `#${index} {2EC32E}| ${inviterGang.name} vs ${invitedGang.name} | ${i.status == "preparing" ? "{FFB300}Preparing" : "{FF0000}Started"}`; 
-            });
+                info += `\n#${index} {2EC32E}| ${inviterGang.name} vs ${invitedGang.name} | ${i.status == "preparing" ? "{FFB300}Preparing" : "{FF0000}Started"}`; 
+            }) : info = "No Gang Wars!";
             player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.LIST, "Gang Wars list", info, "Close", "");
             break;
         }
@@ -1941,21 +1942,35 @@ CMD.on("gwar", (player, params) => {
             break;
         }
         case "kick": {
+            if(Player.Info[player.playerid].inGwar == -1) return;
+            if(!params[1]) return SendUsage(player, "/gwar kick [ID/Name]");
             break;
         }
         case "map": {
+            if(Player.Info[player.playerid].inGwar == -1) return;
+            let info = "";
+            GangWar.Maps.forEach((i) => { info += `\n{FFB300}${i.name}`; });
+            player.ShowPlayerDialog(Dialog.GANG_WAR_MAP, samp.DIALOG_STYLE.LIST, "{FF0000}Gang War location", info, "Select", "Cancel");
             break;
         }
         case "weaps": {
+            if(Player.Info[player.playerid].inGwar == -1) return;
+            let info = "";
+            GangWar.Weapons.forEach((i) => { info += `\n{FFB300}${i.name}`; });
+            player.ShowPlayerDialog(Dialog.GANG_WAR_WEAPONS, samp.DIALOG_STYLE.LIST, "{FF0000}Gang War Weapons", info, "Select", "Cancel");
             break;
         }
         case "skin": {
+            if(Player.Info[player.playerid].inGwar == -1) return;
             break;
         }
         case "points": {
+            if(Player.Info[player.playerid].inGwar == -1) return;
             break;
         }
         case "start": {
+            if(Player.Info[player.playerid].inGwar == -1) return;
+            GangWar.Start(player).catch((error) => { SendError(player, error); });
             break;
         }
         case "stop": {
@@ -1964,7 +1979,7 @@ CMD.on("gwar", (player, params) => {
             GangWar.Stop(params[1]).catch((error) => { SendError(player, error); })
             break;
         }
-        default: SendUsage(player, "/gwar [info/invite/list/join/kick/map/weaps/skin/points/start/stop]");
+        default: SendError(player, "Invalid option!");
     }
 });
 
@@ -5381,11 +5396,21 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.GANG_WAR_WEAPONS: {
+            if(!response) return;
+            GangWar.setWeapon(player, listitem);
+            break;
+        }
+        case Dialog.GANG_WAR_MAP: {
+            if(!response) return;
+            GangWar.setMap(player, listitem);
+            break;
+        }
         case Dialog.GANG_WAR_INVITE: {
             if(!response) return;
             Gang.Info.forEach((gang, index) => {
                 if(index == listitem) {
-                    GangWar.Invite(Player.Info[player.playerid].Gang, gang.id).then((gwarId) => {
+                    GangWar.Invite(player, gang.id).then((gwarId) => {
                         GangWar.Join(player, gwarId).then(() => {
                             player.GameTextForPlayer("~y~~h~GWar Lobby", 4000, 3);
                         }).catch((error) => { SendError(player, error); });

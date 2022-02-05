@@ -42,8 +42,8 @@ module.exports = {
     UpdateDynamic3DTextLabelText(id, color, text) {
         callPublic("_UpdateDynamic3DTextLabelText", "iis", id, color, text);
     },
-    CreateDynamicMapIcon() {
-
+    CreateDynamicMapIcon(x, y, z, type, color) {
+        return callPublic("_CreateDynamicMapIcon", "fffii", x, y, z, type, color);
     },
     Update(playerid) {
         callPublic("_Streamer_Update", "i", playerid);

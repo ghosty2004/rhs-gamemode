@@ -10,5 +10,6 @@ export declare function CreateDynamic3DTextLabel(text: string, color: number, x:
 export declare function DestroyDynamic3DTextLabel(id: number): boolean;
 export declare function IsValidDynamic3DTextLabel(id: number): boolean;
 export declare function UpdateDynamic3DTextLabelText(id: number, color: number, text: string): void;
+export declare function CreateDynamicMapIcon(x: number, y: number, z: number, type: number, color: number): number;
 export declare function Update(playerid: number): void;
 export declare function UpdateAll(): void;

@@ -84,5 +84,7 @@ module.exports = {
     HOUSE_OPTIONS:              83,
     BUSINESS:                   84,
     BUSINESS_OPTIONS:           85,
-    GANG_WAR_INVITE:            86
+    GANG_WAR_INVITE:            86,
+    GANG_WAR_MAP:               87,
+    GANG_WAR_WEAPONS:           88
 }

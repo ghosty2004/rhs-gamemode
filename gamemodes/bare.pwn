@@ -64,4 +64,6 @@ event:_DestroyDynamic3DTextLabel(STREAMER_TAG_3D_TEXT_LABEL:id) { return Destroy
 event:_IsValidDynamic3DTextLabel(STREAMER_TAG_3D_TEXT_LABEL:id) { return IsValidDynamic3DTextLabel(STREAMER_TAG_3D_TEXT_LABEL:id); }
 event:_UpdateDynamic3DTextLabelText(STREAMER_TAG_3D_TEXT_LABEL:id, color, text[]) { return UpdateDynamic3DTextLabelText(STREAMER_TAG_3D_TEXT_LABEL:id, color, text); }
 
+event:_CreateDynamicMapIcon(Float:x, Float:y, Float:z, type, color) { return CreateDynamicMapIcon(x, y, z, type, color); }
+
 event:_Streamer_Update(playerid) { return Streamer_Update(playerid); }

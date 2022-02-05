@@ -24,7 +24,7 @@ module.exports = {
         const OnlineTime = timestampToHMS(Server.Info.StartTime);
         const embed = new MessageEmbed();
         embed.setColor("RANDOM");
-        embed.addField("Gangs:", `${Gang.Get().length}`);
+        embed.addField("Gangs:", `${Gang.Info.length}`);
         embed.addField("Clans:", `${Clan.Get().length}`);
         embed.addField("Online players:", `${getPlayers().length}`);
         embed.addField("Total users:", `${await getTotalUsersCount()}`);
