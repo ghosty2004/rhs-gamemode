@@ -162,7 +162,8 @@ export declare const Info: {
         Index: number
     },
     InHouse: number,
-    InBusiness: number
+    InBusiness: number,
+    inGwar: number
 }[];
 
 export declare function ResetVariables(playerid: number): void;

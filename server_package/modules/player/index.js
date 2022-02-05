@@ -157,7 +157,8 @@ module.exports = {
                 Index: 0
             },
             InHouse: 0,
-            InBusiness: 0
+            InBusiness: 0,
+            inGwar: -1
         }
 
         /* ===================== */

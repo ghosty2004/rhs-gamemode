@@ -31,6 +31,7 @@ const events = require("./modules/events");
 const Firework = require("./modules/firework");
 const Function = require("./modules/functions");
 const Gang = require("./modules/gang");
+const GangWar = require("./modules/gangwar");
 const House = require("./modules/house");
 const Minigames = require("./modules/minigames");
 const con = require("./modules/mysql"); 
@@ -1197,7 +1198,7 @@ CMD.on("sstunts", (player) => {
  */
 CMD.on("enter", (player) => {
     let resultHouse = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
-    let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(f.position[0], f.position[1], f.position[2]));
+    let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
     if(resultHouse) {
         let interiorResult = data.interiors.find(f => f.name == resultHouse.interiorType);
         if(!interiorResult) return SendError(player, Errors.UNEXPECTED);
@@ -1923,16 +1924,46 @@ CMD.on("gwar", (player, params) => {
             break;
         }
         case "list": {
+            let info = "";
+            GangWar.Info.forEach((i, index) => { 
+                let inviterGang = Gang.Info.find(f => f.id == i.inviterGang);
+                let invitedGang = Gang.Info.find(f => f.id == i.invitedGang);
+                info += `#${index} {2EC32E}| ${inviterGang.name} vs ${invitedGang.name} | ${i.status == "preparing" ? "{FFB300}Preparing" : "{FF0000}Started"}`; 
+            });
+            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.LIST, "Gang Wars list", info, "Close", "");
             break;
         }
-        case "join": break;
-        case "kick": break;
-        case "map": break;
-        case "weaps": break;
-        case "skin": break;
-        case "points": break;
-        case "start": break;
-        case "stop": break;
+        case "join": {
+            if(Player.Info[player.playerid].inGwar != -1) return;
+            if(!params[1]) return SendUsage(player, "/gwar join [gwar id]");
+            params[1] = parseInt(params[1]);
+            GangWar.Join(player, params[1]).catch((error) => { SendError(player, error); });
+            break;
+        }
+        case "kick": {
+            break;
+        }
+        case "map": {
+            break;
+        }
+        case "weaps": {
+            break;
+        }
+        case "skin": {
+            break;
+        }
+        case "points": {
+            break;
+        }
+        case "start": {
+            break;
+        }
+        case "stop": {
+            if(!params[1]) return SendUsage(player, "/gwar stop [gwar id]");
+            params[1] = parseInt(params[1]);
+            GangWar.Stop(params[1]).catch((error) => { SendError(player, error); })
+            break;
+        }
         default: SendUsage(player, "/gwar [info/invite/list/join/kick/map/weaps/skin/points/start/stop]");
     }
 });
@@ -2440,7 +2471,11 @@ CMD.on("getinfo", (player, params) => {
     info += `Name\t${target.GetPlayerName(24)}\n`;
     info += `ID\t${target.playerid}\n`;
     info += `IP\t${target.GetPlayerIp(16)}\n`;
-    info += `Position\t${JSON.stringify(target.GetPlayerPos())}`;
+    info += `Position\t${JSON.stringify(target.GetPlayerPos())}\n`;
+    info += `Health\t${target.GetPlayerHealth()}\n`;
+    info += `Armour\t${target.GetPlayerArmour()}\n`;
+    info += `Virtual World\t${target.GetPlayerVirtualWorld()}\n`;
+    info += `Interior\t${target.GetPlayerInterior()}`
     player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, "Get Info", info, "Close", "");
 });
 
@@ -3134,7 +3169,7 @@ CMD.on("createbusiness", (player, params) => {
     params[1] = parseInt(params[1]);
     let interiorTypeTemp = data.interiors.filter(f => f.name.startsWith("BUSINESS"));
     let interiorType = interiorTypeTemp[Function.getRandomInt(0, interiorTypeTemp.length)].name;
-    let name = params.splice(2).join(" ") ? params.splice(2).join(" ") : "ForSale";
+    let name = params.slice(2).join(" ") ? params.slice(2).join(" ") : "ForSale";
     con.query("INSERT INTO business (name, owner, position, interiorType, cost, win) VALUES(?, ?, ?, ?, ?, ?)", [name, 0, JSON.stringify(player.GetPlayerPos()), interiorType, params[0], params[1]], (err, result) => {
         if(err) return SendError(player, Errors.UNEXPECTED);
         Business.Create(result.insertId, name, 0, player.GetPlayerPos(), interiorType, params[0], params[1]);
@@ -5350,7 +5385,11 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             if(!response) return;
             Gang.Info.forEach((gang, index) => {
                 if(index == listitem) {
-                    if(gang.id == Player.Info[player.playerid].Gang) return SendError(player, "You can't invite this gang to gwar!");
+                    GangWar.Invite(Player.Info[player.playerid].Gang, gang.id).then((gwarId) => {
+                        GangWar.Join(player, gwarId).then(() => {
+                            player.GameTextForPlayer("~y~~h~GWar Lobby", 4000, 3);
+                        }).catch((error) => { SendError(player, error); });
+                    }).catch((error) => { SendError(player, error); });
                 }
             });
             break;
