@@ -229,7 +229,7 @@ module.exports = {
             if(!this.Info[gwarId]) reject(UNEXPECTED);
             let inviterPlayersCount = getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId && Player.Info[f.playerid].Gang == this.Info[gwarId].inviterGang).length;
             let invitedPlayersCount = getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId && Player.Info[f.playerid].Gang == this.Info[gwarId].invitedGang).length;
-            //if(inviterPlayersCount < 1 || invitedPlayersCount < 1) return reject("There needs to be at least 1 player in each gang!");
+            if(inviterPlayersCount < 1 || invitedPlayersCount < 1) return reject("There needs to be at least 1 player in each gang!");
             this.Info[gwarId].status = "started";
             this.setGwarType(gwarId, "updateTextDraws");
             this.setGwarType(gwarId, "showTextDraws");
