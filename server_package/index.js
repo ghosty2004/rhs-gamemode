@@ -2977,6 +2977,12 @@ CMD.on("write", (player, params) => {
 
 CMD.on("ahall", (player) => {
     if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    samp.getPlayers().filter(f => !isPlayerInSpecialZone(f)).forEach((i) => {
+        i.SetPlayerHealth(100);
+        i.SetPlayerArmour(100);
+        i.SendClientMessage(data.colors.YELLOW, `Administrator {FF0000}${player.GetPlayerName(24)} {FFFF00}has restored all players Health and Armour that are not Death Match Zone!`);
+    });
+    SendACMD(player, "AHAll");
 });
 
 CMD.on("slap", (player, params) => {
