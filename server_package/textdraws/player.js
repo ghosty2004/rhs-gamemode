@@ -15,7 +15,7 @@ module.exports = {
     
     Load(player) {
         // => Gang War Info 1
-        this.gangWarInfo1[player.playerid] = CreatePlayerTextDraw(player.playerid, 634.000000, 417.000000, "United Pirates Castle: ~r~~h~0");
+        this.gangWarInfo1[player.playerid] = CreatePlayerTextDraw(player.playerid, 634.000000, 417.000000, "");
         PlayerTextDrawLetterSize(player.playerid, this.gangWarInfo1[player.playerid], 0.350000, 1.900000);
         PlayerTextDrawTextSize(player.playerid, this.gangWarInfo1[player.playerid], 1280.000000, 1280.000000);
         PlayerTextDrawAlignment(player.playerid, this.gangWarInfo1[player.playerid], 3);
@@ -30,11 +30,11 @@ module.exports = {
         PlayerTextDrawSetSelectable(player.playerid, this.gangWarInfo1[player.playerid], 0);
 
         // => Gang War Info 2
-        this.gangWarInfo2[player.playerid] = CreatePlayerTextDraw(player.playerid, 634.000000, 402.000000, "Politia Romana - NEW GeneratioN: ~r~~h~0");
+        this.gangWarInfo2[player.playerid] = CreatePlayerTextDraw(player.playerid, 634.000000, 402.000000, "");
         PlayerTextDrawLetterSize(player.playerid, this.gangWarInfo2[player.playerid], 0.350000, 1.900000);
         PlayerTextDrawTextSize(player.playerid, this.gangWarInfo2[player.playerid], 1280.000000, 1280.000000);
         PlayerTextDrawAlignment(player.playerid, this.gangWarInfo2[player.playerid], 3);
-        PlayerTextDrawColor(player.playerid, this.gangWarInfo2[player.playerid], 0x1060FBAA);
+        PlayerTextDrawColor(player.playerid, this.gangWarInfo2[player.playerid], 0xFFFFFFAA);
         PlayerTextDrawUseBox(player.playerid, this.gangWarInfo2[player.playerid], 0);
         PlayerTextDrawBoxColor(player.playerid, this.gangWarInfo2[player.playerid], 0x80808080);
         PlayerTextDrawSetShadow(player.playerid, this.gangWarInfo2[player.playerid], 1);

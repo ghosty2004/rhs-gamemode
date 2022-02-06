@@ -414,6 +414,7 @@ CMD.on("leave", (player) => {
             if(Player.Info[player.playerid].In_DM == "mrf") Player.Info[player.playerid].Selected_MRF_Weapon = null;
             Player.Info[player.playerid].In_DM = "none";
         }
+        if(Player.Info[player.playerid].inGwar != -1) return GangWar.Kick(player, "~r~~h~gwar left");
         player.SpawnPlayer();
     }
 });
@@ -1942,19 +1943,29 @@ CMD.on("gwar", (player, params) => {
             break;
         }
         case "kick": {
-            if(Player.Info[player.playerid].inGwar == -1) return;
+            let gwarId = Player.Info[player.playerid].inGwar;
+            if(gwarId == -1) return;
+            if(GangWar.Info[gwarId].status == "started") return;
             if(!params[1]) return SendUsage(player, "/gwar kick [ID/Name]");
+            let target = getPlayer(params[1]);
+            if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+            if(Player.Info[target.playerid].inGwar != gwarId) return SendError(player, "This player is not in your gwar!");
+            GangWar.Kick(target, "~r~~h~kicked from gwar");
             break;
         }
         case "map": {
-            if(Player.Info[player.playerid].inGwar == -1) return;
+            let gwarId = Player.Info[player.playerid].inGwar;
+            if(gwarId == -1) return;
+            if(GangWar.Info[gwarId].status == "started") return;
             let info = "";
             GangWar.Maps.forEach((i) => { info += `\n{FFB300}${i.name}`; });
             player.ShowPlayerDialog(Dialog.GANG_WAR_MAP, samp.DIALOG_STYLE.LIST, "{FF0000}Gang War location", info, "Select", "Cancel");
             break;
         }
         case "weaps": {
-            if(Player.Info[player.playerid].inGwar == -1) return;
+            let gwarId = Player.Info[player.playerid].inGwar;
+            if(gwarId == -1) return;
+            if(GangWar.Info[gwarId].status == "started") return;
             let info = "";
             GangWar.Weapons.forEach((i) => { info += `\n{FFB300}${i.name}`; });
             player.ShowPlayerDialog(Dialog.GANG_WAR_WEAPONS, samp.DIALOG_STYLE.LIST, "{FF0000}Gang War Weapons", info, "Select", "Cancel");
@@ -1965,11 +1976,15 @@ CMD.on("gwar", (player, params) => {
             break;
         }
         case "points": {
-            if(Player.Info[player.playerid].inGwar == -1) return;
+            let gwarId = Player.Info[player.playerid].inGwar;
+            if(gwarId == -1) return;
+            if(GangWar.Info[gwarId].status == "started") return;
             break;
         }
         case "start": {
-            if(Player.Info[player.playerid].inGwar == -1) return;
+            let gwarId = Player.Info[player.playerid].inGwar;
+            if(gwarId == -1) return;
+            if(GangWar.Info[gwarId].status == "started") return;
             GangWar.Start(player).catch((error) => { SendError(player, error); });
             break;
         }
@@ -3346,7 +3361,7 @@ function OnPlayerCommandText(player, cmdtext) {
     let params = cmdtext.split(/[ ]+/); 
     cmdtext = params[0].toLowerCase();
     params.shift();
-    if(isPlayerInSpecialZone(player) && cmdtext != "leave") return player.GameTextForPlayer("~w~~h~Use ~r~~h~/Leave ~w~~h~to ~r~~h~Leave~w~~h~!", 4000, 4);
+    if(isPlayerInSpecialZone(player) && cmdtext != "leave" && cmdtext != "gwar") return player.GameTextForPlayer("~w~~h~Use ~r~~h~/Leave ~w~~h~to ~r~~h~Leave~w~~h~!", 4000, 4);
     if(Player.Info[player.playerid].AFK && cmdtext != "back") return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use~n~~r~~h~Commands~w~~h~!", 3000, 4);
     if(CMD.eventNames().some(s => s == cmdtext)) {
         try { CMD.emit(cmdtext, player, params); }
@@ -4222,7 +4237,8 @@ function SendACMD(player, cmdtext) {
 function isPlayerInSpecialZone(player) {
     let value = false;
     if(Player.Info[player.playerid].In_Minigame != "none") value = true;
-    if(Player.Info[player.playerid].In_DM != "none") value = true;
+    else if(Player.Info[player.playerid].In_DM != "none") value = true;
+    else if(Player.Info[player.playerid].inGwar != -1) value = true;
     return value;
 }
 
@@ -5252,14 +5268,23 @@ samp.OnPlayerPickUpPickup((player, pickupid) => {
     Circle.WeaponPickup(player, pickupid); 
 });
 
-samp.OnPlayerDeath((player, killerid, reason) => {
+samp.OnPlayerDeath((player, killer, reason) => {
     player.GameTextForPlayer("~r~~h~You Died", 2000, 2);
 
     if(!isPlayerInSpecialZone(player)) Circle.DropWeapons(player);
 
-    if(samp.IsPlayerConnected(killerid.playerid)) {
-        samp.SendDeathMessage(killerid.playerid, player.playerid, killerid.GetPlayerWeapon());
-        Player.Info[killerid.playerid].Kills_Data.Kills++;
+    if(samp.IsPlayerConnected(killer.playerid)) {
+        samp.SendDeathMessage(killer.playerid, player.playerid, killer.GetPlayerWeapon());
+        Player.Info[killer.playerid].Kills_Data.Kills++;
+
+        /**
+         * Gang War System
+         */
+        if(Player.Info[player.playerid].inGwar != -1 && Player.Info[killer.playerid] != -1) {
+            let gwarId = Player.Info[killer.playerid].inGwar;
+            if(Player.Info[player.playerid].inGwar != gwarId) return;
+            GangWar.addPointTo(killer);
+        }
     }
 
     Player.Info[player.playerid].Kills_Data.Deaths++;
@@ -5361,8 +5386,8 @@ samp.OnPlayerDisconnect((player, reason) => {
     Circle.DeleteCreateCarsFromPlayer(player);
 
     if(Player.Info[player.playerid].SpawnedCar) samp.DestroyVehicle(Player.Info[player.playerid].SpawnedCar);
-
     if(Player.Info[player.playerid].Caged) UnCagePlayer(player);
+    if(Player.Info[player.playerid].inGwar != -1) GangWar.Kick(player, "~r~~h~gwar lost");
 
     Player.ResetVariables(player.playerid);
 
@@ -5371,13 +5396,13 @@ samp.OnPlayerDisconnect((player, reason) => {
     HideConnectTextDraw(player);
     HideSpawnTextDraw(player);
 
-    let reason_string = "";
+    let reasonString = "";
     switch(reason) {
-        case 0: reason_string = "~p~~h~(Timeout)"; break;
-        case 1: reason_string = "~r~~h~(Leaving)"; break;
-        case 2: reason_string = "~r~~h~(Kicked/Bannned)"; break;
+        case 0: reasonString = "~p~~h~(Timeout)"; break;
+        case 1: reasonString = "~r~~h~(Leaving)"; break;
+        case 2: reasonString = "~r~~h~(Kicked/Bannned)"; break;
     }
-    AddToTDLogs(`~r~~h~${player.GetPlayerName(24)}(${player.playerid}) ~w~~h~has left the server ${reason_string}!`);
+    AddToTDLogs(`~r~~h~${player.GetPlayerName(24)}(${player.playerid}) ~w~~h~has left the server ${reasonString}!`);
     return true;
 });
 
@@ -5411,9 +5436,7 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             Gang.Info.forEach((gang, index) => {
                 if(index == listitem) {
                     GangWar.Invite(player, gang.id).then((gwarId) => {
-                        GangWar.Join(player, gwarId).then(() => {
-                            player.GameTextForPlayer("~y~~h~GWar Lobby", 4000, 3);
-                        }).catch((error) => { SendError(player, error); });
+                        GangWar.Join(player, gwarId).catch((error) => { SendError(player, error); });
                     }).catch((error) => { SendError(player, error); });
                 }
             });

@@ -1,4 +1,4 @@
-const { CreateDynamicPickup, CreateDynamic3DTextLabel, DestroyDynamicPickup, DestroyDynamic3DTextLabel, CreateDynamicMapIcon } = require("../streamer");
+const { CreateDynamicPickup, CreateDynamic3DTextLabel, DestroyDynamicPickup, DestroyDynamic3DTextLabel, CreateDynamicMapIcon, UpdateDynamic3DTextLabelText } = require("../streamer");
 const { getNameByAccID } = require("../functions");
 
 module.exports = {

@@ -9,7 +9,7 @@ const Player = require("../player");
 
 module.exports = {
     /**
-     * @type {[{inviterGang: Number, invitedGang: Number, status: "preparing"|"started", map: Number, weapon: Number}]}
+     * @type {[{inviterGang: Number, invitedGang: Number, status: "preparing"|"started"|"someOneWin", map: Number, weapon: Number, inviterGangPoints: Number, invitedGangPoints: Number}]}
      */
     Info: [],
     /**
@@ -30,6 +30,92 @@ module.exports = {
     ],
     /**
      * @param {SampPlayer} player
+     */
+    addPointTo(player) {
+        let gwarId = Player.Info[player.playerid].inGwar;
+        if(!this.Info[gwarId]) return;
+        if(this.Info[gwarId].inviterGang == Player.Info[player.playerid].Gang) {
+            this.Info[gwarId].inviterGangPoints += 1;
+        } else {
+            this.Info[gwarId].invitedGangPoints += 1;
+        }
+        this.setGwarType(gwarId, "updateTextDraws");
+    },
+    /**
+     * @param {Number} gwarId 
+     * @param {"inviter"|"invited"|"unknown"} who 
+     */
+    Win(gwarId, who) {
+        if(!this.Info[gwarId]) return;
+        this.Info[gwarId].status = "someOneWin";
+        if(who == "inviter") {
+            getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId && this.Info[gwarId].inviterGang == Player.Info[f.playerid].Gang).forEach((i) => { this.Kick(i, "~g~~h~gwar win"); });
+            getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId && this.Info[gwarId].invitedGang == Player.Info[f.playerid].Gang).forEach((i) => { this.Kick(i, "~r~~h~gwar lost"); });
+        } else if(who == "invited") {
+            getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId && this.Info[gwarId].invitedGang == Player.Info[f.playerid].Gang).forEach((i) => { this.Kick(i, "~g~~h~gwar win"); });
+            getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId && this.Info[gwarId].inviterGang == Player.Info[f.playerid].Gang).forEach((i) => { this.Kick(i, "~r~~h~gwar lost"); });
+        }
+        else if(who == "unknown") { }
+        this.setGwarType(gwarId, "hideTextDraws");
+        this.Info.splice(gwarId, 1);
+    },
+    /**
+     * @param {Number} gwarId 
+     * @param {"showTextDraws"|"hideTextDraws"|"updateTextDraws"|"spawnPlayers"} type 
+     */
+    setGwarType(gwarId, type) {
+        if(!this.Info[gwarId]) return;
+        let inviterGang = Gang.Info.find(f => f.id == this.Info[gwarId].inviterGang);
+        let invitedGang = Gang.Info.find(f => f.id == this.Info[gwarId].invitedGang);
+        let inviterPlayers = getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId && Player.Info[f.playerid].Gang == inviterGang.id);
+        let invitedPlayers = getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId && Player.Info[f.playerid].Gang == invitedGang.id);
+        inviterPlayers.forEach((i) => { 
+            switch(type) {
+                case "showTextDraws": i.PlayerTextDrawShow(gangWarInfo1[i.playerid]), i.PlayerTextDrawShow(gangWarInfo2[i.playerid]); break;
+                case "hideTextDraws": i.PlayerTextDrawHide(gangWarInfo1[i.playerid]), i.PlayerTextDrawHide(gangWarInfo1[i.playerid]); break;
+                case "updateTextDraws": {
+                    i.PlayerTextDrawSetString(gangWarInfo1[i.playerid], `${inviterGang.name}: ~r~~h~0`);
+                    i.PlayerTextDrawColor(gangWarInfo1[i.playerid], inviterGang.color);
+                    i.PlayerTextDrawSetString(gangWarInfo2[i.playerid], `${invitedGang.name}: ~r~~h~0`);
+                    i.PlayerTextDrawColor(gangWarInfo2[i.playerid], invitedGang.color);
+                    break;
+                }
+                case "spawnPlayers": this.spawnPlayerInMatch(i); break;
+            }
+        });
+        invitedPlayers.forEach((i) => { 
+            switch(type) {
+                case "showTextDraws": i.PlayerTextDrawShow(gangWarInfo1[i.playerid]), i.PlayerTextDrawShow(gangWarInfo2[i.playerid]); break;
+                case "hideTextDraws": i.PlayerTextDrawHide(gangWarInfo1[i.playerid]), i.PlayerTextDrawHide(gangWarInfo1[i.playerid]); break;
+                case "updateTextDraws": {
+                    i.PlayerTextDrawSetString(gangWarInfo1[i.playerid], `${invitedGang.name}: ~r~~h~0`);
+                    i.PlayerTextDrawColor(gangWarInfo1[i.playerid], invitedGang.color);
+                    i.PlayerTextDrawSetString(gangWarInfo2[i.playerid], `${inviterGang.name}: ~r~~h~0`);
+                    i.PlayerTextDrawColor(gangWarInfo2[i.playerid], inviterGang.color);
+                    break;
+                }
+                case "spawnPlayers": this.spawnPlayerInMatch(i); break;
+            }
+        });
+    },
+    /**
+     * @param {SampPlayer} player 
+     */
+    spawnPlayerInMatch(player) {
+        let gwarId = Player.Info[player.playerid].inGwar;
+        if(!this.Info[gwarId]) return;
+        if(this.Info[gwarId].inviterGang == Player.Info[player.playerid].Gang) {
+            player.SetPlayerPos(this.Maps[this.Info[gwarId].map].positionInviter[0], this.Maps[this.Info[gwarId].map].positionInviter[1], this.Maps[this.Info[gwarId].map].positionInviter[2]);
+            player.SetPlayerFacingAngle(this.Maps[this.Info[gwarId].map].positionInviter[3]);
+        } else {
+            player.SetPlayerPos(this.Maps[this.Info[gwarId].map].positionInvited[0], this.Maps[this.Info[gwarId].map].positionInvited[1], this.Maps[this.Info[gwarId].map].positionInvited[2]);
+            player.SetPlayerFacingAngle(this.Maps[this.Info[gwarId].map].positionInvited[3]);
+        }
+        player.SetPlayerInterior(this.Maps[this.Info[gwarId].map].interiorId);
+        player.SetPlayerVirtualWorld(gwarId + 999);
+    },
+    /**
+     * @param {SampPlayer} player
      * @param {Number} invitedGang 
      */
     Invite(player, invitedGang) {
@@ -44,7 +130,9 @@ module.exports = {
                 invitedGang: invitedGangResult.id,
                 status: "preparing",
                 map: 0,
-                weapon: 0
+                weapon: 0,
+                inviterGangPoints: 0,
+                invitedGangPoints: 0
             });
             let gwarId = (index - 1);
             getPlayers().filter(f => Player.Info[f.playerid].Gang == invitedGangResult.id).forEach((i) => {
@@ -60,14 +148,36 @@ module.exports = {
         return new Promise((resolve, reject) => {
             if(!this.Info[gwarId]) return reject("This gwar id not exists!");
             if(this.Info[gwarId].status == "started") return reject("You can't join in started wars!");
+            if(this.Info[gwarId].invitedGang != Player.Info[player.playerid].Gang && this.Info[gwarId].inviterGang != Player.Info[player.playerid].Gang) return reject("This gwar invite is not for your gang!");
             player.SetPlayerPos(-1394.2000, 987.6200, 1023.9598);
             player.SetPlayerFacingAngle(176.8759);
             player.SetPlayerInterior(15);
             player.SetPlayerVirtualWorld(gwarId + 999);
             player.ResetPlayerWeapons();
             Player.Info[player.playerid].inGwar = gwarId;
+            player.GameTextForPlayer("~y~~h~GWar Lobby", 4000, 3);
             resolve(true);
         });
+    },
+    /**
+     * @param {SampPlayer} player 
+     * @param {String} reason 
+     */
+    Kick(player, reason) {
+        let gwarId = Player.Info[player.playerid].inGwar;
+        if(!this.Info[gwarId]) return;
+        Player.Info[player.playerid].inGwar = -1;
+        player.GameTextForPlayer(reason, 4000, 3);
+        player.SpawnPlayer();
+        player.PlayerTextDrawHide(gangWarInfo1[player.playerid]);
+        player.PlayerTextDrawHide(gangWarInfo2[player.playerid]);
+        if(this.Info[gwarId].status == "started") {
+            let inviterPlayersCount = getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId && Player.Info[f.playerid].Gang == this.Info[gwarId].inviterGang).length;
+            let invitedPlayersCount = getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId && Player.Info[f.playerid].Gang == this.Info[gwarId].invitedGang).length;
+            if(invitedPlayersCount == 0 && inviterPlayersCount >= 1) this.Win(gwarId, "inviter");
+            else if(inviterPlayersCount == 0 && invitedPlayersCount >= 1) this.Win(gwarId, "invited");
+            else this.Win(gwarId, "unknown");
+        }
     },
     /**
      * @param {SampPlayer} player 
@@ -98,11 +208,15 @@ module.exports = {
      */
     Start(player) {
         return new Promise((resolve, reject) => {
-            let index = Player.Info[player.playerid].inGwar;
-            if(!this.Info[index]) reject(UNEXPECTED);
-            let inviterGangPlayers = getPlayers().filter(f => Player.Info[f.playerid].inGwar == index && Player.Info[f.playerid].Gang == this.Info[index].inviterGang);
-            let invitedGangPlayers = getPlayers().filter(f => Player.Info[f.playerid].inGwar == index && Player.Info[f.playerid].Gang == this.Info[index].invitedGang);
-            if(inviterGangPlayers.length < 1 || invitedGangPlayers.length < 1) return reject("There needs to be at least 1 player in each gang!");
+            let gwarId = Player.Info[player.playerid].inGwar;
+            if(!this.Info[gwarId]) reject(UNEXPECTED);
+            let inviterPlayersCount = getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId && Player.Info[f.playerid].Gang == this.Info[gwarId].inviterGang).length;
+            let invitedPlayersCount = getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId && Player.Info[f.playerid].Gang == this.Info[gwarId].invitedGang).length;
+            //if(inviterPlayersCount < 1 || invitedPlayersCount < 1) return reject("There needs to be at least 1 player in each gang!");
+            this.Info[gwarId].status = "started";
+            this.setGwarType(gwarId, "updateTextDraws");
+            this.setGwarType(gwarId, "showTextDraws");
+            this.setGwarType(gwarId, "spawnPlayers");
             resolve(true);
         });
     },
@@ -110,11 +224,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             if(!this.Info[gwarId]) return reject("This gwar id not exists!");
             if(this.Info[gwarId].status == "started") return reject("You can't stop started wars!");
-            getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId).forEach((i) => {
-                Player.Info[i.playerid].inGwar = -1;
-                i.GameTextForPlayer("~r~~h~gwar canceled", 4000, 3);
-                i.SpawnPlayer();
-            });
+            getPlayers().filter(f => Player.Info[f.playerid].inGwar == gwarId).forEach((i) => { this.Kick(i, "~r~~h~gwar canceled"); });
             this.Info.splice(gwarId, 1);
             resolve(true);
         });
