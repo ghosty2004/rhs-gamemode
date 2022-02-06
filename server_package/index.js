@@ -1979,6 +1979,7 @@ CMD.on("gwar", (player, params) => {
             let gwarId = Player.Info[player.playerid].inGwar;
             if(gwarId == -1) return;
             if(GangWar.Info[gwarId].status == "started") return;
+            player.ShowPlayerDialog(Dialog.GANG_WAR_POINTS, samp.DIALOG_STYLE.INPUT, "{FF0000}Gang War Points", "{FFB300}Insert required amount of points for a gang to win the war:", "Set", "Cancel");
             break;
         }
         case "start": {
@@ -4433,18 +4434,20 @@ function SetupPlayerForSpawn(player, type=0) {
         }
         else if(Player.Info[player.playerid].Gang) { /* Gang Spawn */
             let playerGang = Gang.Info.find(f => f.id == Player.Info[player.playerid].Gang);
-            player.SetPlayerPos(playerGang.position[0], playerGang.position[1], playerGang.position[2]);
-            player.SetPlayerFacingAngle(playerGang.position[3]);
-            player.SetPlayerColor(playerGang.color);
-            for(let i = 0; i < playerGang.weapons.length; i++) {
-                player.GivePlayerWeapon(playerGang.weapons[i], 9999);
+            if(Player.Info[player.playerid].inGwar != -1) GangWar.spawnPlayerInMatch(player);
+            else {
+                player.SetPlayerPos(playerGang.position[0], playerGang.position[1], playerGang.position[2]);
+                player.SetPlayerFacingAngle(playerGang.position[3]);
+                for(let i = 0; i < playerGang.weapons.length; i++) {
+                    player.GivePlayerWeapon(playerGang.weapons[i], 9999);
+                }
             }
-
+            player.SetPlayerColor(playerGang.color);
             let AttackGangZone = Gang.Info.find(f => f.territory.GangZone == playerGang.capturing.turf);
             let DefendGangZone = Gang.Info.find(f => Gang.GetOwnedGangZones(playerGang.id).some(s => s == f.capturing.turf) && f.capturing.turf != -1);
-
             if(AttackGangZone) player.TextDrawShowForPlayer(TextDraws.server.attack_territory);
             else if(DefendGangZone) player.TextDrawShowForPlayer(TextDraws.server.under_attack_territory);
+
         }
         else SetupPlayerForSpawn(player, 1);
     }
@@ -5421,6 +5424,14 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
+        case Dialog.GANG_WAR_POINTS: {
+            if(!response) return;
+            inputtext = parseInt(inputtext);
+            if(inputtext < 10) return player.ShowPlayerDialog(Dialog.GANG_WAR_POINTS, samp.DIALOG_STYLE.INPUT, "{FF0000}Gang War Points", "{FF0000}Invalid. Minimum points: 10!\n{FFB300}Insert required amount of points for a gang to win the war:", "Set", "Cancel");
+            if(inputtext > 100) return player.ShowPlayerDialog(Dialog.GANG_WAR_POINTS, samp.DIALOG_STYLE.INPUT, "{FF0000}Gang War Points", "{FF0000}Invalid. Maximum points: 100!\n{FFB300}Insert required amount of points for a gang to win the war:", "Set", "Cancel");
+            GangWar.setRequiredPoints(player, inputtext);
+            break;
+        }
         case Dialog.GANG_WAR_WEAPONS: {
             if(!response) return;
             GangWar.setWeapon(player, listitem);

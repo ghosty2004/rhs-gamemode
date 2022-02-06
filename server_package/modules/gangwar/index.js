@@ -9,7 +9,7 @@ const Player = require("../player");
 
 module.exports = {
     /**
-     * @type {[{inviterGang: Number, invitedGang: Number, status: "preparing"|"started"|"someOneWin", map: Number, weapon: Number, inviterGangPoints: Number, invitedGangPoints: Number}]}
+     * @type {[{inviterGang: Number, invitedGang: Number, status: "preparing"|"started"|"someOneWin", map: Number, weapon: Number, requiredPoints: Number, inviterGangPoints: Number, invitedGangPoints: Number}]}
      */
     Info: [],
     /**
@@ -25,8 +25,8 @@ module.exports = {
      * @type {[{name: String, guns: Number[]}]}
      */
     Weapons: [
-        {name: "Walking Weapons", guns: []},
-        {name: "Running Weapons", guns: []}
+        {name: "Walking Weapons", guns: [24, 25, 34]},
+        {name: "Running Weapons", guns: [24, 26, 31]}
     ],
     /**
      * @param {SampPlayer} player
@@ -36,8 +36,10 @@ module.exports = {
         if(!this.Info[gwarId]) return;
         if(this.Info[gwarId].inviterGang == Player.Info[player.playerid].Gang) {
             this.Info[gwarId].inviterGangPoints += 1;
+            if(this.Info[gwarId].inviterGangPoints == this.Info[gwarId].requiredPoints) this.Win(gwarId, "inviter");
         } else {
             this.Info[gwarId].invitedGangPoints += 1;
+            if(this.Info[gwarId].invitedGangPoints == this.Info[gwarId].requiredPoints) this.Win(gwarId, "invited");
         }
         this.setGwarType(gwarId, "updateTextDraws");
     },
@@ -74,9 +76,9 @@ module.exports = {
                 case "showTextDraws": i.PlayerTextDrawShow(gangWarInfo1[i.playerid]), i.PlayerTextDrawShow(gangWarInfo2[i.playerid]); break;
                 case "hideTextDraws": i.PlayerTextDrawHide(gangWarInfo1[i.playerid]), i.PlayerTextDrawHide(gangWarInfo1[i.playerid]); break;
                 case "updateTextDraws": {
-                    i.PlayerTextDrawSetString(gangWarInfo1[i.playerid], `${inviterGang.name}: ~r~~h~0`);
+                    i.PlayerTextDrawSetString(gangWarInfo1[i.playerid], `${inviterGang.name}: ~r~~h~${this.Info[gwarId].inviterGangPoints}`);
                     i.PlayerTextDrawColor(gangWarInfo1[i.playerid], inviterGang.color);
-                    i.PlayerTextDrawSetString(gangWarInfo2[i.playerid], `${invitedGang.name}: ~r~~h~0`);
+                    i.PlayerTextDrawSetString(gangWarInfo2[i.playerid], `${invitedGang.name}: ~r~~h~${this.Info[gwarId].invitedGangPoints}`);
                     i.PlayerTextDrawColor(gangWarInfo2[i.playerid], invitedGang.color);
                     break;
                 }
@@ -88,9 +90,9 @@ module.exports = {
                 case "showTextDraws": i.PlayerTextDrawShow(gangWarInfo1[i.playerid]), i.PlayerTextDrawShow(gangWarInfo2[i.playerid]); break;
                 case "hideTextDraws": i.PlayerTextDrawHide(gangWarInfo1[i.playerid]), i.PlayerTextDrawHide(gangWarInfo1[i.playerid]); break;
                 case "updateTextDraws": {
-                    i.PlayerTextDrawSetString(gangWarInfo1[i.playerid], `${invitedGang.name}: ~r~~h~0`);
+                    i.PlayerTextDrawSetString(gangWarInfo1[i.playerid], `${invitedGang.name}: ~r~~h~${this.Info[gwarId].invitedGangPoints}`);
                     i.PlayerTextDrawColor(gangWarInfo1[i.playerid], invitedGang.color);
-                    i.PlayerTextDrawSetString(gangWarInfo2[i.playerid], `${inviterGang.name}: ~r~~h~0`);
+                    i.PlayerTextDrawSetString(gangWarInfo2[i.playerid], `${inviterGang.name}: ~r~~h~${this.Info[gwarId].inviterGangPoints}`);
                     i.PlayerTextDrawColor(gangWarInfo2[i.playerid], inviterGang.color);
                     break;
                 }
@@ -113,6 +115,8 @@ module.exports = {
         }
         player.SetPlayerInterior(this.Maps[this.Info[gwarId].map].interiorId);
         player.SetPlayerVirtualWorld(gwarId + 999);
+        player.ResetPlayerWeapons();
+        this.Weapons[this.Info[gwarId].weapon].guns.forEach((weaponId) => { player.GivePlayerWeapon(weaponId, 9999); });
     },
     /**
      * @param {SampPlayer} player
@@ -131,6 +135,7 @@ module.exports = {
                 status: "preparing",
                 map: 0,
                 weapon: 0,
+                requiredPoints: 10,
                 inviterGangPoints: 0,
                 invitedGangPoints: 0
             });
@@ -201,6 +206,18 @@ module.exports = {
         this.Info[index].weapon = weaponId;
         getPlayers().filter(f => Player.Info[f.playerid].inGwar == index).forEach((i) => {
             i.SendClientMessage(LIGHT_GREEN, `GWAR Weapons: {FF0000}${player.GetPlayerName(24)} {2EC32E}changed weapons to: {FFB300}${this.Weapons[weaponId].name}`);
+        });
+    },
+    /**
+     * @param {SampPlayer} player 
+     * @param {Number} value 
+     */
+    setRequiredPoints(player, value) {
+        let index = Player.Info[player.playerid].inGwar;
+        if(!this.Info[index]) return;
+        this.Info[index].requiredPoints = value;
+        getPlayers().filter(f => Player.Info[f.playerid].inGwar == index).forEach((i) => {
+            i.SendClientMessage(LIGHT_GREEN, `GWAR Points: {FF0000}${player.GetPlayerName(24)} {2EC32E}changed required points to: {FFB300}${value}`);
         });
     },
     /**
