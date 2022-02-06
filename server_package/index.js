@@ -1239,7 +1239,7 @@ CMD.on("exit", (player) => {
 
 CMD.on("buy", (player) => {
     let resultHouse = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
-    let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(f.position[0], f.position[1], f.position[2]));
+    let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
     if(resultHouse) {
         if(Function.totalGameTime(player, "default").hours < 5) return SendError(player, "You need to have 5 hours on the server to buy a House!");
         if(Player.Info[player.playerid].Coins < resultBusiness.cost) return SendError(player, `You must have at least ${resultBusiness.cost} coins to buy this House!`);
@@ -1263,7 +1263,7 @@ CMD.on("buy", (player) => {
 
 CMD.on("sell", (player) => {
     let resultHouse = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
-    let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(f.position[0], f.position[1], f.position[2]));
+    let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
     if(resultHouse) {
         if(resultHouse.owner != Player.Info[player.playerid].AccID) return SendError(player, "You don't have what to sell!");
     } 
@@ -1275,7 +1275,7 @@ CMD.on("sell", (player) => {
 
 CMD.on("renew", (player) => {
     let resultHouse = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
-    let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(f.position[0], f.position[1], f.position[2]));
+    let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
     if(resultHouse) {
 
     } 
@@ -3580,6 +3580,7 @@ function spawnPlayerInDM(player, first_time=false) {
 }
 
 function CheckAntiCheat(player) {
+    if(Player.Info[player.playerid].Admin) return;
     /* ======== */
     /* Fly Hack */
     /* ======== */
