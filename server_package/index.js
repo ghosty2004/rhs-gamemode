@@ -3162,7 +3162,7 @@ CMD.on("crash", (player, params) => {
     if(!params[0]) return SendUsage(player, "/crash [ID/Name]");
     let target = getPlayer(params[0]);
     if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
-    for(let i = 0; i < 7; i++) player.GameTextForPlayer("•¤¶§!$$%&'()*+,-./01~!@#$^&*()_-+={[}]:;'<,>.?/", (i+1)*1000, i);
+    for(let i = 0; i < 7; i++) target.GameTextForPlayer("•¤¶§!$$%&'()*+,-./01~!@#$^&*()_-+={[}]:;'<,>.?/", (i+1)*1000, i);
     samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been CRASHED by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
     SendACMD(player, "Crash");
 });
