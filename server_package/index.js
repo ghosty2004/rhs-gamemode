@@ -1268,9 +1268,19 @@ CMD.on("sell", (player) => {
     let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
     if(resultHouse) {
         if(resultHouse.owner != Player.Info[player.playerid].AccID) return SendError(player, "You don't have what to sell!");
+        con.query("UPDATE houses SET owner = ? WHERE ID = ?", [0, resultHouse.id], (err) => {
+            if(err) return SendError(player, Errors.UNEXPECTED);
+            resultHouse.owner = 0;
+            House.Update(resultHouse.id);
+        });
     } 
     else if(resultBusiness) {
         if(resultBusiness.owner != Player.Info[player.playerid].AccID) return SendError(player, "You don't have what to sell!");
+        con.query("UPDATE business SET owner = ? WHERE ID = ?", [0, resultBusiness.id], (err) => {
+            if(err) return SendError(player, Errors.UNEXPECTED);
+            resultBusiness.owner = 0;
+            Business.Update(resultBusiness.id);
+        });
     } 
     else SendError(player, "You are not in a House/Business Pickup!");
 });
@@ -1303,7 +1313,7 @@ CMD.on("myhouse", (player) => {
 CMD.on("myh", (player) => { CMD.emit("myhouse", player); })
 
 CMD.on("mybusiness", (player) => {
-    let result = Business.Info.find(f => f.owner == Player.Info[f.playerid].AccID);
+    let result = Business.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
     if(!result) return SendError(player, "You don't have a Business!");
     player.SetPlayerPos(result.position[0], result.position[1], result.position[2]);
 });
@@ -4209,9 +4219,9 @@ function showStats(player, target, offline_check=false) {
     info += `{BBFF00}Race Points: {49FFFF}${offline_check ? target.racepoints : Player.Info[target.playerid].Driving_Data.RacePoints} {BBFF00}(${getRanksRankName("race", offline_check ? target.racepoints : Player.Info[target.playerid].Driving_Data.RacePoints)}{BBFF00})\n`;
     info += "\n";
     info += "{FF4800}Properties\n";
-    info += `{BBFF00}Business: ${Business.Info.some(s => s.owner == offline_check ? target.ID : Player.Info[target.playerid].AccID) ? "{49FFFF}Yes" : "{FF0000}No"}\n`; 
-    info += `{BBFF00}House: ${House.Info.some(s => s.owner == offline_check ? target.ID : Player.Info[target.playerid].AccID) ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
-    info += `{BBFF00}Personal Vehicle: ${PCar.Info.some(s => s.owner == offline_check ? target.ID : Player.Info[target.playerid].AccID) ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
+    info += `{BBFF00}Business: ${Business.Info.some(s => s.owner == (offline_check ? target.ID : Player.Info[target.playerid].AccID)) ? "{49FFFF}Yes" : "{FF0000}No"}\n`; 
+    info += `{BBFF00}House: ${House.Info.some(s => s.owner == (offline_check ? target.ID : Player.Info[target.playerid].AccID)) ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
+    info += `{BBFF00}Personal Vehicle: ${PCar.Info.some(s => s.owner == (offline_check ? target.ID : Player.Info[target.playerid].AccID)) ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
     info += "\n";
     info += `{FF4800}Statistics note: {49FFFF}${getPlayerStatsNote(target, offline_check)}{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob\n`;
     if(!offline_check) {
