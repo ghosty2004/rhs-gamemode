@@ -1197,6 +1197,21 @@ CMD.on("sstunts", (player) => {
  * Properties Commands
  * House / Business
  */
+CMD.on("lift", (player, params) => {
+    let result = isPlayerInAnyHouseLift(player);
+    if(!result) return SendError(player, "You are not close to a lift!");
+    if(result.owner != Player.Info[player.playerid].AccID) return SendError(player, "You are not owner of this house lift!");
+    let newLevel = 0;
+    switch(params[0]) {
+        case "up": newLevel = result.lifts[0].level + 1; break;
+        case "down": newLevel = result.lifts[0].level - 1; break;
+        default: return SendUsage(player, "/lift [Up/Down]");
+    }
+    if(typeof(result.lifts[0].positionsZ[newLevel]) == "undefined") return SendError(player, "This lift level not exists!");
+    samp.MoveObject(result.lifts[0].objectHandle, result.lifts[0].positionXYZ[0], result.lifts[0].positionXYZ[1], result.lifts[0].positionXYZ[2] + result.lifts[0].positionsZ[newLevel], 9, result.lifts[0].rotationXYZ[0], result.lifts[0].rotationXYZ[1], result.lifts[0].rotationXYZ[2]);
+    result.lifts[0].level = newLevel;
+});
+
 CMD.on("enter", (player) => {
     let resultHouse = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
     let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
@@ -3172,12 +3187,16 @@ CMD.on("setall", (player, params) => {
  * Admins Commands
  * RCON
  */
-CMD.on("gangedit", (player) => {
+CMD.on("edithouse", (player) => {
+    if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+});
+
+CMD.on("editgang", (player) => {
     if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     let zone = getPlayerGangZone(player);
     if(!zone) return SendError(player, "You are not in a Gang Territory!");
     let info = "Spawn";
-    player.ShowPlayerDialog(Dialog.EDIT_GANG, samp.DIALOG_STYLE.LIST, `{FF0000}Gang Edit - ${zone.name}`, info, "Select", "Cancel");
+    player.ShowPlayerDialog(Dialog.EDIT_GANG, samp.DIALOG_STYLE.LIST, `{FF0000}Edit Gang - ${zone.name}`, info, "Select", "Cancel");
 });
 
 CMD.on("crash", (player, params) => {
@@ -3191,14 +3210,14 @@ CMD.on("crash", (player, params) => {
 });
 
 CMD.on("createhouse", (player, params) => {
-    if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!isNumber(params[0])) return SendUsage(player, "/createhouse [Cost]");
     params[0] = parseInt(params[0]);
     let interiorTypeTemp = data.interiors.filter(f => f.name.startsWith("HOUSE"));
     let interiorType = interiorTypeTemp[Function.getRandomInt(0, interiorTypeTemp.length)].name;
-    con.query("INSERT INTO houses (owner, position, interiorType, cost) VALUES(?, ?, ?, ?)", [0, JSON.stringify(player.GetPlayerPos()), interiorType, params[0]], (err, result) => {
+    con.query("INSERT INTO houses (owner, position, interiorType, cost, lifts) VALUES(?, ?, ?, ?, ?)", [0, JSON.stringify(player.GetPlayerPos()), interiorType, params[0], JSON.stringify([])], (err, result) => {
         if(err) return SendError(player, Errors.UNEXPECTED);
-        House.Create(result.insertId, 0, player.GetPlayerPos(), interiorType, params[0]);
+        House.Create(result.insertId, 0, player.GetPlayerPos(), interiorType, params[0], []);
         player.SendClientMessage(data.colors.YELLOW, `You have successfully created house with ID {FF0000}${result.insertId} {FFFF00}and cost {FF0000}${params[0]}{FFFF00}!`);
         SendACMD(player, "CreateHouse");
     });
@@ -3208,6 +3227,7 @@ CMD.on("deletehouse", (player) => {
     if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     let result = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
     if(!result) return SendError(player, "You are not close to any house!");
+    if(result.lifts.length != 0) return SendError(player, "You can't delete a house with lifts!");
     con.query("DELETE FROM houses WHERE ID = ?", [result.id], (err) => {
         if(err) return SendError(player, Errors.UNEXPECTED);
         House.Delete(result.id);
@@ -3217,7 +3237,7 @@ CMD.on("deletehouse", (player) => {
 });
 
 CMD.on("createbusiness", (player, params) => {
-    if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!isNumber(params[0]) || !isNumber(params[1])) return SendUsage(player, "/createbusiness [Cost] [Win] [Name(Optional)]");
     params[0] = parseInt(params[0]);
     params[1] = parseInt(params[1]);
@@ -3293,7 +3313,6 @@ CMD.on("setaccess", async (player, params) => {
         target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has seted your RCON access to: {FF0000}${params[1].toUpperCase()}{FFFF00}!`);
         player.SendClientMessage(data.colors.YELLOW, `You have successfully seted {FF0000}${target.GetPlayerName(24)}{FFFF00}'s RCON type to: {FF0000}${params[1].toUpperCase()}{FFFF00}!`);
         YSF.SetPlayerAdmin(target, Player.Info[target.playerid].RconType != 0);
-        //if(target.IsPlayerAdmin() && setValue == 0) Function.kickPlayer(target);
         SendACMD(player, "SetAccess");
     }
 });
@@ -3366,7 +3385,17 @@ CMD.on("givepcar", (player, params) => {
 /**
  * Functions
  */
-function OnPlayerText(player, text) {
+function isPlayerInAnyHouseLift(player) {
+    return House.Info.find((houseFind) => {
+        return houseFind.lifts.find((liftFind) => {
+            for(let i = 0; i < liftFind.positionsZ.length; i++) {
+                if(player.IsPlayerInRangeOfPoint(2, liftFind.positionXYZ[0], liftFind.positionXYZ[1], liftFind.positionXYZ[2] + liftFind.positionsZ[i])) return true;
+            }
+        });
+    });
+}
+
+async function OnPlayerText(player, text) {
     if(!Player.Info[player.playerid].LoggedIn) return;
     if(Player.Info[player.playerid].AFK) return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use the~n~~r~~h~Chat~w~~h~!", 4000, 4);
     if(!checkAntiSpam(player, 0)) return false;
@@ -4514,7 +4543,7 @@ function LoadFromDB() {
 function LoadHouses() {
     con.query("SELECT * FROM houses", function(err, result) {
         for(let i = 0; i < result.length; i++) {
-            House.Create(result[i].ID, result[i].owner, JSON.parse(result[i].position), result[i].interiorType, result[i].cost);
+            House.Create(result[i].ID, result[i].owner, JSON.parse(result[i].position), result[i].interiorType, result[i].cost, JSON.parse(result[i].lifts));
         }
         console.log(`Loaded ${result.length} houses.`);
     });
