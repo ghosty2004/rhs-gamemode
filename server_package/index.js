@@ -1298,12 +1298,14 @@ CMD.on("chint", (player) => {
 CMD.on("myhouse", (player) => {
     let result = House.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
     if(!result) return SendError(player, "You don't have a House!");
+    player.SetPlayerPos(result.position[0], result.position[1], result.position[2]);
 });
 CMD.on("myh", (player) => { CMD.emit("myhouse", player); })
 
 CMD.on("mybusiness", (player) => {
     let result = Business.Info.find(f => f.owner == Player.Info[f.playerid].AccID);
     if(!result) return SendError(player, "You don't have a Business!");
+    player.SetPlayerPos(result.position[0], result.position[1], result.position[2]);
 });
 CMD.on("myb", (player) => { CMD.emit("mybusiness", player); });
 
@@ -2321,13 +2323,6 @@ CMD.on("mkick", (player, params) => {
     if(!Player.Info[player.playerid].Clan) return SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
     if(Player.Info[player.playerid].Clan_Rank < 2) return SendError(player, "You need to be Gang Owner or Clan Founder to use this command!");
     if(!params[0]) return SendUsage(player, "/MKick [ID/Name]");
-    let target = getPlayer(params[0]);
-    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
-});
-
-CMD.on("invite", (player, params) => {
-    if(!Player.Info[player.playerid].Clan) return SendError(player, Errors.NOT_MEMBER_OF_ANY_CLAN);
-    if(!params[0]) return SendUsage(player, "/Invite [ID/Name]");
     let target = getPlayer(params[0]);
     if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
 });
