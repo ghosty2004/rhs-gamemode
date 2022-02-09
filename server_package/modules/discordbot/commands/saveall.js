@@ -14,7 +14,7 @@ module.exports = {
         let accId = await Function.discordUserData.loginSessionId(interaction.user);
         if(!accId) return interaction.reply("You need to have a login session. Use /login !");
         if(await Function.discordUserData.columnValue(interaction.user, "rcontype") < 1) return interaction.reply(NOT_ENOUGH_ADMIN);
-        Function.saveAll();
+        Function.saveAll(interaction.user.tag, true);
         interaction.reply("You have successfull saved all server data.")
     }
 }

@@ -1241,8 +1241,9 @@ CMD.on("buy", (player) => {
     let resultHouse = House.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
     let resultBusiness = Business.Info.find(f => player.IsPlayerInRangeOfPoint(1, f.position[0], f.position[1], f.position[2]));
     if(resultHouse) {
+        if(House.Info.some(s => s.owner == Player.Info[player.playerid].AccID)) return SendError(player, "Ai deja o casa!", "You already own a house!");
         if(Function.totalGameTime(player, "default").hours < 5) return SendError(player, "You need to have 5 hours on the server to buy a House!");
-        if(Player.Info[player.playerid].Coins < resultBusiness.cost) return SendError(player, `You must have at least ${resultBusiness.cost} coins to buy this House!`);
+        if(Player.Info[player.playerid].Coins < resultHouse.cost) return SendError(player, `You must have at least ${resultBusiness.cost} coins to buy this House!`);
         con.query("UPDATE houses SET owner = ? WHERE ID = ?", [Player.Info[player.playerid].AccID, resultHouse.id], (err) => {
             if(err) return SendError(player, Errors.UNEXPECTED);
             resultHouse.owner = Player.Info[player.playerid].AccID;
@@ -1250,6 +1251,7 @@ CMD.on("buy", (player) => {
         });
     } 
     else if(resultBusiness) {
+        if(Business.Info.some(s => s.owner == Player.Info[player.playerid].AccID)) return SendError(player, "Ai deja o afacere!", "You already own a business!");
         if(Function.totalGameTime(player, "default").hours < 5) return SendError(player, "You need to have 5 hours on the server to buy a Business!");
         if(Player.Info[player.playerid].Coins < resultBusiness.cost) return SendError(player, `You must have at least ${resultBusiness.cost} coins to buy this Business!`);
         con.query("UPDATE business SET owner = ? WHERE ID = ?", [Player.Info[player.playerid].AccID, resultBusiness.id], (err) => {
@@ -2086,33 +2088,33 @@ CMD.on("capture", (player, params) => {
         case "start": {
             if(Player.Info[player.playerid].Gang_Data.Rank < 3) return SendError(player, "You need to be leader to use this command!");
             if(playerGang.capturing.turf != -1) return SendError(player, "Your gang is already capturing a territory!");
-            let zone = GetPlayerGangZone(player);
+            let zone = getPlayerGangZone(player);
             if(!zone) return SendError(player, "You are not in a Gang Territory!");
-            if(zone.owner == Player.Info[player.playerid].Gang) return SendError(player, "This Territory is already owned by your Gang!");
-            if(Gang.Info.filter(f => f.capturing.turf == zone.GangZone)[0]) return SendError(player, "This territory is in war!");
-            let zoneGang = Gang.Info.find(f => f.id == zone.owner);
+            if(zone.territory.owner == Player.Info[player.playerid].Gang) return SendError(player, "This Territory is already owned by your Gang!");
+            if(Gang.Info.filter(f => f.capturing.turf == zone.territory.GangZone)[0]) return SendError(player, "This territory is in war!");
+            let zoneGang = Gang.Info.find(f => f.id == zone.territory.owner);
             if(zoneGang.capturing.turf != -1) return SendError(player, "This territory owner is in another war!");
-            if(Gang.Info.filter(f => Gang.GetOwnedGangZones(Player.Info[zone.owner].Gang).some(s => s == f.capturing.turf) && f.capturing.turf != -1)[0]) return SendError(player, "This territory owner is in another war!");
-            startCapture(player, zone.GangZone);
+            if(Gang.Info.filter(f => Gang.GetOwnedGangZones(Player.Info[zone.territory.owner].Gang).some(s => s == f.capturing.turf) && f.capturing.turf != -1)[0]) return SendError(player, "This territory owner is in another war!");
+            startCapture(player, zone.territory.GangZone);
             break;
         }
         case "stop": {
             if(player.GetPlayerVirtualWorld() != 0) return SendError(player, "You can capture stop a gang only being in /vw 0!");
-            let zone = GetPlayerGangZone(player);
+            let zone = getPlayerGangZone(player);
             if(!zone) return SendError(player, "You are not in a Gang Territory!");
             let DefendGangZone = Gang.Info.filter(f => f.capturing.turf == zone.GangZone)[0];
             if(!DefendGangZone) return SendError(player, "This territory is not attacked!");
-            if(Player.Info[player.playerid].Gang != zone.owner) return SendError(player, "You are not member of this territory owner Gang!");
-            if(samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == DefendGangZone.id && GetPlayerGangZone(f) == zone).length != 0) return SendError(player, "Eliminate all players from this territory and try again!");
+            if(Player.Info[player.playerid].Gang != zone.territory.owner) return SendError(player, "You are not member of this territory owner Gang!");
+            if(samp.getPlayers().filter(f => Player.Info[f.playerid].Gang == DefendGangZone.id && getPlayerGangZone(f).territory == zone.territory).length != 0) return SendError(player, "Eliminate all players from this territory and try again!");
             loseCapture(DefendGangZone.id);
             break;
         }
         case "join": {
             if(Player.Info[player.playerid].Gang_Data.Capturing) return SendError(player, "You are already joined in a territory war!");
             if(playerGang.capturing.turf == -1) return SendError(player, "Your gang is not in a territory war!");
-            let zone = GetPlayerGangZone(player);
+            let zone = getPlayerGangZone(player);
             if(!zone) return SendError(player, "You are not in a Gang Territory!");
-            if(zone.GangZone != playerGang.capturing.turf) return SendError(player, "You are not in the war territory!");
+            if(zone.territory.GangZone != playerGang.capturing.turf) return SendError(player, "You are not in the war territory!");
             player.GameTextForPlayer("~g~~h~Start killing!~n~~r~~h~don't leave the territory!", 3000, 3);
             Player.Info[player.playerid].Gang_Data.Capturing = true;
             ShowCapturingLabelFor(player);
@@ -2620,6 +2622,8 @@ CMD.on("god", (player) => {
 
 CMD.on("asay", (player, params) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params.slice(0).join(" ")) return SendUsage(player, "/asay [Text]");
+    samp.SendClientMessageToAll(0xFF6BFFAA, `*** Admin *** {03FF09}${player.GetPlayerName(24)}: {FF00F6}${params.slice(0).join(" ")}`);
 });
 
 CMD.on("caps", (player) => {
@@ -2805,7 +2809,7 @@ CMD.on("set", (player, params) => {
                 SendACMD(player, "Set Money");
                 break;
             }
-            case "drifts": {
+            case "drift": {
                 if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
                 if(params[2] < 0 || params[2] > 999999999) return SendError(player, "Invalid drift (0-999999999)!");
                 target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Drift to {FF0000}${params[2]}{FFFF00}!`);
@@ -2842,7 +2846,7 @@ CMD.on("set", (player, params) => {
                 break;
             }
             case "kicks": {
-                if(Player.Info[player.playerid].RconType < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+                if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
                 if(params[2] < 0 || params[2] > 2) return SendError(player, "Invalid kicks (0-2)!");
                 target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set your Kicks to {FF0000}${params[2]}{FFFF00}!`);
                 player.SendClientMessage(data.colors.YELLOW, `You have set {FF0000}${target.GetPlayerName(24)}{FFFF00}'s Kicks to {FF0000}${params[2]}{FFFF00}!`);
@@ -3163,6 +3167,14 @@ CMD.on("setall", (player, params) => {
  * Admins Commands
  * RCON
  */
+CMD.on("gangedit", (player) => {
+    if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    let zone = getPlayerGangZone(player);
+    if(!zone) return SendError(player, "You are not in a Gang Territory!");
+    let info = "Spawn";
+    player.ShowPlayerDialog(Dialog.EDIT_GANG, samp.DIALOG_STYLE.LIST, `{FF0000}Gang Edit - ${zone.name}`, info, "Select", "Cancel");
+});
+
 CMD.on("crash", (player, params) => {
     if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!params[0]) return SendUsage(player, "/crash [ID/Name]");
@@ -3272,9 +3284,11 @@ CMD.on("setaccess", async (player, params) => {
     }
     if(setValue != -1) {
         UpdatePlayer(target, "rcontype", setValue);
+        Player.Info[target.playerid].RconType = setValue;
         target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has seted your RCON access to: {FF0000}${params[1].toUpperCase()}{FFFF00}!`);
         player.SendClientMessage(data.colors.YELLOW, `You have successfully seted {FF0000}${target.GetPlayerName(24)}{FFFF00}'s RCON type to: {FF0000}${params[1].toUpperCase()}{FFFF00}!`);
-        if(target.IsPlayerAdmin() && setValue == 0) Function.kickPlayer(target);
+        YSF.SetPlayerAdmin(target, Player.Info[target.playerid].RconType != 0);
+        //if(target.IsPlayerAdmin() && setValue == 0) Function.kickPlayer(target);
         SendACMD(player, "SetAccess");
     }
 });
@@ -3863,9 +3877,9 @@ function ShowGangZonesForPlayer(player) {
     });
 }
 
-function GetPlayerGangZone(player) {
-    const data = Gang.Info.filter(f => player.position.x >= f.territory.MinX && player.position.x <= f.territory.MaxX && player.position.y >= f.territory.MinY && player.position.y <= f.territory.MaxY)[0];
-    if(data) return data.territory;
+function getPlayerGangZone(player) {
+    const data = Gang.Info.find(f => player.position.x >= f.territory.MinX && player.position.x <= f.territory.MaxX && player.position.y >= f.territory.MinY && player.position.y <= f.territory.MaxY);
+    if(data) return data;
     else return null;
 } 
 
@@ -4200,9 +4214,9 @@ function showStats(player, target, offline_check=false) {
     info += `{BBFF00}Race Points: {49FFFF}${offline_check ? target.racepoints : Player.Info[target.playerid].Driving_Data.RacePoints} {BBFF00}(${getRanksRankName("race", offline_check ? target.racepoints : Player.Info[target.playerid].Driving_Data.RacePoints)}{BBFF00})\n`;
     info += "\n";
     info += "{FF4800}Properties\n";
-    info += `{BBFF00}Business: {FF0000}No\n`;
-    info += `{BBFF00}House: {FF0000}No\n`;
-    info += `{BBFF00}Personal Vehicle: {FF0000}No\n`; // {49FFFF}Yes
+    info += `{BBFF00}Business: ${Business.Info.some(s => s.owner == offline_check ? target.ID : Player.Info[target.playerid].AccID) ? "{49FFFF}Yes" : "{FF0000}No"}\n`; 
+    info += `{BBFF00}House: ${House.Info.some(s => s.owner == offline_check ? target.ID : Player.Info[target.playerid].AccID) ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
+    info += `{BBFF00}Personal Vehicle: ${PCar.Info.some(s => s.owner == offline_check ? target.ID : Player.Info[target.playerid].AccID) ? "{49FFFF}Yes" : "{FF0000}No"}\n`;
     info += "\n";
     info += `{FF4800}Statistics note: {49FFFF}${getPlayerStatsNote(target, offline_check)}{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob\n`;
     if(!offline_check) {
@@ -4226,11 +4240,14 @@ function getPlayerStatsNote(player, offline_check=false) {
     let note = 0;
     if((offline_check ? player.stuntpoints : Player.Info[player.playerid].Driving_Data.StuntPoints) >= 1000) note += 1;
     if((offline_check ? player.driftpoints : Player.Info[player.playerid].Driving_Data.DriftPoints) >= 1000) note += 1;
-    if((offline_check ? player.racepoints : Player.Info[player.playerid].Driving_Data.RacePoints) >= 100) note += 1;
+    if((offline_check ? player.racepoints : Player.Info[player.playerid].Driving_Data.RacePoints) >= 1000) note += 1;
+    if((offline_check ? player.kills : Player.Info[player.playerid].Kills_Data.Kills) >= 1000) note += 1;
     if((offline_check ? player.bestkillingspree : Player.Info[player.playerid].Kills_Data.BestKillingSpree) >= 100) note += 1;
     if((offline_check ? player.hours : Function.totalGameTime(player, "default").hours) >= 100) note += 1;
     if((offline_check ? player.respect_positive : Player.Info[player.playerid].Respect.Positive) >= 50) note += 1;
     if((offline_check ? player.coins : Player.Info[player.playerid].Coins) >= 25000) note += 1;
+    if(Business.Info.some(s => s.owner == offline_check ? player.ID : Player.Info[player.playerid].AccID)) note += 1;
+    if(House.Info.some(s => s.owner == offline_check ? player.ID : Player.Info[player.playerid].AccID)) note += 1;
     return note;
 }
 
@@ -4952,6 +4969,8 @@ function LoadPlayerStats(player) {
                 Player.Info[player.playerid].AdminActivity.Mutes = result[0].admin_mutes;
                 Player.Info[player.playerid].AdminActivity.ClearChats = result[0].admin_clearchats;
                 Player.Info[player.playerid].AdminActivity.Since = result[0].admin_since;
+                Player.Info[player.playerid].RconType = result[0].rcontype;
+                YSF.SetPlayerAdmin(player, Player.Info[player.playerid].RconType != 0);
                 Player.Info[player.playerid].VIP = result[0].VIP;
                 Player.Info[player.playerid].VIP_Expire = result[0].VIP_Expire;
                 Player.Info[player.playerid].Clan = result[0].clan;
@@ -5124,7 +5143,7 @@ samp.OnPlayerEnterCheckpoint((player) => {
     return true;
 });
 
-samp.OnRconLoginAttempt((ip, password, success) => {
+/*samp.OnRconLoginAttempt((ip, password, success) => {
     if(success) {
         samp.getPlayers().filter(f => f.GetPlayerIp(16) == ip && Player.Info[f.playerid].LoggedIn).forEach((i) => {
             con.query("SELECT rcontype FROM users WHERE id = ?", [Player.Info[i.playerid].AccID], function(err, result) {
@@ -5144,7 +5163,7 @@ samp.OnRconLoginAttempt((ip, password, success) => {
         });
     }
     return true;
-});
+});*/
 
 samp.OnPlayerKeyStateChange((player, newkeys, oldkeys) => {
     if(newkeys & samp.KEY.FIRE) {

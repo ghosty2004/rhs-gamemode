@@ -264,17 +264,11 @@ module.exports = {
             Clan.Info[clanId].skin.member, Clan.Info[clanId].skin.leader, Clan.Info[clanId].kills, Clan.Info[clanId].deaths, clanId
         ]);
     },
-    /**
-     * @param {Number} gangId
-     */
-    saveGang(gangId) {
-        if(!Gang.Exists(gangId)) return;
+    saveGang(gang) {
         con.query("UPDATE gangs SET name = ?, position = ?, weapon = ?, color = ?, alliance = ?, points = ?, captures = ?, kills = ?, deaths = ?, territory_position = ? WHERE ID = ?", [
-            Gang.Info[gangId].name, JSON.stringify(Gang.Info[gangId].position), JSON.stringify(Gang.Info[gangId].weapons), Gang.Info[gangId].color, Gang.Info[gangId].alliance, Gang.Info[gangId].points, Gang.Info[gangId].captures, 
-            Gang.Info[gangId].kills, Gang.Info[gangId].deaths, JSON.stringify([Gang.Info[gangId].territory.MinX, Gang.Info[gangId].territory.MinY, Gang.Info[gangId].territory.MaxX, Gang.Info[gangId].territory.MaxY]), gangId
-        ], function(err, result) {
-            if(err) console.log(err);
-        });
+            gang.name, JSON.stringify(gang.position), JSON.stringify(gang.weapons), gang.color, gang.alliance, gang.points, gang.captures, 
+            gang.kills, gang.deaths, JSON.stringify([gang.territory.MinX, gang.territory.MinY, gang.territory.MaxX, gang.territory.MaxY]), gang.id
+        ]);
     },
     /**
      * @param {SampPlayer} player 
@@ -339,10 +333,10 @@ module.exports = {
     saveAll(admin, discod = false) {
         getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
             this.savePlayer(i);
-            i.SendClientMessage(colors.YELLOW, `Admin {FF0000}${discod ? admin : player.GetPlayerName(24)} {FFFF00}has saved your {FF0000}account{FFFF00}!`);
+            i.SendClientMessage(colors.YELLOW, `Admin {FF0000}${discod ? admin : admin.GetPlayerName(24)} {FFFF00}has saved your {FF0000}account{FFFF00}!`);
         });
         Clan.Get().forEach((i) => { this.saveClan(i.id); });
-        Gang.Get().forEach((i) => { this.saveGang(i.id); });
+        Gang.Info.forEach((i) => { this.saveGang(i); });
     },
     /**
      * @param {Number} rank 

@@ -37,6 +37,7 @@ event:_EnableConsoleMSGsForPlayer(playerid, color) return EnableConsoleMSGsForPl
 event:_IsValidNickName(const name[]) return IsValidNickName(name);
 event:_AllowNickNameCharacter(const character[], bool:allow) return AllowNickNameCharacter(character[0], allow);
 event:_IsNickNameCharacterAllowed(const character[]) return IsNickNameCharacterAllowed(character[0]);
+event:_SetPlayerAdmin(playerid, bool:admin) return SetPlayerAdmin(playerid, admin);
 
 /* ==================== */
 /* CPLoader Node Events */
