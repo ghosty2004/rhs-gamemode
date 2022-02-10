@@ -630,7 +630,7 @@ CMD.on("up", (player, params) => {
 });
 
 CMD.on("dive", (player) => {
-
+    CMD.emit("up", player, [100]);
 });
 
 CMD.on("rw", (player) => {

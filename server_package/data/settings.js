@@ -42,7 +42,8 @@ module.exports = {
         "~w~~h~Do you want to go up? Type ~r~~h~/vup~w~~h~!",
         "~w~~h~Do you love ~r~~h~races~w~~h~? try ~r~~h~/races~w~~h~!",
         "~w~~h~Do you want to see the best clans on our server? Check ~w~~h~/ctop~w~~h~!",
-        "~w~~h~Are you bored and do not know what to do? Try ~r~~h~/splaces~w~~h~!"
+        "~w~~h~Are you bored and do not know what to do? Try ~r~~h~/splaces~w~~h~!",
+        "~w~~h~Do you like skydiving? Type ~r~~h~/dive~w~~h~!"
     ],
     GANGS: {
         CAPTURE_TIME: 10 //5 * 60 // 5 Minutes
