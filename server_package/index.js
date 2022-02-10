@@ -1200,7 +1200,7 @@ CMD.on("sstunts", (player) => {
 CMD.on("lift", (player, params) => {
     let result = isPlayerInAnyHouseLift(player);
     if(!result) return SendError(player, "You are not close to a lift!");
-    if(result.owner != Player.Info[player.playerid].AccID) return SendError(player, "You are not owner of this house lift!");
+    if(result.owner != Player.Info[player.playerid].AccID && Player.Info[player.playerid].RconType == 0) return SendError(player, "You are not owner of this house lift!");
     let newLevel = 0;
     switch(params[0]) {
         case "up": newLevel = result.lifts[0].level + 1; break;

@@ -37,7 +37,7 @@ module.exports = {
                 level: 0
             })) - 1;
             for(let labelLoop = 0; labelLoop < lifts[i].positionsZ.length; labelLoop++) {
-                this.Info[index].lifts[liftIndex].labels.push(CreateDynamic3DTextLabel("/lift", -1, lifts[i].positionXYZ[0], lifts[i].positionXYZ[1], lifts[i].positionXYZ[2] + lifts[i].positionsZ[labelLoop], 20));
+                this.Info[index].lifts[liftIndex].labels.push(CreateDynamic3DTextLabel(`/lift\n{BBFF00}Level: {FF0000}${(labelLoop + 1)}`, -1, lifts[i].positionXYZ[0], lifts[i].positionXYZ[1], lifts[i].positionXYZ[2] + lifts[i].positionsZ[labelLoop], 5));
             }
         }
     },
