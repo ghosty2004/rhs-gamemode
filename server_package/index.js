@@ -3389,13 +3389,13 @@ function isPlayerInAnyHouseLift(player) {
     return House.Info.find((houseFind) => {
         return houseFind.lifts.find((liftFind) => {
             for(let i = 0; i < liftFind.positionsZ.length; i++) {
-                if(player.IsPlayerInRangeOfPoint(2, liftFind.positionXYZ[0], liftFind.positionXYZ[1], liftFind.positionXYZ[2] + liftFind.positionsZ[i])) return true;
+                if(player.IsPlayerInRangeOfPoint(3, liftFind.positionXYZ[0], liftFind.positionXYZ[1], liftFind.positionXYZ[2] + liftFind.positionsZ[i])) return true;
             }
         });
     });
 }
 
-async function OnPlayerText(player, text) {
+function OnPlayerText(player, text) {
     if(!Player.Info[player.playerid].LoggedIn) return;
     if(Player.Info[player.playerid].AFK) return player.GameTextForPlayer("~w~~h~Type ~r~~h~/back~n~~w~~h~to use the~n~~r~~h~Chat~w~~h~!", 4000, 4);
     if(!checkAntiSpam(player, 0)) return false;
