@@ -1119,11 +1119,9 @@ CMD.on("parkours", (player) => {
 
 CMD.on("partys", (player) => {
     let info = "Command\tDescription\n";
-    info += "{49FFFF}/Party\t{BBFF00}Party\n";
-    info += "{49FFFF}/Bamboo\t{BBFF00}Bamboo Club\n";
-    info += "{49FFFF}/Bar\t{BBFF00}Party Bar\n";
-    info += "{49FFFF}/Minecraft\t{BBFF00}Party Minecraft\n";
-    info += "{49FFFF}/Island\t{BBFF00}Island";
+    Teleport.Info.filter(f => f.type == "partys").forEach((i) => {
+        info += `{49FFFF}/${capitalizeFirstLetter(i.command)}\t{BBFF00}${i.name}\n`;
+    }); 
     player.ShowPlayerDialog(Dialog.TELES_PARTYS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Partys", info, "Teleport", "Back");
 });
 
@@ -2492,6 +2490,7 @@ CMD.on("muted", (player) => {
 
 CMD.on("mute", (player, params) => {
     if(Player.Info[player.playerid].Admin < 1) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+
 });
 
 CMD.on("unmute", (player, params) => {
@@ -3421,7 +3420,7 @@ function OnPlayerCommandText(player, cmdtext) {
     if(CMD.eventNames().some(s => s == cmdtext)) {
         try { CMD.emit(cmdtext, player, params); }
         catch(e) { console.log(e.stack); }
-    } else if(Teleport.Exists(cmdtext)) { 
+    } else if(Teleport.Info.some(s => s.command == cmdtext)) { 
         let result = Teleport.Info.find(f => f.command == cmdtext);
         TelePlayer(player, cmdtext, result.name, result.position[0], result.position[1], result.position[2], result.position[3]);
     } else player.SendClientMessage(data.colors.RED, Function.Lang(player, `Comanda {BBFF00}/${cmdtext}{FF0000} nu exista! Foloseste {BBFF00}/help{FF0000} sau {BBFF00}/cmds{FF0000}!`, `Command {BBFF00}/${cmdtext}{FF0000} don't exist! Use {BBFF00}/help{FF0000} or {BBFF00}/cmds{FF0000}!`));
@@ -6697,7 +6696,11 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.TELES_PARTYS: {
             if(response) {
-
+                Teleport.Info.filter(f => f.type == "partys").forEach((i, index) => {
+                    if(index == listitem) {
+                        TelePlayer(player, i.command, i.name, i.position[0], i.position[1], i.position[2], i.position[3]);  
+                    }
+                });
             }
             else CMD.emit("teles", player);
             break;
@@ -6711,13 +6714,11 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
         }
         case Dialog.TELES_OTHERS: {
             if(response) {
-                let result = Teleport.Info.filter(f => f.type == "others");
-                for(let i = 0; i < result.length; i++) {
-                    if(i == listitem) {
-                        TelePlayer(player, result[i].command, result[i].name, result[i].position[0], result[i].position[1], result[i].position[2], result[i].position[3]);  
-                        break;
+                Teleport.Info.filter(f => f.type == "others").forEach((i, index) => {
+                    if(index == listitem) {
+                        TelePlayer(player, i.command, i.name, i.position[0], i.position[1], i.position[2], i.position[3]);  
                     }
-                }
+                });
             }
             else CMD.emit("teles", player);
             break;
