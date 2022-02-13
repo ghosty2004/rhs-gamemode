@@ -27,7 +27,7 @@ module.exports = {
 
         app.get("/api/onlineplayers", (request, response) => {
             let array = [];
-            getPlayers().forEach((i) => {
+            getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
                 array.push({
                     Id: i.playerid,
                     Name: i.GetPlayerName(24),

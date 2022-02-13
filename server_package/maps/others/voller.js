@@ -75,7 +75,7 @@ module.exports = {
         fso_map = CreateDynamicObject(8283, 1477.390625, 730.593811, 10.859400, 0.000000, 0.000000, 0.000000, -1, -1); // 1
         SetDynamicObjectMaterial(fso_map, 0, 19543, "beach_sfs", "Grass_128HV", 0);
         fso_map = CreateDynamicObject(8134, 1477.390625, 730.593750, 10.859380, 0.000000, 0.000000, 0.000000, -1, -1); // 1
-        SetDynamicObjectMaterialText(fso_map, 0, "Volly.", 90, "Arial", 64, 0, 0xFFFF00FF, 0x72FFFF, 2);
+        SetDynamicObjectMaterialText(fso_map, 0, "Volly gay.", 90, "Arial", 64, 0, 0xFFFF00FF, 0x72FFFF, 2);
         CreateDynamicObject(1408, 1473.558838, 733.049194, 10.621100, 0.000000, 0.000000, 0.000000, -1, -1); // 0
         CreateDynamicObject(3472, 1484.026001, 706.098083, 7.752400, 92.000000, 0.000000, 0.000000, -1, -1); // 0
         CreateDynamicObject(1408, 1463.143921, 768.852478, 10.621100, 0.000000, 0.000000, -180.000000, -1, -1); // 0
