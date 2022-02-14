@@ -1887,7 +1887,7 @@ CMD.on("songforme", (player, params) => {
  */
 CMD.on("gcmds", (player) => {
     let playerGang = Gang.Info.find(f => f.id == Player.Info[player.playerid].Gang);
-    if(playerGang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+    if(!playerGang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
     let info = "";
     info += "{BBFF00}OWNER Commands:\n";
     info += "{FFFFFF}/settings /setrank /alliance /stopalliance /refreshall\n";
