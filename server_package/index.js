@@ -613,6 +613,7 @@ CMD.on("report", (player, params) => {
             Player.Info[target.playerid].Reported.By = player.playerid;
             Player.Info[target.playerid].Reported.Reason = params.slice(1).join(" ");
             SendMessageToAdmins(data.colors.RED, `/REPORTS: {00BBF6}${player.GetPlayerName(24)}(${player.playerid}) {BBFF00}reported {00BBF6}${target.GetPlayerName(24)}(${target.playerid}){BBFF00} Reason: {00BBF6}${params.slice(1).join(" ")}`);
+            Discord.sendLog("reports", "ORANGE", `/REPORTS: **${player.GetPlayerName(24)}(${player.playerid})** reported **${target.GetPlayerName(24)}(${target.playerid})** Reason: **${params.slice(1).join(" ")}**`);
             checkReportsTD();
         }
         else SendError(player, Errors.PLAYER_NOT_CONNECTED);
