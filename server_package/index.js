@@ -2504,7 +2504,7 @@ CMD.on("kick", (player, params) => {
     let target = getPlayer(params[0]);
     if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
     Function.kickTargetByAdmin({name: player.GetPlayerName(24), accId: Player.Info[player.playerid].AccID } ,target, params.slice(1).join(" "));
-    SendACMD(admin, "Kick");
+    SendACMD(player, "Kick");
 });
 
 CMD.on("warn", (player, params) => {

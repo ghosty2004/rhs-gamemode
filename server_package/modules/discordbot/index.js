@@ -312,6 +312,7 @@ function sendLog(type, color, description) {
             embed.setColor(color);
             embed.setTitle(`${type} LOG`);
             embed.setDescription(description);
+            embed.setTimestamp();
             channel.send({embeds: [embed]}).catch(() => {
                 channel.send(description);
             });
