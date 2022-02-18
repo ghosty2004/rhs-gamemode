@@ -2560,7 +2560,7 @@ CMD.on("unjail", (player, params) => {
             samp.SendClientMessageToAll(data.colors.RED, `${target.GetPlayerName(24)} {D1D1D1}has been unjailed by Admin {00A6FF}${player.GetPlayerName(24)}{D1D1D1}!`);
             Player.Info[target.playerid].Jailed = 0;
             target.SpawnPlayer();
-            SendACMD("UnJail");
+            SendACMD(player, "UnJail");
         }
         else SendError(player, Errors.PLAYER_NOT_CONNECTED);
     }
@@ -2894,7 +2894,7 @@ CMD.on("set", (player, params) => {
                 SendACMD(player, "Set Founder");
                 break;
             }
-            default: SendError(player, "Invalid item!"); break;
+            default: SendError(player, "Invalid option!"); break;
         }
     }
 });
@@ -3181,6 +3181,48 @@ CMD.on("giveall", (player, params) => {
 
 CMD.on("setall", (player, params) => {
     if(Player.Info[player.playerid].Admin < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0] || !params[1]) {
+        SendUsage(player, "/SetAll [Option] [Amount]");
+        player.SendClientMessage(data.colors.RED, "Options: {FFFFFF}Time, Weather, World, Health, Armour");
+    }
+    else {
+        params[1] = parseInt(params[1]);
+        switch(params[0]) {
+            case "time": {
+                if(params[1] < 0 || params[1] > 23) return SendError(player, "Invalid time (0-23)!");
+                samp.SendClientMessageToAll(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set Time for all players to {FF0000}${params[1]}:00{FFFF00}!`);
+                samp.getPlayers().forEach((i) => { i.SetPlayerTime(params[1], 0); }); 
+                SendACMD(player, "SetAll Time");
+                break;
+            }
+            case "weather": {
+                if(params[1] < 0 || params[1] > 20) return SendError(player, "Invalid weather (0-20)!");
+                samp.SendClientMessageToAll(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set Weather for all players to {FF0000}${params[1]}{FFFF00}!`);
+                samp.getPlayers().forEach((i) => { i.SetPlayerWeather(params[1]); }); 
+                SendACMD(player, "SetAll Weather");
+                break;
+            }
+            case "world": {
+                samp.SendClientMessageToAll(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set World for all players to {FF0000}${params[1]}{FFFF00}!`);
+                samp.getPlayers().forEach((i) => { i.SetPlayerVirtualWorld(params[1]); }); 
+                SendACMD(player, "SetAll World");
+                break;
+            }
+            case "health": {
+                samp.SendClientMessageToAll(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set Health for all players to {FF0000}${params[1]}{FFFF00}!`);
+                samp.getPlayers().forEach((i) => { i.SetPlayerHealth(params[1]); }); 
+                SendACMD(player, "SetAll Health");
+                break;
+            }
+            case "armour": {
+                samp.SendClientMessageToAll(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has set Armour for all players to {FF0000}${params[1]}{FFFF00}!`);
+                samp.getPlayers().forEach((i) => { i.SetPlayerArmour(params[1]); }); 
+                SendACMD(player, "SetAll Armour");
+                break;
+            }
+            default: SendError(player, "Invalid option!"); break;
+        }
+    }
 });
 
 /**
