@@ -5103,9 +5103,14 @@ function LoadPlayerStats(player) {
 
 ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT', 'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'].forEach((signal) => {
     process.on(signal, async () => {
-        samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => { Function.savePlayer(i); });
-        samp.GameTextForAll("~r~~h~restarting...", 60 * 1000, 0);
-        console.log("\nSaving all players stats and sending announce about restart.\nPlease wait...");
+        console.log("\nSaving all datas and sending announce about restart.\nPlease wait...");
+        Function.saveAll("SERVER", true);
+        setInterval(() => {
+            samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
+                i.GameTextForPlayer("~r~~h~restarting...", 1000, 0);
+                i.PlayerPlaySound(1057, 0, 0, 0);
+            });
+        }, 1);
         await Function.Sleep(5000);
         process.exit(1);
     });
