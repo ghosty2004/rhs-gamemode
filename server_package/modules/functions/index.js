@@ -9,6 +9,12 @@ const Player = require("../player");
 
 module.exports = { 
     /**
+     * @param {Number} ms 
+     */
+    Sleep(ms) {
+        return new Promise((resolve) => { setTimeout(resolve, ms); });
+    },
+    /**
      * @param {SampPlayer} player 
      * @param {String} ro_string 
      * @param {String} en_string 
