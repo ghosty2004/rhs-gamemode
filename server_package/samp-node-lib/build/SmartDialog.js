@@ -11,7 +11,7 @@ exports.ShowPlayerSmartDialog = ShowPlayerSmartDialog;
 class SmartDialogFunctions {
     static ShowPlayerSmartDialog(playerid, style, caption, info, button1, button2, callback) {
         (0, SampFunctions_1.ShowPlayerDialog)(playerid, 0, style, caption, info, button1, button2);
-        dialogEvent.once("onResponse", (responsePlayerId, responseDialogId, responseButton, responseListItem, responseInputText) => {
+        function onResponse(responsePlayerId, responseDialogId, responseButton, responseListItem, responseInputText) {
             if (responsePlayerId != playerid)
                 return;
             if (responseDialogId != 0)
@@ -26,7 +26,9 @@ class SmartDialogFunctions {
                     });
                 }
             });
-        });
+            dialogEvent.removeListener("onResponse", onResponse);
+        }
+        dialogEvent.on("onResponse", onResponse);
     }
 }
 exports.SmartDialogFunctions = SmartDialogFunctions;

@@ -1,4 +1,3 @@
-import {OnDialogResponse,SampEvents} from "./SampEvents";
 import {ShowPlayerDialog} from "./SampFunctions";
 import {SMART_DIALOG_CALLBACK} from "./SampInterface";
 
@@ -13,7 +12,7 @@ export const ShowPlayerSmartDialog = (playerid: number, style: number, caption: 
 export class SmartDialogFunctions {
     static ShowPlayerSmartDialog(playerid: number, style: number, caption: string, info: string, button1: string, button2: string, callback: SMART_DIALOG_CALLBACK): void {
         ShowPlayerDialog(playerid, 0, style, caption, info, button1, button2);
-        dialogEvent.once("onResponse", (responsePlayerId, responseDialogId, responseButton, responseListItem, responseInputText) => {
+        function onResponse(responsePlayerId: number, responseDialogId: number, responseButton: number, responseListItem: number, responseInputText: string) {
             if(responsePlayerId != playerid) return;
             if(responseDialogId != 0) return;
             callback({
@@ -25,8 +24,10 @@ export class SmartDialogFunctions {
                         callback(newCallBack);
                     });
                 }
-            })
-        });
+            });
+            dialogEvent.removeListener("onResponse", onResponse);
+        }
+        dialogEvent.on("onResponse", onResponse);
     }
 }
 

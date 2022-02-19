@@ -7,12 +7,13 @@
 /**
  * Node Package Modules
  */
-const colors = require("colors");
 const md5 = require("md5");
 const YouTubeSearch = require("youtube-search-without-api-key");
 const hastebin = require("hastebin-gen");
 const ipInfo = require("ip-info-finder");
+
 require("youtube-audio-server").listen(7777);
+require("colors");
 
 const package_json = require("../package.json");
 
@@ -136,13 +137,6 @@ CMD.on("discordsignout", (player) => {
 /**
  * Player's Commands
  */
-CMD.on("debugdialog", (player) => {
-    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, "Debug Dialog Test", "Successfullt debugged", "Button 1", "Button 2", (response) => {
-        player.SendClientMessage(-1, `dialog response: ${JSON.stringify(response)}`);
-        if(response.button) response.repeatDialog();
-    })
-});
-
 CMD.on("gpci", (player) => {
     player.SendClientMessage(-1, `Your gpci: {FF0000}${player.gpci(41)} {FFFFFF}!`);
 });
@@ -247,7 +241,7 @@ CMD.on("anim", (player, params) => {
         info += "\n\n";
         info += "{00BBF6}Pont: {BBFF00}To stop an {00BBF6}Anim {BBFF00}, type {00BBF6}/Anim {FF0000}stop{BBFF00}.\n";
         info += `{BBFF00}Total Anims: {FF0000}${data.animations.length}`;
-        player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Anim {FF0000}List", info, "Close", "");
+        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, "Anim {FF0000}List", info, "Close", "");
     }
     else if(params[0] == "stop") player.ClearAnimations(true);
     else {
@@ -315,7 +309,7 @@ CMD.on("vips", (player) => {
     result.forEach((i) => {
         info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t${getVIPRank(Player.Info[i.playerid].VIP)}\n`;
     });
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${result.length} {00FF00}Online VIP(s)!`, info, "Close", "");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${result.length} {00FF00}Online VIP(s)!`, info, "Close", "");
 });
 
 CMD.on("mp3", (player) => {
@@ -352,7 +346,7 @@ CMD.on("vworld", (player, params) => {
     info += `${Function.Lang(player, "Iti poti invita prietenii in aceasta lume folosind /pm pentru a avea un duel sau o cursa!", "You can invite your friends with /pm in this world for have a duel or a race!")}\n`;
     info += "\n";
     info += `${Function.Lang(player, "Pentru a te intoarce inapoi in lumea normala cu toti jucatori foloseste /vw 0 sau teleporteazate! Exemplu /lv", "To return to the normal world with other players use /vw 0 or teleport in one place! For example /lv")}`;
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Lumea mea virtuala", "My Virutal World"), info, "Ok", "");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Lumea mea virtuala", "My Virutal World"), info, "Ok", "");
 });
 CMD.on("vw", (player, params) => { CMD.emit("vworld", player, params); });
 
@@ -362,7 +356,7 @@ CMD.on("godp", (player) => {
     result.forEach((i) => {
         info += `{00FF00}${i.GetPlayerName(24)} {00BBF6}(ID:${i.playerid}) {00FF00}- GodMode`;
     });
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.LIST, `{00FF00}There are {00BBF6}${result.length} {00FF00}players with God Mode On!`, info, "Close", "");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, `{00FF00}There are {00BBF6}${result.length} {00FF00}players with God Mode On!`, info, "Close", "");
 });
 
 CMD.on("house", async (player) => {
@@ -722,7 +716,7 @@ CMD.on("statsserver", async (player) => {
     info += `{BBFF00}New players registered on server{00BBF6} ${Server.Info.NewRegistredPlayers}\n`;
     info += `{BBFF00}Total players registered on server{00BBF6} ${await getRegistredPlayersCount()}\n`;
     info += `{BBFF00}Messages has been sent{00BBF6} ${Server.Info.Messages}`;
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Server Stats", info, "Close", "");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, "Server Stats", info, "Close", "");
 });
 
 CMD.on("howto", (player) => {
