@@ -5101,8 +5101,11 @@ function LoadPlayerStats(player) {
  * Auto Restart Detect
  */
 
+let restartInProgress = false;
 ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT', 'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'].forEach((signal) => {
     process.on(signal, async () => {
+        if(restartInProgress == true) return;
+        restartInProgress = true;
         console.log("\nSaving all datas and sending announce about restart.\nPlease wait...");
         Function.saveAll("SERVER", true);
         setInterval(() => {

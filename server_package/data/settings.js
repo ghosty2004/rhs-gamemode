@@ -8,9 +8,7 @@ module.exports = {
         "3": "Stunt"
     },
     RANDOM_SERVER_NAMES: [
-        "Romania HarD Stunt - Join Us!",
-        "Romania HarD Stunt - /BuyVIP: It's free!",
-        "Romania HarD Stunt - Copy Version"
+        "Romania HarD Stunt - We are working..."
     ],
     DISCORD_BOT: {
         TOKEN: "OTEyMDA0MDY4MjIwNzQ3ODA2.YZpn-g.J2dGV_Y_vNRC6mu9qIXJ3VPbzac",
