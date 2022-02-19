@@ -34,4 +34,5 @@ var rgba_1 = require("./rgba");
 Object.defineProperty(exports, "rgba", { enumerable: true, get: function () { return rgba_1.rgba; } });
 var SampPlayer_1 = require("./SampPlayer");
 Object.defineProperty(exports, "SampPlayer", { enumerable: true, get: function () { return SampPlayer_1.SampPlayer; } });
+__exportStar(require("./SmartDialog"), exports);
 //# sourceMappingURL=index.js.map

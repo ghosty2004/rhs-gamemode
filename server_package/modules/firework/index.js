@@ -1,4 +1,4 @@
-const { SampPlayer, CreateObject, DestroyObject, MoveObject, CreateExplosion } = require("samp-node-lib");
+const { SampPlayer, CreateObject, DestroyObject, MoveObject, CreateExplosion } = require("../../samp-node-lib");
 const { getRandomInt } = require("../functions");
 
 module.exports = {

@@ -1,4 +1,4 @@
-const { getPlayers, SampPlayer } = require("samp-node-lib");
+const { getPlayers, SampPlayer } = require("../../samp-node-lib");
 
 const { LIGHT_GREEN } = require("../../data/colors");
 const { gangWarInfo1, gangWarInfo2 } = require("../../textdraws/player");

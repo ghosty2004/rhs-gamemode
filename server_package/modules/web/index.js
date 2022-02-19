@@ -1,5 +1,5 @@
 const express = require("express");
-const { getPlayers } = require("samp-node-lib");
+const { getPlayers } = require("../../samp-node-lib");
 
 const Clan = require("../clan");
 const Gang = require("../gang");

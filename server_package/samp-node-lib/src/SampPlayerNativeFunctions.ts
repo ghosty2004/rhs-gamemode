@@ -23,12 +23,19 @@ SOFTWARE.
  */
 import {SampFunctions} from "./SampFunctions";
 import {FIGHT_STYLE, WEAPONSKILL} from "./SampEnum";
+import {SMART_DIALOG_CALLBACK} from "./SampInterface";
+
+import {SmartDialogFunctions} from "./SmartDialog";
 
 export class SampPlayerNativeFunctions {
     public playerid: number;
 
     constructor(playerid: number) {
         this.playerid = playerid;
+    }
+
+    ShowPlayerSmartDialog(style: number, caption: string, info: string, button1: string, button2: string, callback: SMART_DIALOG_CALLBACK): void {
+        return SmartDialogFunctions.ShowPlayerSmartDialog(this.playerid, style, caption, info, button1, button2, callback);
     }
 
     SendClientMessage(color: number, message: string): number {

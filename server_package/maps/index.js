@@ -2,7 +2,7 @@
 /*      MAPS        */
 /* ================ */
 
-const { CreateObject, SetObjectMaterial } = require("samp-node-lib");
+const { CreateObject, SetObjectMaterial } = require("../samp-node-lib");
 const fs = require("fs");
 
 global.CreateObject = CreateObject;

@@ -1,4 +1,4 @@
-const { callPublic, OBJECT_MATERIAL_SIZE, getPlayers } = require("samp-node-lib");
+const { callPublic, OBJECT_MATERIAL_SIZE, getPlayers } = require("../../samp-node-lib");
 
 module.exports = {
     CreateDynamicObject(modelid, x, y, z, rx, ry, rz, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 350, drawdistance = 400, areaid = -1, priority = 0) {

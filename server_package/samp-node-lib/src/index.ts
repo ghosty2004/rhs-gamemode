@@ -13,3 +13,5 @@ export {getAllVehicle} from "./getAllVehicle";
 export {getPlayers} from "./getPlayers";
 export {rgba} from "./rgba";
 export {SampPlayer} from "./SampPlayer";
+
+export * from "./SmartDialog";

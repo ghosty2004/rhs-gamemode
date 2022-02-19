@@ -4,7 +4,7 @@ const {
     PlayerTextDrawSetShadow, PlayerTextDrawSetOutline, PlayerTextDrawBackgroundColor, 
     PlayerTextDrawFont, PlayerTextDrawSetProportional, PlayerTextDrawSetSelectable, PlayerTextDrawSetPreviewModel,
     PlayerTextDrawSetPreviewRot
-} = require("samp-node-lib");
+} = require("../samp-node-lib");
 
 module.exports = {
     gangWarInfo1: {},

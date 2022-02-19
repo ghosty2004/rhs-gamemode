@@ -22,6 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 import {CARMODTYPE, FIGHT_STYLE, PLAYER_STATE, TEXTDRAW_ALIGN, VEHICLE_MODEL_INFO, WEAPONSKILL} from "./SampEnum";
+import {SMART_DIALOG_CALLBACK} from "./SampInterface";
+
+import { EventEmitter } from "events";
 
 export const SendClientMessage = (playerid: number, color: number, message: string): number => {
     return SampFunctions.SendClientMessage(playerid, color, message);

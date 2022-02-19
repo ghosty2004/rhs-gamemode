@@ -1,3 +1,8 @@
+const { SampPlayer, ShowPlayerDialog, OnDialogResponse } = require("../../samp-node-lib");
+
+const { EventEmitter } = require("events");
+const dialogEvent = new EventEmitter();
+
 module.exports = {
     EMPTY:                      1,
     SELECT_LANGUAGE:            2,
@@ -88,5 +93,5 @@ module.exports = {
     GANG_WAR_MAP:               87,
     GANG_WAR_WEAPONS:           88,
     GANG_WAR_POINTS:            89,
-    EDIT_GANG:                  90
+    EDIT_GANG:                  90,
 }

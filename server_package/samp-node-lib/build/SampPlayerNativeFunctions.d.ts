@@ -1,7 +1,9 @@
 import { FIGHT_STYLE, WEAPONSKILL } from "./SampEnum";
+import { SMART_DIALOG_CALLBACK } from "./SampInterface";
 export declare class SampPlayerNativeFunctions {
     playerid: number;
     constructor(playerid: number);
+    ShowPlayerSmartDialog(style: number, caption: string, info: string, button1: string, button2: string, callback: SMART_DIALOG_CALLBACK): void;
     SendClientMessage(color: number, message: string): number;
     SendPlayerMessageToPlayer(senderid: number, message: string): number;
     SendDeathMessageToPlayer(killer: number, killee: number, weapon: number): number;

@@ -2,9 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SampPlayerNativeFunctions = void 0;
 const SampFunctions_1 = require("./SampFunctions");
+const SmartDialog_1 = require("./SmartDialog");
 class SampPlayerNativeFunctions {
     constructor(playerid) {
         this.playerid = playerid;
+    }
+    ShowPlayerSmartDialog(style, caption, info, button1, button2, callback) {
+        return SmartDialog_1.SmartDialogFunctions.ShowPlayerSmartDialog(this.playerid, style, caption, info, button1, button2, callback);
     }
     SendClientMessage(color, message) {
         return SampFunctions_1.SampFunctions.SendClientMessage(this.playerid, color, message);
