@@ -28,11 +28,20 @@ class SmartDialogFunctions {
             });
             dialogEvent.removeListener("onResponse", onResponse);
         }
-        dialogEvent.on("onResponse", onResponse);
+        function onDisconnect(disconnectedPlayerId) {
+            if (disconnectedPlayerId != playerid)
+                return;
+            dialogEvent.removeListener("onResponse", onResponse);
+            dialogEvent.removeListener("onDisconnect", onDisconnect);
+        }
+        dialogEvent.on("onDisconnect", onDisconnect);
     }
 }
 exports.SmartDialogFunctions = SmartDialogFunctions;
 samp.on("OnDialogResponse", (playerid, dialogid, response, listitem, inputtext) => {
     dialogEvent.emit("onResponse", playerid, dialogid, response, listitem, inputtext);
+});
+samp.on("OnPlayerDisconnect", (playerid, reason) => {
+    dialogEvent.emit("onDisconnect", playerid);
 });
 //# sourceMappingURL=SmartDialog.js.map

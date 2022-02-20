@@ -137,6 +137,16 @@ CMD.on("discordsignout", (player) => {
 /**
  * Player's Commands
  */
+CMD.on("smartdialog", (player) => {
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, "Smart Dialog", "Work perfectly :D", "Button 1", "Button 0", (response) => {
+        if(response.button == 1) player.SendClientMessage(-1, "Clicked button 1");
+        else if(response.button == 0) {
+            response.repeatDialog();
+            player.SendClientMessage(-1, "Clicked button 0 and repeated the dialog");
+        }
+    });
+});
+
 CMD.on("gpci", (player) => {
     player.SendClientMessage(-1, `Your gpci: {FF0000}${player.gpci(41)} {FFFFFF}!`);
 });
@@ -5114,8 +5124,10 @@ let restartInProgress = false;
                 i.PlayerPlaySound(1057, 0, 0, 0);
             });
         }, 1);
-        await Function.Sleep(5000);
-        process.exit(1);
+        await Function.Sleep(4000);
+        samp.SendRconCommand("gmx");
+        await Function.Sleep(1000);
+        process.exit();
     });
 });
 
