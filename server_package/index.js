@@ -158,7 +158,100 @@ CMD.on("cmds", (player) => {
 CMD.on("createclan", (player) => {
     if(Player.Info[player.playerid].Clan) return SendError(player, "You already have a Clan. Type /lclan to leave your current clan!");
     player.GameTextForPlayer("~n~~n~~n~~n~~n~~n~~n~~n~~r~~h~Create ~w~~h~your own ~g~~h~clan!", 4000, 4);
-    player.ShowPlayerDialog(Dialog.CREATE_CLAN, samp.DIALOG_STYLE.INPUT, "{BBFF00}Create Clan", "{0072FF}You are now creating a clan!\nEnter below the name of your clan to continue...", "Continue", "Close");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.INPUT, "{BBFF00}Create Clan", "{0072FF}You are now creating a clan!\nEnter below the name of your clan to continue...", "Continue", "Close", (response) => {
+        if(!response.button) return;
+        if(Clan.ExistsName(response.inputText)) return response.repeatDialog(`{0072FF}A clan named {00FF00}'${response.inputText}'{0072FF} already exists!\nPlease try again with another name...`);
+        if(response.inputText.length < 3 || response.inputText.length > 20) return response.repeatDialog("{FF0000}ERROR:\n\n{00FF00}The clan name must be lower that {FF0000}20 {00FF00}characters and biggest that {FF0000}3{00FF00}!\n{00FF00}Please re-type it:");
+        Player.Info[player.playerid].Creating_Clan.name = response.inputText;
+        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", "{0072FF}Now choose a Skin for members!\nEnter below the Skin ID for members:", "Continue", "Close", (response) => {
+            if(!response.button) return;
+            let memberSkin = parseInt(response.inputText);
+            if(memberSkin < 0 || memberSkin > 299) return response.repeatDialog("{0072FF}Invalid Skin ID (0-299)!\nEnter below the Skin ID for members:");
+            Player.Info[player.playerid].Creating_Clan.skin.member = memberSkin;
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", "{0072FF}Now choose a Skin for leaders!\nEnter below the Skin ID for leaders:", "Continue", "Close", (response) => {
+                if(!response.button) return;
+                let leaderSkin = parseInt(response.inputText);
+                if(leaderSkin < 0 || leaderSkin > 299) return response.repeatDialog("{0072FF}Invalid Skin ID (0-299)!\nEnter below the Skin ID for leaders:");
+                Player.Info[player.playerid].Creating_Clan.skin.leader = leaderSkin;
+                player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", "{FF0000}RED\n{F4A460}Brown\n{FF9900}Orange\n{FFFF00}Yellow\n{BBFF00}Lime\n{55FF00}Light green\n{00FFAA}Aqua\n{00DDFF}Light blue\n{0044FF}Blue\n{8000FF}Purple\n{CC00FF}Indigo\n{FF00EE}Pink\n{FFFFFF}White\n{FFEB7B}Crem", "Continue", "Close", (response) => {
+                    if(!response.button) return;
+                    switch(response.listItem) {
+                        case 0: Player.Info[player.playerid].Creating_Clan.color = 0xFF0000AA; break; /* RED */
+                        case 1: Player.Info[player.playerid].Creating_Clan.color = 0xF4A460AA; break; /* Brown */
+                        case 2: Player.Info[player.playerid].Creating_Clan.color = 0xFF9900AA; break; /* Orange */
+                        case 3: Player.Info[player.playerid].Creating_Clan.color = 0xFFFF00AA; break; /* Yellow */
+                        case 4: Player.Info[player.playerid].Creating_Clan.color = 0xBBFF00AA; break; /* Lime */
+                        case 5: Player.Info[player.playerid].Creating_Clan.color = 0x55FF00AA; break; /* Light green */
+                        case 6: Player.Info[player.playerid].Creating_Clan.color = 0x00FFAAAA; break; /* Aqua */
+                        case 7: Player.Info[player.playerid].Creating_Clan.color = 0x00DDFFAA; break; /* Light blue */
+                        case 8: Player.Info[player.playerid].Creating_Clan.color = 0x0044FFAA; break; /* Blue */
+                        case 9: Player.Info[player.playerid].Creating_Clan.color = 0x8000FFAA; break; /* Purple */
+                        case 10: Player.Info[player.playerid].Creating_Clan.color = 0xCC00FFAA; break; /* Indigo */
+                        case 11: Player.Info[player.playerid].Creating_Clan.color = 0xFF00EEAA; break; /* Pink */
+                        case 12: Player.Info[player.playerid].Creating_Clan.color = 0xFFFFFFAA; break; /* White */
+                        case 13: Player.Info[player.playerid].Creating_Clan.color = 0xFFEB7BAA; break; /* Crem */
+                    }
+                    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", "{0072FF}Brass Knuckles\n{0072FF}Golf Club\n{0072FF}Nightstick\n{0072FF}Knife\n{0072FF}Baseball Bat\n{0072FF}Shovel\n{0072FF}Pool Cue\n{0072FF}Katana\n{0072FF}Chainsaw", "Continue", "Skip", (response) => {
+                        if(response.button) {
+                            let start = 1;
+                            Player.Info[player.playerid].Creating_Clan.weapons[0] = start + response.listItem;
+                        }
+                        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", "{0072FF}Pistol\n{0072FF}Silenced Pistol\n{0072FF}Desert Eagle", "Continue", "Skip", (response) => {
+                            if(response.button) {
+                                let start = 22;
+                                Player.Info[player.playerid].Creating_Clan.weapons[1] = start + response.listItem;
+                            }
+                            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", "{0072FF}ShotGun\n{0072FF}Sawn-Off-Shotgune\n{0072FF}SPAZ-12", "Continue", "Skip", (response) => {
+                                if(response.button) {
+                                    let start = 25;
+                                    Player.Info[player.playerid].Creating_Clan.weapons[2] = start + response.listItem;
+                                }
+                                player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", "{0072FF}Micro UZI\n{0072FF}MP5\n{0072FF}TEC-9", "Continue", "Skip", (response) => {
+                                    if(response.button) {
+                                        switch(response.listItem) {
+                                            case 0: Player.Info[player.playerid].Creating_Clan.weapons[3] = 28; break;
+                                            case 1: Player.Info[player.playerid].Creating_Clan.weapons[3] = 29; break;
+                                            case 2: Player.Info[player.playerid].Creating_Clan.weapons[3] = 32; break;
+                                        }
+                                    }
+                                    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", "{0072FF}AK-47\n{0072FF}M4-A1", "Continue", "Skip", (response) => {
+                                        if(response.button) {
+                                            let start = 30;
+                                            Player.Info[player.playerid].Creating_Clan.weapons[4] = start + response.listItem; 
+                                        }
+                                        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", "{0072FF}Country Rifle\n{0072FF}Sniper Rifle", "Continue", "Skip", (response) => {
+                                            if(response.button) {
+                                                let start = 33;
+                                                Player.Info[player.playerid].Creating_Clan.weapons[5] = start + response.listItem; 
+                                            }
+                                
+                                            let info = "";
+                                            info += `{0072FF}Congratulations {00FF00}${player.GetPlayerName(24)}{0072FF} for creating {00FF00}${Player.Info[player.playerid].Creating_Clan.name}{0072FF} clan!\n`;
+                                            info += "If you need help with your clan, type {00FF00}/chelp{0072FF} and {00FF00}/ctop{0072FF} for clan top!";
+                                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "{00FF00}Clan Created!", info, "Close", "");
+                                
+                                            con.query("INSERT INTO clans (name, owner, position, weapon, color, member_skin, leader_skin) VALUES(?, ?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, JSON.stringify([0, 0, 0, 0]), JSON.stringify(Object.values(Player.Info[player.playerid].Creating_Clan.weapons)), `${Player.Info[player.playerid].Creating_Clan.color}`, Player.Info[player.playerid].Creating_Clan.skin.member, Player.Info[player.playerid].Creating_Clan.skin.leader], function(err, result) {
+                                                if(err) return ResetPlayerClanCreateVariables(player);
+                                                Clan.Create(result.insertId, Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, [0, 0, 0, 0], [Player.Info[player.playerid].Creating_Clan.weapons[0], Player.Info[player.playerid].Creating_Clan.weapons[1], Player.Info[player.playerid].Creating_Clan.weapons[2], Player.Info[player.playerid].Creating_Clan.weapons[3], Player.Info[player.playerid].Creating_Clan.weapons[4], Player.Info[player.playerid].Creating_Clan.weapons[5]], Player.Info[player.playerid].Creating_Clan.color, {member: Player.Info[player.playerid].Creating_Clan.skin.member, leader: Player.Info[player.playerid].Creating_Clan.skin.leader}, 0, 0);
+                                                Player.Info[player.playerid].Clan = result.insertId;
+                                                Player.Info[player.playerid].Clan_Rank = 3;
+                                                UpdatePlayer(player, "clan", Player.Info[player.playerid].Clan);
+                                                UpdatePlayer(player, "clan_rank", Player.Info[player.playerid].Clan_Rank);
+                                                player.SetPlayerColor(Player.Info[player.playerid].Creating_Clan.color);
+                                                player.SetPlayerSkin(Player.Info[player.playerid].Creating_Clan.skin.leader);
+                                                for(let i = 0; i < 6; i++) player.GivePlayerWeapon(Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
+                                                ResetPlayerClanCreateVariables(player);
+                                            });
+                                        });
+                                    });
+                                });
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
 });
 
 CMD.on("car", (player, params) => {
@@ -215,12 +308,26 @@ CMD.on("spassword", (player) => {
             info += `${Function.Lang(player, "{FFCC00}De cate ori vei intra pe server, va trebuii sa te loghezi cu ambele parole.", "{FFCC00}Each time you will join our server, you must login with both passwords.")}\n`;
             info += "\n";
             info += `${Function.Lang(player, "{BBFF00}Te rugam sa introduci {FF0000}Parola Secundara{BBFF00}:", "{BBFF00}Please enter before the {FF0000}Secondary Password{BBFF00}:")}`;
-            player.ShowPlayerDialog(Dialog.SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Parola Secundara", "Secondary Password"), info, "Ok", Function.Lang(player, "Renunta", "Cancel"));
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Parola Secundara", "Secondary Password"), info, "Ok", Function.Lang(player, "Renunta", "Cancel"), (response) => {
+                if(!response.button) return;
+                con.query("UPDATE users SET spassword = ? WHERE ID = ?", [md5(response.inputText), Player.Info[player.playerid].AccID], function(err, result) {
+                    if(!err) player.SendClientMessage(-1, Function.Lang(player, "{FF0000}Parola Secundara {FFFF00}a fost inregistrata! Scrie {FF0000}/SPassword {FFFF00}pentru detalii si optiuni!", "{FFFF00}The {FF0000}Secondary Password {FFFF00}was registered! Type {FF0000}/SPassword {FFFF00}for details and options!"));
+                });
+            });
         }
         else {
             info += `${Function.Lang(player, "{49FFFF}Schimba Parola Secundara", "{49FFFF}Change Secondary Password")}\n`;
             info += `${Function.Lang(player, "{FF0000}Dezactiveaza Parola Secundara", "{FF0000}Remove Secondary Password")}\n`;
-            player.ShowPlayerDialog(Dialog.SPASSWORD_OPTIONS, samp.DIALOG_STYLE.LIST, Function.Lang(player, "Parola Secundara", "Secondary Password"), info, Function.Lang(player, "Selecteaza", "Select"), Function.Lang(player, "Renunta", "Cancel"));
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, Function.Lang(player, "Parola Secundara", "Secondary Password"), info, Function.Lang(player, "Selecteaza", "Select"), Function.Lang(player, "Renunta", "Cancel"), (response) => {
+                if(!response.button) return;
+                con.query("UPDATE users SET spassword = ? WHERE ID = ?", ["null", Player.Info[player.playerid].AccID], function(err, result) {
+                    if(err) return;
+                    switch(response.listItem) {
+                        case 0: CMD.emit("spassword", player); break;
+                        case 1: player.SendClientMessage(-1, Function.Lang(player, "{FF0000}Parola Secundara {FFFF00}a fost scoasa! Scrie {FF0000}/SPassword {FFFF00}pentru a adauga alta!", "{FFFF00}The {FF0000}Secondary Password {FFFF00}was removed! Type {FF0000}/SPassword {FFFF00}to add another!")); break;
+                    }
+                });
+            });
         }
     });
 });
@@ -768,7 +875,40 @@ CMD.on("buyvip", (player) => {
     info += `${Function.Lang(player, "{FFFF00}Galben\t{BBFF00}20.000 Coins + 20 Ore\t{00FF00}Permanent!", "{FFFF00}Yellow\t{BBFF00}20.000 Coins + 20 Hours\t{00FF00}Permanent!")}\n`;
     info += `${Function.Lang(player, "{0077FF}Albastru\t{BBFF00}80.000 Coins + 80 Ore\t{00FF00}Permanent!", "{0077FF}Blue\t{BBFF00}80.000 Coins + 80 Hours\t{00FF00}Permanent!")}\n`;
     info += `${Function.Lang(player, "{FFFFFF}Alb\t{BBFF00}150.000 Coins + 150 Ore\t{00BBF6}30 Zile!", "{FFFFFF}White\t{BBFF00}150.000 Coins + 150 Hours\t{00BBF6}30 Days!")}`;
-    player.ShowPlayerDialog(Dialog.BUYVIP, samp.DIALOG_STYLE.TABLIST_HEADERS, Function.Lang(player, "Cumpara VIP - Scrie {FF0000}/vcmds {D1D1D1}pentru comenzi.", "Buy VIP - Type {FF0000}/vcmds {D1D1D1}for commands."), info, Function.Lang(player, "Cumpara", "Buy"), Function.Lang(player, "Inchide", "Close"));
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, Function.Lang(player, "Cumpara VIP - Scrie {FF0000}/vcmds {D1D1D1}pentru comenzi.", "Buy VIP - Type {FF0000}/vcmds {D1D1D1}for commands."), info, Function.Lang(player, "Cumpara", "Buy"), Function.Lang(player, "Inchide", "Close"), (response) => {
+        if(!response.button) return;
+        let purchaseInfo = "";
+        switch(response.listItem) {
+            case 0: {
+                if(Player.Info[player.playerid].VIP >= 1) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
+                Player.Info[player.playerid].VIP = 1;
+                UpdateRankLabelFor(player);
+                samp.SendClientMessageToAll(data.colors.LIGHT_YELLOW, `INFO:{00BBF6} ${player.GetPlayerName(24)}(${player.playerid}){BBFF00} a cumparat{FF0000} VIP Rosu{BBFF00} Gratis, Pentru a cumpara VIP, scrie /BuyVIP!`);
+                purchaseInfo += "{00FF00}Ai cumparat cu succes {FF0000}VIP Red{00FF00} Gratis!\n";
+                purchaseInfo += "{00FF00}Scrie {00BBF6}/vCmds {00FF00}pentru a vedea {FF0000}Comenzile de VIP{00FF00}!";
+                break;
+            }
+            case 1: {
+                if(Player.Info[player.playerid].VIP >= 2) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
+                if(Player.Info[player.playerid].Coins < 20000) return SendError(player, "Nu ai destui Coins/Ore pentru a cumpara acest rank de VIP!", "You don't have enough Coins/Hours to buy that VIP rank!");
+                break;
+            }
+            case 2: {
+                if(Player.Info[player.playerid].VIP >= 3) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
+                if(Player.Info[player.playerid].Coins < 80000) return SendError(player, "Nu ai destui Coins/Ore pentru a cumpara acest rank de VIP!", "You don't have enough Coins/Hours to buy that VIP rank!");
+                break;
+            }
+            case 3: {
+                if(Player.Info[player.playerid].VIP >= 4) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
+                if(Player.Info[player.playerid].Coins < 150000) return SendError(player, "Nu ai destui Coins/Ore pentru a cumpara acest rank de VIP!", "You don't have enough Coins/Hours to buy that VIP rank!");
+                break;
+            }
+        }
+        if(purchaseInfo == "") return;
+        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "VIP {FF0000}Cumparat{AFAFAF}!", ""), purchaseInfo, "Ok", "VCmds", (response) => {
+            if(!response.button) CMD.emit("vcmds", player);
+        });
+    });
 });
 
 CMD.on("stats", (player, params) => {
@@ -810,7 +950,9 @@ CMD.on("rules", (player) => {
     info += `{FFFF00}${Function.Lang(player, "Pentru mai multe reguli si informatii despre ce ai si ce nu ai voie sa faci pe server foloseste comanda {FFEB7B}/important{FFFF00}.", "For more rules and infos about what you are allowed to do and not, use {FFEB7B}/important {FFFF00}cmd.")}\n`;
     info += "\n";
     info += `{FFEB7B}${Function.Lang(player, "Iti multumim pentru ca ti-ai dedicat un minut din viata citind aceste reguli! Iti dorim distractie placuta!", "Thank you for dedicating a minute of your life to read these rules! Have fun!")}`;
-    player.ShowPlayerDialog(Dialog.RULES, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- ${Function.Lang(player, "Reguli", "Rules")}!`, info, Function.Lang(player, "Inchide", "Close"), "Important");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- ${Function.Lang(player, "Reguli", "Rules")}!`, info, Function.Lang(player, "Inchide", "Close"), "Important", (response) => {
+        if(!response.button) ShowImportant(player, 1);
+    });
 });
 
 CMD.on("tutorial", (player) => {
@@ -905,7 +1047,25 @@ CMD.on("teles", (player) => {
     info += "{49FFFF}/Splaces\t{BBFF00}Special Places\n";
     info += "{49FFFF}/Others\t{BBFF00}Other Places\n";
     info += "{49FFFF}/Sstunts\t{BBFF00}Simple Stunts";
-    player.ShowPlayerDialog(Dialog.TELES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Teleports category", info, "Select", "Close");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "Teleports category", info, "Select", "Close", (response) => {
+        if(!response.button) return;
+        switch(response.listItem) {
+            case 0: CMD.emit("stunts", player); break;
+            case 1: CMD.emit("jumps", player); break;
+            case 2: CMD.emit("dm", player); break;
+            case 3: CMD.emit("int", player); break;
+            case 4: CMD.emit("drifts", player); break;
+            case 5: CMD.emit("races", player); break;
+            case 6: CMD.emit("jobs", player); break;
+            case 7: CMD.emit("minigames", player); break;
+            case 8: CMD.emit("challanges", player); break;
+            case 9: CMD.emit("parkours", player); break;
+            case 10: CMD.emit("partys", player); break;
+            case 11: CMD.emit("splaces", player); break;
+            case 12: CMD.emit("others", player); break;
+            case 13: CMD.emit("sstunts", player); break;
+        }
+    });
 });
 
 CMD.on("stunts", (player) => {
@@ -914,7 +1074,16 @@ CMD.on("stunts", (player) => {
         info += `{49FFFF}/${capitalizeFirstLetter(i.command)}\t{BBFF00}${i.name}\n`;
     });
     info += "{49FFFF}/Sstunts\t{BBFF00}Simple Stunts";
-    player.ShowPlayerDialog(Dialog.TELES_STUNTS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Stunts", info, "Teleport", "Back");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "Stunts", info, "Teleport", "Back", (response) => {
+        if(!response.button) return CMD.emit("teles", player);
+        let result = Teleport.Info.filter(f => f.type == "stunts");
+        if(response.listItem == result.length) return CMD.emit("sstunts", player);
+        result.forEach((teleport, index) => {
+            if(index == response.listItem) {
+                TelePlayer(player, teleport.command, teleport.name, teleport.position[0], teleport.position[1], teleport.position[2], teleport.position[3]);
+            }
+        }); 
+    });
 });
 
 CMD.on("jumps", (player) => {
@@ -928,7 +1097,9 @@ CMD.on("jumps", (player) => {
     info += "{49FFFF}/Tj\t{BBFF00}Tube Jump\n";
     info += "{49FFFF}/Bcar\t{BBFF00}Basket Car\n";
     info += "{49FFFF}/Bj\t{BBFF00}Building Jump";
-    player.ShowPlayerDialog(Dialog.TELES_JUMPS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Jumps Zones", info, "Teleport", "Back");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "Jumps Zones", info, "Teleport", "Back", (response) => {
+        if(!response.button) return CMD.emit("teles", player);
+    });
 });
 
 CMD.on("dm", (player) => {
@@ -944,7 +1115,22 @@ CMD.on("dm", (player) => {
     info += `{49FFFF}/Prodm\t{BBFF00}Pro DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "prodm").length} Players\n`;
     info += `{49FFFF}/Helldm\t{BBFF00}Hell DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "helldm").length} Players\n`;
     info += `{49FFFF}/GunWar\t{BBFF00}Gun War DeathMatch\t{00BBF6}${samp.getPlayers().filter(f => Player.Info[f.playerid].In_DM == "gunwar").length} Players`;
-    player.ShowPlayerDialog(Dialog.TELES_DM, samp.DIALOG_STYLE.TABLIST_HEADERS, "Death match zone", info, "Teleport", "Back");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "Death match zone", info, "Teleport", "Back", (response) => {
+        if(!response.button) return CMD.emit("teles", player);
+        switch(response.listItem) {
+            case 0: CMD.emit("minigun", player); break;
+            case 1: CMD.emit("de", player); break;
+            case 2: CMD.emit("m4", player); break;
+            case 3: CMD.emit("os", player); break;
+            case 4: CMD.emit("sniper", player); break;
+            case 5: CMD.emit("mrf", player); break;
+            case 6: CMD.emit("garena", player); break;
+            case 7: CMD.emit("oh", player); break;
+            case 8: CMD.emit("prodm", player); break;
+            case 9: CMD.emit("helldm", player); break;
+            case 10: CMD.emit("gunwar", player); break;
+        }
+    });
 });
 
 CMD.on("minigun", (player) => { 
@@ -1017,7 +1203,15 @@ CMD.on("drifts", (player) => {
     info += "{FF0000}/Drift 5\n";
     info += "{FFFF00}/Drift 6\n";
     info += "{FFFF00}/LvAir";
-    player.ShowPlayerDialog(Dialog.TELES_DRIFTS, samp.DIALOG_STYLE.LIST, "Drifts", info, "Teleport", "Back");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Drifts", info, "Teleport", "Back", (response) => {
+        if(!response.button) return CMD.emit("teles", player);
+        let result = Teleport.Info.filter(f => f.type == "drifts");
+        result.forEach((teleport, index) => {
+            if(index == response.listItem) {
+                CMD.emit("drift", player, [index+1]);
+            }
+        });
+    });
 });
 
 CMD.on("drift", (player, params) => {
@@ -1039,7 +1233,9 @@ CMD.on("jobs", (player) => {
     info += "{BBFF00}Policeman\n";
     info += "{BBFF00}Fisherman\n";
     info += "{BBFF00}Hunterman";
-    player.ShowPlayerDialog(Dialog.TELES_JOBS, samp.DIALOG_STYLE.LIST, "Jobs", info, "Teleport", "Back");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Jobs", info, "Teleport", "Back", (response) => {
+        if(!response.button) return CMD.emit("teles", player);
+    });
 });
 
 CMD.on("minigames", (player) => {
@@ -1054,7 +1250,9 @@ CMD.on("minigames", (player) => {
     info += "{49FFFF}/Derby\t{BBFF00}The Derby\n";
     info += "{49FFFF}/Football\t{BBFF00}Play Football\n";
     info += "{49FFFF}/Zm\t{BBFF00}Zombies vs Humans";
-    player.ShowPlayerDialog(Dialog.TELES_MINIGAMES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Minigames", info, "Teleport", "Back");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "Minigames", info, "Teleport", "Back", (response) => {
+        if(!response.button) return CMD.emit("teles", player);
+    });
 });
 
 CMD.on("gifts", (player) => {
@@ -1121,7 +1319,9 @@ CMD.on("challanges", (player) => {
     info += "{49FFFF}/Quad\t{BBFF00}Quad\n";
     info += "{49FFFF}/Karting\t{BBFF00}Karting\n";
     info += "{49FFFF}/Monster\t{BBFF00}Monster Crash";
-    player.ShowPlayerDialog(Dialog.TELES_CHALLANGES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Challenges", info, "Teleport", "Back");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "Challenges", info, "Teleport", "Back", (response) => {
+        if(!response.button) return CMD.emit("teles", player);
+    });
 });
 
 CMD.on("parkours", (player) => {
@@ -1130,7 +1330,9 @@ CMD.on("parkours", (player) => {
     info += "{49FFFF}/gparkour\t{BBFF00}Grove Parkour\n";
     info += "{49FFFF}/sfparkour\t{BBFF00}San Fierro Parkour\n";
     info += "{49FFFF}/cpk\t{BBFF00}City Parkour";
-    player.ShowPlayerDialog(Dialog.TELES_PARKOURS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Parkours Teleports", info, "Teleport", "Back");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "Parkours Teleports", info, "Teleport", "Back", (response) => {
+        if(!response.button) return CMD.emit("teles", player);
+    });
 });
 
 CMD.on("partys", (player) => {
@@ -1138,7 +1340,14 @@ CMD.on("partys", (player) => {
     Teleport.Info.filter(f => f.type == "partys").forEach((i) => {
         info += `{49FFFF}/${capitalizeFirstLetter(i.command)}\t{BBFF00}${i.name}\n`;
     }); 
-    player.ShowPlayerDialog(Dialog.TELES_PARTYS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Partys", info, "Teleport", "Back");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "Partys", info, "Teleport", "Back", (response) => {
+        if(!response.button) return CMD.emit("teles", player);
+        Teleport.Info.filter(f => f.type == "partys").forEach((teleport, index) => {
+            if(index == response.listItem) {
+                TelePlayer(player, teleport.command, teleport.name, teleport.position[0], teleport.position[1], teleport.position[2], teleport.position[3]);  
+            }
+        });
+    });
 });
 
 CMD.on("splaces", (player) => {
@@ -1162,7 +1371,9 @@ CMD.on("splaces", (player) => {
     info += "{49FFFF}/Market\t{BBFF00}Market\n";
     info += "{49FFFF}/Justglass\t{BBFF00}Just Glass\n";
     info += "{49FFFF}/Drag3\t{BBFF00}Drag Race 3";
-    player.ShowPlayerDialog(Dialog.TELES_SPECIAL_PLACES, samp.DIALOG_STYLE.TABLIST_HEADERS, "Special Places", info, "Teleport", "Back");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "Special Places", info, "Teleport", "Back", (response) => {
+        if(!response.button) return CMD.emit("teles", player);
+    });
 });
 
 CMD.on("others", (player) => {
@@ -1170,7 +1381,14 @@ CMD.on("others", (player) => {
     Teleport.Info.filter(f => f.type == "others").forEach((i) => {
         info += `{49FFFF}/${capitalizeFirstLetter(i.command)}\t{BBFF00}${i.name}\n`;
     });
-    player.ShowPlayerDialog(Dialog.TELES_OTHERS, samp.DIALOG_STYLE.TABLIST_HEADERS, "Other Teleports", info, "Teleport", "Back");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "Other Teleports", info, "Teleport", "Back", (response) => {
+        if(!response.button) return CMD.emit("teles", player);
+        Teleport.Info.filter(f => f.type == "others").forEach((teleport, index) => {
+            if(index == response.listItem) {
+                TelePlayer(player, teleport.command, teleport.name, teleport.position[0], teleport.position[1], teleport.position[2], teleport.position[3]);  
+            }
+        });
+    });
 });
 
 CMD.on("sstunts", (player) => {
@@ -1204,7 +1422,9 @@ CMD.on("sstunts", (player) => {
     info += "{FF0000}Simple Stunt 27\n";
     info += "{FF0000}Simple Stunt 28\n";
     info += "{FF0000}Simple Stunt 29";
-    player.ShowPlayerDialog(Dialog.TELES_SIMPLE_STUNTS, samp.DIALOG_STYLE.LIST, "Simple Stunts", info, "Teleport", "Back");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Simple Stunts", info, "Teleport", "Back", (response) => {
+        if(!response.button) return CMD.emit("teles", player);
+    });
 });
 
 /**
@@ -1965,7 +2185,16 @@ CMD.on("gwar", (player, params) => {
         case "invite": {
             let info = "";
             Gang.Info.forEach((i) => { info += `\n${i.name}`; });
-            player.ShowPlayerDialog(Dialog.GANG_WAR_INVITE, samp.DIALOG_STYLE.LIST, "Select enemy gang", info, "Invite", "Cancel");
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Select enemy gang", info, "Invite", "Cancel", (response) => {
+                if(!response.button) return;
+                Gang.Info.forEach((gang, index) => {
+                    if(index == response.listItem) {
+                        GangWar.Invite(player, gang.id).then((gwarId) => {
+                            GangWar.Join(player, gwarId).catch((error) => { SendError(player, error); });
+                        }).catch((error) => { SendError(player, error); });
+                    }
+                });
+            });
             break;
         }
         case "list": {
@@ -1975,7 +2204,7 @@ CMD.on("gwar", (player, params) => {
                 let invitedGang = Gang.Info.find(f => f.id == i.invitedGang);
                 info += `\n#${index} {2EC32E}| ${inviterGang.name} vs ${invitedGang.name} | ${i.status == "preparing" ? "{FFB300}Preparing" : "{FF0000}Started"}`; 
             }) : info = "No Gang Wars!";
-            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.LIST, "Gang Wars list", info, "Close", "");
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Gang Wars list", info, "Close", "");
             break;
         }
         case "join": {
@@ -2002,7 +2231,10 @@ CMD.on("gwar", (player, params) => {
             if(GangWar.Info[gwarId].status == "started") return;
             let info = "";
             GangWar.Maps.forEach((i) => { info += `\n{FFB300}${i.name}`; });
-            player.ShowPlayerDialog(Dialog.GANG_WAR_MAP, samp.DIALOG_STYLE.LIST, "{FF0000}Gang War location", info, "Select", "Cancel");
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{FF0000}Gang War location", info, "Select", "Cancel", (response) => {
+                if(!response.button) return;
+                GangWar.setMap(player, response.listItem);
+            });
             break;
         }
         case "weaps": {
@@ -2011,7 +2243,10 @@ CMD.on("gwar", (player, params) => {
             if(GangWar.Info[gwarId].status == "started") return;
             let info = "";
             GangWar.Weapons.forEach((i) => { info += `\n{FFB300}${i.name}`; });
-            player.ShowPlayerDialog(Dialog.GANG_WAR_WEAPONS, samp.DIALOG_STYLE.LIST, "{FF0000}Gang War Weapons", info, "Select", "Cancel");
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{FF0000}Gang War Weapons", info, "Select", "Cancel", (response) => {
+                if(!response.button) return;
+                GangWar.setWeapon(player, response.listItem);
+            });
             break;
         }
         case "skin": {
@@ -2022,7 +2257,13 @@ CMD.on("gwar", (player, params) => {
             let gwarId = Player.Info[player.playerid].inGwar;
             if(gwarId == -1) return;
             if(GangWar.Info[gwarId].status == "started") return;
-            player.ShowPlayerDialog(Dialog.GANG_WAR_POINTS, samp.DIALOG_STYLE.INPUT, "{FF0000}Gang War Points", "{FFB300}Insert required amount of points for a gang to win the war:", "Set", "Cancel");
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.INPUT, "{FF0000}Gang War Points", "{FFB300}Insert required amount of points for a gang to win the war:", "Set", "Cancel", (response) => {
+                if(!response.button) return;
+                let points = parseInt(response.inputText);
+                if(points < 10) return response.repeatDialog("{FF0000}Invalid. Minimum points: 10!\n{FFB300}Insert required amount of points for a gang to win the war:"); 
+                if(points > 100) return response.repeatDialog("{FF0000}Invalid. Maximum points: 100!\n{FFB300}Insert required amount of points for a gang to win the war:");
+                GangWar.setRequiredPoints(player, points);
+            });
             break;
         }
         case "start": {
@@ -4250,6 +4491,11 @@ function SendMessageToAdmins(color, message) {
     });
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ * @param {any} target 
+ * @param {Boolean} offline_check 
+ */
 function showStats(player, target, offline_check=false) {
     let OnlineTime = offline_check ? {hours: target.hours, minutes: target.minutes, seconds: target.seconds} : Function.totalGameTime(target, "default");
     let info = "";
@@ -4292,7 +4538,23 @@ function showStats(player, target, offline_check=false) {
         info += `{FF4800}Last Online: {49FFFF}${target.laston}`;                                                                                                                                                                        
     }
     let kicks = (offline_check ? target.kicks : Player.Info[target.playerid].Kicks) ? ` - {FF0000}${offline_check ? target.kicks : Player.Info[target.playerid].Kicks}/3 {BBFF00}kicks` : "";
-    player.ShowPlayerDialog(target == player ? Dialog.STATS : Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, (offline_check ? `{FF0000}${target.name}{BBFF00}'s offline stats!` : `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s stats!`) + kicks, info, "Ok", `${target == player ? "Description" : ""}`);
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, (offline_check ? `{FF0000}${target.name}{BBFF00}'s offline stats!` : `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s stats!`) + kicks, info, "Ok", `${target == player ? "Description" : ""}`, (response) => {
+        if(target != player) return;
+        if(response.button) return;
+        let info = "";
+        info += `{0072FF}${Function.Lang(player, "Descriere Linia 1", "Description Line 1")}\n`;
+        info += `{FFFF00}${Function.Lang(player, "Descriere Linia 2", "Description Line 2")}\n`;
+        info += `{FF0000}${Function.Lang(player, "Descriere Linia 3", "Description Line 3")}`;
+        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, Function.Lang(player, "Descriere", "Description"), info, Function.Lang(player, "Selecteaza", "Select"), Function.Lang(player, "Inapoi", "Back"), (response) => {
+            if(!response.button) return CMD.emit("stats", player, []);
+            let editingLine = response.listItem + 1;
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.INPUT, Function.Lang(player, "Descriere", "Description"), Function.Lang(player, "{FFFF00}Te rugam sa iti introduci {FF0000}Descrierea{FFFF00}:", "{FFFF00}Please enter your {FF0000}Description{FFFF00}:"), Function.Lang(player, "Ok", "Update"), Function.Lang(player, "Renunta", "Cancel"), (response) => {
+                if(!response.button) return;
+                Player.Info[player.playerid].Description[editingLine] = response.inputText;
+                player.SendClientMessage(data.colors.YELLOW, Function.Lang(player, "Ti-ai modificat Descrierea! Scrie {FF0000}/Stats {FFFF00}pentru a o vedea!", "You have updated your Description! Type {FF0000}/Stats {FFFF00}to see it!"));
+            });
+        });
+    });
 }
 
 function getPlayerStatsNote(player, offline_check=false) {
@@ -4794,6 +5056,10 @@ function SendError(player, ro_error, en_error=ro_error /* Set default value for 
     player.SendClientMessage(0xFF0000AA, `ERROR: ${Function.Lang(player, ro_error, en_error)}`);
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ * @param {Number} page 
+ */
 function ShowImportant(player, page) {
     let info = "";
     switch(page) {
@@ -4830,7 +5096,10 @@ function ShowImportant(player, page) {
                     break;
                 }
             }
-            player.ShowPlayerDialog(Dialog.IMPORTANT_1, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- Important!`, info, Function.Lang(player, "Pagina 2", "Page 2"), Function.Lang(player, "Reguli", "Rules"));
+            player.ShowPlayerDialog(samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- Important!`, info, Function.Lang(player, "Pagina 2", "Page 2"), Function.Lang(player, "Reguli", "Rules"), (response) => {
+                if(response.button) ShowImportant(player, 2);
+                else CMD.emit("rules", player);
+            });
             break;
         }
         case 2: {
@@ -4866,12 +5135,18 @@ function ShowImportant(player, page) {
                     break;
                 }
             }
-            player.ShowPlayerDialog(Dialog.IMPORTANT_2, samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- Important!`, info, "Accept", Function.Lang(player, "Pagina 1", "Page 1"));
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, `${data.settings.SERVER_NAME} {FFEB7B}- Important!`, info, "Accept", Function.Lang(player, "Pagina 1", "Page 1"), (response) => {
+                if(!response.button) ShowImportant(player, 1);
+            });
             break;
         }
     }
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ * @param {Number} page 
+ */
 function ShowCMDS(player, page) {
     let info = "";
     switch(page) {
@@ -4905,7 +5180,9 @@ function ShowCMDS(player, page) {
             info += `{FFCC00}/weapons {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "Cumpara-ti niste 'jucarii'." : "Buy some 'toys'."}\n`;
             info += `{FFCC00}/fweapons {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "Cumpara-ti niste 'jucarii' de copii mici." : "Buy some kids 'toys'."}\n`;
             info += `{FFCC00}/bweapons {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "Cumpara-ti niste 'jucarii' de baieti mari. :))" : "Buy some big boys 'toys'. :))"}\n`;
-            player.ShowPlayerDialog(Dialog.CMDS_1, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Comenzi - Pagina {FF0000}1", "Commands - Page {FF0000}1"), info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", Player.Info[player.playerid].Language == 1 ? "Pagina 2" : "Page 2");
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Comenzi - Pagina {FF0000}1", "Commands - Page {FF0000}1"), info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", Player.Info[player.playerid].Language == 1 ? "Pagina 2" : "Page 2", (response) => {
+                if(!response.button) ShowCMDS(player, 2);
+            });
             break;
         }
         case 2: {
@@ -4937,7 +5214,10 @@ function ShowCMDS(player, page) {
             info += `{FF0000}/hidetag {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Ascunde-ti tie sau celorlalti jucatori tag-ul!" : "Hide your/others' tag."}\n`;
             info += `{FF0000}/vCmds {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Vezi o lista cu comenzile de VIP." : "View a list with all VIP Commands."}\n`;
             info += `{FF0000}/vup {49FFFF}- ${Player.Info[player.playerid].Language == 1 ? "Activeaza/Dezactiveaza functia de VUP a vehiculului." : "Activate/Deactivate Vehicle's VUP Function."}\n`;
-            player.ShowPlayerDialog(Dialog.CMDS_2, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Comenzi - Pagina {FF0000}2", "Commands - Page {FF0000}2"), info, Function.Lang(player, "Pagina 1", "Page 1"), Function.Lang(player, "Pagina 3", "Page 3"));
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Comenzi - Pagina {FF0000}2", "Commands - Page {FF0000}2"), info, Function.Lang(player, "Pagina 1", "Page 1"), Function.Lang(player, "Pagina 3", "Page 3"), (response) => {
+                if(response.button) ShowCMDS(player, 1);
+                else ShowCMDS(player, 3);
+            });
             break;
         }
         case 3: {
@@ -4966,7 +5246,9 @@ function ShowCMDS(player, page) {
             info += `{FF0000}/wtime {05C81F}- ${Player.Info[player.playerid].Language == 1 ? "Pentru a vedea cat este ceasul!" : "To see what the clock is!"}\n`;
             info += `{FF0000}/blacklisted {05C81F}- ${Player.Info[player.playerid].Language == 1 ? "Pentru a vedea cine se afla pe lista neagra!" : "To see who is blacklisted!"}\n`;
             info += `{FF0000}/email {05C81F}- ${Player.Info[player.playerid].Language == 1 ? "Pentru a schimba sau adauga un e-mail in contul tau!" : "To change or add a e-mail to your account!"}\n`;
-            player.ShowPlayerDialog(Dialog.CMDS_3, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Comenzi - Pagina {FF0000}3", "Commands - Page {FF0000}3"), info, Function.Lang(player, "Inchide", "Close"), Function.Lang(player, "Pagina 2", "Page 2"));
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Comenzi - Pagina {FF0000}3", "Commands - Page {FF0000}3"), info, Function.Lang(player, "Inchide", "Close"), Function.Lang(player, "Pagina 2", "Page 2"), (response) => {
+                if(!response.button) ShowCMDS(player, 2);
+            });
             break;
         }
     }
@@ -4976,6 +5258,9 @@ function replaceAll(string, search, replace) {
     return string.split(search).join(replace);
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ */
 function PreparatePlayerLogin(player) {
     con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
         if(err) return player.Kick();
@@ -4985,7 +5270,21 @@ function PreparatePlayerLogin(player) {
             info += "\n";
             info += `{FFCC00}${Function.Lang(player, "Numele tau nu este inregistrat. Te rugam sa-l inregistrezi pentru a-ti salva statisticile!", "Your name is not registered. Please register it to save your statistics!")}\n`;
             info += `{FFFF00}${Function.Lang(player, "Introdu o parola grea pe care doar tu sa o stii pentru a te autentifica! ({FF0000}intre 3-25 de caractere{FFFF00}):", "Enter a hard password before ({FF0000}Min. 3 - Max. 25 characters{FFFF00}):")}`;
-            player.ShowPlayerDialog(Dialog.REGISTER, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Inregistreaza-ti numele!", "Register your name!"), info, "Register", Function.Lang(player, "Nume Nou", "New Name"));
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Inregistreaza-ti numele!", "Register your name!"), info, "Register", Function.Lang(player, "Nume Nou", "New Name"), (response) => {
+                if(!response.button) return Call_NewName(player);
+                else {
+                    con.query("INSERT INTO users (name, password) VALUES(?, ?)", [player.GetPlayerName(24), md5(response.inputText)], function(err, result) {
+                        if(err) return player.Kick();
+                        Player.Info[player.playerid].AccID = result.insertId;
+                        LoadPlayerStats(player, false);
+                        Server.Info.NewRegistredPlayers++;
+                        samp.SendClientMessageToAll(data.colors.ORANGE, `INFO: {00BBF6}${player.GetPlayerName(24)}(${player.playerid}){BBFF00} ${Function.Lang(player, `s-a inregistrat pe server-ul nostru!`, `has registered on our server!`)}`);
+                        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, "Inregistrare {BBFF00}Reusita!", `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n{BBFF00}Te-ai inregistrat cu succes pe server-ul ${data.settings.SERVER_NAME}{BBFF00}!\n{BBFF00}Tine minte! De cate ori vei reveni, va trebuii sa te autentifici cu parola: {FF0000}${response.inputText}{BBFF00}!\n\n{FFFF00}Pentru mai multe informatii, click pe buton-ul {FF0000}Ajutor{FFFF00}.\n{FFFF00}De asemenea, nu uita sa ne vizitezi si website-ul si forum-ul nostru la adresa {FF0000}${data.settings.SERVER_WEB}{FFFF00}!`, "Inchide", "Ajutor!", (response) => {
+                            if(!response.button) CMD.emit("help", player);
+                        });
+                    });
+                }      
+            });
         }
         else { /* Login */
             let info = "";
@@ -4993,16 +5292,53 @@ function PreparatePlayerLogin(player) {
             info += "\n";
             info += `{FFCC00}${Function.Lang(player, "Trebuie sa te autentifici cu parola acestui cont inainte de a continua!", "Please login password for this account before continuing!")}\n`;
             info += `{FFFF00}${Function.Lang(player, "Daca acesta nu este numele contului tau, apasa pe butonul {FF0000}Nume Nou{FFFF00}!", "If this is not your account name, click on the {FF0000}New Name{FFFF00}!")}`;
-            player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Autentificare", "Login"), info, Function.Lang(player, "Autentificare", "Login"), Function.Lang(player, "Nume Nou", "New Name"));
+            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Autentificare", "Login"), info, Function.Lang(player, "Autentificare", "Login"), Function.Lang(player, "Nume Nou", "New Name"), (response) => {
+                if(!response.button) return Call_NewName(player);
+                con.query("SELECT * FROM users WHERE name = ? AND password = ?", [player.GetPlayerName(24), md5(response.inputText)], function(err, result) {
+                    if(err) return player.Kick();
+                    if(result == 0) {
+                        Player.Info[player.playerid].Fail_Logins++;
+                        if(Player.Info[player.playerid].Fail_Logins == 4) return player.Kick();
+                        let info = "";
+                        info += `{FF0000}${Function.Lang(player, `Autentificare nereusita (${Player.Info[player.playerid].Fail_Logins}/4)!`, `Login failed (${Player.Info[player.playerid].Fail_Logins}/4)!`)}\n`;
+                        info += "\n";
+                        info += `{FFFF00}${Function.Lang(player, "Ai introdus parola gresita. Te rugam sa incerci din nou!", "You entered the wrong password. Please try again!")}\n`;
+                        info += `{00FF00}${Function.Lang(player, `Daca ti-ai uitat parola intra pe {FF0000}${data.settings.SERVER_WEB}{00FF00} pentru a o reseta!`, `If you forgot your password enter the {FF0000}${data.settings.SERVER_WEB} {00FF00}to reset it!`)}`
+                        response.repeatDialog(info);
+                    }   
+                    else {
+                        Player.Info[player.playerid].Fail_Logins = 0;
+                        if(result[0].spassword == "null") return LoadPlayerStats(player);
+                        let info = "";
+                        info += `${Function.Lang(player, "{FF0000}Acest cont are o parola secundara!", "{FF0000}This account has a secondary password!")}\n`;
+                        info += `${Function.Lang(player, "{FFCC00}Autentifica-te cu parola secundara pentru a putea continua!", "{FFCC00}Please login with the secondary password in order to continue!")}\n`;
+                        info += "\n";
+                        info += `${Function.Lang(player, "{FFFF00}Scrie mai jos {FF0000}Parola Secundara{FFFF00}:", "{FFFF00}Enter below the {FF0000}Secondary Password{FFFF00}:")}`;
+                        player.ShowPlayerDialog(Dialog.LOGIN_SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Autentificare - Parola Secundara", "Login - Secondary Password"), info, Function.Lang(player, "Autentificare", "Login"), Function.Lang(player, "Nume Nou", "New Name"));
+                    }
+                });
+            });
         }
     });
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ */
 function Call_NewName(player) {
-    player.ShowPlayerDialog(Dialog.NEW_NAME, samp.DIALOG_STYLE.INPUT, "Change Name", "{BBFF00}Please enter below new nickname wich you want to have\n{FFFF00}This name need to between {FF0000}3-20{FFFF00} characters long!:", "Change", "Random Name");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.INPUT, "Change Name", "{BBFF00}Please enter below new nickname wich you want to have\n{FFFF00}This name need to between {FF0000}3-20{FFFF00} characters long!:", "Change", "Random Name", (response) => {
+        if(response.button) {
+            if(response.inputText.length < 3 || inputtext.length > 20) return Call_NewName(player);
+            player.SetPlayerName(inputtext);
+        } else {
+            let tag = Function.getRandomInt(1, 99999);
+            player.SetPlayerName(`[${tag}]TempName`);
+        }
+        PreparatePlayerLogin(player);
+    });
 }
 
-function LoadPlayerStats(player) {
+function LoadPlayerStats(player, showDialog = true) {
     con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], async function(err, result) {
         if(err || !result) return player.Kick();
         Player.Info[player.playerid].AccID = result[0].ID;
@@ -5087,23 +5423,25 @@ function LoadPlayerStats(player) {
         LoadPlayerPersonalCars(player);
         LoadPlayerHolds(player);
 
-        let info = "";
-        info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
-        info += "{BBFF00}Ai fost autentificat cu succes!\n";
-        info += "\n";
-        info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
-        info += `{BBFF00}VIP: ${Player.Info[player.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
-        info += "{BBFF00}Nota Statistici: {FF0000}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob\n";
-        info += "\n";
-        info += "{BBFF00}Pentru mai multe statistici, foloseste {FF0000}/stats{BBFF00}.\n";
-        if(result[0].spassword == "null") {
+        if(showDialog) {
+            let info = "";
+            info += `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n`;
+            info += "{BBFF00}Ai fost autentificat cu succes!\n";
             info += "\n";
-            info += "{FF0000}Mesaj {FF9900}URGENT {FF0000}pentru siguranta contului tau:\n";
-            info += "{FFFFFF}In contul tau nu exista o parola secundara!\n";
-            info += "{FFFFFF}Pentru a evita pierderea contului tau,\n";
-            info += "{FFFFFF}Adauga o parola secundara folosind comanda {FF0000}/Spassword{FFFFFF}!";
+            info += `{BBFF00}Admin: ${Player.Info[player.playerid].Admin ? `{49FFFF}Yes {BBFF00}- ${getAdminRank(Player.Info[player.playerid].Admin)}` : "{FF0000}No"}\n`;
+            info += `{BBFF00}VIP: ${Player.Info[player.playerid].VIP ? `{49FFFF}Yes {BBFF00}- ${getVIPRank(Player.Info[player.playerid].VIP)}` : "{FF0000}No"}\n`;
+            info += "{BBFF00}Nota Statistici: {FF0000}0{BBFF00}/{FF0000}10 {BBFF00}- Rank: {FF0000}{42bff4}Noob\n";
+            info += "\n";
+            info += "{BBFF00}Pentru mai multe statistici, foloseste {FF0000}/stats{BBFF00}.\n";
+            if(result[0].spassword == "null") {
+                info += "\n";
+                info += "{FF0000}Mesaj {FF9900}URGENT {FF0000}pentru siguranta contului tau:\n";
+                info += "{FFFFFF}In contul tau nu exista o parola secundara!\n";
+                info += "{FFFFFF}Pentru a evita pierderea contului tau,\n";
+                info += "{FFFFFF}Adauga o parola secundara folosind comanda {FF0000}/Spassword{FFFFFF}!";
+            }
+            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
         }
-        player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
     });
 }
 
@@ -5447,7 +5785,10 @@ samp.OnPlayerConnect(async(player) => {
         });
         
         /* Language Select */
-        player.ShowPlayerDialog(Dialog.SELECT_LANGUAGE, samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English");
+        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, "{00BBF6}Language {FF0000}/ {00BBF6}Limba", `{FFFF00}Welcome to ${data.settings.SERVER_NAME}{FFFF00}, {00BBF6}${player.GetPlayerName(24)}{FFFF00}!\n{FFFF00}Please select your language to continue!`, "Romana", "English", (response) => {
+            Player.Info[player.playerid].Language = response.button;
+            PreparatePlayerLogin(player);
+        });
         
         Maps.RemoveBuildings(player); /* Remove Player GTA:SA Objects */
         TextDraws.player.Load(player); /* Load Player TextDraws */
@@ -5519,35 +5860,6 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
     switch(dialogid) {
-        case Dialog.GANG_WAR_POINTS: {
-            if(!response) return;
-            inputtext = parseInt(inputtext);
-            if(inputtext < 10) return player.ShowPlayerDialog(Dialog.GANG_WAR_POINTS, samp.DIALOG_STYLE.INPUT, "{FF0000}Gang War Points", "{FF0000}Invalid. Minimum points: 10!\n{FFB300}Insert required amount of points for a gang to win the war:", "Set", "Cancel");
-            if(inputtext > 100) return player.ShowPlayerDialog(Dialog.GANG_WAR_POINTS, samp.DIALOG_STYLE.INPUT, "{FF0000}Gang War Points", "{FF0000}Invalid. Maximum points: 100!\n{FFB300}Insert required amount of points for a gang to win the war:", "Set", "Cancel");
-            GangWar.setRequiredPoints(player, inputtext);
-            break;
-        }
-        case Dialog.GANG_WAR_WEAPONS: {
-            if(!response) return;
-            GangWar.setWeapon(player, listitem);
-            break;
-        }
-        case Dialog.GANG_WAR_MAP: {
-            if(!response) return;
-            GangWar.setMap(player, listitem);
-            break;
-        }
-        case Dialog.GANG_WAR_INVITE: {
-            if(!response) return;
-            Gang.Info.forEach((gang, index) => {
-                if(index == listitem) {
-                    GangWar.Invite(player, gang.id).then((gwarId) => {
-                        GangWar.Join(player, gwarId).catch((error) => { SendError(player, error); });
-                    }).catch((error) => { SendError(player, error); });
-                }
-            });
-            break;
-        }
         case Dialog.HOUSE: {
             if(!response) {
                 let info = "";
@@ -6354,10 +6666,6 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             }
             break;
         }
-        case Dialog.BUYVIP_AFTER: {
-            if(!response) CMD.emit("vcmds", player);
-            break;
-        }
         case Dialog.LOGIN_SPASSWORD: {
             if(response) {
                 con.query("SELECT * FROM users WHERE name = ? AND spassword = ?", [player.GetPlayerName(24), md5(inputtext)], function(err, result) {
@@ -6384,567 +6692,6 @@ samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
             else Call_NewName(player);
             break;
         }
-        case Dialog.SPASSWORD: {
-            if(response) {
-                con.query("UPDATE users SET spassword = ? WHERE ID = ?", [md5(inputtext), Player.Info[player.playerid].AccID], function(err, result) {
-                    if(!err) {
-                        player.SendClientMessage(-1, Function.Lang(player, "{FF0000}Parola Secundara {FFFF00}a fost inregistrata! Scrie {FF0000}/SPassword {FFFF00}pentru detalii si optiuni!", "{FFFF00}The {FF0000}Secondary Password {FFFF00}was registered! Type {FF0000}/SPassword {FFFF00}for details and options!"));
-                    }
-                });
-            }
-            break;
-        }
-        case Dialog.SPASSWORD_OPTIONS: {
-            if(response) {
-                switch(listitem) {
-                    case 0: {
-                        player.ShowPlayerDialog(Dialog.SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Parola Secundara", "Secondary Password"), Function.Lang(player, "{FFFF00}Te rugam sa introduci {FF0000}Parola Secundara{FFFF00}:", "{FFFF00}Please enter below the {FF0000}Secondary Password{FFFF00}:"), "Ok", Function.Lang(player, "Renunta", "Cancel"));
-                        break;
-                    }
-                    case 1: {
-                        con.query("UPDATE users SET spassword = ? WHERE ID = ?", ["null", Player.Info[player.playerid].AccID], function(err, result) {
-                            if(!err) {
-                                player.SendClientMessage(-1, Function.Lang(player, "{FF0000}Parola Secundara {FFFF00}a fost scoasa! Scrie {FF0000}/SPassword {FFFF00}pentru a adauga alta!", "{FFFF00}The {FF0000}Secondary Password {FFFF00}was removed! Type {FF0000}/SPassword {FFFF00}to add another!"));
-                            }
-                        });
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        case Dialog.CREATE_CLAN: {
-            if(response) {
-                if(!Clan.ExistsName(inputtext)) {
-                    if(inputtext.length < 3 || inputtext.length > 20) return player.ShowPlayerDialog(Dialog.CREATE_CLAN, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", "{FF0000}ERROR:\n\n{00FF00}The clan name must be lower that {FF0000}20 {00FF00}characters and biggest that {FF0000}3{00FF00}!\n{00FF00}Please re-type it:", "Continue", "Close");
-                    Player.Info[player.playerid].Creating_Clan.name = inputtext;
-                    player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN_MEMBERS, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", "{0072FF}Now choose a Skin for members!\nEnter below the Skin ID for members:", "Continue", "Close");
-                }
-                else player.ShowPlayerDialog(Dialog.CREATE_CLAN, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", `{0072FF}A clan named {00FF00}'${inputtext}'{0072FF} already exists!\nPlease try again with another name...`, "Continue", "Close");
-            }
-            break;
-        }
-        case Dialog.CREATE_CLAN_SKIN_MEMBERS: {
-            if(response) {
-                inputtext = parseInt(inputtext);
-                if(inputtext < 0 || inputtext > 299) return player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN_MEMBERS, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan - {FF0000}ERROR!", "{0072FF}Invalid Skin ID (0-299)!\nEnter below the Skin ID for members:", "Continue", "Close");
-                Player.Info[player.playerid].Creating_Clan.skin.member = inputtext;
-                player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN_LEADERS, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan", "{0072FF}Now choose a Skin for leaders!\nEnter below the Skin ID for leaders:", "Continue", "Close");
-            }
-            break;
-        }
-        case Dialog.CREATE_CLAN_SKIN_LEADERS: {
-            if(response) {
-                inputtext = parseInt(inputtext);
-                if(inputtext < 0 || inputtext > 299) return player.ShowPlayerDialog(Dialog.CREATE_CLAN_SKIN_LEADERS, samp.DIALOG_STYLE.INPUT, "{00FF00}Create Clan - {FF0000}ERROR!", "{0072FF}Invalid Skin ID (0-299)!\nEnter below the Skin ID for leaders:", "Continue", "Close");
-                Player.Info[player.playerid].Creating_Clan.skin.leader = inputtext;
-                let info = "";
-                info += "{FF0000}RED\n";
-                info += "{F4A460}Brown\n";
-                info += "{FF9900}Orange\n";
-                info += "{FFFF00}Yellow\n";
-                info += "{BBFF00}Lime\n";
-                info += "{55FF00}Light green\n";
-                info += "{00FFAA}Aqua\n";
-                info += "{00DDFF}Light blue\n";
-                info += "{0044FF}Blue\n";
-                info += "{8000FF}Purple\n";
-                info += "{CC00FF}Indigo\n";
-                info += "{FF00EE}Pink\n";
-                info += "{FFFFFF}White\n";
-                info += "{FFEB7B}Crem";
-                player.ShowPlayerDialog(Dialog.CREATE_CLAN_COLOR, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Close");
-            }
-            break;
-        }
-        case Dialog.CREATE_CLAN_COLOR: {
-            if(response) {
-                switch(listitem) {
-                    case 0: Player.Info[player.playerid].Creating_Clan.color = 0xFF0000AA; break; /* RED */
-                    case 1: Player.Info[player.playerid].Creating_Clan.color = 0xF4A460AA; break; /* Brown */
-                    case 2: Player.Info[player.playerid].Creating_Clan.color = 0xFF9900AA; break; /* Orange */
-                    case 3: Player.Info[player.playerid].Creating_Clan.color = 0xFFFF00AA; break; /* Yellow */
-                    case 4: Player.Info[player.playerid].Creating_Clan.color = 0xBBFF00AA; break; /* Lime */
-                    case 5: Player.Info[player.playerid].Creating_Clan.color = 0x55FF00AA; break; /* Light green */
-                    case 6: Player.Info[player.playerid].Creating_Clan.color = 0x00FFAAAA; break; /* Aqua */
-                    case 7: Player.Info[player.playerid].Creating_Clan.color = 0x00DDFFAA; break; /* Light blue */
-                    case 8: Player.Info[player.playerid].Creating_Clan.color = 0x0044FFAA; break; /* Blue */
-                    case 9: Player.Info[player.playerid].Creating_Clan.color = 0x8000FFAA; break; /* Purple */
-                    case 10: Player.Info[player.playerid].Creating_Clan.color = 0xCC00FFAA; break; /* Indigo */
-                    case 11: Player.Info[player.playerid].Creating_Clan.color = 0xFF00EEAA; break; /* Pink */
-                    case 12: Player.Info[player.playerid].Creating_Clan.color = 0xFFFFFFAA; break; /* White */
-                    case 13: Player.Info[player.playerid].Creating_Clan.color = 0xFFEB7BAA; break; /* Crem */
-                }
-                let info = "";
-                info += "{0072FF}Brass Knuckles\n";
-                info += "{0072FF}Golf Club\n";
-                info += "{0072FF}Nightstick\n";
-                info += "{0072FF}Knife\n";
-                info += "{0072FF}Baseball Bat\n";
-                info += "{0072FF}Shovel\n";
-                info += "{0072FF}Pool Cue\n";
-                info += "{0072FF}Katana\n";
-                info += "{0072FF}Chainsaw";
-                player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_1, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
-            }
-            break;
-        }
-        case Dialog.CREATE_CLAN_WEAPON_1: {
-            if(response) {
-                let start = 1;
-                Player.Info[player.playerid].Creating_Clan.weapons[0] = start + listitem;
-            }
-
-            let info = "";
-            info += "{0072FF}Pistol\n";
-            info += "{0072FF}Silenced Pistol\n";
-            info += "{0072FF}Desert Eagle";
-            player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_2, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
-            break;
-        }
-        case Dialog.CREATE_CLAN_WEAPON_2: {
-            if(response) {
-                let start = 22;
-                Player.Info[player.playerid].Creating_Clan.weapons[1] = start + listitem;
-            }
-
-            let info = "";
-            info += "{0072FF}ShotGun\n";
-            info += "{0072FF}Sawn-Off-Shotgune\n";
-            info += "{0072FF}SPAZ-12";
-            player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_3, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
-            break;
-        }
-        case Dialog.CREATE_CLAN_WEAPON_3: {
-            if(response) {
-                let start = 25;
-                Player.Info[player.playerid].Creating_Clan.weapons[2] = start + listitem;
-            }
-
-            let info = "";
-            info += "{0072FF}Micro UZI\n";
-            info += "{0072FF}MP5\n";
-            info += "{0072FF}TEC-9";
-            player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_4, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
-            break;
-        }
-        case Dialog.CREATE_CLAN_WEAPON_4: {
-            if(response) {
-                switch(listitem) {
-                    case 0: Player.Info[player.playerid].Creating_Clan.weapons[3] = 28; break;
-                    case 1: Player.Info[player.playerid].Creating_Clan.weapons[3] = 29; break;
-                    case 2: Player.Info[player.playerid].Creating_Clan.weapons[3] = 32; break;
-                }
-            }
-
-            let info = "";
-            info += "{0072FF}AK-47\n";
-            info += "{0072FF}M4-A1";
-            player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_5, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
-            break;
-        }
-        case Dialog.CREATE_CLAN_WEAPON_5: {
-            if(response) {
-                let start = 30;
-                Player.Info[player.playerid].Creating_Clan.weapons[4] = start + listitem; 
-            }
-
-            let info = "";
-            info += "{0072FF}Country Rifle\n";
-            info += "{0072FF}Sniper Rifle";
-            player.ShowPlayerDialog(Dialog.CREATE_CLAN_WEAPON_6, samp.DIALOG_STYLE.LIST, "{00FF00}Create Clan", info, "Continue", "Skip");
-            break;
-        }
-        case Dialog.CREATE_CLAN_WEAPON_6: {
-            if(response) {
-                let start = 33;
-                Player.Info[player.playerid].Creating_Clan.weapons[5] = start + listitem; 
-            }
-
-            /* Send Informations in Dialog */
-            let info = "";
-            info += `{0072FF}Congratulations {00FF00}${player.GetPlayerName(24)}{0072FF} for creating {00FF00}${Player.Info[player.playerid].Creating_Clan.name}{0072FF} clan!\n`;
-            info += "If you need help with your clan, type {00FF00}/chelp{0072FF} and {00FF00}/ctop{0072FF} for clan top!";
-            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "{00FF00}Clan Created!", info, "Close", "");
-
-            /* Create row in SQL */
-            con.query("INSERT INTO clans (name, owner, position, weapon, color, member_skin, leader_skin) VALUES(?, ?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, JSON.stringify([0, 0, 0, 0]), JSON.stringify(Object.values(Player.Info[player.playerid].Creating_Clan.weapons)), `${Player.Info[player.playerid].Creating_Clan.color}`, Player.Info[player.playerid].Creating_Clan.skin.member, Player.Info[player.playerid].Creating_Clan.skin.leader], function(err, result) {
-                if(!err) {
-                    Clan.Create(result.insertId, Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, [0, 0, 0, 0], [Player.Info[player.playerid].Creating_Clan.weapons[0], Player.Info[player.playerid].Creating_Clan.weapons[1], Player.Info[player.playerid].Creating_Clan.weapons[2], Player.Info[player.playerid].Creating_Clan.weapons[3], Player.Info[player.playerid].Creating_Clan.weapons[4], Player.Info[player.playerid].Creating_Clan.weapons[5]], Player.Info[player.playerid].Creating_Clan.color, {member: Player.Info[player.playerid].Creating_Clan.skin.member, leader: Player.Info[player.playerid].Creating_Clan.skin.leader}, 0, 0);
-                    Player.Info[player.playerid].Clan = result.insertId;
-                    Player.Info[player.playerid].Clan_Rank = 3;
-                    UpdatePlayer(player, "clan", Player.Info[player.playerid].Clan);
-                    UpdatePlayer(player, "clan_rank", Player.Info[player.playerid].Clan_Rank);
-                    player.SetPlayerColor(Player.Info[player.playerid].Creating_Clan.color);
-                    player.SetPlayerSkin(Player.Info[player.playerid].Creating_Clan.skin.leader);
-                    for(let i = 0; i < 6; i++) {
-                        player.GivePlayerWeapon(Clan.Info[Player.Info[player.playerid].Clan].weapons[i], 9999);
-                    }
-                    ResetPlayerClanCreateVariables(player);
-                }
-                else ResetPlayerClanCreateVariables(player);
-            });
-            break;
-        }
-        case Dialog.TELES: {
-            if(response) {
-                switch(listitem) {
-                    case 0: { /* Stunts */
-                        CMD.emit("stunts", player);
-                        break;
-                    }
-                    case 1: { /* Jumps */
-                        CMD.emit("jumps", player);
-                        break;
-                    }
-                    case 2: { /* Death Matchs */
-                        CMD.emit("dm", player);
-                        break;
-                    }
-                    case 3: { /* Interiors */
-                        CMD.emit("int", player);
-                        break;
-                    }
-                    case 4: { /* Drifts */
-                        CMD.emit("drifts", player);
-                        break;
-                    }
-                    case 5: { /* Races */
-                        CMD.emit("races", player);
-                        break;
-                    }
-                    case 6: { /* Jobs */
-                        CMD.emit("jobs", player);
-                        break;
-                    }
-                    case 7: { /* Minigames */
-                        CMD.emit("minigames", player);
-                        break;
-                    }
-                    case 8: { /* Challenges */
-                        CMD.emit("challanges", player);
-                        break;
-                    }
-                    case 9: { /* Parkours */
-                        CMD.emit("parkours", player);
-                        break;
-                    }
-                    case 10: { /* Partys */
-                        CMD.emit("partys", player);
-                        break;
-                    }
-                    case 11: { /* Special Places */
-                        CMD.emit("splaces", player);
-                        break;
-                    }
-                    case 12: { /* Others */
-                        CMD.emit("others", player);
-                        break;
-                    }
-                    case 13: { /* Simple Stunts */
-                        CMD.emit("sstunts", player);
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        case Dialog.TELES_STUNTS: {
-            if(response) {
-                let result = Teleport.Info.filter(f => f.type == "stunts");
-                for(let i = 0; i < result.length; i++) {
-                    if(i == listitem) {
-                        TelePlayer(player, result[i].command, result[i].name, result[i].position[0], result[i].position[1], result[i].position[2], result[i].position[3]);
-                        break;
-                    }
-                }
-                if(listitem == result.length) CMD.emit("sstunts", player);
-            }
-            else CMD.emit("teles", player);
-            break;
-        }
-        case Dialog.TELES_JUMPS: {
-            if(response) {
-
-            }
-            else CMD.emit("teles", player);
-            break;
-        }
-        case Dialog.TELES_DM: {
-            if(response) {
-                switch(listitem) {
-                    case 0: CMD.emit("minigun", player); break;
-                    case 1: CMD.emit("de", player); break;
-                    case 2: CMD.emit("m4", player); break;
-                    case 3: CMD.emit("os", player); break;
-                    case 4: CMD.emit("sniper", player); break;
-                    case 5: CMD.emit("mrf", player); break;
-                    case 6: CMD.emit("garena", player); break;
-                    case 7: CMD.emit("oh", player); break;
-                    case 8: CMD.emit("prodm", player); break;
-                    case 9: CMD.emit("helldm", player); break;
-                    case 10: CMD.emit("gunwar", player); break;
-                }
-            }
-            else CMD.emit("teles", player);
-            break;
-        }
-        case Dialog.TELES_DRIFTS: {
-            if(response) {
-                let result = Teleport.Info.filter(f => f.type == "drifts");
-                for(let i = 0; i < result.length; i++) {
-                    if(i == listitem) {
-                        CMD.emit("drift", player, [i+1]);
-                        break;
-                    }
-                }
-            }
-            else CMD.emit("teles", player);
-            break;
-        }
-        case Dialog.TELES_JOBS: {
-            if(response) {
-
-            }
-            else CMD.emit("teles", player);
-            break;
-        }
-        case Dialog.TELES_MINIGAMES: {
-            if(response) {
-
-            }
-            else CMD.emit("teles", player);
-            break;
-        }
-        case Dialog.TELES_CHALLANGES: {
-            if(response) {
-
-            }
-            else CMD.emit("teles", player);
-            break;
-        }
-        case Dialog.TELES_PARKOURS: {
-            if(response) {
-
-            }
-            else CMD.emit("teles", player);
-            break;
-        }
-        case Dialog.TELES_PARTYS: {
-            if(response) {
-                Teleport.Info.filter(f => f.type == "partys").forEach((i, index) => {
-                    if(index == listitem) {
-                        TelePlayer(player, i.command, i.name, i.position[0], i.position[1], i.position[2], i.position[3]);  
-                    }
-                });
-            }
-            else CMD.emit("teles", player);
-            break;
-        }
-        case Dialog.TELES_SPECIAL_PLACES: {
-            if(response) {
-
-            }
-            else CMD.emit("teles", player);
-            break;
-        }
-        case Dialog.TELES_OTHERS: {
-            if(response) {
-                Teleport.Info.filter(f => f.type == "others").forEach((i, index) => {
-                    if(index == listitem) {
-                        TelePlayer(player, i.command, i.name, i.position[0], i.position[1], i.position[2], i.position[3]);  
-                    }
-                });
-            }
-            else CMD.emit("teles", player);
-            break;
-        }
-        case Dialog.TELES_SIMPLE_STUNTS: {
-            if(response) {
-
-            }
-            else CMD.emit("teles", player);
-            break;
-        }
-        case Dialog.STATS: {
-            if(!response) {
-                let info = "";
-                info += `{0072FF}${Function.Lang(player, "Descriere Linia 1", "Description Line 1")}\n`;
-                info += `{FFFF00}${Function.Lang(player, "Descriere Linia 2", "Description Line 2")}\n`;
-                info += `{FF0000}${Function.Lang(player, "Descriere Linia 3", "Description Line 3")}`;
-                player.ShowPlayerDialog(Dialog.STATS_DESCRIPTION, samp.DIALOG_STYLE.LIST, Function.Lang(player, "Descriere", "Description"), info, Function.Lang(player, "Selecteaza", "Select"), Function.Lang(player, "Inapoi", "Back"));
-            }
-            break;
-        }
-        case Dialog.STATS_DESCRIPTION: {
-            if(response) {
-                Player.Info[player.playerid].Editing_Stats_Description_Line = listitem + 1;
-                player.ShowPlayerDialog(Dialog.STATS_DESCRIPTION_INPUT, samp.DIALOG_STYLE.INPUT, Function.Lang(player, "Descriere", "Description"), Function.Lang(player, "{FFFF00}Te rugam sa iti introduci {FF0000}Descrierea{FFFF00}:", "{FFFF00}Please enter your {FF0000}Description{FFFF00}:"), Function.Lang(player, "Ok", "Update"), Function.Lang(player, "Renunta", "Cancel"));
-            }
-            else CMD.emit("stats", player, []);
-            break;
-        }
-        case Dialog.STATS_DESCRIPTION_INPUT: {
-            if(response) {
-                Player.Info[player.playerid].Description[Player.Info[player.playerid].Editing_Stats_Description_Line] = inputtext;
-                player.SendClientMessage(data.colors.YELLOW, Function.Lang(player, "Ti-ai modificat Descrierea! Scrie {FF0000}/Stats {FFFF00}pentru a o vedea!", "You have updated your Description! Type {FF0000}/Stats {FFFF00}to see it!"));
-                Player.Info[player.playerid].Editing_Stats_Description_Line = 0;
-            }
-            else Player.Info[player.playerid].Editing_Stats_Description_Line = 0;
-            break;
-        }
-        case Dialog.BUYVIP: {
-            if(response) {
-                switch(listitem) {
-                    case 0: {
-                        if(Player.Info[player.playerid].VIP >= 1) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
-                        Player.Info[player.playerid].VIP = 1;
-                        UpdateRankLabelFor(player);
-                        samp.SendClientMessageToAll(data.colors.LIGHT_YELLOW, `INFO:{00BBF6} ${player.GetPlayerName(24)}(${player.playerid}){BBFF00} a cumparat{FF0000} VIP Rosu{BBFF00} Gratis, Pentru a cumpara VIP, scrie /BuyVIP!`);
-                        let info = "";
-                        info += "{00FF00}Ai cumparat cu succes {FF0000}VIP Red{00FF00} Gratis!\n";
-                        info += "{00FF00}Scrie {00BBF6}/vCmds {00FF00}pentru a vedea {FF0000}Comenzile de VIP{00FF00}!";
-                        player.ShowPlayerDialog(Dialog.BUYVIP_AFTER, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "VIP {FF0000}Cumparat{AFAFAF}!", ""), info, "Ok", "VCmds");
-                        break;
-                    }
-                    case 1: {
-                        if(Player.Info[player.playerid].VIP >= 2) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
-                        if(Player.Info[player.playerid].Coins >= 20000) {
-
-                        }
-                        else SendError(player, "Nu ai destui Coins/Ore pentru a cumpara acest rank de VIP!", "You don't have enough Coins/Hours to buy that VIP rank!");
-                        break;
-                    }
-                    case 2: {
-                        if(Player.Info[player.playerid].VIP >= 3) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
-                        if(Player.Info[player.playerid].Coins >= 80000) {
-
-                        }
-                        else SendError(player, "Nu ai destui Coins/Ore pentru a cumpara acest rank de VIP!", "You don't have enough Coins/Hours to buy that VIP rank!");
-                        break;
-                    }
-                    case 3: {
-                        if(Player.Info[player.playerid].VIP >= 4) return SendError(player, "You can't buy this VIP rank because you have already this rank or bigger!");
-                        if(Player.Info[player.playerid].Coins >= 150000) {
-
-                        }
-                        else SendError(player, "Nu ai destui Coins/Ore pentru a cumpara acest rank de VIP!", "You don't have enough Coins/Hours to buy that VIP rank!");
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        case Dialog.IMPORTANT_1: {
-            if(response) ShowImportant(player, 2);
-            else CMD.emit("rules", player);
-            break;
-        }
-        case Dialog.IMPORTANT_2: {
-            if(!response) ShowImportant(player, 1);
-            break;
-        }
-        case Dialog.RULES: {
-            if(!response) ShowImportant(player, 1);
-            break;
-        }
-        case Dialog.ADD_MAIL: {
-            if(response) {
-                if(validateEmail(inputtext)) {
-                    player.SendClientMessage(data.colors.YELLOW, Function.Lang(player, `Ti-ai adaugat cu succes E-Mail-ul {FF0000}${inputtext} {FFFF00}in Cont!`, `You have successfully added the {FF0000}${inputtext} {FFFF00}E-Mail in your Account!`));
-                    Player.Info[player.playerid].Mail = inputtext;
-                }
-                else player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Function.Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Function.Lang(player, "Adauga", "Add"), Function.Lang(player, "Mai tarziu", "Later"));
-            }
-            else player.SendClientMessage(data.colors.YELLOW, Function.Lang(player, "Ai refuzat sa iti adaugi un {FF0000}E-Mail {FFFF00}in cont! Cont-ul tau este vulnerabil!", "You refused to add an {FF0000}E-Mail {FFFF00}in your Account! Your Account is vulnerable!"));
-            break;
-        }
-        case Dialog.CMDS_1: {
-            if(!response) ShowCMDS(player, 2);
-            break;
-        }
-        case Dialog.CMDS_2: {
-            if(response) ShowCMDS(player, 1);
-            else ShowCMDS(player, 3);
-            break;
-        }
-        case Dialog.CMDS_3: {
-            if(!response) ShowCMDS(player, 2);
-            break;
-        }
-        case Dialog.NEW_NAME: {
-            if(response) {
-                if(inputtext.length < 3 || inputtext.length > 20) return Call_NewName(player);
-                player.SetPlayerName(inputtext);
-                PreparatePlayerLogin(player);
-            }
-            else {
-                let tag = Function.getRandomInt(1, 99999);
-                player.SetPlayerName(`[${tag}]TempName`);
-                PreparatePlayerLogin(player);
-            }
-            break;
-        }
-        case Dialog.LOGIN: {
-            if(response) {
-                con.query("SELECT * FROM users WHERE name = ? AND password = ?", [player.GetPlayerName(24), md5(inputtext)], function(err, result) {
-                    if(!err) {
-                        if(result == 0) {
-                            Player.Info[player.playerid].Fail_Logins++;
-                            if(Player.Info[player.playerid].Fail_Logins == 4) player.Kick();
-                            else {
-                                let info = "";
-                                info += `{FF0000}${Function.Lang(player, `Autentificare nereusita (${Player.Info[player.playerid].Fail_Logins}/4)!`, `Login failed (${Player.Info[player.playerid].Fail_Logins}/4)!`)}\n`;
-                                info += "\n";
-                                info += `{FFFF00}${Function.Lang(player, "Ai introdus parola gresita. Te rugam sa incerci din nou!", "You entered the wrong password. Please try again!")}\n`;
-                                info += `{00FF00}${Function.Lang(player, `Daca ti-ai uitat parola intra pe {FF0000}${data.settings.SERVER_WEB}{00FF00} pentru a o reseta!`, `If you forgot your password enter the {FF0000}${data.settings.SERVER_WEB} {00FF00}to reset it!`)}`
-                                player.ShowPlayerDialog(Dialog.LOGIN, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Autentificare {FF0000}Nereusita", "Login {FF0000}Failed"), info, Function.Lang(player, "Autentificare", "Login"), Function.Lang(player, "Nume Nou", "New Name"));
-                            }
-                        }   
-                        else {
-                            Player.Info[player.playerid].Fail_Logins = 0;
-                            if(result[0].spassword == "null") LoadPlayerStats(player);
-                            else {
-                                let info = "";
-                                info += `${Function.Lang(player, "{FF0000}Acest cont are o parola secundara!", "{FF0000}This account has a secondary password!")}\n`;
-                                info += `${Function.Lang(player, "{FFCC00}Autentifica-te cu parola secundara pentru a putea continua!", "{FFCC00}Please login with the secondary password in order to continue!")}\n`;
-                                info += "\n";
-                                info += `${Function.Lang(player, "{FFFF00}Scrie mai jos {FF0000}Parola Secundara{FFFF00}:", "{FFFF00}Enter below the {FF0000}Secondary Password{FFFF00}:")}`;
-                                player.ShowPlayerDialog(Dialog.LOGIN_SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Autentificare - Parola Secundara", "Login - Secondary Password"), info, Function.Lang(player, "Autentificare", "Login"), Function.Lang(player, "Nume Nou", "New Name"));
-                            }
-                        }
-                    }
-                    else player.Kick();
-                });
-            }
-            else Call_NewName(player);
-            break;
-        }
-        case Dialog.AFTER_REGISTER: {
-            if(!response) CMD.emit("help", player);
-            break;
-        }
-        case Dialog.REGISTER: {
-            if(response) {
-                con.query("INSERT INTO users (name, password) VALUES(?, ?)", [player.GetPlayerName(24), md5(inputtext)], function(err, result) {
-                    if(!err) {
-                        Player.Info[player.playerid].AccID = result.insertId;
-                        LoadPlayerStats(player);
-                        Server.Info.NewRegistredPlayers++;
-                        samp.SendClientMessageToAll(data.colors.ORANGE, `INFO: {00BBF6}${player.GetPlayerName(24)}(${player.playerid}){BBFF00} ${Function.Lang(player, `s-a inregistrat pe server-ul nostru!`, `has registered on our server!`)}`);
-                        player.ShowPlayerDialog(Dialog.AFTER_REGISTER, samp.DIALOG_STYLE.MSGBOX, "Inregistrare {BBFF00}Reusita!", `{BBFF00}Salut {FF0000}${player.GetPlayerName(24)}{BBFF00}!\n{BBFF00}Te-ai inregistrat cu succes pe server-ul ${data.settings.SERVER_NAME}{BBFF00}!\n{BBFF00}Tine minte! De cate ori vei reveni, va trebuii sa te autentifici cu parola: {FF0000}${inputtext}{BBFF00}!\n\n{FFFF00}Pentru mai multe informatii, click pe buton-ul {FF0000}Ajutor{FFFF00}.\n{FFFF00}De asemenea, nu uita sa ne vizitezi si website-ul si forum-ul nostru la adresa {FF0000}${data.settings.SERVER_WEB}{FFFF00}!`, "Inchide", "Ajutor!");
-                    }
-                    else player.Kick();
-                });
-            }
-            else Call_NewName(player);
-            break;
-        }
-        case Dialog.SELECT_LANGUAGE: {
-            Player.Info[player.playerid].Language = response;
-            PreparatePlayerLogin(player);
-            break;
-        }
     }
     return true;
 });
@@ -6956,7 +6703,12 @@ samp.OnPlayerSpawn((player) => {
     ShowSpawnTextDraw(player);
     player.SetPlayerVirtualWorld(0);
     if(Player.Info[player.playerid].Mail == "none" && Player.Info[player.playerid].Need_Mail_Showed == false) {
-        player.ShowPlayerDialog(Dialog.ADD_MAIL, samp.DIALOG_STYLE.INPUT, "E-Mail", Function.Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Function.Lang(player, "Adauga", "Add"), Function.Lang(player, "Mai tarziu", "Later"));
+        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.INPUT, "E-Mail", Function.Lang(player, "{FFFF00}Se pare ca nu ai un {FF0000}E-Mail {FFFF00}in cont!\n{FFCC00}In cazul in care iti vei uita parola, nu o vei putea recupera!\n\n{FF0000}Daca doresti sa iti adaugi un E-Mail in cont, te rugam sa il introduci mai jos:", "{FFFF00}It looks like you don't have any {FF0000}E-Mail {FF0000}in your account!\n{FFCC00}If you will forgot your password, you will be not able to recover it!\n\n{FF0000}If you want to add an E-Mail in your account, please type it before:"), Function.Lang(player, "Adauga", "Add"), Function.Lang(player, "Mai tarziu", "Later"), (response) => {
+            if(!response.button) return player.SendClientMessage(data.colors.YELLOW, Function.Lang(player, "Ai refuzat sa iti adaugi un {FF0000}E-Mail {FFFF00}in cont! Cont-ul tau este vulnerabil!", "You refused to add an {FF0000}E-Mail {FFFF00}in your Account! Your Account is vulnerable!"));
+            if(!validateEmail(response.inputText)) return response.repeatDialog();
+            player.SendClientMessage(data.colors.YELLOW, Function.Lang(player, `Ti-ai adaugat cu succes E-Mail-ul {FF0000}${response.inputText} {FFFF00}in Cont!`, `You have successfully added the {FF0000}${response.inputText} {FFFF00}E-Mail in your Account!`));
+            Player.Info[player.playerid].Mail = response.inputText;
+        });
         Player.Info[player.playerid].Need_Mail_Showed = true;
     }
     SetupPlayerForSpawn(player);

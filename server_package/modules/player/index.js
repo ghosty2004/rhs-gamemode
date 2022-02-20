@@ -93,7 +93,6 @@ module.exports = {
                 "3": ""
             },
             LastOn: "Unknown",
-            Editing_Stats_Description_Line: 0,
             Creating_Clan: {
                 name: "",
                 skin: {

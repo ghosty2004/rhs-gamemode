@@ -19,14 +19,16 @@ export class SmartDialogFunctions {
                 button: responseButton,
                 listItem: responseListItem,
                 inputText: responseInputText,
-                repeatDialog() {
-                    SmartDialogFunctions.ShowPlayerSmartDialog(playerid, style, caption, info, button1, button2, (newCallBack) => {
+                repeatDialog(repeatInfo = info) {
+                    SmartDialogFunctions.ShowPlayerSmartDialog(playerid, style, caption, repeatInfo, button1, button2, (newCallBack) => {
                         callback(newCallBack);
                     });
                 }
             });
             dialogEvent.removeListener("onResponse", onResponse);
+            dialogEvent.removeListener("onDisconnect", onDisconnect);
         }
+        dialogEvent.on("onResponse", onResponse);
         function onDisconnect(disconnectedPlayerId: number) {
             if(disconnectedPlayerId != playerid) return;
             dialogEvent.removeListener("onResponse", onResponse);

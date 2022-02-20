@@ -90,7 +90,6 @@ export declare const Info: {
         "3": string
     },
     LastOn: "Unknown",
-    Editing_Stats_Description_Line: number,
     Creating_Clan: {
         name: string,
         skin: {

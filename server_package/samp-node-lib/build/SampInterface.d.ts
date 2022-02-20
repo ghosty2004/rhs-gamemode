@@ -3,6 +3,6 @@ export interface SMART_DIALOG_CALLBACK {
         button: number;
         listItem: number;
         inputText: string;
-        repeatDialog(): void;
+        repeatDialog(repeatInfo: string): void;
     }): any;
 }
