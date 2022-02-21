@@ -59,7 +59,7 @@ export class SmartDialogFunctions {
 }
 
 samp.on("OnDialogResponse", (playerid, dialogid, response, listitem, inputtext) => {
-    if(showingDialog[playerid] == true) dialogEvent.emit("onNewDialog");
+    if(showingDialog[playerid] == true) dialogEvent.emit("onNewDialog", playerid);
     dialogEvent.emit("onResponse", playerid, dialogid, response, listitem, inputtext);
 });
 

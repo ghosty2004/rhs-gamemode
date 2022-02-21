@@ -54,7 +54,7 @@ class SmartDialogFunctions {
 exports.SmartDialogFunctions = SmartDialogFunctions;
 samp.on("OnDialogResponse", (playerid, dialogid, response, listitem, inputtext) => {
     if (showingDialog[playerid] == true)
-        dialogEvent.emit("onNewDialog");
+        dialogEvent.emit("onNewDialog", playerid);
     dialogEvent.emit("onResponse", playerid, dialogid, response, listitem, inputtext);
 });
 samp.on("OnPlayerDisconnect", (playerid, reason) => {
