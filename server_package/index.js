@@ -29,7 +29,6 @@ const Business = require("./modules/business");
 const Checkpoint = require("./modules/checkpoint");
 const Circle = require("./modules/circle");
 const Clan = require("./modules/clan");
-const Dialog = require("./modules/dialog");
 const Discord = require("./modules/discordbot");
 const Errors = require("./modules/errors");
 const events = require("./modules/events");
@@ -228,7 +227,7 @@ CMD.on("createclan", (player) => {
                                             let info = "";
                                             info += `{0072FF}Congratulations {00FF00}${player.GetPlayerName(24)}{0072FF} for creating {00FF00}${Player.Info[player.playerid].Creating_Clan.name}{0072FF} clan!\n`;
                                             info += "If you need help with your clan, type {00FF00}/chelp{0072FF} and {00FF00}/ctop{0072FF} for clan top!";
-                                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "{00FF00}Clan Created!", info, "Close", "");
+                                            player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "{00FF00}Clan Created!", info, "Close", "");
                                 
                                             con.query("INSERT INTO clans (name, owner, position, weapon, color, member_skin, leader_skin) VALUES(?, ?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].Creating_Clan.name, Player.Info[player.playerid].AccID, JSON.stringify([0, 0, 0, 0]), JSON.stringify(Object.values(Player.Info[player.playerid].Creating_Clan.weapons)), `${Player.Info[player.playerid].Creating_Clan.color}`, Player.Info[player.playerid].Creating_Clan.skin.member, Player.Info[player.playerid].Creating_Clan.skin.leader], function(err, result) {
                                                 if(err) return ResetPlayerClanCreateVariables(player);
@@ -358,7 +357,7 @@ CMD.on("anim", (player, params) => {
         info += "\n\n";
         info += "{00BBF6}Pont: {BBFF00}To stop an {00BBF6}Anim {BBFF00}, type {00BBF6}/Anim {FF0000}stop{BBFF00}.\n";
         info += `{BBFF00}Total Anims: {FF0000}${data.animations.length}`;
-        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, "Anim {FF0000}List", info, "Close", "");
+        player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Anim {FF0000}List", info, "Close", "");
     }
     else if(params[0] == "stop") player.ClearAnimations(true);
     else {
@@ -392,7 +391,168 @@ CMD.on("trade", (player) => {
     info += "{BBFF00}Please enter below {FF0000}Name/ID {BBFF00}of the player you want to trade with.\n";
     info += "\n";
     info += "{BBFF00}Use {FF0000}/Market{BBFF00} to see prices for trade.";
-    player.ShowPlayerDialog(Dialog.TRADE, samp.DIALOG_STYLE.INPUT, "Trade", info, "Next", "Cancel");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.INPUT, "Trade", info, "Next", "Cancel", (response) => {
+        if(!response.button) return
+        let target = getPlayer(response.inputText);
+        if(!target || target.playerid == player.playerid) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+        if(Player.Info[target.playerid].Atrade != player.playerid) return SendError(player, "That player has no Trade activated on you!");
+        Player.Info[player.playerid].Trade.On = target.playerid;
+        let info = "";
+        info += "{00FF00}Sell {FF0000}Money\n";
+        info += "{00FF00}Sell {FF0000}Hours\n";
+        info += "{00FF00}Sell {FF0000}Coins\n";
+        info += "{00FF00}Sell {FF0000}Kills & Deaths\n";
+        info += "{00FF00}Sell {FF0000}Stunt Points\n";
+        info += "{00FF00}Sell {FF0000}Drift Points\n";
+        info += "{00FF00}Sell {FF0000}Race Points";
+        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Trade", info, "Select", "Cancel", (response) => {
+            if(!response.button) return resetTradeVariables(player);
+            Player.Info[player.playerid].Trade.Sell.Item = response.listItem;
+            player.ShowPlayerSmartDialog(isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}`, `{FFFF94}You have selected to sell {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FF9900}!${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel", (response) => {
+                if(!response.button) return resetTradeVariables(player);
+                let value = parseInt(response.inputText);
+                if(getTradeItemAmount(player, Player.Info[player.playerid].Trade.Sell.Item) >= value || !isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item)) {
+                    Player.Info[player.playerid].Trade.Sell.Value = value;
+                    let info = "";
+                    info += "{00FF00}Buy {FF0000}Money\n";
+                    info += "{00FF00}Buy {FF0000}Hours\n";
+                    info += "{00FF00}Buy {FF0000}Coins\n";
+                    info += "{00FF00}Buy {FF0000}Kills & Deaths\n";
+                    info += "{00FF00}Buy {FF0000}Stunt Points\n";
+                    info += "{00FF00}Buy {FF0000}Drift Points\n";
+                    info += "{00FF00}Buy {FF0000}Race Points";
+                    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Trade", info, "Select", "Cancel", (response) => {
+                        if(!response.button) return resetTradeVariables(player);
+                        Player.Info[player.playerid].Trade.Buy.Item = response.listItem;
+                        player.ShowPlayerSmartDialog(isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}`, `{FFFF94}You have selected to buy {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FF9900}!${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel", (response) => {
+                            if(!response.button) return resetTradeVariables(player);
+                            let target = samp.getPlayers().filter(f => f.playerid == Player.Info[player.playerid].Trade.On && Player.Info[f.playerid].Atrade == player.playerid)[0];
+                            if(!target) return SendError(player, Errors.UNEXPECTED);
+                            let value = parseInt(response.inputText);
+                            if(getTradeItemAmount(target, Player.Info[player.playerid].Trade.Buy.Item) >= value || !isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item)) {
+                                Player.Info[player.playerid].Trade.Buy.Value = value;
+                                let info = "";
+                                info += `{FFFF94}You have completed all the steps before sending a{FF0000} Trade Request{FFFF94} to {FF0000}${target.GetPlayerName(24)} (ID:${target.playerid}){FFFF94}!\n`;
+                                info += `{FFFF94}Are you sure ? You want to send a {FF0000}Trade Request{FFFF94} to {FF0000}${target.GetPlayerName(24)} (ID:${target.playerid}){FFFF94} ?`;
+                                player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, "Trade {FF0000}completed", info, "Continue", "Close", (response) => {
+                                    if(!response.button) return resetTradeVariables(player);
+                                    let target = samp.getPlayers().filter(f => f.playerid == Player.Info[player.playerid].Trade.On && Player.Info[f.playerid].Atrade == player.playerid)[0];
+                                    if(!target) return SendError(player, Errors.UNEXPECTED);
+                                    player.SendClientMessage(data.colors.YELLOW, "Trade request was sent successfully! Please wait while player Accepts or Rejects the Trade Request!");
+                                    Player.Info[target.playerid].TradeRequestFrom = player.playerid;
+                                    let info = "";
+                                    info += `{FFFF00}Hi {11FF00}${target.GetPlayerName(24)}{FFFF00}!\n`;
+                                    info += `{11FF00}${player.GetPlayerName(24)}{FFFF00} wants to sell you {11FF00}${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? `${Player.Info[player.playerid].Trade.Sell.Value} ` : ""}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FFFF00} for your {11FF00}${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? `${Player.Info[player.playerid].Trade.Buy.Value} ` : ""}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FFFF00}!`;
+                                    target.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, "Trade {FF0000}Request", info, "Decline", "Accept", (response) => {
+                                        let target = samp.getPlayers().filter(f => f.playerid == Player.Info[player.playerid].TradeRequestFrom)[0];
+                                        if(!target) return SendError(player, Errors.UNEXPECTED);
+                                        if(response.button) {
+                                            player.SendClientMessage(data.colors.YELLOW, "You have successfully declined the Trade Request!");
+                                            target.SendClientMessage(data.colors.YELLOW, `{11FF00}${player.GetPlayerName(24)}{FFFF00} Declined your Trade Request!`);
+                                            resetTradeVariables(player);
+                                            resetTradeVariables(target);
+                                        }
+                                        else {
+                                            /* ========== */
+                                            /* Target Buy */
+                                            /* ========== */
+                                            switch(getTradeItemName(Player.Info[target.playerid].Trade.Buy.Item)) {
+                                                case "Money": {
+                                                    Player.Info[target.playerid].Money += Player.Info[target.playerid].Trade.Buy.Value;
+                                                    Player.Info[player.playerid].Money -= Player.Info[target.playerid].Trade.Buy.Value;
+                                                    break;
+                                                }
+                                                case "Hours": {
+                                                    Player.Info[target.playerid].OnlineTime.Hours += Player.Info[target.playerid].Trade.Buy.Value;
+                                                    Player.Info[player.playerid].OnlineTime.Hours -= Player.Info[target.playerid].Trade.Buy.Value;
+                                                    break;
+                                                }
+                                                case "Coins": {
+                                                    Player.Info[target.playerid].Coins += Player.Info[target.playerid].Trade.Buy.Value;
+                                                    Player.Info[player.playerid].Coins -= Player.Info[target.playerid].Trade.Buy.Value;
+                                                    break;
+                                                }
+                                                case "Kills & Deaths": {
+                                                    Player.Info[target.playerid].Kills_Data.Kills += Player.Info[player.playerid].Kills_Data.Kills;
+                                                    Player.Info[target.playerid].Kills_Data.Deaths += Player.Info[player.playerid].Kills_Data.Deaths;
+                                                    Player.Info[player.playerid].Kills_Data.Kills = 0;
+                                                    Player.Info[player.playerid].Kills_Data.Deaths = 0;
+                                                    break;
+                                                }
+                                                case "Stunt Points": {
+                                                    Player.Info[target.playerid].Driving_Data.StuntPoints += Player.Info[target.playerid].Trade.Buy.Value;
+                                                    Player.Info[player.playerid].Driving_Data.StuntPoints -= Player.Info[target.playerid].Trade.Buy.Value;
+                                                    break;
+                                                }
+                                                case "Drift Points": {
+                                                    Player.Info[target.playerid].Driving_Data.DriftPoints += Player.Info[target.playerid].Trade.Buy.Value;
+                                                    Player.Info[player.playerid].Driving_Data.DriftPoints -= Player.Info[target.playerid].Trade.Buy.Value;
+                                                    break;
+                                                }
+                                                case "Race Points": {
+                                                    Player.Info[target.playerid].Driving_Data.RacePoints += Player.Info[target.playerid].Trade.Buy.Value;
+                                                    Player.Info[player.playerid].Driving_Data.RacePoints -= Player.Info[target.playerid].Trade.Buy.Value;
+                                                    break;
+                                                }
+                                            }
+                                            /* =========== */
+                                            /* Target Sell */
+                                            /* =========== */
+                                            switch(getTradeItemName(Player.Info[target.playerid].Trade.Sell.Item)) {
+                                                case "Money": {
+                                                    Player.Info[player.playerid].Money += Player.Info[target.playerid].Trade.Sell.Value;
+                                                    Player.Info[target.playerid].Money -= Player.Info[target.playerid].Trade.Sell.Value;
+                                                    break;
+                                                }
+                                                case "Hours": {
+                                                    Player.Info[player.playerid].OnlineTime.Hours += Player.Info[target.playerid].Trade.Sell.Value;
+                                                    Player.Info[target.playerid].OnlineTime.Hours -= Player.Info[target.playerid].Trade.Sell.Value;
+                                                    break;
+                                                }
+                                                case "Coins": {
+                                                    Player.Info[player.playerid].Coins += Player.Info[target.playerid].Trade.Sell.Value;
+                                                    Player.Info[target.playerid].Coins -= Player.Info[target.playerid].Trade.Sell.Value;
+                                                    break;
+                                                }
+                                                case "Kills & Deaths": {
+                                                    Player.Info[player.playerid].Kills_Data.Kills += Player.Info[target.playerid].Kills_Data.Kills;
+                                                    Player.Info[player.playerid].Kills_Data.Deaths += Player.Info[target.playerid].Kills_Data.Deaths;
+                                                    Player.Info[target.playerid].Kills_Data.Kills = 0;
+                                                    Player.Info[target.playerid].Kills_Data.Deaths = 0;
+                                                    break;
+                                                }
+                                                case "Stunt Points": {
+                                                    Player.Info[player.playerid].Driving_Data.StuntPoints += Player.Info[target.playerid].Trade.Sell.Value;
+                                                    Player.Info[target.playerid].Driving_Data.StuntPoints -= Player.Info[target.playerid].Trade.Sell.Value;
+                                                    break;
+                                                }
+                                                case "Drift Points": {
+                                                    Player.Info[player.playerid].Driving_Data.DriftPoints += Player.Info[target.playerid].Trade.Sell.Value;
+                                                    Player.Info[target.playerid].Driving_Data.DriftPoints -= Player.Info[target.playerid].Trade.Sell.Value;
+                                                    break;
+                                                }
+                                                case "Race Points": {
+                                                    Player.Info[player.playerid].Driving_Data.RacePoints += Player.Info[target.playerid].Trade.Sell.Value;
+                                                    Player.Info[target.playerid].Driving_Data.RacePoints -= Player.Info[target.playerid].Trade.Sell.Value;
+                                                    break;
+                                                }
+                                            }
+                                            player.SendClientMessage(data.colors.YELLOW, "You have successfully accepted the Trade Request!");
+                                            target.SendClientMessage(data.colors.YELLOW, `{11FF00}${player.GetPlayerName(24)}{FFFF00} Accepted your Trade Request!`);
+                                            resetTradeVariables(player);
+                                            resetTradeVariables(target);
+                                        }
+                                    });
+                                });
+                            }
+                            else response.repeatDialog();
+                        });
+                    });
+                }
+                else response.repeatDialog();
+            });
+        });
+    });
 });
 
 CMD.on("market", (player) => {
@@ -426,7 +586,7 @@ CMD.on("vips", (player) => {
     result.forEach((i) => {
         info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t${getVIPRank(Player.Info[i.playerid].VIP)}\n`;
     });
-    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${result.length} {00FF00}Online VIP(s)!`, info, "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${result.length} {00FF00}Online VIP(s)!`, info, "Close", "");
 });
 
 CMD.on("mp3", (player) => {
@@ -463,7 +623,7 @@ CMD.on("vworld", (player, params) => {
     info += `${Function.Lang(player, "Iti poti invita prietenii in aceasta lume folosind /pm pentru a avea un duel sau o cursa!", "You can invite your friends with /pm in this world for have a duel or a race!")}\n`;
     info += "\n";
     info += `${Function.Lang(player, "Pentru a te intoarce inapoi in lumea normala cu toti jucatori foloseste /vw 0 sau teleporteazate! Exemplu /lv", "To return to the normal world with other players use /vw 0 or teleport in one place! For example /lv")}`;
-    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Lumea mea virtuala", "My Virutal World"), info, "Ok", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Lumea mea virtuala", "My Virutal World"), info, "Ok", "");
 });
 CMD.on("vw", (player, params) => { CMD.emit("vworld", player, params); });
 
@@ -473,7 +633,7 @@ CMD.on("godp", (player) => {
     result.forEach((i) => {
         info += `{00FF00}${i.GetPlayerName(24)} {00BBF6}(ID:${i.playerid}) {00FF00}- GodMode`;
     });
-    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, `{00FF00}There are {00BBF6}${result.length} {00FF00}players with God Mode On!`, info, "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.LIST, `{00FF00}There are {00BBF6}${result.length} {00FF00}players with God Mode On!`, info, "Close", "");
 });
 
 CMD.on("house", async (player) => {
@@ -492,7 +652,29 @@ CMD.on("house", async (player) => {
     info += `{00BBF6}Locked: {BBFF00}Yes\n`;
     info += "\n";
     info += "{00BBF6}Use {BBFF00}/MyH {00BBF6}to go back at your home.";
-    player.ShowPlayerDialog(Dialog.HOUSE, samp.DIALOG_STYLE.MSGBOX, `{BBFF00}${ownerName}{00BBF6}'s house stats!`, info, "Close", "Options");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, `{BBFF00}${ownerName}{00BBF6}'s house stats!`, info, "Close", "Options", (response) => {
+        if(response.button) return;
+        let info = "";
+        info += "{BBFF00}Buy {00BBF6}House\n";
+        info += "{BBFF00}Sell {FF0000}House\n";
+        info += "{BBFF00}Re-new {00BBF6}House\n";
+        info += "{BBFF00}Lock/UnLock {FF0000}House\n";
+        info += "{BBFF00}Enter {00BBF6}House\n";
+        info += "{BBFF00}Change {FF0000}Interior\n";
+        info += "{BBFF00}Spawn me at {00BBF6}House";
+        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "House {FF0000}Options", info, "Select", "Back", (response) => {
+            if(!response.button) return CMD.emit("house", player);
+            switch(response.listItem) {
+                case 0: CMD.emit("buy", player); break;
+                case 1: CMD.emit("sell", player); break;
+                case 2: CMD.emit("renew", player); break;
+                case 3: CMD.emit("lock", player); break;
+                case 4: CMD.emit("enter", player); break;
+                case 5: CMD.emit("chint", player); break;
+                case 6: CMD.emit("myhouse", player); break;
+            }
+        });
+    });
 });
 
 CMD.on("business", async (player) => {
@@ -513,7 +695,29 @@ CMD.on("business", async (player) => {
     info += "\n";
     info += "{00BBF6}Payday comes every 2 hours when you are online.\n";
     info += "{00BBF6}Use {BBFF00}/MyBusiness {00BBF6}to go back at your Business.";
-    player.ShowPlayerDialog(Dialog.BUSINESS, samp.DIALOG_STYLE.MSGBOX, `{BBFF00}${ownerName}{00BBF6}'s business stats!`, info, "Close", "Options");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, `{BBFF00}${ownerName}{00BBF6}'s business stats!`, info, "Close", "Options", (response) => {
+        if(response.button) return;
+        let info = "";
+        info += "{BBFF00}Buy {00BBF6}Business\n";
+        info += "{BBFF00}Sell {FF0000}Business\n";
+        info += "{BBFF00}Re-new {00BBF6}Business\n";
+        info += "{BBFF00}Enter {FF0000}Business\n";
+        info += "{BBFF00}Upgrade {00BBF6}Business\n";
+        info += "{BBFF00}Change {FF0000}Name\n";
+        info += "{BBFF00}Spawn me at {00BBF6}Business";
+        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Business {FF0000}Options", info, "Select", "Back", (response) => {
+            if(!response.button) return CMD.emit("business", player);
+            switch(response.listItem) {
+                case 0: CMD.emit("buy", player); break;
+                case 1: CMD.emit("sell", player); break;
+                case 2: CMD.emit("renew", player); break;
+                case 3: CMD.emit("enter", player); break;
+                case 4: CMD.emit("upgrade", player); break;
+                case 5: CMD.emit("bname", player, []); break;
+                case 6: CMD.emit("mybusiness", player); break;
+            }
+        });
+    });
 });
 
 CMD.on("leave", (player) => {
@@ -647,7 +851,9 @@ CMD.on("speed", (player) => {
     info += "Info\tCooldown\n";
     info += "{00BBF6}Enable Speed Boost\t{FFFFFF}15 seconds\n";
     info += "{FF0000}Disable Speed Boost";
-    player.ShowPlayerDialog(Dialog.SPEED, samp.DIALOG_STYLE.TABLIST_HEADERS, "{00BBF6}Vehicle Speed Boost{FFFFFF} - Activate with Key {FF0000}", info, "Ok", "Close");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "{00BBF6}Vehicle Speed Boost{FFFFFF} - Activate with Key {FF0000}", info, "Ok", "Close", (response) => {
+
+    });
 });
 
 CMD.on("fix", (player) => {
@@ -686,7 +892,9 @@ CMD.on("vup", (player) => {
     info += "{00BBF6}VUP Level 3\t{FFFFFF}3 seconds\n"
     info += "{00BBF6}VUP Level 4 {FF0000}- Only VIP Blue\t{FFFFFF}3 seconds\n"
     info += "{FF0000}Disable Vehicle Jump";
-    player.ShowPlayerDialog(Dialog.VUP, samp.DIALOG_STYLE.TABLIST_HEADERS, "{00BBF6}Vehicle Jump", info, "Select", "Close");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "{00BBF6}Vehicle Jump", info, "Select", "Close", (response) => {
+
+    });
 });
 
 CMD.on("pm", (player, params) => {
@@ -705,25 +913,154 @@ CMD.on("hold", (player) => {
     info += "{FFFF00}Settings / Preferences\n";
     info += "{FF0000}Load holds ({FFFFFF}/holdon{FF0000})\n";
     info += "{FF0000}Remove holds ({FFFFFF}/holdoff{FF0000})";
-    player.ShowPlayerDialog(Dialog.HOLD, samp.DIALOG_STYLE.LIST, "{BBFF00}Create, edit, use holds {00BBF6}Have fun!", info, "Select", "Close");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{BBFF00}Create, edit, use holds {00BBF6}Have fun!", info, "Select", "Close", (response) => {
+        if(!response.button) return ResetPlayerHoldCreateVariables(player);
+        switch(response.listItem) {
+            case 0: {
+                let info = "";
+                for(let i = 0; i < Player.Info[player.playerid].Holds.length; i++) {
+                    info += `{0072FF}Slot ${i} - {BBFF00}${Player.Info[player.playerid].Holds[i].used ? "Used" : "Free"}\n`;
+                }
+                player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{BBFF00}You can hold 10 objects! Choose slot for hold!", info, "Select", "Back", (response) => {
+                    if(!response.button) return CMD.emit("hold", player);
+                    for(let i = 0; i < Player.Info[player.playerid].Holds.length; i++) {
+                        if(i == response.listItem) {
+                            Player.Info[player.playerid].HoldsData.Editing = Player.Info[player.playerid].Holds[i].index;
+                            switch(Player.Info[player.playerid].Holds[i].used) {
+                                case true: {
+                                    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, "{BBFF00}Oops...! Error!", "{0072FF}Sorry but this slot is curently used!\n{0072FF}Do you wish to edit the hold in that slot or remove it ?", "Edit", "Remove", (response) => {
+                                        if(response.button) {
+                                            player.EditAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
+                                        } else {
+                                            player.RemovePlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
+                                            let index = Player.Info[player.playerid].Holds.find(f => f.index == Player.Info[player.playerid].HoldsData.Editing);
+                                            if(index != -1) {
+                                                RemovePlayerHoldIndex(player, Player.Info[player.playerid].HoldsData.Editing, true);
+                                                ResetPlayerHoldCreateVariables(player);
+                                                player.GameTextForPlayer("~w~~h~Hold ~r~~h~removed", 3000, 4);
+                                            }
+                                        }
+                                    });
+                                    break;
+                                }
+                                case false: {
+                                    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.INPUT, "{BBFF00}Object ID", "{0072FF}Please insert below the ID of the Object that you want to attach on you!", "Select", "Back", (response) => {
+                                        if(!response.button) return CMD.emit("hold", player);  
+                                        Player.Info[player.playerid].HoldsData.CreatingId = parseInt(response.inputText);
+                                        let info = "";
+                                        info += "{BBFF00}Spine\n";
+                                        info += "{BBFF00}Head\n";
+                                        info += "{BBFF00}Left Upper Arm\n";
+                                        info += "{BBFF00}Right Upper Arm\n";
+                                        info += "{BBFF00}Left Hand\n";
+                                        info += "{BBFF00}Right Hand\n";
+                                        info += "{BBFF00}Left Thigh\n";
+                                        info += "{BBFF00}Right Thigh\n";
+                                        info += "{BBFF00}Left Foot\n";
+                                        info += "{BBFF00}Right Foot\n";
+                                        info += "{BBFF00}Left Calf\n";
+                                        info += "{BBFF00}Right Calf\n";
+                                        info += "{BBFF00}Left Forearm\n";
+                                        info += "{BBFF00}Right Forearm\n";
+                                        info += "{BBFF00}Left Clavicle\n";
+                                        info += "{BBFF00}Right Clavicle\n";
+                                        info += "{BBFF00}Neck\n";
+                                        info += "{BBFF00}Jaw";
+                                        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{BBFF00}Choose on which side of the body the object will apparen", info, "Select", "Back", (response) => {
+                                            if(!response.button) return CMD.emit("hold", player);  
+                                            player.SetPlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing, Player.Info[player.playerid].HoldsData.CreatingId, listitem+1, 0, 0, 0, 0, 0, 0, 1, 1, 1);
+                                            player.EditAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
+                                        });
+                                    });
+                                    break;
+                                }
+                            }
+                            break;
+                        } 
+                    }
+                });
+                break;
+            }
+            case 1: {
+                let info = "";
+                data.holds.forEach((i) => { info += `{BBFF00}${i.name}\n`; });
+                info += "{FF0000}Remove Holds ({FFFFFF}/holdoff{FF0000})";
+                player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{00BBF6}Hold List", info, "Select", "Close", (response) => {
+                    if(!response.button) return;
+                    for(let i = 0; i < data.holds.length; i++) {
+                        if(i == response.listItem) {
+                            Player.Info[player.playerid].Holds.filter(f => f.used).forEach((i) => {
+                                player.RemovePlayerAttachedObject(i.index);
+                                RemovePlayerHoldIndex(player, i.index);
+                            });
+                            for(let d = 0; d < data.holds[i].objects.length; d++) {
+                                Player.Info[player.playerid].Holds[d].index = d;
+                                Player.Info[player.playerid].Holds[d].used = true;
+                                Player.Info[player.playerid].Holds[d].model = data.holds[i].objects[d][0];
+                                Player.Info[player.playerid].Holds[d].bone = data.holds[i].objects[d][1];
+                                Player.Info[player.playerid].Holds[d].offsetposition = [data.holds[i].objects[d][2], data.holds[i].objects[d][3], data.holds[i].objects[d][4]];
+                                Player.Info[player.playerid].Holds[d].offsetrotation = [data.holds[i].objects[d][5], data.holds[i].objects[d][6], data.holds[i].objects[d][7]];
+                                Player.Info[player.playerid].Holds[d].offsetscale = [data.holds[i].objects[d][8], data.holds[i].objects[d][9], data.holds[i].objects[d][10]];
+                                player.SetPlayerAttachedObject(d, data.holds[i].objects[d][0], data.holds[i].objects[d][1], data.holds[i].objects[d][2], data.holds[i].objects[d][3], data.holds[i].objects[d][4], data.holds[i].objects[d][5], data.holds[i].objects[d][6], data.holds[i].objects[d][7], data.holds[i].objects[d][8], data.holds[i].objects[d][9], data.holds[i].objects[d][10]);
+                            }
+                            break;
+                        }
+                    }
+                    if(response.listItem == data.holds.length) CMD.emit("holdoff", player);
+                });
+                break;
+            }
+            case 2: {
+                let result = Player.Info[player.playerid].Holds.filter(f => f.used);
+                if(result.length == 0) return SendError(player, "You don't have holds!");
+                result.forEach((i) => {
+                    con.query("SELECT * FROM holds WHERE owner = ? AND index_number = ?", [Player.Info[player.playerid].AccID, i.index], function(err, result) {
+                        if(result == 0) con.query("INSERT INTO holds (owner, index_number, model, bone, offsetposition, offsetrotation, offsetscale) VALUES(?, ?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].AccID, i.index, i.model, i.bone, JSON.stringify(i.offsetposition), JSON.stringify(i.offsetrotation), JSON.stringify(i.offsetscale)]);
+                        else con.query("UPDATE holds SET model = ?, bone = ?, offsetposition = ?, offsetrotation = ?, offsetscale = ? WHERE index_number = ? AND owner = ?", [i.model, i.bone, JSON.stringify(i.offsetposition), JSON.stringify(i.offsetrotation), JSON.stringify(i.offsetscale), i.index, Player.Info[player.playerid].AccID]);
+                    });
+                });
+                player.GameTextForPlayer("~w~~h~All ~r~~h~holds ~w~~h~saved", 3000, 3);
+                break;
+            }
+            case 3: {
+                let info = "";
+                info += "{00BBF6}Show holds everytime you spawn\n";
+                info += "{00BBF6}Show holds inside every vehicle\n";
+                info += "{00BBF6}Hide holds";
+                player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{BBFF00}Settings / Preferences Hold", info, "Select", "Back", (response) => {
+                    if(!response.button) return;
+                    switch(response.listItem) {
+                        case 0: Player.Info[player.playerid].HoldsData.Settings = 1; break;
+                        case 1: Player.Info[player.playerid].HoldsData.Settings = 2; break;
+                        case 2: Player.Info[player.playerid].HoldsData.Settings = 0; break;
+                    }
+                    if(Player.Info[player.playerid].HoldsData.Settings == 0) for(let i = 0; i < 10; i++) player.RemovePlayerAttachedObject(i);
+                    player.GameTextForPlayer("~w~~h~Hold Settings ~r~~h~saved", 3000, 3);
+                });
+                break;
+            }
+            case 4: CMD.emit("holdon", player); break;
+            case 5: CMD.emit("holdoff", player); break;
+        }
+    });
 });
 
-CMD.on("holdon", async (player) => {
+CMD.on("holdon", async (player, params, showGameText = true) => {
     LoadPlayerHolds(player).then(() => {
         Player.Info[player.playerid].Holds.filter(f => f.used).forEach((i) => {
             player.SetPlayerAttachedObject(i.index, i.model, i.bone, i.offsetposition[0], i.offsetposition[1], i.offsetposition[2], i.offsetrotation[0], i.offsetrotation[1], i.offsetrotation[2], i.offsetscale[0], i.offsetscale[1], i.offsetscale[2]);
         });
-        player.GameTextForPlayer("~w~~h~Holds ~r~~h~on", 3000, 4);
+        if(showGameText) player.GameTextForPlayer("~w~~h~Holds ~r~~h~on", 3000, 4);
     });
 });
 
-CMD.on("holdoff", (player) => {
+CMD.on("holdoff", (player, params, showGameText = true) => {
     for(let i = 0; i < 10; i++) {
         let result = Player.Info[player.playerid].Holds.find(f => f.index == i && f.used);
         if(result) RemovePlayerHoldIndex(player, result.index);
         player.RemovePlayerAttachedObject(i);
     }
-    player.GameTextForPlayer("~w~~h~Holds ~r~~h~removed", 3000, 4);
+    if(showGameText) player.GameTextForPlayer("~w~~h~Holds ~r~~h~removed", 3000, 4);
 });
 
 CMD.on("report", (player, params) => {
@@ -795,7 +1132,144 @@ CMD.on("top", (player) => {
     info += "{BBFF00}Top Admins\n";
     info += "{BBFF00}Top 10 players in this month\n";
     info += `{FFEB7B}Top 100 and many more, only on{FF0000} ${data.settings.SERVER_WEB}`;
-    player.ShowPlayerDialog(Dialog.TOP, samp.DIALOG_STYLE.LIST, "Top 10", info, "Select", "Close");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Top 10", info, "Select", "Close", (response) => {
+        if(!response.button) return;
+        switch(response.listItem) {
+            case 0: CMD.emit("gtop", player); break;
+            case 1: {
+                con.query("SELECT name, kills FROM clans ORDER BY kills DESC LIMIT 10", function(err, result) {
+                    let info = "{FFFFFF}Our best Clans are here!\n";
+                    if(!err && result) {
+                        info += "\n";
+                        for(let i = 0; i < result.length; i++) {
+                            info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].kills} {BBFF00}Kills\n`;
+                        }
+                    }
+                    info += "\n";
+                    info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Top 10 Clans", info, "Ok", "");
+                });
+                break;
+            }
+            case 2: {
+                con.query("SELECT name, adminpoints FROM users WHERE admin >= 1 ORDER BY adminpoints DESC LIMIT 10", function(err, result) {
+                    let info = "{FFFFFF}Our best Admins are here!\n";
+                    if(!err && result) {
+                        info += "\n";
+                        for(let i = 0; i < result.length; i++) {
+                            info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].adminpoints} {BBFF00}Activity Points\n`;
+                        }
+                    }
+                    info += "\n";
+                    info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Top 10 Admins", info, "Ok", "");
+                });
+                break;
+            }
+            case 3: {
+                let info = "";
+                info += "{BBFF00}Top Online\n";
+                info += "{BBFF00}Top Killers\n";
+                info += "{BBFF00}Top Stunters\n";
+                info += "{BBFF00}Top Drifters\n";
+                info += "{BBFF00}Top Racers\n";
+                info += "{BBFF00}Top Gang Members\n";
+                info += "{FFEB7B}Your stats will be updated after each {FF0000}disconnect";
+                player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Top 10 players in this month", info, "Select", "Close", (response) => {
+                    if(!response.button) return;
+                    switch(response.listItem) {
+                        case 0: {
+                            con.query("SELECT name, month_hours FROM users ORDER BY month_hours DESC LIMIT 10", function(err, result) {
+                                let info = "{FFFFFF}Our best Most active players are here!\n";
+                                if(!err && result) {
+                                    info += "\n";
+                                    for(let i = 0; i < result.length; i++) {
+                                        info += `{FF0000}${i+1}. {BBFF00}${result[i].name}.: {00BBF6}${result[i].month_hours} {BBFF00}Hours\n`;
+                                    }
+                                }
+                                info += "\n";
+                                info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                                player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Top 10 Most active players", info, "Ok", "");
+                            });
+                            break;
+                        }
+                        case 1: {
+                            con.query("SELECT name, month_kills FROM users ORDER BY month_kills DESC LIMIT 10", function(err, result) {
+                                let info = "{FFFFFF}Our best Killers are here!\n";
+                                if(!err && result) {
+                                    info += "\n";
+                                    for(let i = 0; i < result.length; i++) {
+                                        info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[0].month_kills} {BBFF00}Kills\n`;
+                                    }
+                                }
+                                info += "\n";
+                                info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                                player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Top 10 Killers", info, "Ok", "");
+                            });
+                            break;
+                        }
+                        case 2: {
+                            con.query("SELECT name, month_stuntpoints FROM users ORDER BY month_stuntpoints DESC LIMIT 10", function(err, result) {
+                                let info = "{FFFFFF}Our best Stunters are here!\n";
+                                if(!err && result) {
+                                    info += "\n";
+                                    for(let i = 0; i < result.length; i++) {
+                                        info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].month_stuntpoints} {BBFF00}Stunt Points\n`;
+                                    }
+                                }
+                                info += "\n";
+                                info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                                player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Top 10 Stunters", info, "Ok", "");
+                            });
+                            break;
+                        }
+                        case 3: {
+                            con.query("SELECT name, month_driftpoints FROM users ORDER BY month_driftpoints DESC LIMIT 10", function(err, result) {
+                                let info = "{FFFFFF}Our best Drifters are here!\n";
+                                if(!err && result) {
+                                    info += "\n";
+                                    for(let i = 0; i < result.length; i++) {
+                                        info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].month_driftpoints} {BBFF00}Drift Points\n`;
+                                    }
+                                }
+                                info += "\n";
+                                info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                                player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Top 10 Drifters", info, "Ok", "");
+                            });
+                            break;
+                        }
+                        case 4: {
+                            con.query("SELECT name, month_racepoints FROM users ORDER BY month_racepoints DESC LIMIT 10", function(err, result) {
+                                let info = "{FFFFFF}Our best Racers are here!\n";
+                                if(!err && result) {
+                                    info += "\n";
+                                    for(let i = 0; i < result.length; i++) {
+                                        info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].month_racepoints} {BBFF00}Race Points\n`;
+                                    }
+                                }
+                                info += "\n";
+                                info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
+                                player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Top 10 Racers", info, "Ok", "");
+                            });
+                            break;
+                        }
+                        case 5: {
+                            break;
+                        }
+                        case 6: {
+                            player.GameTextForPlayer("~w~~h~you need to ~g~~h~/quit~n~~w~~h~the~r~~h~ server~w~~h~ in order to~n~~y~~h~update tops with your stats!", 4000, 3);
+                            break;
+                        }
+                    }
+                });
+                break;
+            }
+            case 4: {
+                player.GameTextForPlayer("~w~~h~visit ~g~~h~now~n~~w~~h~www.~r~~h~RHS-Server.~w~~h~com/top~n~~y~~h~to more tops and others!", 4000, 3);
+                break;
+            }
+        }
+    });
 });
 
 CMD.on("session", (player, params) => {
@@ -833,7 +1307,7 @@ CMD.on("statsserver", async (player) => {
     info += `{BBFF00}New players registered on server{00BBF6} ${Server.Info.NewRegistredPlayers}\n`;
     info += `{BBFF00}Total players registered on server{00BBF6} ${await getRegistredPlayersCount()}\n`;
     info += `{BBFF00}Messages has been sent{00BBF6} ${Server.Info.Messages}`;
-    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, "Server Stats", info, "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Server Stats", info, "Close", "");
 });
 
 CMD.on("howto", (player) => {
@@ -854,7 +1328,7 @@ CMD.on("ranks", (player) => {
     info += "{FFFF00}Specialist\t{FFFFFF}3000+\t\t{FFFFFF}10000+\t{FFFFFF}1000+\t{FFFFFF}1000+\n";
     info += "{00FF00}Master\t{FFFFFF}10000+\t\t{FFFFFF}100000+\t{FFFFFF}4000+\t{FFFFFF}2000+\n";
     info += "{0072FF}King\t{FFFFFF}20000+\t\t{FFFFFF}300000+\t{FFFFFF}8000+\t{FFFFFF}5000+";
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Stats Ranks", info, "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Stats Ranks", info, "Close", "");
 });
 
 CMD.on("wtime", (player, params) => {
@@ -931,7 +1405,7 @@ CMD.on("help", (player) => {
     info += `{00BBF6}/Teles {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "O lista cu toate teleportarile de pe server." : "A list with all server's teleports."}\n`;
     info += `{00BBF6}/Admins {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "O lista cu toti Adminii Online de pe server." : "A list with all online Admins from the server."}\n`;
     info += `{00BBF6}/Report [ID][Motiv] {00FF00}- ${Player.Info[player.playerid].Language == 1 ? "O comanda ce iti permite sa raportezi un jucator care nu respecta regulamentul!" : "A command wich help you report a player that is not respecting the /Rules!"}\n`;
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `${Player.Info[player.playerid].Language == 1 ? "Ajutor" : "Help"}`, info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, `${Player.Info[player.playerid].Language == 1 ? "Ajutor" : "Help"}`, info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", "");
 });
 CMD.on("ajutor", (player) => { CMD.emit("help", player); });
 
@@ -997,7 +1471,7 @@ CMD.on("tutorial", (player) => {
             break;
         }
     }
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Tutorial - Cum poti face 10/10 stats!", "Tutorial - How to make 10/10 stats!"), info, "Ok", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "Tutorial - Cum poti face 10/10 stats!", "Tutorial - How to make 10/10 stats!"), info, "Ok", "");
 });
 
 CMD.on("credits", async (player) => {
@@ -1028,7 +1502,7 @@ CMD.on("credits", async (player) => {
     info += `{15FF00}${player.GetPlayerName(24)}\n`;
     info += "\n";
     info += `{00BBF6}${Player.Info[player.playerid].Language == 1 ? `Multumim, {FF0000}${player.GetPlayerName(24)}{00BBF6}, pentru ca joci pe server-ul nostru!` : `Thank you, {FF0000}${player.GetPlayerName(24)}{00BBF6}, for playing on our server!`}`;
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `${Player.Info[player.playerid].Language == 1 ? "Creatori" : "Credits"}`, info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, `${Player.Info[player.playerid].Language == 1 ? "Creatori" : "Credits"}`, info, Player.Info[player.playerid].Language == 1 ? "Inchide" : "Close", "");
 });
 
 CMD.on("teles", (player) => {
@@ -1268,7 +1742,7 @@ CMD.on("gifts", (player) => {
     info += "{FA4205}» {04FB21}Remember that there's only one lucky present at each level of this minigame!\n";
     info += "\n";
     info += "{FA4205}» {ffff00}Have Fun!";
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Gifts Minigame", info, "Ok", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Gifts Minigame", info, "Ok", "");
 });
 
 CMD.on("lastman", (player) => {
@@ -1621,7 +2095,76 @@ CMD.on("buycar", (player) => {
     info += "Expensive Vehicles\n";
     info += "Bike/Moto\n";
     info += "Premium Vehicles";
-    player.ShowPlayerDialog(Dialog.BUYCAR, samp.DIALOG_STYLE.LIST, "{FF0000}#DealerShip {FFFF00}#Select", info, "Select", "Close");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{FF0000}#DealerShip {FFFF00}#Select", info, "Select", "Close", (response) => {
+        if(!response.button) return;
+        switch(response.listItem) {
+            case 0: {
+                con.query("SELECT * FROM dealership WHERE type = ?", ["cheap"], function(err, result) {
+                    if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+                    let info = "Vehicle\tCoins\n";
+                    for(let i = 0; i < result.length; i++) {
+                        info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
+                    }
+                    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Cheap Vehicles", info, "Buy", "Close", (response) => {
+                        if(response.button) BuySpecificCar(player, "cheap", response.listItem);
+                    });
+                });
+                break;
+            }
+            case 1: {
+                con.query("SELECT * FROM dealership WHERE type = ?", ["regular"], function(err, result) {
+                    if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+                    let info = "Vehicle\tCoins\n";
+                    for(let i = 0; i < result.length; i++) {
+                        info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
+                    }
+                    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Regular Vehicles", info, "Buy", "Close", (response) => {
+                        if(response.button) BuySpecificCar(player, "regular", response.listItem);
+                    });
+                });
+                break;
+            }
+            case 2: {
+                con.query("SELECT * FROM dealership WHERE type = ?", ["expensive"], function(err, result) {
+                    if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+                    let info = "Vehicle\tCoins\n";
+                    for(let i = 0; i < result.length; i++) {
+                        info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
+                    }
+                    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Expensive Vehicles", info, "Buy", "Close", (response) => {
+                        if(response.button) BuySpecificCar(player, "expensive", response.listItem);
+                    });
+                });
+                break;
+            }
+            case 3: {
+                con.query("SELECT * FROM dealership WHERE type = ?", ["bikes"], function(err, result) {
+                    if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+                    let info = "Vehicle\tCoins\n";
+                    for(let i = 0; i < result.length; i++) {
+                        info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
+                    }
+                    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Bikes/Moto", info, "Buy", "Close", (response) => {
+                        if(response.button) BuySpecificCar(player, "bikes", response.listItem);
+                    });
+                });
+                break;
+            }
+            case 4: {
+                con.query("SELECT * FROM dealership WHERE type = ?", ["premium"], function(err, result) {
+                    if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
+                    let info = "Vehicle\tCoins\n";
+                    for(let i = 0; i < result.length; i++) {
+                        info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
+                    }
+                    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Premium Vehicles", info, "Buy", "Close", (player) => {
+                        if(response.button) BuySpecificCar(player, "premium", response.listItem);
+                    });
+                });
+                break;
+            }
+        }
+    });
 });
 
 /**
@@ -1716,7 +2259,7 @@ CMD.on("vcmds", (player, params) => {
         }
     }
 
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "{FFCC00}Comenzi VIP - {FF0000}/BuyVIP, /Vips.", "{FFCC00}VIP Commands - {FF0000}/BuyVIP, /Vips."), info, Function.Lang(player, "Inchide", "Close"), "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, Function.Lang(player, "{FFCC00}Comenzi VIP - {FF0000}/BuyVIP, /Vips.", "{FFCC00}VIP Commands - {FF0000}/BuyVIP, /Vips."), info, Function.Lang(player, "Inchide", "Close"), "");
 });
 
 /**
@@ -1742,7 +2285,7 @@ CMD.on("astats", (player, params) => {
     info += `{BBFF00}Other Activity Points: {49FFFF}0\n`;
     info += "\n";
     info += `{FFFF99}Admin since, {49FFFF}${Player.Info[target.playerid].AdminActivity.Since}{FFFF99}!`;
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s Admin Stats!`, info, "Ok", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s Admin Stats!`, info, "Ok", "");
 });
 
 CMD.on("time", (player, params) => {
@@ -1834,7 +2377,7 @@ CMD.on("getid", (player, params) => {
     result.forEach((i) => {
         info += `1. ${i.GetPlayerName(24)} {00BBF6}(ID: ${i.playerid})\n`;
     });
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.LIST, `Searched for: "${params[0]}"`, info, "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.LIST, `Searched for: "${params[0]}"`, info, "Close", "");
 });
 
 CMD.on("lockcar", (player) => {
@@ -1857,41 +2400,25 @@ CMD.on("dos", (player) => {
 CMD.on("mycolor", (player) => {
     if(Player.Info[player.playerid].VIP < 1) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
     let info = "";
-    switch(Player.Info[player.playerid].Language) {
-        case 0: {
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({FF0000}in Rosu{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({0000FF}in Albastru{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({AFAFAF}in Gri{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({33AA33}in Verde{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({FFFF00}in Galben{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({FFFFFF}in Alb{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({800080}in Mov{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({FF9900}in Portocaliu{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({FF66FF}in Roz{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({10F441}in Verde Lamai{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({000000}in Negru{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({00BBF6}in Albastru Deschis{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Schimba culoarea ({FFEB7B}in Crem{00FF00})";
-            break;
-        }
-        case 1: {
-            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({FF0000}to Red{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({0000FF}to Blue{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({AFAFAF}to Grey{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({33AA33}to Green{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({FFFF00}to Yellow{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({FFFFFF}to White{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({800080}to Purple{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({FF9900}to Orange{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({FF66FF}to Pink{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({10F441}to Lime{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({000000}to Black{00FF00})\n";
-            info += "{00FF00}>{00BBF6}> {00FF00}Change Color ({00BBF6}to Light Blue{00FF00})\n";
-            info += "{00FF00}>{00bbF6}> {00FF00}Change Color ({00BBF6}to Crem {00FF00})";
-            break;
-        }
-    }
-    player.ShowPlayerDialog(Dialog.MY_COLOR, samp.DIALOG_STYLE.LIST, "Color {FF0000}Menu", info, Function.Lang(player, "Schimba", "Change"), Function.Lang(player, "Inchide", "Close"));
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({FF0000}${Function.Lang(player, "in Rosu", "to Red")}{00FF00})\n`;
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({0000FF}${Function.Lang(player, "in Albastru", "to Blue")}{00FF00})\n`;
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({AFAFAF}${Function.Lang(player, "in Gri", "to Grey")}{00FF00})\n`;
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({33AA33}${Function.Lang(player, "in Verde", "to Green")}{00FF00})\n`;
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({FFFF00}${Function.Lang(player, "in Galben", "to Yellow")}{00FF00})\n`;
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({FFFFFF}${Function.Lang(player, "in Alb", "to White")}{00FF00})\n`;
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({800080}${Function.Lang(player, "in Mov", "to Purple")}{00FF00})\n`;
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({FF9900}${Function.Lang(player, "in Portocaliu", "to Orange")}{00FF00})\n`;
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({FF66FF}${Function.Lang(player, "in Roz", "to Pink")}{00FF00})\n`;
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({10F441}${Function.Lang(player, "in Verde Lamai", "to Lime")}{00FF00})\n`;
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({000000}${Function.Lang(player, "in Negru", "to Black")}{00FF00})\n`;
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({00BBF6}${Function.Lang(player, "in Albastru Deschis", "to Light Blue")}{00FF00})\n`;
+    info += `{00FF00}>{00BBF6}> {00FF00}${Function.Lang(player, "Schimba culoarea", "Change Color")} ({FFEB7B}${Function.Lang(player, "in Crem", "to Crem")}{00FF00})`;
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Color {FF0000}Menu", info, Function.Lang(player, "Schimba", "Change"), Function.Lang(player, "Inchide", "Close"), (response) => {
+        if(!response.button) return;
+        let colors = [0xFF0000AA, 0x0000FFAA, 0xAFAFAFAA, 0x33AA33AA, 0xFFFF00AA, 0xFFFFFFAA, 0x800080AA, 0xFF9900AA, 0xFF66FFAA, 0x10F441AA, 0x000000AA, 0x00BBF6AA, 0xFFEB7BAA];
+        player.SetPlayerColor(colors[response.listItem]);
+        player.GameTextForPlayer("~w~~h~Color ~g~~h~changed", 4000, 4);
+    });
 });
 
 CMD.on("vbike", (player) => {
@@ -1913,7 +2440,7 @@ CMD.on("admins", (player) => {
     result.forEach((i) => {
         info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t${getAdminRank(Player.Info[i.playerid].Admin)}\n`;
     });
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${result.length} {00FF00}Online Admin(s)!`, info, "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.TABLIST_HEADERS, `{00FF00}There are {00BBF6}${result.length} {00FF00}Online Admin(s)!`, info, "Close", "");
 });
 
 CMD.on("s2", (player) => {
@@ -2087,11 +2614,79 @@ CMD.on("cartext", (player) => {
     if(player.IsPlayerInAnyVehicle()) return SendError(player, "You can't be in a vehicle!");
     let position = samp.GetVehiclePos(car.vehicle);
     if(!player.IsPlayerInRangeOfPoint(5, position.x, position.y, position.z)) return SendError(player, "You are not in range of point with your vehicle!");
-    let info = "";
-    for(let i = 0; i < car.cartext.length; i++) {
-        info += `{BBFF00}Slot {00BBF6}${i+1}{BBFF00} - ${car.cartext[i].text != "null" ? `Used | Text: {00BBF6}${car.cartext[i].text}{BBFF00} | Style {00BBF6}- ${getCarTextSize(car.cartext[i].fontsize)}` : "Free"}\n`;
+    let info = ""; 
+    for(let i = 0; i < car.cartext.length; i++) { 
+        info += `{BBFF00}Slot {00BBF6}${i+1}{BBFF00} - ${car.cartext[i].text != "null" ? `Used | Text: {00BBF6}${car.cartext[i].text}{BBFF00} | Style {00BBF6}- ${getCarTextSize(car.cartext[i].fontsize)}` : "Free"}\n`; 
     }
-    player.ShowPlayerDialog(Dialog.CARTEXT, samp.DIALOG_STYLE.LIST, "Personal Vehicle Holds - Slot", info, "Select", "Close");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Personal Vehicle Holds - Slot", info, "Select", "Close", (response) => {
+        if(!response.button) return;
+        let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
+        if(!car) return;
+        for(let i = 0; i < car.cartext.length; i++) {
+            if(i == response.listItem) {
+                Player.Info[player.playerid].EditingCarText.Index = i;
+                if(car.cartext[i].text != "null") {
+                    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.MSGBOX, "Personal Vehicle Holds - Slot in use", "{BBFF00}This slot is already in use!\n{BBFF00}If you want to edit this slot click on 'Edit' or to remove click on 'Remove'.", "Edit", "Remove", (response) => {
+                        let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
+                        if(!car) return;
+                        car.cartext[Player.Info[player.playerid].EditingCarText.Index].text = "null";
+                        car.cartext[Player.Info[player.playerid].EditingCarText.Index].fontsize = 15;
+                        car.cartext[Player.Info[player.playerid].EditingCarText.Index].offsetposition = [0, 0, 0];
+                        car.cartext[Player.Info[player.playerid].EditingCarText.Index].offsetrotation = [0, 0, 0];
+                        samp.DestroyObject(car.cartext[Player.Info[player.playerid].EditingCarText.Index].object);
+                        delete car.cartext[Player.Info[player.playerid].EditingCarText.Index].object;
+                        con.query("UPDATE personalcars SET cartext = ? WHERE ID = ?", [JSON.stringify(car.cartext), car.id]);
+
+                        if(response.button) {
+                            player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.INPUT, "Personal Vehicle Holds - Text", "{BBFF00}Insert your text!\n{BBFF00}If you want to color the text insert hex color!", "Select", "Close", (response) => {
+                                if(!response.button) return;
+                                let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
+                                if(!car) return;
+                                let data = car.cartext.at(Player.Info[player.playerid].EditingCarText.Index);
+                                let position = samp.GetVehiclePos(car.vehicle);
+                                data.text = response.inputText;
+                                data.fontsize = Player.Info[player.playerid].EditingCarText.Fontsize;
+                                data.object = samp.CreateObject(19477, position.x, position.y, position.z, 0, 0, 0);
+                                samp.SetObjectMaterialText(data.object, data.text, 0, 40, "Quartz MS", data.fontsize, true, 0xFFFFFFAA, 0, 1);
+                                player.EditObject(data.object);
+                            });
+                        }
+                    });
+                }
+                else {
+                    let info = "";
+                    info += "{BBFF00}Text {00BBF6}- Small\n";
+                    info += "{BBFF00}Text {00BBF6}- Medium\n";
+                    info += "{BBFF00}Text {00BBF6}- Big";
+                    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Personal Vehicle Holds - Style Text", info, "Select", "Close", (response) => {
+                        if(!response.button) return;
+                        let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
+                        if(!car) return;
+                        let size = 0;
+                        switch(response.listItem) {
+                            case 0: size = 15; break;
+                            case 1: size = 20; break;
+                            case 2: size = 25; break;
+                        }
+                        Player.Info[player.playerid].EditingCarText.Fontsize = size;
+                        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.INPUT, "Personal Vehicle Holds - Text", "{BBFF00}Insert your text!\n{BBFF00}If you want to color the text insert hex color!", "Select", "Close", (response) => {
+                            if(!response.button) return;
+                            let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
+                            if(!car) return;
+                            let data = car.cartext.at(Player.Info[player.playerid].EditingCarText.Index);
+                            let position = samp.GetVehiclePos(car.vehicle);
+                            data.text = response.inputText;
+                            data.fontsize = Player.Info[player.playerid].EditingCarText.Fontsize;
+                            data.object = samp.CreateObject(19477, position.x, position.y, position.z, 0, 0, 0);
+                            samp.SetObjectMaterialText(data.object, data.text, 0, 40, "Quartz MS", data.fontsize, true, 0xFFFFFFAA, 0, 1);
+                            player.EditObject(data.object);
+                        });
+                    });
+                }
+                break;
+            }
+        }
+    });
 }); 
 
 CMD.on("tags", (player) => {
@@ -2102,14 +2697,20 @@ CMD.on("songforall", (player, params) => {
     if(Player.Info[player.playerid].VIP < 4) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
     if(!params.slice(0).join(" ")) return SendUsage(player, "/SongForAll [YouTube Title]");
     player.SendClientMessage(-1, "Searching for YouTube results...");
-    Player.Info[player.playerid].YouTubeSearchResults = [];
     YouTubeSearch.search(params.slice(0).join(" ")).then((result) => {
         let info = "Title\tTime\n";
-        for(let i = 0; i < result.length; i++) {
-            info += `${result[i].snippet.title}\t${result[i].snippet.duration}\n`;
-            Player.Info[player.playerid].YouTubeSearchResults.push(result[i].id.videoId);
-        }
-        player.ShowPlayerDialog(Dialog.YOUTUBE_SEARCH, samp.DIALOG_STYLE.TABLIST_HEADERS, `{FFFFFF}YouTube Search - found {FF0000}${result.length} {FFFFFF}results`, info, "Play", "Close");
+        result.forEach((videoData) => { info += `${videoData.snippet.title}\t${videoData.snippet.duration}\n`; });
+        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.TABLIST_HEADERS, `{FFFFFF}YouTube Search - found {FF0000}${result.length} {FFFFFF}results`, info, "Play", "Close", (response) => {
+            if(!response.button) return;
+            result.forEach((videoData, index) => {
+                if(index == response.listItem) {
+                    samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((i) => {
+                        i.PlayAudioStreamForPlayer(`http://45.14.236.12:7777/${videoData.id.videoId}`);
+                        i.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has started an audio stream.`);
+                    });
+                }
+            });
+        });
     });
 });
 
@@ -2139,7 +2740,7 @@ CMD.on("gcmds", (player) => {
     info += "\n";
     info += "{FFFF00}Type !text in chat for gang chat!\n";
     info += "{FFFF00}Type &text in chat for ally gang chat!";
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `Gang - ${playerGang.name} ({FFFF00}${getGangRank(Player.Info[player.playerid].Gang_Data.Rank)}{AAAAAA})`, info, "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, `Gang - ${playerGang.name} ({FFFF00}${getGangRank(Player.Info[player.playerid].Gang_Data.Rank)}{AAAAAA})`, info, "Close", "");
 });
 
 /**
@@ -2327,7 +2928,7 @@ CMD.on("gm", (player) => {
     result.forEach((i) => {
         info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t{00BBF6}${getGangRank(Player.Info[i.playerid].Gang_Data.Rank)} ${Player.Info[i.playerid].Gang_Data.Capturing ? "{FF0000}(Capturing)" : ""}\n`;
     });
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Gang Members: {FF0000}${result.length}{AFAFAF} online - {FF0000}${playerGang.name}`, info, "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Gang Members: {FF0000}${result.length}{AFAFAF} online - {FF0000}${playerGang.name}`, info, "Close", "");
 });
 
 CMD.on("gstats", (player, params) => {
@@ -2348,7 +2949,7 @@ CMD.on("gstats", (player, params) => {
     info += `{BBFF00}Time: {49FFFF}${OnlineTimeGang.hours} {BBFF00}hrs, {49FFFF}${OnlineTimeGang.minutes} {BBFF00}mins, {49FFFF}${OnlineTimeGang.seconds} {BBFF00}secs\n`;
     info += "\n";
     info += `{FFFF99}Gang member since, {49FFFF}${Player.Info[target.playerid].Gang_Data.MemberSince}{FFFF99}!`;
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s Gang Stats!`, info, "Ok", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, `{FF0000}${target.GetPlayerName(24)}{BBFF00}'s Gang Stats!`, info, "Ok", "");
 });
 
 CMD.on("lgang", (player) => {
@@ -2442,10 +3043,19 @@ CMD.on("base", (player) => {
     if(!playerGang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
     if(Gang.Info.filter(f => f.territory.owner == playerGang.id).length == 0) return SendError(player, "Your Gang don't own any teritories!");
     let info = "";
-    Gang.Info.filter(f => f.territory.owner == playerGang.id).forEach((i) => {
-        info += `{33CC00}${i.name}\n`;
+    let result = Gang.Info.filter(f => f.territory.owner == playerGang.id);
+    result.forEach((i) => { info += `{33CC00}${i.name}\n`; });
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Base Teleport", info, "Teleport", "Cancel", (response) => {
+        if(!response.button) return;
+        if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
+        result.forEach((gang, index) => {
+            if(response.listItem == index) {
+                player.SetPlayerPos(gang.base_position[0], gang.base_position[1], gang.base_position[2]);
+                player.SetPlayerFacingAngle(gang.base_position[3]);
+                player.GameTextForPlayer("~g~~h~Teleported to~n~~r~~h~gang base", 3000, 3);
+            }   
+        });
     });
-    player.ShowPlayerDialog(Dialog.BASE_TELEPORT, samp.DIALOG_STYLE.LIST, "Base Teleport", info, "Teleport", "Cancel");
 });
 
 CMD.on("og", (player) => {
@@ -2488,7 +3098,16 @@ CMD.on("gang", (player) => {
     info += "{49FFFF}Online Members - {BBFF00}/gm\n";
     info += "{49FFFF}Gang Commands - {BBFF00}/gcmds\n";
     info += "{49FFFF}Top Gang - {BBFF00}/gtop";
-    player.ShowPlayerDialog(Dialog.GANG, samp.DIALOG_STYLE.LIST, "{FF0000}My Gang", info, "Select", "");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{FF0000}My Gang", info, "Select", "", (response) => {
+        if(!response.button) return;
+        switch(response.listItem) {
+            case 0: CMD.emit("ginfo", player, []); break;
+            case 1: CMD.emit("gstats", player, []); break;
+            case 2: CMD.emit("gm", player); break;
+            case 3: CMD.emit("gcmds", player); break;
+            case 4: CMD.emit("gtop", player); break;
+        }
+    });
 });
 
 CMD.on("ginfo", async (player, params) => {
@@ -2509,7 +3128,7 @@ CMD.on("ginfo", async (player, params) => {
     info += `{BBFF00}Gang Founders: {33CCFF}${await Function.getGangFounders(gang)}\n`;
     info += "\n";
     info += "{BBFF00}If you want to view other gang's stats, type {FFFF00}/GInfo [GangID]";
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Gang Info", info, "Ok", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Gang Info", info, "Ok", "");
 });
 
 CMD.on("gtop", (player) => {
@@ -2522,7 +3141,7 @@ CMD.on("gtop", (player) => {
     });
     info += "\n";
     info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Gangs", info, "Ok", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Top 10 Gangs", info, "Ok", "");
 });
 
 /**
@@ -2550,7 +3169,7 @@ CMD.on("chelp", (player) => {
     info += "{BBFF00}/cinfo {FFFF00}- To see a member of a clan!";
     info += "\n";
     info += '{BBFF00}Use {FF0000}"!" {BBFF00}to use Clan Chat!';
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "{FFFFFF}Clan {FF0000}Commands", info, "Ok", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "{FFFFFF}Clan {FF0000}Commands", info, "Ok", "");
 });
 CMD.on("clan", (player) => { CMD.emit("chelp", player); });
 
@@ -2614,7 +3233,7 @@ CMD.on("cm", (player) => {
     result.forEach((i) => {
         info += `{49FFFF}${i.GetPlayerName(24)}(${i.playerid})\t{00BBF6}${getClanRank(Player.Info[i.playerid].Clan_Rank)}\n`;
     });
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Clan Members: {FF0000}${result.length}{AFAFAF} online - {FF0000}${Clan.Info[Player.Info[player.playerid].Clan].name}`, info, "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.TABLIST_HEADERS, `{AFAFAF}Clan Members: {FF0000}${result.length}{AFAFAF} online - {FF0000}${Clan.Info[Player.Info[player.playerid].Clan].name}`, info, "Close", "");
 });
 
 CMD.on("cinfo", async (player, params) => {
@@ -2636,7 +3255,7 @@ CMD.on("cinfo", async (player, params) => {
     info += "{FFFFFF}none, none, none, none, none, none\n";
     info += "\n";
     info += "{FFFF00}Type {FF0000}/cinfo [ID/Name]{FFFF00} to see others Clan Stats!";
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Clan Info", info, "Ok", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Clan Info", info, "Ok", "");
 });
 
 CMD.on("lclan", (player) => {
@@ -2683,7 +3302,7 @@ CMD.on("acmds", (player) => {
     info += "{0072FF}/GiveAll [Money], /SetAll [Money / Weather / Time / World /Wanted]\n";
     info += "\n";
     info += "{00FF00}Use: {FF0000}'@' {00FF00}to talk in {FF0000}Admin Chat{00FF00}!\n";
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Admin {FF0000}Commands", info, "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Admin {FF0000}Commands", info, "Close", "");
 });
 
 /**
@@ -2711,7 +3330,7 @@ CMD.on("reports", (player) => {
         let reporter = samp.IsPlayerConnected(Player.Info[i.playerid].Reported.By) ? samp.GetPlayerName(Player.Info[i.playerid].Reported.By, 24) : "Server";
         info += `{0072FF}#${i.playerid}\t{FF0000}${reporter}\t{FF0000}${i.GetPlayerName(24)}\t{FFFF00}${Player.Info[i.playerid].Reported.Reason}\n`;
     });
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, `{FF0000}Active reports {FFFFFF}- Use {00FF00}/res [id] [Checked]`, info, "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.TABLIST_HEADERS, `{FF0000}Active reports {FFFFFF}- Use {00FF00}/res [id] [Checked]`, info, "Close", "");
 });
 
 CMD.on("res", (player, params) => {
@@ -2785,7 +3404,7 @@ CMD.on("getinfo", (player, params) => {
     info += `Armour\t${target.GetPlayerArmour()}\n`;
     info += `Virtual World\t${target.GetPlayerVirtualWorld()}\n`;
     info += `Interior\t${target.GetPlayerInterior()}`
-    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.TABLIST_HEADERS, "Get Info", info, "Close", "");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.TABLIST_HEADERS, "Get Info", info, "Close", "");
 });
 
 CMD.on("jail", (player, params) => {
@@ -3233,7 +3852,16 @@ CMD.on("event", (player) => {
     info += "{FFFF00}Reaction Test\n";
     info += "{00FF00}Reaction Maths\n";
     info += "{00BBF6}Question";
-    player.ShowPlayerDialog(Dialog.EVENT, samp.DIALOG_STYLE.LIST, "Events", info, "Select", "Cancel");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Events", info, "Select", "Cancel", (response) => {
+        if(!response.button) return;
+        switch(response.listItem) {
+            case 0: CMD.emit("starevent", player); break;
+            case 1: break;
+            case 2: break;
+            case 3: break;
+            case 4: break;
+        }
+    });
 });
 
 CMD.on("starevent", (player) => {
@@ -3494,7 +4122,7 @@ CMD.on("editgang", (player) => {
     let zone = getPlayerGangZone(player);
     if(!zone) return SendError(player, "You are not in a Gang Territory!");
     let info = "Spawn";
-    player.ShowPlayerDialog(Dialog.EDIT_GANG, samp.DIALOG_STYLE.LIST, `{FF0000}Edit Gang - ${zone.name}`, info, "Select", "Cancel");
+    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.LIST, `{FF0000}Edit Gang - ${zone.name}`, info, "Select", "Cancel");
 });
 
 CMD.on("crash", (player, params) => {
@@ -3732,6 +4360,10 @@ function UpdateAdminVariables(player) {
     Player.Info[player.playerid].AdminActivity.Since = Function.getBeatifulDate(); 
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ * @param {Boolean} first_time 
+ */
 function spawnPlayerInDM(player, first_time=false) {
     player.ResetPlayerWeapons();
 
@@ -3825,7 +4457,15 @@ function spawnPlayerInDM(player, first_time=false) {
                 info += "{0072FF}Minigun\n"
                 info += "{FFFF00}Rocket Launcher\n"
                 info += "{FF0000}Flame-Thrower";
-                player.ShowPlayerDialog(Dialog.SELECT_MRF_WEAPON, samp.DIALOG_STYLE.LIST, "Minigun-Rocket-Flame Death Match - Select Weapon", info, "Select", "Leave");
+                player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "Minigun-Rocket-Flame Death Match - Select Weapon", info, "Select", "Leave", (response) => {
+                    if(!response.button) return CMD.emit("leave");
+                    switch(response.listItem) {
+                        case 0: Player.Info[player.playerid].Selected_MRF_Weapon = 38; break;
+                        case 1: Player.Info[player.playerid].Selected_MRF_Weapon = 35; break;
+                        case 2: Player.Info[player.playerid].Selected_MRF_Weapon = 37; break;
+                    }
+                    player.GivePlayerWeapon(Player.Info[player.playerid].Selected_MRF_Weapon, 99999);
+                });
             }
             else player.GivePlayerWeapon(Player.Info[player.playerid].Selected_MRF_Weapon, 99999);
             TelePlayer(player, "mrf", "M.R.F Death Match", position[0], position[1], position[2], position[3], true, first_time);
@@ -4415,7 +5055,7 @@ function checkPlayerBanStatus(player, check_acc_id=true) {
             if(!err && result != 0) {
                 if(Function.getTimestamp() < result[0].to_timestamp) {
                     HideConnectTextDraw(player);
-                    player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "", "", "", "");
+                    player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "", "", "", "");
                     let difference = timeDifference(result[0].to_timestamp);
                     player.SendClientMessage(data.colors.LIGHT_BLUE, "================(Ban Details)================");
                     player.SendClientMessage(data.colors.GRAY, `Sorry, but {FF0000}${await Function.getNameByAccID(result[0].acc_id)} {CEC8C8}is banned on our server!`);
@@ -4805,9 +5445,7 @@ function SetupPlayerForSpawn(player, type=0) {
 
     /* Check if the hold settings is setted for spawn */
     if(Player.Info[player.playerid].HoldsData.Settings == 1) {
-        Player.Info[player.playerid].Holds.filter(f => f.used).forEach((i) => {
-            player.SetPlayerAttachedObject(i.index, i.model, i.bone, i.offsetposition[0], i.offsetposition[1], i.offsetposition[2], i.offsetrotation[0], i.offsetrotation[1], i.offsetrotation[2], i.offsetscale[0], i.offsetscale[1], i.offsetscale[2]);
-        });
+        CMD.emit("holdon", player, [], false);
     }
 
     /* Check if the player is in DeathMatch */
@@ -5314,7 +5952,25 @@ function PreparatePlayerLogin(player) {
                         info += `${Function.Lang(player, "{FFCC00}Autentifica-te cu parola secundara pentru a putea continua!", "{FFCC00}Please login with the secondary password in order to continue!")}\n`;
                         info += "\n";
                         info += `${Function.Lang(player, "{FFFF00}Scrie mai jos {FF0000}Parola Secundara{FFFF00}:", "{FFFF00}Enter below the {FF0000}Secondary Password{FFFF00}:")}`;
-                        player.ShowPlayerDialog(Dialog.LOGIN_SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Autentificare - Parola Secundara", "Login - Secondary Password"), info, Function.Lang(player, "Autentificare", "Login"), Function.Lang(player, "Nume Nou", "New Name"));
+                        player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Autentificare - Parola Secundara", "Login - Secondary Password"), info, Function.Lang(player, "Autentificare", "Login"), Function.Lang(player, "Nume Nou", "New Name"), (response) => {
+                            if(!response.button) return Call_NewName(player);
+                            con.query("SELECT * FROM users WHERE name = ? AND spassword = ?", [player.GetPlayerName(24), md5(response.inputText)], function(err, result) {
+                                if(err) return player.Kick();
+                                if(result == 0) {
+                                    Player.Info[player.playerid].Fail_Logins++;
+                                    if(Player.Info[player.playerid].Fail_Logins == 4) player.Kick();
+                                    else {
+                                        let info = "";
+                                        info += `{FF0000}${Function.Lang(player, `Autentificare esuata (${Player.Info[player.playerid].Fail_Logins}/4)!`, `Login failed (${Player.Info[player.playerid].Fail_Logins}/4)!`)}\n`;
+                                        info += "\n";
+                                        info += `{FFCC00}${Function.Lang(player, "Ai introdus o parola secundara gresita! Te rugam sa incerci din nou!", "You have entered a wrong secondary password! Please try again!")}\n`;
+                                        info += `{FFFF00}${Function.Lang(player, `Daca ti-ai uitat parola secundara, viziteaza {FF0000}${data.settings.SERVER_WEB} {FFFF00}pentru a o reseta!`, `If you forgot your secondary password, visit {FF0000}${data.settings.SERVER_WEB} {FFFF00}to reset it!`)}`;
+                                        response.repeatDialog(info);
+                                    }
+                                }
+                                else LoadPlayerStats(player);
+                            });
+                        });
                     }
                 });
             });
@@ -5440,7 +6096,7 @@ function LoadPlayerStats(player, showDialog = true) {
                 info += "{FFFFFF}Pentru a evita pierderea contului tau,\n";
                 info += "{FFFFFF}Adauga o parola secundara folosind comanda {FF0000}/Spassword{FFFFFF}!";
             }
-            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
+            player.ShowPlayerDialog(0, samp.DIALOG_STYLE.MSGBOX, "Contul meu", info, "Ok", "");
         }
     });
 }
@@ -5688,7 +6344,6 @@ samp.OnPlayerEditAttachedObject((player, response, index, modelid, boneid, fOffs
 });
 
 samp.OnPlayerClickPlayer((player, clickedplayer) => {
-    Player.Info[player.playerid].ClickedPlayer = clickedplayer.playerid;
     let info = "";
     info += `{0072FF}${Function.Lang(player, "Vezi statistici", "Show Stats")} - {00FF00}/stats\n`;
     info += `{0072FF}${Function.Lang(player, "Vezi statistici gang", "Show Gang Stats")} - {00FF00}/gstats\n`;
@@ -5696,7 +6351,17 @@ samp.OnPlayerClickPlayer((player, clickedplayer) => {
     info += `{0072FF}${Function.Lang(player, "Vezi statistici admin", "Show Admin Stats")} - {00FF00}/astats\n`;
     info += `{0072FF}${Function.Lang(player, "Trimite PM", "Send PM")} - {00FF00}/PM\n`;
     info += `{0072FF}${Function.Lang(player, "Urmareste jucator", "Spectate him")} - {00FF00}/spec`;
-    player.ShowPlayerDialog(Dialog.PLAYER_CLICK, samp.DIALOG_STYLE.LIST, Function.Lang(player, `{AAAAAA}Ai dat click pe {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`, `{AAAAAA}You have clicked {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`), info, "Select", "Close");
+    player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, Function.Lang(player, `{AAAAAA}Ai dat click pe {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`, `{AAAAAA}You have clicked {FF0000}${clickedplayer.GetPlayerName(24)}{AAAAAA}!`), info, "Select", "Close", (response) => {
+        if(!response.button) return;
+        switch(response.listItem) {
+            case 0: CMD.emit("stats", player, [clickedplayer.playerid]); break;
+            case 1: CMD.emit("gstats", player, [clickedplayer.playerid]); break;
+            case 2: CMD.emit("cinfo", player, [clickedplayer.playerid]); break;
+            case 3: CMD.emit("astats", player, [clickedplayer.playerid]); break;
+            case 4: CMD.emit("pm", player, [clickedplayer.playerid]); break;
+            case 5: CMD.emit("spec", player, [clickedplayer.playerid]); break;
+        }
+    });
     return true;
 });
 
@@ -5738,9 +6403,14 @@ samp.OnPlayerTakeDamage((player, issuerid, amount, weaponid, bodypart) => {
 samp.OnPlayerEnterVehicle((player, vehicleid, ispassenger) => {
     /* Check if the hold settings is setted for vehicle enter */
     if(Player.Info[player.playerid].HoldsData.Settings == 2) {
-        Player.Info[player.playerid].Holds.filter(f => f.used).forEach((i) => {
-            player.SetPlayerAttachedObject(i.index, i.model, i.bone, i.offsetposition[0], i.offsetposition[1], i.offsetposition[2], i.offsetrotation[0], i.offsetrotation[1], i.offsetrotation[2], i.offsetscale[0], i.offsetscale[1], i.offsetscale[2]);
-        });
+        CMD.emit("holdon", player, [], false);
+    }
+    return true;
+});
+
+samp.OnPlayerExitVehicle((player, vehicleid) => {
+    if(Player.Info[player.playerid].HoldsData.Settings == 2) {
+        CMD.emit("holdoff", player, [], false);
     }
     return true;
 });
@@ -5859,840 +6529,6 @@ samp.OnPlayerUpdate((player) => {
 });
 
 samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
-    switch(dialogid) {
-        case Dialog.HOUSE: {
-            if(!response) {
-                let info = "";
-                info += "{BBFF00}Buy {00BBF6}House\n";
-                info += "{BBFF00}Sell {FF0000}House\n";
-                info += "{BBFF00}Re-new {00BBF6}House\n";
-                info += "{BBFF00}Lock/UnLock {FF0000}House\n";
-                info += "{BBFF00}Enter {00BBF6}House\n";
-                info += "{BBFF00}Change {FF0000}Interior\n";
-                info += "{BBFF00}Spawn me at {00BBF6}House";
-                player.ShowPlayerDialog(Dialog.HOUSE_OPTIONS, samp.DIALOG_STYLE.LIST, "House {FF0000}Options", info, "Select", "Back");
-            }
-            break;
-        }
-        case Dialog.HOUSE_OPTIONS: {
-            if(response) {
-                switch(listitem) {
-                    case 0: CMD.emit("buy", player); break;
-                    case 1: CMD.emit("sell", player); break;
-                    case 2: CMD.emit("renew", player); break;
-                    case 3: CMD.emit("lock", player); break;
-                    case 4: CMD.emit("enter", player); break;
-                    case 5: CMD.emit("chint", player); break;
-                    case 6: CMD.emit("myhouse", player); break;
-                }
-            } 
-            else CMD.emit("house", player);
-            break;
-        }
-        case Dialog.BUSINESS: {
-            if(!response) {
-                let info = "";
-                info += "{BBFF00}Buy {00BBF6}Business\n";
-                info += "{BBFF00}Sell {FF0000}Business\n";
-                info += "{BBFF00}Re-new {00BBF6}Business\n";
-                info += "{BBFF00}Enter {FF0000}Business\n";
-                info += "{BBFF00}Upgrade {00BBF6}Business\n";
-                info += "{BBFF00}Change {FF0000}Name\n";
-                info += "{BBFF00}Spawn me at {00BBF6}Business";
-                player.ShowPlayerDialog(Dialog.BUSINESS_OPTIONS, samp.DIALOG_STYLE.LIST, "Business {FF0000}Options", info, "Select", "Back");
-            }
-            break;
-        }
-        case Dialog.BUSINESS_OPTIONS: {
-            if(response) {
-                switch(listitem) {
-                    case 0: CMD.emit("buy", player); break;
-                    case 1: CMD.emit("sell", player); break;
-                    case 2: CMD.emit("renew", player); break;
-                    case 3: CMD.emit("enter", player); break;
-                    case 4: CMD.emit("upgrade", player); break;
-                    case 5: CMD.emit("bname", player, []); break;
-                    case 6: CMD.emit("mybusiness", player); break;
-                }
-            }
-            else CMD.emit("business", player);
-            break;
-        }
-        case Dialog.VUP: {
-            if(response) {
-                
-            }
-            break;
-        }
-        case Dialog.SPEED: {
-            if(response) {
-
-            }
-            break;
-        }
-        case Dialog.CARTEXT: {
-            if(response) {
-                let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
-                if(!car) return;
-                for(let i = 0; i < car.cartext.length; i++) {
-                    if(i == listitem) {
-                        Player.Info[player.playerid].EditingCarText.Index = i;
-                        if(car.cartext[i].text != "null") {
-                            player.ShowPlayerDialog(Dialog.CARTEXT_EDIT_OR_REMOVE, samp.DIALOG_STYLE.MSGBOX, "Personal Vehicle Holds - Slot in use", "{BBFF00}This slot is already in use!\n{BBFF00}If you want to edit this slot click on 'Edit' or to remove click on 'Remove'.", "Edit", "Remove");
-                        }
-                        else {
-                            let info = "";
-                            info += "{BBFF00}Text {00BBF6}- Small\n";
-                            info += "{BBFF00}Text {00BBF6}- Medium\n";
-                            info += "{BBFF00}Text {00BBF6}- Big";
-                            player.ShowPlayerDialog(Dialog.CARTEXT_SELECT_SIZE, samp.DIALOG_STYLE.LIST, "Personal Vehicle Holds - Style Text", info, "Select", "Close");
-                        }
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        case Dialog.CARTEXT_EDIT_OR_REMOVE: {
-            let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
-            if(!car) return;
-            car.cartext[Player.Info[player.playerid].EditingCarText.Index].text = "null";
-            car.cartext[Player.Info[player.playerid].EditingCarText.Index].fontsize = 15;
-            car.cartext[Player.Info[player.playerid].EditingCarText.Index].offsetposition = [0, 0, 0];
-            car.cartext[Player.Info[player.playerid].EditingCarText.Index].offsetrotation = [0, 0, 0];
-            samp.DestroyObject(car.cartext[Player.Info[player.playerid].EditingCarText.Index].object);
-            delete car.cartext[Player.Info[player.playerid].EditingCarText.Index].object;
-            con.query("UPDATE personalcars SET cartext = ? WHERE ID = ?", [JSON.stringify(car.cartext), car.id]);
-
-            if(response) {
-                player.ShowPlayerDialog(Dialog.CARTEXT_INPUT_TEXT, samp.DIALOG_STYLE.INPUT, "Personal Vehicle Holds - Text", "{BBFF00}Insert your text!\n{BBFF00}If you want to color the text insert hex color!", "Select", "Close");
-            }
-            break;
-        }
-        case Dialog.CARTEXT_SELECT_SIZE: {
-            if(response) {
-                let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
-                if(!car) return;
-                let size = 0;
-                switch(listitem) {
-                    case 0: size = 15; break;
-                    case 1: size = 20; break;
-                    case 2: size = 25; break;
-                }
-                Player.Info[player.playerid].EditingCarText.Fontsize = size;
-                player.ShowPlayerDialog(Dialog.CARTEXT_INPUT_TEXT, samp.DIALOG_STYLE.INPUT, "Personal Vehicle Holds - Text", "{BBFF00}Insert your text!\n{BBFF00}If you want to color the text insert hex color!", "Select", "Close");
-            }
-            break;
-        }
-        case Dialog.CARTEXT_INPUT_TEXT: {
-            if(response) {
-                let car = PCar.Info.find(f => f.owner == Player.Info[player.playerid].AccID);
-                if(!car) return;
-                let data = car.cartext.at(Player.Info[player.playerid].EditingCarText.Index);
-                let position = samp.GetVehiclePos(car.vehicle);
-                data.text = inputtext;
-                data.fontsize = Player.Info[player.playerid].EditingCarText.Fontsize;
-                data.object = samp.CreateObject(19477, position.x, position.y, position.z, 0, 0, 0);
-                samp.SetObjectMaterialText(data.object, data.text, 0, 40, "Quartz MS", data.fontsize, true, 0xFFFFFFAA, 0, 1);
-                player.EditObject(data.object);
-            }
-            break;
-        }
-        case Dialog.HOLD: {
-            if(response) {
-                switch(listitem) {
-                    case 0: {
-                        let info = "";
-                        for(let i = 0; i < Player.Info[player.playerid].Holds.length; i++) {
-                            info += `{0072FF}Slot ${i} - {BBFF00}${Player.Info[player.playerid].Holds[i].used ? "Used" : "Free"}\n`;
-                        }
-                        player.ShowPlayerDialog(Dialog.HOLD_SELECT, samp.DIALOG_STYLE.LIST, "{BBFF00}You can hold 10 objects! Choose slot for hold!", info, "Select", "Back");
-                        break;
-                    }
-                    case 1: {
-                        let info = "";
-                        data.holds.forEach((i) => { info += `{BBFF00}${i.name}\n`; });
-                        info += "{FF0000}Remove Holds ({FFFFFF}/holdoff{FF0000})";
-                        player.ShowPlayerDialog(Dialog.HOLD_LIST, samp.DIALOG_STYLE.LIST, "{00BBF6}Hold List", info, "Select", "Close");
-                        break;
-                    }
-                    case 2: {
-                        let result = Player.Info[player.playerid].Holds.filter(f => f.used);
-                        if(result.length == 0) return SendError(player, "You don't have holds!");
-                        result.forEach((i) => {
-                            con.query("SELECT * FROM holds WHERE owner = ? AND index_number = ?", [Player.Info[player.playerid].AccID, i.index], function(err, result) {
-                                if(result == 0) con.query("INSERT INTO holds (owner, index_number, model, bone, offsetposition, offsetrotation, offsetscale) VALUES(?, ?, ?, ?, ?, ?, ?)", [Player.Info[player.playerid].AccID, i.index, i.model, i.bone, JSON.stringify(i.offsetposition), JSON.stringify(i.offsetrotation), JSON.stringify(i.offsetscale)]);
-                                else con.query("UPDATE holds SET model = ?, bone = ?, offsetposition = ?, offsetrotation = ?, offsetscale = ? WHERE index_number = ? AND owner = ?", [i.model, i.bone, JSON.stringify(i.offsetposition), JSON.stringify(i.offsetrotation), JSON.stringify(i.offsetscale), i.index, Player.Info[player.playerid].AccID]);
-                            });
-                        });
-                        player.GameTextForPlayer("~w~~h~All ~r~~h~holds ~w~~h~saved", 3000, 3);
-                        break;
-                    }
-                    case 3: {
-                        let info = "";
-                        info += "{00BBF6}Show holds everytime you spawn\n";
-                        info += "{00BBF6}Show holds inside every vehicle\n";
-                        info += "{00BBF6}Hide holds";
-                        player.ShowPlayerDialog(Dialog.HOLD_SETTINGS, samp.DIALOG_STYLE.LIST, "{BBFF00}Settings / Preferences Hold", info, "Select", "Back");
-                        break;
-                    }
-                    case 4: CMD.emit("holdon", player); break;
-                    case 5: CMD.emit("holdoff", player); break;
-                }
-            }
-            else ResetPlayerHoldCreateVariables(player);
-            break;
-        }
-        case Dialog.HOLD_SELECT: {
-            if(response) {
-                for(let i = 0; i < Player.Info[player.playerid].Holds.length; i++) {
-                    if(i == listitem) {
-                        Player.Info[player.playerid].HoldsData.Editing = Player.Info[player.playerid].Holds[i].index;
-                        switch(Player.Info[player.playerid].Holds[i].used) {
-                            case true: {
-                                player.ShowPlayerDialog(Dialog.HOLD_REMOVE_OR_EDIT, samp.DIALOG_STYLE.MSGBOX, "{BBFF00}Oops...! Error!", "{0072FF}Sorry but this slot is curently used!\n{0072FF}Do you wish to edit the hold in that slot or remove it ?", "Edit", "Remove");
-                                break;
-                            }
-                            case false: {
-                                player.ShowPlayerDialog(Dialog.HOLD_CREATE_INSERT_ID, samp.DIALOG_STYLE.INPUT, "{BBFF00}Object ID", "{0072FF}Please insert below the ID of the Object that you want to attach on you!", "Select", "Back");
-                                break;
-                            }
-                        }
-                        break;
-                    } 
-                }
-            }
-            else CMD.emit("hold", player);
-            break;
-        }
-        case Dialog.HOLD_LIST: {
-            if(response) {
-                for(let i = 0; i < data.holds.length; i++) {
-                    if(i == listitem) {
-                        Player.Info[player.playerid].Holds.filter(f => f.used).forEach((i) => {
-                            player.RemovePlayerAttachedObject(i.index);
-                            RemovePlayerHoldIndex(player, i.index);
-                        });
-                        for(let d = 0; d < data.holds[i].objects.length; d++) {
-                            Player.Info[player.playerid].Holds[d].index = d;
-                            Player.Info[player.playerid].Holds[d].used = true;
-                            Player.Info[player.playerid].Holds[d].model = data.holds[i].objects[d][0];
-                            Player.Info[player.playerid].Holds[d].bone = data.holds[i].objects[d][1];
-                            Player.Info[player.playerid].Holds[d].offsetposition = [data.holds[i].objects[d][2], data.holds[i].objects[d][3], data.holds[i].objects[d][4]];
-                            Player.Info[player.playerid].Holds[d].offsetrotation = [data.holds[i].objects[d][5], data.holds[i].objects[d][6], data.holds[i].objects[d][7]];
-                            Player.Info[player.playerid].Holds[d].offsetscale = [data.holds[i].objects[d][8], data.holds[i].objects[d][9], data.holds[i].objects[d][10]];
-                            player.SetPlayerAttachedObject(d, data.holds[i].objects[d][0], data.holds[i].objects[d][1], data.holds[i].objects[d][2], data.holds[i].objects[d][3], data.holds[i].objects[d][4], data.holds[i].objects[d][5], data.holds[i].objects[d][6], data.holds[i].objects[d][7], data.holds[i].objects[d][8], data.holds[i].objects[d][9], data.holds[i].objects[d][10]);
-                        }
-                        break;
-                    }
-                }
-                if(listitem == data.holds.length) CMD.emit("holdoff", player);
-            }
-            break;
-        }
-        case Dialog.HOLD_REMOVE_OR_EDIT: {
-            if(response) player.EditAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
-            else {
-                player.RemovePlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
-                let index = Player.Info[player.playerid].Holds.find(f => f.index == Player.Info[player.playerid].HoldsData.Editing);
-                if(index != -1) {
-                    RemovePlayerHoldIndex(player, Player.Info[player.playerid].HoldsData.Editing, true);
-                    ResetPlayerHoldCreateVariables(player);
-                    player.GameTextForPlayer("~w~~h~Hold ~r~~h~removed", 3000, 4);
-                }
-            }
-            break;
-        }
-        case Dialog.HOLD_CREATE_INSERT_ID: {
-            if(response) {
-                Player.Info[player.playerid].HoldsData.CreatingId = parseInt(inputtext);
-                let info = "";
-                info += "{BBFF00}Spine\n";
-                info += "{BBFF00}Head\n";
-                info += "{BBFF00}Left Upper Arm\n";
-                info += "{BBFF00}Right Upper Arm\n";
-                info += "{BBFF00}Left Hand\n";
-                info += "{BBFF00}Right Hand\n";
-                info += "{BBFF00}Left Thigh\n";
-                info += "{BBFF00}Right Thigh\n";
-                info += "{BBFF00}Left Foot\n";
-                info += "{BBFF00}Right Foot\n";
-                info += "{BBFF00}Left Calf\n";
-                info += "{BBFF00}Right Calf\n";
-                info += "{BBFF00}Left Forearm\n";
-                info += "{BBFF00}Right Forearm\n";
-                info += "{BBFF00}Left Clavicle\n";
-                info += "{BBFF00}Right Clavicle\n";
-                info += "{BBFF00}Neck\n";
-                info += "{BBFF00}Jaw";
-                player.ShowPlayerDialog(Dialog.HOLD_CREATE_SELECT_BODY, samp.DIALOG_STYLE.LIST, "{BBFF00}Choose on which side of the body the object will apparen", info, "Select", "Back");
-            }
-            else CMD.emit("hold", player);  
-            break;
-        }
-        case Dialog.HOLD_CREATE_SELECT_BODY: {
-            if(response) {
-                player.SetPlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing, Player.Info[player.playerid].HoldsData.CreatingId, listitem+1, 0, 0, 0, 0, 0, 0, 1, 1, 1);
-                player.EditAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
-            }
-            else CMD.emit("hold", player);  
-            break;
-        }
-        case Dialog.HOLD_SETTINGS: {
-            if(response) {
-                switch(listitem) {
-                    case 0: Player.Info[player.playerid].HoldsData.Settings = 1; break;
-                    case 1: Player.Info[player.playerid].HoldsData.Settings = 2; break;
-                    case 2: Player.Info[player.playerid].HoldsData.Settings = 0; break;
-                }
-                if(Player.Info[player.playerid].HoldsData.Settings == 0) for(let i = 0; i < 10; i++) player.RemovePlayerAttachedObject(i);
-                player.GameTextForPlayer("~w~~h~Hold Settings ~r~~h~saved", 3000, 3);
-            }
-            break;
-        }
-        case Dialog.MY_COLOR: {
-            if(response) {
-                switch(listitem) {
-                    case 0: player.SetPlayerColor(0xFF0000AA); break;
-                    case 1: player.SetPlayerColor(0x0000FFAA); break;
-                    case 2: player.SetPlayerColor(0xAFAFAFAA); break;
-                    case 3: player.SetPlayerColor(0x33AA33AA); break;
-                    case 4: player.SetPlayerColor(0xFFFF00AA); break;
-                    case 5: player.SetPlayerColor(0xFFFFFFAA); break;
-                    case 6: player.SetPlayerColor(0x800080AA); break;
-                    case 7: player.SetPlayerColor(0xFF9900AA); break;
-                    case 8: player.SetPlayerColor(0xFF66FFAA); break;
-                    case 9: player.SetPlayerColor(0x10F441AA); break;
-                    case 10: player.SetPlayerColor(0x000000AA); break;
-                    case 11: player.SetPlayerColor(0x00BBF6AA); break;
-                    case 12: player.SetPlayerColor(0x00BBF6AA); break;
-                }
-                player.GameTextForPlayer("~w~~h~Color ~g~~h~changed", 4000, 4);
-            }
-            break;
-        }
-        case Dialog.SELECT_MRF_WEAPON: {
-            if(response) {
-                switch(listitem) {
-                    case 0: Player.Info[player.playerid].Selected_MRF_Weapon = 38; break;
-                    case 1: Player.Info[player.playerid].Selected_MRF_Weapon = 35; break;
-                    case 2: Player.Info[player.playerid].Selected_MRF_Weapon = 37; break;
-                }
-                player.GivePlayerWeapon(Player.Info[player.playerid].Selected_MRF_Weapon, 99999);
-            }
-            else CMD.emit("leave");
-            break;
-        }
-        case Dialog.BUYCAR_CHEAP: {
-            if(response) BuySpecificCar(player, "cheap", listitem);
-            break;
-        }
-        case Dialog.BUYCAR_REGULAR: {
-            if(response) BuySpecificCar(player, "regular", listitem);
-            break;
-        }
-        case Dialog.BUYCAR_EXPENSIVE: {
-            if(response) BuySpecificCar(player, "expensive", listitem);
-            break;
-        }
-        case Dialog.BUYCAR_BIKES: {
-            if(response) BuySpecificCar(player, "bikes", listitem);
-            break;
-        }
-        case Dialog.BUYCAR_PREMIUM: {
-            if(response) BuySpecificCar(player, "premium", listitem);
-            break;
-        }
-        case Dialog.BUYCAR: {
-            if(response) {
-                switch(listitem) {
-                    case 0: {
-                        con.query("SELECT * FROM dealership WHERE type = ?", ["cheap"], function(err, result) {
-                            if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
-                            let info = "Vehicle\tCoins\n";
-                            for(let i = 0; i < result.length; i++) {
-                                info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
-                            }
-                            player.ShowPlayerDialog(Dialog.BUYCAR_CHEAP, samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Cheap Vehicles", info, "Buy", "Close");
-                        });
-                        break;
-                    }
-                    case 1: {
-                        con.query("SELECT * FROM dealership WHERE type = ?", ["regular"], function(err, result) {
-                            if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
-                            let info = "Vehicle\tCoins\n";
-                            for(let i = 0; i < result.length; i++) {
-                                info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
-                            }
-                            player.ShowPlayerDialog(Dialog.BUYCAR_REGULAR, samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Regular Vehicles", info, "Buy", "Close");
-                        });
-                        break;
-                    }
-                    case 2: {
-                        con.query("SELECT * FROM dealership WHERE type = ?", ["expensive"], function(err, result) {
-                            if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
-                            let info = "Vehicle\tCoins\n";
-                            for(let i = 0; i < result.length; i++) {
-                                info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
-                            }
-                            player.ShowPlayerDialog(Dialog.BUYCAR_EXPENSIVE, samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Expensive Vehicles", info, "Buy", "Close");
-                        });
-                        break;
-                    }
-                    case 3: {
-                        con.query("SELECT * FROM dealership WHERE type = ?", ["bikes"], function(err, result) {
-                            if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
-                            let info = "Vehicle\tCoins\n";
-                            for(let i = 0; i < result.length; i++) {
-                                info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
-                            }
-                            player.ShowPlayerDialog(Dialog.BUYCAR_BIKES, samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Bikes/Moto", info, "Buy", "Close");
-                        });
-                        break;
-                    }
-                    case 4: {
-                        con.query("SELECT * FROM dealership WHERE type = ?", ["premium"], function(err, result) {
-                            if(err || result == 0) return SendError(player, Errors.UNEXPECTED);
-                            let info = "Vehicle\tCoins\n";
-                            for(let i = 0; i < result.length; i++) {
-                                info += `${samp.vehicleNames[result[i].model-400]}\t${Function.numberWithCommas(result[i].cost)}\n`;
-                            }
-                            player.ShowPlayerDialog(Dialog.BUYCAR_PREMIUM, samp.DIALOG_STYLE.TABLIST_HEADERS, "{FF0000}#DealerShip {FFFF00}- Premium Vehicles", info, "Buy", "Close");
-                        });
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        case Dialog.BASE_TELEPORT: {
-            if(response) {
-                if(!Player.Info[player.playerid].Gang) return SendError(player, Errors.NOT_MEMBER_OF_ANY_GANG);
-                Gang.Info.filter(f => f.territory.owner == Player.Info[player.playerid].Gang).forEach((i, index) => {
-                    if(listitem == index) {
-                        player.SetPlayerPos(i.base_position[0], i.base_position[1], i.base_position[2]);
-                        player.SetPlayerFacingAngle(i.base_position[3]);
-                        player.GameTextForPlayer("~g~~h~Teleported to~n~~r~~h~gang base", 3000, 3);
-                    }   
-                });
-            }
-            break;
-        }
-        case Dialog.YOUTUBE_SEARCH: {
-            if(response) {
-                for(let i = 0; i < Player.Info[player.playerid].YouTubeSearchResults.length; i++) {
-                    if(i == listitem) {
-                        samp.getPlayers().filter(f => Player.Info[f.playerid].LoggedIn).forEach((players) => {
-                            players.PlayAudioStreamForPlayer(`http://45.14.236.12:7777/${Player.Info[player.playerid].YouTubeSearchResults[i]}`);
-                            players.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has started an audio stream.`);
-                        });
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        case Dialog.GANG: {
-            if(response) {
-                switch(listitem) {
-                    case 0: CMD.emit("ginfo", player, []); break;
-                    case 1: CMD.emit("gstats", player, []); break;
-                    case 2: CMD.emit("gm", player); break;
-                    case 3: CMD.emit("gcmds", player); break;
-                    case 4: CMD.emit("gtop", player); break;
-                }
-            }
-            break;
-        }
-        case Dialog.EVENT: {
-            switch(listitem) {
-                case 0: { /* Star Event */
-                    CMD.emit("starevent", player); 
-                    break;
-                }
-                case 1: { /* Death Math Events */
-                    break;
-                }
-                case 2: { /* Reaction Test */
-                    break;
-                }
-                case 3: { /* Reaction Maths */
-                    break;
-                }
-                case 4: { /* Question */
-                    break;
-                }
-            }
-            break;
-        }
-        case Dialog.TRADE: {
-            if(response) {
-                let target = getPlayer(inputtext);
-                if(!target || target.playerid == player.playerid) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
-                if(Player.Info[target.playerid].Atrade != player.playerid) return SendError(player, "That player has no Trade activated on you!");
-                Player.Info[player.playerid].Trade.On = target.playerid;
-                let info = "";
-                info += "{00FF00}Sell {FF0000}Money\n";
-                info += "{00FF00}Sell {FF0000}Hours\n";
-                info += "{00FF00}Sell {FF0000}Coins\n";
-                info += "{00FF00}Sell {FF0000}Kills & Deaths\n";
-                info += "{00FF00}Sell {FF0000}Stunt Points\n";
-                info += "{00FF00}Sell {FF0000}Drift Points\n";
-                info += "{00FF00}Sell {FF0000}Race Points";
-                player.ShowPlayerDialog(Dialog.TRADE_SELL, samp.DIALOG_STYLE.LIST, "Trade", info, "Select", "Cancel");
-            }
-            break;
-        }
-        case Dialog.TRADE_SELL: {
-            if(response) {
-                Player.Info[player.playerid].Trade.Sell.Item = listitem;
-                player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_SELL_ITEM, isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}`, `{FFFF94}You have selected to sell {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FF9900}!${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
-            }
-            else resetTradeVariables(player);
-            break;
-        }
-        case Dialog.TRADE_VALIDATE_SELL_ITEM: {
-            if(response) {
-                inputtext = parseInt(inputtext);
-                if(getTradeItemAmount(player, Player.Info[player.playerid].Trade.Sell.Item) >= inputtext || !isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item)) {
-                    Player.Info[player.playerid].Trade.Sell.Value = inputtext;
-                    let info = "";
-                    info += "{00FF00}Buy {FF0000}Money\n";
-                    info += "{00FF00}Buy {FF0000}Hours\n";
-                    info += "{00FF00}Buy {FF0000}Coins\n";
-                    info += "{00FF00}Buy {FF0000}Kills & Deaths\n";
-                    info += "{00FF00}Buy {FF0000}Stunt Points\n";
-                    info += "{00FF00}Buy {FF0000}Drift Points\n";
-                    info += "{00FF00}Buy {FF0000}Race Points";
-                    player.ShowPlayerDialog(Dialog.TRADE_BUY, samp.DIALOG_STYLE.LIST, "Trade", info, "Select", "Cancel");
-                }
-                else player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_SELL_ITEM, isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}`, `{FFFF94}You have selected to sell {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FF9900}!${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
-            }
-            else resetTradeVariables(player);
-            break;
-        }
-        case Dialog.TRADE_BUY: {
-            if(response) {
-                Player.Info[player.playerid].Trade.Buy.Item = listitem;
-                player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_BUY_ITEM, isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}`, `{FFFF94}You have selected to buy {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FF9900}!${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
-            }
-            else resetTradeVariables(player);
-            break;
-        }
-        case Dialog.TRADE_VALIDATE_BUY_ITEM: {
-            if(response) {
-                inputtext = parseInt(inputtext);
-                let target = samp.getPlayers().filter(f => f.playerid == Player.Info[player.playerid].Trade.On && Player.Info[f.playerid].Atrade == player.playerid)[0];
-                if(!target) return SendError(player, Errors.UNEXPECTED);
-                inputtext = parseInt(inputtext);
-                if(getTradeItemAmount(target, Player.Info[player.playerid].Trade.Buy.Item) >= inputtext || !isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item)) {
-                    Player.Info[player.playerid].Trade.Buy.Value = inputtext;
-                    let info = "";
-                    info += `{FFFF94}You have completed all the steps before sending a{FF0000} Trade Request{FFFF94} to {FF0000}${target.GetPlayerName(24)} (ID:${target.playerid}){FFFF94}!\n`;
-                    info += `{FFFF94}Are you sure ? You want to send a {FF0000}Trade Request{FFFF94} to {FF0000}${target.GetPlayerName(24)} (ID:${target.playerid}){FFFF94} ?`;
-                    player.ShowPlayerDialog(Dialog.TRADE_SEND, samp.DIALOG_STYLE.MSGBOX, "Trade {FF0000}completed", info, "Continue", "Close");
-                }
-                else player.ShowPlayerDialog(Dialog.TRADE_VALIDATE_BUY_ITEM, isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? samp.DIALOG_STYLE.INPUT : samp.DIALOG_STYLE.MSGBOX, `Trade {FF0000}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}`, `{FFFF94}You have selected to buy {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FF9900}!${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? `\n{FFFF94}Enter the amount of {11FF00}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FFFF94} which you want to sell!` : ""}`, "Next", "Cancel");
-            }
-            else resetTradeVariables(player);
-            break;
-        }
-        case Dialog.TRADE_SEND: {
-            if(response) {
-                let target = samp.getPlayers().filter(f => f.playerid == Player.Info[player.playerid].Trade.On && Player.Info[f.playerid].Atrade == player.playerid)[0];
-                if(!target) return SendError(player, Errors.UNEXPECTED);
-                player.SendClientMessage(data.colors.YELLOW, "Trade request was sent successfully! Please wait while player Accepts or Rejects the Trade Request!");
-                Player.Info[target.playerid].TradeRequestFrom = player.playerid;
-                let info = "";
-                info += `{FFFF00}Hi {11FF00}${target.GetPlayerName(24)}{FFFF00}!\n`;
-                info += `{11FF00}${player.GetPlayerName(24)}{FFFF00} wants to sell you {11FF00}${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Sell.Item) ? `${Player.Info[player.playerid].Trade.Sell.Value} ` : ""}${getTradeItemName(Player.Info[player.playerid].Trade.Sell.Item)}{FFFF00} for your {11FF00}${isTradeItemNeedValue(Player.Info[player.playerid].Trade.Buy.Item) ? `${Player.Info[player.playerid].Trade.Buy.Value} ` : ""}${getTradeItemName(Player.Info[player.playerid].Trade.Buy.Item)}{FFFF00}!`;
-                target.ShowPlayerDialog(Dialog.TRADE_REQUEST, samp.DIALOG_STYLE.MSGBOX, "Trade {FF0000}Request", info, "Decline", "Accept");
-            }
-            else resetTradeVariables(player);
-            break;
-        }
-        case Dialog.TRADE_REQUEST: {
-            let target = samp.getPlayers().filter(f => f.playerid == Player.Info[player.playerid].TradeRequestFrom)[0];
-            if(!target) return SendError(player, Errors.UNEXPECTED);
-            if(response) {
-                player.SendClientMessage(data.colors.YELLOW, "You have successfully declined the Trade Request!");
-                target.SendClientMessage(data.colors.YELLOW, `{11FF00}${player.GetPlayerName(24)}{FFFF00} Declined your Trade Request!`);
-                resetTradeVariables(player);
-            }
-            else {
-                /* ========== */
-                /* Target Buy */
-                /* ========== */
-                switch(getTradeItemName(Player.Info[target.playerid].Trade.Buy.Item)) {
-                    case "Money": {
-                        Player.Info[target.playerid].Money += Player.Info[target.playerid].Trade.Buy.Value;
-                        Player.Info[player.playerid].Money -= Player.Info[target.playerid].Trade.Buy.Value;
-                        break;
-                    }
-                    case "Hours": {
-                        Player.Info[target.playerid].OnlineTime.Hours += Player.Info[target.playerid].Trade.Buy.Value;
-                        Player.Info[player.playerid].OnlineTime.Hours -= Player.Info[target.playerid].Trade.Buy.Value;
-                        break;
-                    }
-                    case "Coins": {
-                        Player.Info[target.playerid].Coins += Player.Info[target.playerid].Trade.Buy.Value;
-                        Player.Info[player.playerid].Coins -= Player.Info[target.playerid].Trade.Buy.Value;
-                        break;
-                    }
-                    case "Kills & Deaths": {
-                        Player.Info[target.playerid].Kills_Data.Kills += Player.Info[player.playerid].Kills_Data.Kills;
-                        Player.Info[target.playerid].Kills_Data.Deaths += Player.Info[player.playerid].Kills_Data.Deaths;
-                        Player.Info[player.playerid].Kills_Data.Kills = 0;
-                        Player.Info[player.playerid].Kills_Data.Deaths = 0;
-                        break;
-                    }
-                    case "Stunt Points": {
-                        Player.Info[target.playerid].Driving_Data.StuntPoints += Player.Info[target.playerid].Trade.Buy.Value;
-                        Player.Info[player.playerid].Driving_Data.StuntPoints -= Player.Info[target.playerid].Trade.Buy.Value;
-                        break;
-                    }
-                    case "Drift Points": {
-                        Player.Info[target.playerid].Driving_Data.DriftPoints += Player.Info[target.playerid].Trade.Buy.Value;
-                        Player.Info[player.playerid].Driving_Data.DriftPoints -= Player.Info[target.playerid].Trade.Buy.Value;
-                        break;
-                    }
-                    case "Race Points": {
-                        Player.Info[target.playerid].Driving_Data.RacePoints += Player.Info[target.playerid].Trade.Buy.Value;
-                        Player.Info[player.playerid].Driving_Data.RacePoints -= Player.Info[target.playerid].Trade.Buy.Value;
-                        break;
-                    }
-                }
-                /* =========== */
-                /* Target Sell */
-                /* =========== */
-                switch(getTradeItemName(Player.Info[target.playerid].Trade.Sell.Item)) {
-                    case "Money": {
-                        Player.Info[player.playerid].Money += Player.Info[target.playerid].Trade.Sell.Value;
-                        Player.Info[target.playerid].Money -= Player.Info[target.playerid].Trade.Sell.Value;
-                        break;
-                    }
-                    case "Hours": {
-                        Player.Info[player.playerid].OnlineTime.Hours += Player.Info[target.playerid].Trade.Sell.Value;
-                        Player.Info[target.playerid].OnlineTime.Hours -= Player.Info[target.playerid].Trade.Sell.Value;
-                        break;
-                    }
-                    case "Coins": {
-                        Player.Info[player.playerid].Coins += Player.Info[target.playerid].Trade.Sell.Value;
-                        Player.Info[target.playerid].Coins -= Player.Info[target.playerid].Trade.Sell.Value;
-                        break;
-                    }
-                    case "Kills & Deaths": {
-                        Player.Info[player.playerid].Kills_Data.Kills += Player.Info[target.playerid].Kills_Data.Kills;
-                        Player.Info[player.playerid].Kills_Data.Deaths += Player.Info[target.playerid].Kills_Data.Deaths;
-                        Player.Info[target.playerid].Kills_Data.Kills = 0;
-                        Player.Info[target.playerid].Kills_Data.Deaths = 0;
-                        break;
-                    }
-                    case "Stunt Points": {
-                        Player.Info[player.playerid].Driving_Data.StuntPoints += Player.Info[target.playerid].Trade.Sell.Value;
-                        Player.Info[target.playerid].Driving_Data.StuntPoints -= Player.Info[target.playerid].Trade.Sell.Value;
-                        break;
-                    }
-                    case "Drift Points": {
-                        Player.Info[player.playerid].Driving_Data.DriftPoints += Player.Info[target.playerid].Trade.Sell.Value;
-                        Player.Info[target.playerid].Driving_Data.DriftPoints -= Player.Info[target.playerid].Trade.Sell.Value;
-                        break;
-                    }
-                    case "Race Points": {
-                        Player.Info[player.playerid].Driving_Data.RacePoints += Player.Info[target.playerid].Trade.Sell.Value;
-                        Player.Info[target.playerid].Driving_Data.RacePoints -= Player.Info[target.playerid].Trade.Sell.Value;
-                        break;
-                    }
-                }
-                player.SendClientMessage(data.colors.YELLOW, "You have successfully accepted the Trade Request!");
-                target.SendClientMessage(data.colors.YELLOW, `{11FF00}${player.GetPlayerName(24)}{FFFF00} Accepted your Trade Request!`);
-                resetTradeVariables(player);
-            }
-            break;
-        }
-        case Dialog.PLAYER_CLICK: {
-            if(response) {
-                switch(listitem) {
-                    case 0: CMD.emit("stats", player, [Player.Info[player.playerid].ClickedPlayer]); break;
-                    case 1: CMD.emit("gstats", player, [Player.Info[player.playerid].ClickedPlayer]); break;
-                    case 2: CMD.emit("cinfo", player, [Player.Info[player.playerid].ClickedPlayer]); break;
-                    case 3: CMD.emit("astats", player, [Player.Info[player.playerid].ClickedPlayer]); break;
-                    case 4: CMD.emit("pm", player, [Player.Info[player.playerid].ClickedPlayer]); break;
-                    case 5: CMD.emit("spec", player, [Player.Info[player.playerid].ClickedPlayer]); break;
-                }
-            }
-            break;
-        }
-        case Dialog.TOP_MONTH: {
-            if(response) {
-                switch(listitem) {
-                    case 0: {
-                        con.query("SELECT name, month_hours FROM users ORDER BY month_hours DESC LIMIT 10", function(err, result) {
-                            let info = "{FFFFFF}Our best Most active players are here!\n";
-                            if(!err && result) {
-                                info += "\n";
-                                for(let i = 0; i < result.length; i++) {
-                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}.: {00BBF6}${result[i].month_hours} {BBFF00}Hours\n`;
-                                }
-                            }
-                            info += "\n";
-                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
-                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Most active players", info, "Ok", "");
-                        });
-                        break;
-                    }
-                    case 1: {
-                        con.query("SELECT name, month_kills FROM users ORDER BY month_kills DESC LIMIT 10", function(err, result) {
-                            let info = "{FFFFFF}Our best Killers are here!\n";
-                            if(!err && result) {
-                                info += "\n";
-                                for(let i = 0; i < result.length; i++) {
-                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[0].month_kills} {BBFF00}Kills\n`;
-                                }
-                            }
-                            info += "\n";
-                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
-                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Killers", info, "Ok", "");
-                        });
-                        break;
-                    }
-                    case 2: {
-                        con.query("SELECT name, month_stuntpoints FROM users ORDER BY month_stuntpoints DESC LIMIT 10", function(err, result) {
-                            let info = "{FFFFFF}Our best Stunters are here!\n";
-                            if(!err && result) {
-                                info += "\n";
-                                for(let i = 0; i < result.length; i++) {
-                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].month_stuntpoints} {BBFF00}Stunt Points\n`;
-                                }
-                            }
-                            info += "\n";
-                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
-                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Stunters", info, "Ok", "");
-                        });
-                        break;
-                    }
-                    case 3: {
-                        con.query("SELECT name, month_driftpoints FROM users ORDER BY month_driftpoints DESC LIMIT 10", function(err, result) {
-                            let info = "{FFFFFF}Our best Drifters are here!\n";
-                            if(!err && result) {
-                                info += "\n";
-                                for(let i = 0; i < result.length; i++) {
-                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].month_driftpoints} {BBFF00}Drift Points\n`;
-                                }
-                            }
-                            info += "\n";
-                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
-                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Drifters", info, "Ok", "");
-                        });
-                        break;
-                    }
-                    case 4: {
-                        con.query("SELECT name, month_racepoints FROM users ORDER BY month_racepoints DESC LIMIT 10", function(err, result) {
-                            let info = "{FFFFFF}Our best Racers are here!\n";
-                            if(!err && result) {
-                                info += "\n";
-                                for(let i = 0; i < result.length; i++) {
-                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].month_racepoints} {BBFF00}Race Points\n`;
-                                }
-                            }
-                            info += "\n";
-                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
-                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Racers", info, "Ok", "");
-                        });
-                        break;
-                    }
-                    case 5: {
-                        break;
-                    }
-                    case 6: {
-                        player.GameTextForPlayer("~w~~h~you need to ~g~~h~/quit~n~~w~~h~the~r~~h~ server~w~~h~ in order to~n~~y~~h~update tops with your stats!", 4000, 3);
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        case Dialog.TOP: {
-            if(response) {
-                switch(listitem) {
-                    case 0: CMD.emit("gtop", player); break;
-                    case 1: {
-                        con.query("SELECT name, kills FROM clans ORDER BY kills DESC LIMIT 10", function(err, result) {
-                            let info = "{FFFFFF}Our best Clans are here!\n";
-                            if(!err && result) {
-                                info += "\n";
-                                for(let i = 0; i < result.length; i++) {
-                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].kills} {BBFF00}Kills\n`;
-                                }
-                            }
-                            info += "\n";
-                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
-                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Clans", info, "Ok", "");
-                        });
-                        break;
-                    }
-                    case 2: {
-                        con.query("SELECT name, adminpoints FROM users WHERE admin >= 1 ORDER BY adminpoints DESC LIMIT 10", function(err, result) {
-                            let info = "{FFFFFF}Our best Admins are here!\n";
-                            if(!err && result) {
-                                info += "\n";
-                                for(let i = 0; i < result.length; i++) {
-                                    info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].adminpoints} {BBFF00}Activity Points\n`;
-                                }
-                            }
-                            info += "\n";
-                            info += `{FFFFFF}Visit {FF0000}${data.settings.SERVER_WEB} {FFFFFF}for more!`;
-                            player.ShowPlayerDialog(Dialog.EMPTY, samp.DIALOG_STYLE.MSGBOX, "Top 10 Admins", info, "Ok", "");
-                        });
-                        break;
-                    }
-                    case 3: {
-                        let info = "";
-                        info += "{BBFF00}Top Online\n";
-                        info += "{BBFF00}Top Killers\n";
-                        info += "{BBFF00}Top Stunters\n";
-                        info += "{BBFF00}Top Drifters\n";
-                        info += "{BBFF00}Top Racers\n";
-                        info += "{BBFF00}Top Gang Members\n";
-                        info += "{FFEB7B}Your stats will be updated after each {FF0000}disconnect";
-                        player.ShowPlayerDialog(Dialog.TOP_MONTH, samp.DIALOG_STYLE.LIST, "Top 10 players in this month", info, "Select", "Close");
-                        break;
-                    }
-                    case 4: {
-                        player.GameTextForPlayer("~w~~h~visit ~g~~h~now~n~~w~~h~www.~r~~h~RHS-Server.~w~~h~com/top~n~~y~~h~to more tops and others!", 4000, 3);
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        case Dialog.LOGIN_SPASSWORD: {
-            if(response) {
-                con.query("SELECT * FROM users WHERE name = ? AND spassword = ?", [player.GetPlayerName(24), md5(inputtext)], function(err, result) {
-                    if(!err) {
-                        if(result == 0) {
-                            Player.Info[player.playerid].Fail_Logins++;
-                            if(Player.Info[player.playerid].Fail_Logins == 4) player.Kick();
-                            else {
-                                let info = "";
-                                info += `{FF0000}${Function.Lang(player, `Autentificare esuata (${Player.Info[player.playerid].Fail_Logins}/4)!`, `Login failed (${Player.Info[player.playerid].Fail_Logins}/4)!`)}\n`;
-                                info += "\n";
-                                info += `{FFCC00}${Function.Lang(player, "Ai introdus o parola secundara gresita! Te rugam sa incerci din nou!", "You have entered a wrong secondary password! Please try again!")}\n`;
-                                info += `{FFFF00}${Function.Lang(player, `Daca ti-ai uitat parola secundara, viziteaza {FF0000}${data.settings.SERVER_WEB} {FFFF00}pentru a o reseta!`, `If you forgot your secondary password, visit {FF0000}${data.settings.SERVER_WEB} {FFFF00}to reset it!`)}`
-                                player.ShowPlayerDialog(Dialog.LOGIN_SPASSWORD, samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Autentificare - Parola Secundara", "Login - Secondary Password"), info, Function.Lang(player, "Autentificare", "Login"), Function.Lang(player, "Nume Nou", "New Name"));
-                            }
-                        }
-                        else {
-                            LoadPlayerStats(player);
-                        }
-                    }
-                    else player.Kick();
-                });
-            }
-            else Call_NewName(player);
-            break;
-        }
-    }
     return true;
 });
 

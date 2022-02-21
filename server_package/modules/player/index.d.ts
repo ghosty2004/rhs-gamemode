@@ -107,7 +107,6 @@ export declare const Info: {
     In_Minigame: "none"|"gifts"|"hns"|"lastman"|"targets",
     TargetsPoints: number,
     TargetsLastShot: number,
-    ClickedPlayer: number,
     DiscordLoginRequest: {
         From: null|string,
         Code: number
@@ -135,7 +134,6 @@ export declare const Info: {
     },
     SpawnedCar: number,
     Spectating: number,
-    YouTubeSearchResults: Array<any>,
     CageObjects: Array<any>,
     AFK: boolean,
     Need_Mail_Showed: boolean,

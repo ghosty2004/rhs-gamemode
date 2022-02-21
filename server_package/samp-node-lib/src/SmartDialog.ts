@@ -1,3 +1,7 @@
+/**
+ * Smart Dialog by @Ghosty2004
+ */
+
 import {ShowPlayerDialog} from "./SampFunctions";
 import {SMART_DIALOG_CALLBACK} from "./SampInterface";
 

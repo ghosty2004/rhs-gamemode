@@ -110,7 +110,6 @@ module.exports = {
             In_Minigame: "none",
             TargetsPoints: 0,
             TargetsLastShot: Math.floor(Date.now() / 1000),
-            ClickedPlayer: playerid,
             DiscordLoginRequest: {
                 From: null,
                 Code: 0
@@ -138,7 +137,6 @@ module.exports = {
             },
             SpawnedCar: -1,
             Spectating: -1,
-            YouTubeSearchResults: [],
             CageObjects: [],
             AFK: false,
             Need_Mail_Showed: false,

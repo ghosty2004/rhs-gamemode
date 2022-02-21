@@ -16,12 +16,12 @@ module.exports = {
     },
     /**
      * @param {SampPlayer} player 
-     * @param {String} ro_string 
-     * @param {String} en_string 
+     * @param {String} roString 
+     * @param {String} enString 
      * @returns {String}
      */
-    Lang(player, ro_string, en_string) {
-        return Player.Info[player.playerid].Language == 1 ? ro_string : en_string;
+    Lang(player, roString, enString) {
+        return Player.Info[player.playerid].Language == 1 ? roString : enString;
     },
     /**
      * @param {SampPlayer} player 
