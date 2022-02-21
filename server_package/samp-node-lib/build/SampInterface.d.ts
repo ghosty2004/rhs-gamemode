@@ -6,3 +6,6 @@ export interface SMART_DIALOG_CALLBACK {
         repeatDialog(repeatInfo: string): void;
     }): any;
 }
+export interface SMART_DIALOG_SHOWING {
+    [key: number]: boolean;
+}
