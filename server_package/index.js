@@ -6423,7 +6423,6 @@ samp.OnPlayerGiveDamageActor((player, damaged_actorid, amount, weaponid, bodypar
 });
 
 samp.OnPlayerWeaponShot((player, weaponid, hittype, hitid, fX, fY, fZ) => {
-    /* Targets Minigame */
     if(Player.Info[player.playerid].In_Minigame == "targets") {
         if(weaponid == Minigames.Targets.Weapon) {
             if(hittype == samp.BULLET_HIT_TYPE.OBJECT) {
@@ -6528,13 +6527,8 @@ samp.OnPlayerUpdate((player) => {
     return true;
 });
 
-samp.OnDialogResponse((player, dialogid, response, listitem, inputtext) => {
-    return true;
-});
-
 samp.OnPlayerSpawn((player) => {
     if(!Player.Info[player.playerid].LoggedIn) return player.Kick();
-
     HideConnectTextDraw(player);
     ShowSpawnTextDraw(player);
     player.SetPlayerVirtualWorld(0);
@@ -6550,9 +6544,7 @@ samp.OnPlayerSpawn((player) => {
     SetupPlayerForSpawn(player);
     ShowGangZonesForPlayer(player);
     ShowRankLabelFor(player);
-
     player.PlayerPlaySound(1063, 0.0, 0.0, 0.0);
-
     return true;
 });
 
