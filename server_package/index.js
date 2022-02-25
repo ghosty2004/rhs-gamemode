@@ -3874,6 +3874,16 @@ CMD.on("endstarevent", (player) => {
 
 CMD.on("giveweapon", (player, params) => {
     if(Player.Info[player.playerid].Admin < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    if(!params[0] || !Function.isNumber(params[1])) return SendUsage(player, "/GiveWeapon [ID/Name] [Weapon ID] [Ammo(Optional)]");
+    let target = getPlayer(params[0]);
+    if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
+    params[1] = parseInt(params[1]);
+    if(params[1] < 0 || params[1] > 46) return SendError(player, "Invalid weapon ID (0-46)!");
+    let ammo = 9999; if(params[1]) ammo = parseInt(params[1]);
+    target.GivePlayerWeapon(params[1], ammo);
+    target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has gived you weapon {FF0000}${samp.GetWeaponName(params[1], 32)}{FFFF00}!`);
+    player.SendClientMessage(data.colors.YELLOW, `You have gived weapon {FF0000}${samp.GetWeaponName(params[1], 32)} {FFFF00}to {FF0000}${target.GetPlayerName(24)}{FFFF00}!`);
+    SendACMD(player, "GiveWeapon");
 });
 
 CMD.on("write", (player, params) => {
@@ -6511,6 +6521,10 @@ samp.OnPlayerDisconnect((player, reason) => {
         case 2: reasonString = "~r~~h~(Kicked/Bannned)"; break;
     }
     AddToTDLogs(`~r~~h~${player.GetPlayerName(24)}(${player.playerid}) ~w~~h~has left the server ${reasonString}!`);
+    return true;
+});
+
+samp.OnPlayerStateChange((player, newstate, oldstate) => {
     return true;
 });
 
