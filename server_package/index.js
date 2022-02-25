@@ -4321,6 +4321,11 @@ CMD.on("givepcar", (player, params) => {
 /**
  * Functions
  */
+function sendBuster(player, reason) {
+    player.SendClientMessage(data.colors.RED, `${data.settings.BUSTER_PREFIX}: Kicking player ${player.GetPlayerName(24)}(${player.playerid}). Reason: ${reason}`);
+    Function.kickPlayer(player);
+}
+
 function isPlayerInAnyHouseLift(player) {
     return House.Info.find((houseFind) => {
         return houseFind.lifts.find((liftFind) => {
@@ -4543,7 +4548,15 @@ function spawnPlayerInDM(player, first_time=false) {
     }
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ */
 function CheckAntiCheat(player) {
+    /*if(player.IsPlayerInAnyVehicle()) {
+        let [vecX, vecY, vecZ] = samp.GetVehicleVelocity(player.vehicleId);
+        player.SendClientMessage(-1, `Velocity: {FF0000}${vecX}, ${vecY}, ${vecZ}`);
+    }*/
+
     if(Player.Info[player.playerid].Admin) return;
     /* ======== */
     /* Fly Hack */
