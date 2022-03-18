@@ -4552,11 +4552,6 @@ function spawnPlayerInDM(player, first_time=false) {
  * @param {samp.SampPlayer} player 
  */
 function CheckAntiCheat(player) {
-    /*if(player.IsPlayerInAnyVehicle()) {
-        let [vecX, vecY, vecZ] = samp.GetVehicleVelocity(player.vehicleId);
-        player.SendClientMessage(-1, `Velocity: {FF0000}${vecX}, ${vecY}, ${vecZ}`);
-    }*/
-
     if(Player.Info[player.playerid].Admin) return;
     /* ======== */
     /* Fly Hack */

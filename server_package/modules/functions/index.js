@@ -62,7 +62,7 @@ module.exports = {
         let hours = Math.floor(time / 3600);
         let minutes = Math.floor(time / 60) % 60;
         let seconds = Math.floor(time % 60);
-        return {hours: ('0' + hours).slice(-2), minutes: ('0' + minutes).slice(-2), seconds: ('0' + seconds).slice(-2)};
+        return {hours: `${hours}`.length == 1 ? `0${hours}` : `${hours}`, minutes: ('0' + minutes).slice(-2), seconds: ('0' + seconds).slice(-2)};
     }, 
     /**
      * @returns {String}
