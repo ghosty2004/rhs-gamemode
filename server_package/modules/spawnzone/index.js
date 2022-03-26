@@ -1,5 +1,5 @@
 const { SERVER_WEB } = require("../../data/settings");
-const { CreateDynamic3DTextLabel, DestroyDynamic3DTextLabel } = require("../streamer");
+const { CreateDynamic3DTextLabel, DestroyDynamic3DTextLabel } = require("../../libs/streamer");
 
 module.exports = {
     Info: {},

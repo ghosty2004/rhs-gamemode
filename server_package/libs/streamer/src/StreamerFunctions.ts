@@ -163,7 +163,7 @@ export const Streamer_GetLastUpdateTime = (): number => {
     return samp.callNative("Streamer_GetLastUpdateTime", "");
 }
 
-export const Streamer_Update = (playerid: number, type: number): void => {
+export const Streamer_Update = (playerid: number, type: -1): void => {
     samp.callNative("Streamer_Update", "ii", playerid, type);
 }
 
@@ -420,8 +420,8 @@ export const GetPlayerCameraTargetDynObject = (playerid: number): number => {
 
 // => Pickups
 
-export const CreateDynamicPickup = (modelid: number, type: number, x: number, y: number, z: number, worldid = -1, interiorid = -1, playerid = -1): number => {
-    return samp.callNative("CreateDynamicPickup", "iifffiii", modelid, type, x, y, z, worldid, interiorid, playerid);
+export const CreateDynamicPickup = (modelid: number, type: number, x: number, y: number, z: number, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 200, areaid = -1, priority = 0): number => {
+    return samp.callNative("CreateDynamicPickup", "iifffiiifii", modelid, type, x, y, z, worldid, interiorid, playerid, streamdistance, areaid, priority);
 }
 
 export const DestroyDynamicPickup = (pickupid: number): void => {
@@ -478,8 +478,8 @@ export const GetPlayerVisibleDynamicRaceCP = (playerid: number): number => {
 
 // => Map Icons
 
-export const CreateDynamicMapIcon = (x: number, y: number, z: number, type: number, color: number, worldid = -1, interiorid = -1, playerid = -1): number => {
-    return samp.callNative("CreateDynamicMapIcon", "fffiiiii", x, y, z, type, color, worldid, interiorid, playerid);
+export const CreateDynamicMapIcon = (x: number, y: number, z: number, type: number, color: number, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 200, style = 0, areaid = -1, priority = 0): number => {
+    return samp.callNative("CreateDynamicMapIcon", "fffiiiiifiii", x, y, z, type, color, worldid, interiorid, playerid, streamdistance, style, areaid, priority);
 }
 
 export const DestroyDynamicMapIcon = (iconid: number): void => {
@@ -492,8 +492,8 @@ export const IsValidDynamicMapIcon = (iconid: number): number => {
 
 // => 3D Text Labels
 
-export const CreateDynamic3DTextLabel = (text: string, color: number, x: number, y: number, z: number, drawdistance: number, attachedplayer = 0xFFFF, attachedvehicle = 0xFFFF, testlos = 0, worldid = -1, interiorid = -1, playerid = -1): number => {
-    return samp.callNative("CreateDynamic3DTextLabel", "siffffiiiiii", text, color, x, y, z, drawdistance, attachedplayer, attachedvehicle, testlos, worldid, interiorid, playerid);
+export const CreateDynamic3DTextLabel = (text: string, color: number, x: number, y: number, z: number, drawdistance: number, attachedplayer = 0xFFFF, attachedvehicle = 0xFFFF, testlos = 0, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 200, areaid = -1, priority = 0): number => {
+    return samp.callNative("CreateDynamic3DTextLabel", "siffffiiiiiifii", text, color, x, y, z, drawdistance, attachedplayer, attachedvehicle, testlos, worldid, interiorid, playerid, streamdistance, areaid, priority);
 }
 
 export const DestroyDynamic3DTextLabel = (id: number): void => {

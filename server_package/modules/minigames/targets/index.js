@@ -1,6 +1,6 @@
 const { CreateObject, SetObjectPos } = require("../../../libs/samp");
 const { getRandomInt } = require("../../functions");
-const { CreateDynamic3DTextLabel, DestroyDynamic3DTextLabel, Update } = require("../../streamer");
+const { CreateDynamic3DTextLabel, DestroyDynamic3DTextLabel, Streamer_Update } = require("../../../libs/streamer");
 
 module.exports = {
     Weapon: 33,
@@ -20,7 +20,7 @@ module.exports = {
         SetObjectPos(this.HitObject, position[0], position[1], position[2]);
         DestroyDynamic3DTextLabel(this.HitLabel);
         this.HitLabel = CreateDynamic3DTextLabel(`{FF0000}Hit by:\n{FFFFFF}${player.GetPlayerName(24)}`, -1, position[0], position[1], position[2], 50); 
-        Update(player.playerid);
+        Streamer_Update(player.playerid);
     },
     Load: function() {
         this.HitObject = CreateObject(1276, -457.156891, -2668.693848, 1071.062622, 0.000000, 0.000000, -90.000000, 3139.0);

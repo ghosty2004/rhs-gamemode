@@ -44,7 +44,6 @@ const PCar = require("./modules/pcar");
 const Player = require("./modules/player");
 const Server = require("./modules/server");
 const SpawnZone = require("./modules/spawnzone");
-const Streamer = require("./modules/streamer");
 const Teleport = require("./modules/teleport");
 const Web = require("./modules/web");
 const YSF = require("./modules/YSF");
@@ -4701,19 +4700,19 @@ function closeGate(gangId) {
 function ShowRankLabelFor(player) {
     if(Player.Info[player.playerid].Rank_Label) return;
     if(getPlayerRankInLabel(player) == "") return;
-    Player.Info[player.playerid].Rank_Label = Streamer.CreateDynamic3DTextLabel(getPlayerRankInLabel(player), -1, 0, 0, 0.40000000596046, 50, player.playerid);
+    Player.Info[player.playerid].Rank_Label = streamer.CreateDynamic3DTextLabel(getPlayerRankInLabel(player), -1, 0, 0, 0.40000000596046, 50, player.playerid);
 }
 
 function HideRankLabelFor(player) {
     if(!Player.Info[player.playerid].Rank_Label) return;
-    Streamer.DestroyDynamic3DTextLabel(Player.Info[player.playerid].Rank_Label);
+    streamer.DestroyDynamic3DTextLabel(Player.Info[player.playerid].Rank_Label);
     Player.Info[player.playerid].Rank_Label = null;
 }
 
 function UpdateRankLabelFor(player) {
     if(!Player.Info[player.playerid].Rank_Label) ShowRankLabelFor(player);
     if(getPlayerRankInLabel(player) == "") return HideRankLabelFor(player);
-    Streamer.UpdateDynamic3DTextLabelText(Player.Info[player.playerid].Rank_Label, -1, getPlayerRankInLabel(player));
+    streamer.UpdateDynamic3DTextLabelText(Player.Info[player.playerid].Rank_Label, -1, getPlayerRankInLabel(player));
 }
 
 function AfkBrb(player, type) {
@@ -4819,12 +4818,12 @@ function loseCapture(gangId) {
 
 function ShowCapturingLabelFor(player) {
     if(Player.Info[player.playerid].Gang_Data.Capturing_Label) return;
-    Player.Info[player.playerid].Gang_Data.Capturing_Label = Streamer.CreateDynamic3DTextLabel("Capturing...", -16776961, 0, 0, 0, 50, player.playerid);
+    Player.Info[player.playerid].Gang_Data.Capturing_Label = streamer.CreateDynamic3DTextLabel("Capturing...", -16776961, 0, 0, 0, 50, player.playerid);
 }
 
 function HideCapturingLabelFor(player) {
     if(!Player.Info[player.playerid].Gang_Data.Capturing_Label) return;
-    Streamer.DestroyDynamic3DTextLabel(Player.Info[player.playerid].Gang_Data.Capturing_Label);
+    streamer.DestroyDynamic3DTextLabel(Player.Info[player.playerid].Gang_Data.Capturing_Label);
     Player.Info[player.playerid].Gang_Data.Capturing_Label = null;
 }
 

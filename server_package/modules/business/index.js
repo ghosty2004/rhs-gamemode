@@ -1,4 +1,4 @@
-const { CreateDynamicPickup, CreateDynamic3DTextLabel, DestroyDynamicPickup, DestroyDynamic3DTextLabel, CreateDynamicMapIcon, UpdateDynamic3DTextLabelText } = require("../streamer");
+const { CreateDynamicPickup, CreateDynamic3DTextLabel, DestroyDynamicPickup, DestroyDynamic3DTextLabel, CreateDynamicMapIcon, UpdateDynamic3DTextLabelText } = require("../../libs/streamer");
 const { getNameByAccID } = require("../functions");
 
 module.exports = {
@@ -25,7 +25,7 @@ module.exports = {
                 interiorType: interiorType,
                 cost: cost,
                 win: win,
-                label: CreateDynamic3DTextLabel(`{FFFF00}"${name}{FFFF00}"\n{6600FF}Owner: {00FF00}${owner == 0 ? "For Sale" : `${await getNameByAccID(owner)}`}\n{6600FF}Cost: {00FF00}${cost} Coins\n{6600FF}Win: {00FF00}${win} Coins\n{6666FF}/business`, -1, position[0], position[1], position[2]+1, 50, -1, -1, true),
+                label: CreateDynamic3DTextLabel(`{FFFF00}"${name}{FFFF00}"\n{6600FF}Owner: {00FF00}${owner == 0 ? "For Sale" : `${await getNameByAccID(owner)}`}\n{6600FF}Cost: {00FF00}${cost} Coins\n{6600FF}Win: {00FF00}${win} Coins\n{6666FF}/business`, -1, position[0], position[1], position[2]+1, 50, 0xFFFF, 0xFFFF, true),
                 pickup: CreateDynamicPickup(1274, 1, position[0], position[1], position[2]),
                 mapIcon: CreateDynamicMapIcon(position[0], position[1], position[2], owner == 0 ? 52 : 36, owner == 0 ? 52 : 36)
             }); 
