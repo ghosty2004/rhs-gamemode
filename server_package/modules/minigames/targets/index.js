@@ -1,4 +1,4 @@
-const { CreateObject, SetObjectPos } = require("../../../samp-node-lib");
+const { CreateObject, SetObjectPos } = require("../../../libs/samp");
 const { getRandomInt } = require("../../functions");
 const { CreateDynamic3DTextLabel, DestroyDynamic3DTextLabel, Update } = require("../../streamer");
 

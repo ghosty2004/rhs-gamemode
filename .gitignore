@@ -7,3 +7,6 @@ server_package/modules/mysql
 server_log.txt
 samp-node.log
 server.cfg
+
+server_package/libs/samp/build
+server_package/libs/streamer/build

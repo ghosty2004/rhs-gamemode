@@ -1,5 +1,5 @@
 {
-  "name": "samp-node-lib",
+  "name": "samp",
   "version": "1.0.5",
   "description": "NodeJS library for Scripting San Andreas Multiplayer:SAMP depends on samp-node plugin",
   "main": "build/index.js",

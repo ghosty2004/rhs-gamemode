@@ -6,7 +6,7 @@ const {
     TextDrawCreate, TextDrawLetterSize, TextDrawTextSize, TextDrawAlignment, TextDrawColor,
     TextDrawUseBox, TextDrawBoxColor, TextDrawSetShadow, TextDrawSetOutline,
     TextDrawBackgroundColor, TextDrawFont, TextDrawSetProportional, TextDrawSetSelectable
-} = require("../samp-node-lib");
+} = require("../libs/samp");
 const { SV_NAME, SERVER_WEB } = require("../data/settings");
 
 module.exports = {

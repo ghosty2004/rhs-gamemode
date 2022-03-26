@@ -1,6 +1,6 @@
 const { CreateDynamicPickup, CreateDynamic3DTextLabel, DestroyDynamicPickup, DestroyDynamic3DTextLabel, UpdateDynamic3DTextLabelText } = require("../streamer");
 const { getNameByAccID } = require("../functions");
-const { CreateObject } = require("../../samp-node-lib");
+const { CreateObject } = require("../../libs/samp");
 
 module.exports = {
     /**

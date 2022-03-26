@@ -20,7 +20,8 @@ const package_json = require("../package.json");
 /**
  * Samp Node Lib
  */
-const samp = require("./samp-node-lib");
+const samp = require("./libs/samp")
+const streamer = require("./libs/streamer");
 
 /**
  * Custom Modules

@@ -1,4 +1,4 @@
-const { callPublic } = require("../../samp-node-lib");
+const { callPublic } = require("../../libs/samp");
 
 module.exports = {
     CreateCustomCheckpoint: function(x, y, z, size, drawdistance) {

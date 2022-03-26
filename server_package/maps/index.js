@@ -2,12 +2,12 @@
 /*      MAPS        */
 /* ================ */
 
-const { CreateObject, SetObjectMaterial } = require("../samp-node-lib");
+const { CreateObject, SetObjectMaterial } = require("../libs/samp");
 const fs = require("fs");
 
 global.CreateObject = CreateObject;
 global.SetObjectMaterial = SetObjectMaterial;
-const { CreateDynamicObject, SetDynamicObjectMaterial, SetDynamicObjectMaterialText } = require("../modules/streamer");
+const { CreateDynamicObject, SetDynamicObjectMaterial, SetDynamicObjectMaterialText } = require("../libs/streamer");
 global.CreateDynamicObject = CreateDynamicObject;
 global.SetDynamicObjectMaterial = SetDynamicObjectMaterial;
 global.SetDynamicObjectMaterialText = SetDynamicObjectMaterialText;

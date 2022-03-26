@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { CommandInteraction, MessageEmbed } = require("discord.js");
-const { getPlayers, GetServerTickRate } = require("../../../samp-node-lib");
+const { getPlayers, GetServerTickRate } = require("../../../libs/samp");
 
 const Clan = require("../../clan");
 const Gang = require("../../gang");

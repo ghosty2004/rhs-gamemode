@@ -1,5 +1,5 @@
 const { User } = require("discord.js");
-const { getPlayers, SampPlayer, GetVehicleRotationQuat, GetVehiclePos, SendClientMessageToAll } = require("../../samp-node-lib");
+const { getPlayers, SampPlayer, GetVehicleRotationQuat, GetVehiclePos, SendClientMessageToAll } = require("../../libs/samp");
 
 const Clan = require("../clan");
 const Gang = require("../gang");

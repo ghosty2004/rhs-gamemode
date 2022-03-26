@@ -1,4 +1,4 @@
-const { callPublic, SampPlayer } = require("../../samp-node-lib");
+const { callPublic, SampPlayer } = require("../../libs/samp");
 
 module.exports = {
     /**

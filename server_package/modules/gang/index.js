@@ -1,4 +1,4 @@
-const { GangZoneCreate, GangZoneDestroy, CreateObject, Create3DTextLabel, DestroyObject, Delete3DTextLabel } = require("../../samp-node-lib");
+const { GangZoneCreate, GangZoneDestroy, CreateObject, Create3DTextLabel, DestroyObject, Delete3DTextLabel } = require("../../libs/samp");
 const { GANGS } = require("../../data/settings");
 const { CreateCustomCheckpoint, DeleteCustomCheckpoint } = require("../checkpoint");
 
