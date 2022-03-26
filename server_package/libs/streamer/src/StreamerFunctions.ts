@@ -312,8 +312,8 @@ export const Streamer_SetItemOffset = (type: number, id: number, x: number, y: n
 
 // => Objects
 
-export const CreateDynamicObject = (modelid: number, x: number, y: number, z: number, rx: number, ry: number, rz: number, worldid: -1, interiorid: -1, playerid: -1): number => {
-    return samp.callNative("CreateDynamicObject", "iffffffiii", modelid, x, y, z, rx, ry, rz, worldid, interiorid, playerid);
+export const CreateDynamicObject = (modelid: number, x: number, y: number, z: number, rx: number, ry: number, rz: number, worldid = -1, interiorid = -1, playerid = -1, streamdistance = 300, drawdistance = 300, areaid = -1, priority = 0): number => {
+    return samp.callNative("CreateDynamicObject", "iffffffiiiffii", modelid, x, y, z, rx, ry, rz, worldid, interiorid, playerid, streamdistance, drawdistance, areaid, priority);
 }
 
 export const DestroyDynamicObject = (objectid: number): void => {
@@ -348,7 +348,7 @@ export const SetDynamicObjectNoCameraCol = (objectid: number): void => {
     samp.callNative("SetDynamicObjectNoCameraCol", "i", objectid);
 }
 
-export const MoveDynamicObject = (objectid: number, x: number, y: number, z: number, speed: number, rx: -1000, ry: -1000, rz: -1000): void => {
+export const MoveDynamicObject = (objectid: number, x: number, y: number, z: number, speed: number, rx = -1000, ry = -1000, rz = -1000): void => {
     samp.callNative("MoveDynamicObject", "ifffffff", objectid, x, y, z, speed, rx, ry, rz);
 }
 
@@ -364,7 +364,7 @@ export const AttachCameraToDynamicObject = (playerid: number, objectid: number):
     samp.callNative("AttachCameraToDynamicObject", "ii", playerid, objectid);
 }
 
-export const AttachDynamicObjectToObject = (objectid: number, attachtoid: number, offsetx: number, offsety: number, offsetz: number, rx: number, ry: number, rz: number, syncrotation: -1): void => {
+export const AttachDynamicObjectToObject = (objectid: number, attachtoid: number, offsetx: number, offsety: number, offsetz: number, rx: number, ry: number, rz: number, syncrotation = -1): void => {
     samp.callNative("AttachDynamicObjectToObject", "iiffffffi", objectid, attachtoid, offsetx, offsety, offsetz, rx, ry, rz, syncrotation);
 }
 
@@ -393,7 +393,7 @@ export const GetDynamicObjectMaterial = (objectid: number, materialindex: number
     return { modelId: data[0], txdName: data[1], textureName: data[2], materialColor: data[3] };
 }
 
-export const SetDynamicObjectMaterial = (objectid: number, materialindex: number, modelid: number, txdname: string, texturename: string, materialcolor: 0): void => {
+export const SetDynamicObjectMaterial = (objectid: number, materialindex: number, modelid: number, txdname: string, texturename: string, materialcolor = 0): void => {
     samp.callNative("SetDynamicObjectMaterial", "iiissi", objectid, materialindex, modelid, txdname, texturename, materialcolor);
 }
 
@@ -410,7 +410,7 @@ export const GetDynamicObjectMaterialText = (objectid: number, materialindex: nu
     return { text: data[0], materialSize: data[1], fontFace: data[2], fontSize: data[3], bold: data[4], fontColor: data[5], backColor: data[6], textAligment: data[7] };
 }
 
-export const SetDynamicObjectMaterialText = (objectid: number, materialindex: number, text: string, materialsize: number, fontface: "Arial", fontsize: 24, bold: 1, fontcolor: 0xFFFFFFFF, backcolor: 0, textalignment: 0): void => {
+export const SetDynamicObjectMaterialText = (objectid: number, materialindex: number, text: string, materialsize: number, fontface = "Arial", fontsize = 24, bold = 1, fontcolor = 0xFFFFFFFF, backcolor = 0, textalignment = 0): void => {
     samp.callNative("SetDynamicObjectMaterialText", "iisisiiiii", objectid, materialindex, text, materialsize, fontface, fontsize, bold, fontcolor, backcolor, textalignment);
 }
 
@@ -420,7 +420,7 @@ export const GetPlayerCameraTargetDynObject = (playerid: number): number => {
 
 // => Pickups
 
-export const CreateDynamicPickup = (modelid: number, type: number, x: number, y: number, z: number, worldid: -1, interiorid: -1, playerid: -1): number => {
+export const CreateDynamicPickup = (modelid: number, type: number, x: number, y: number, z: number, worldid = -1, interiorid = -1, playerid = -1): number => {
     return samp.callNative("CreateDynamicPickup", "iifffiii", modelid, type, x, y, z, worldid, interiorid, playerid);
 }
 
@@ -434,7 +434,7 @@ export const IsValidDynamicPickup = (pickupid: number): number => {
 
 // => Checkpoints
 
-export const CreateDynamicCP = (x: number, y: number, z: number, size: number, worldid: -1, interiorid: -1, playerid: -1): number => {
+export const CreateDynamicCP = (x: number, y: number, z: number, size: number, worldid = -1, interiorid = -1, playerid = -1): number => {
     return samp.callNative("CreateDynamicCP", "ffffiiii", x, y, z, size, worldid, interiorid, playerid);
 }
 
@@ -456,7 +456,7 @@ export const GetPlayerVisibleDynamicCP = (playerid: number): number => {
 
 // => Race Checkpoints
 
-export const CreateDynamicRaceCP = (type: number, x: number, y: number, z: number, nextx: number, nexty: number, nextz: number, size: number, worldid: -1, interiorid: -1, playerid: -1): number => {
+export const CreateDynamicRaceCP = (type: number, x: number, y: number, z: number, nextx: number, nexty: number, nextz: number, size: number, worldid = -1, interiorid = -1, playerid = -1): number => {
     return samp.callNative("CreateDynamicRaceCP", "ifffffffiii", type, x, y, z, nextx, nexty, nextz, size, worldid, interiorid, playerid);
 }
 
@@ -478,7 +478,7 @@ export const GetPlayerVisibleDynamicRaceCP = (playerid: number): number => {
 
 // => Map Icons
 
-export const CreateDynamicMapIcon = (x: number, y: number, z: number, type: number, color: number, worldid: -1, interiorid: -1, playerid: -1): number => {
+export const CreateDynamicMapIcon = (x: number, y: number, z: number, type: number, color: number, worldid = -1, interiorid = -1, playerid = -1): number => {
     return samp.callNative("CreateDynamicMapIcon", "fffiiiii", x, y, z, type, color, worldid, interiorid, playerid);
 }
 
@@ -492,7 +492,7 @@ export const IsValidDynamicMapIcon = (iconid: number): number => {
 
 // => 3D Text Labels
 
-export const CreateDynamic3DTextLabel = (text: string, color: number, x: number, y: number, z: number, drawdistance: number, attachedplayer: 0xFFFF, attachedvehicle: 0xFFFF, testlos: 0, worldid: -1, interiorid: -1, playerid: -1): number => {
+export const CreateDynamic3DTextLabel = (text: string, color: number, x: number, y: number, z: number, drawdistance: number, attachedplayer = 0xFFFF, attachedvehicle = 0xFFFF, testlos = 0, worldid = -1, interiorid = -1, playerid = -1): number => {
     return samp.callNative("CreateDynamic3DTextLabel", "siffffiiiiii", text, color, x, y, z, drawdistance, attachedplayer, attachedvehicle, testlos, worldid, interiorid, playerid);
 }
 
@@ -514,27 +514,27 @@ export const UpdateDynamic3DTextLabelText = (id: number, color: number, text: st
 
 // => Areas
 
-export const CreateDynamicCircle = (x: number, y: number, size: number, worldid: -1, interiorid: -1, playerid: -1, priority: 0): number => {
+export const CreateDynamicCircle = (x: number, y: number, size: number, worldid = -1, interiorid = -1, playerid = -1, priority = 0): number => {
     return samp.callNative("CreateDynamicCircle", "fffiiii", x, y, size, worldid, interiorid, playerid, priority);
 }
 
-export const CreateDynamicCylinder = (x: number, y: number, minz: number, maxz: number, size: number, worldid: -1, interiorid: -1, playerid: -1, priority: 0): number => {
+export const CreateDynamicCylinder = (x: number, y: number, minz: number, maxz: number, size: number, worldid = -1, interiorid = -1, playerid = -1, priority = 0): number => {
     return samp.callNative("CreateDynamicCylinder", "fffffiiii", x, y, minz, maxz, size, worldid, interiorid, playerid, priority);
 }
 
-export const CreateDynamicSphere = (x: number, y: number, z: number, size: number, worldid: -1, interiorid: -1, playerid: -1, priority: 0): number => {
+export const CreateDynamicSphere = (x: number, y: number, z: number, size: number, worldid = -1, interiorid = -1, playerid = -1, priority = 0): number => {
     return samp.callNative("CreateDynamicSphere", "ffffiiii", x, y, z, size, worldid, interiorid, playerid, priority);
 }
 
-export const CreateDynamicRectangle = (minx: number, miny: number, maxx: number, maxy: number, worldid: -1, interiorid: -1, playerid: -1, priority: 0): number => {
+export const CreateDynamicRectangle = (minx: number, miny: number, maxx: number, maxy: number, worldid = -1, interiorid = -1, playerid = -1, priority = 0): number => {
     return samp.callNative("CreateDynamicRectangle", "ffffiiii", minx, miny, maxx, maxy, worldid, interiorid, playerid, priority);
 }
 
-export const CreateDynamicCuboid = (minx: number, miny: number, minz: number, maxx: number, maxy: number, maxz: number, worldid: -1, interiorid: -1, playerid: -1, priority: 0): number => {
+export const CreateDynamicCuboid = (minx: number, miny: number, minz: number, maxx: number, maxy: number, maxz: number, worldid = -1, interiorid = -1, playerid = -1, priority = 0): number => {
     return samp.callNative("CreateDynamicCuboid", "ffffffiiii", minx, miny, minz, maxx, maxy, maxz, worldid, interiorid, playerid, priority);
 }
 
-export const CreateDynamicCube = (minx: number, miny: number, minz: number, maxx: number, maxy: number, maxz: number, worldid: -1, interiorid: -1, playerid: -1, priority: 0): number => {
+export const CreateDynamicCube = (minx: number, miny: number, minz: number, maxx: number, maxy: number, maxz: number, worldid = -1, interiorid = -1, playerid = -1, priority = 0): number => {
     return samp.callNative("CreateDynamicCube", "ffffffiiii", minx, miny, minz, maxx, maxy, maxz, worldid, interiorid, playerid, priority);
 }
 
@@ -560,19 +560,19 @@ export const GetDynamicPolygonNumberPoints = (areaid: number): number => {
     return samp.callNative("GetDynamicPolygonNumberPoints", "i", areaid);
 }
 
-export const IsPlayerInDynamicArea = (playerid: number, areaid: number, recheck: 0): number => {
+export const IsPlayerInDynamicArea = (playerid: number, areaid: number, recheck = 0): number => {
     return samp.callNative("IsPlayerInDynamicArea", "iii", playerid, areaid, recheck);
 }
 
-export const IsPlayerInAnyDynamicArea = (playerid: number, recheck: 0): number => {
+export const IsPlayerInAnyDynamicArea = (playerid: number, recheck = 0): number => {
     return samp.callNative("IsPlayerInAnyDynamicArea", "ii", playerid, recheck);
 }
 
-export const IsAnyPlayerInDynamicArea = (areaid: number, recheck: 0): number => {
+export const IsAnyPlayerInDynamicArea = (areaid: number, recheck = 0): number => {
     return samp.callNative("IsAnyPlayerInDynamicArea", "ii", areaid, recheck);
 }
 
-export const IsAnyPlayerInAnyDynamicArea = (recheck: 0): number => {
+export const IsAnyPlayerInAnyDynamicArea = (recheck = 0): number => {
     return samp.callNative("IsAnyPlayerInAnyDynamicArea", "i", recheck);
 }
 
@@ -620,11 +620,11 @@ export const AttachDynamicAreaToObject = (areaid: number, objectid: number): voi
     samp.callNative("AttachDynamicAreaToObject", "ii", areaid, objectid);
 }
 
-export const AttachDynamicAreaToPlayer = (areaid: number, playerid: number, offsetx: 0, offsety: 0, offsetz: 0): void => {
+export const AttachDynamicAreaToPlayer = (areaid: number, playerid: number, offsetx = 0, offsety = 0, offsetz = 0): void => {
     samp.callNative("AttachDynamicAreaToPlayer", "iifff", areaid, playerid, offsetx, offsety, offsetz);
 }
 
-export const AttachDynamicAreaToVehicle = (areaid: number, vehicleid: number, offsetx: 0, offsety: 0, offsetz: 0): void => {
+export const AttachDynamicAreaToVehicle = (areaid: number, vehicleid: number, offsetx = 0, offsety = 0, offsetz = 0): void => {
     samp.callNative("AttachDynamicAreaToVehicle", "iifff", areaid, vehicleid, offsetx, offsety, offsetz);
 }
 
