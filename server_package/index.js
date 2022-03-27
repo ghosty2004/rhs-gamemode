@@ -24,6 +24,10 @@ const samp = require("./libs/samp")
 const streamer = require("./libs/streamer");
 const ysf = require("./libs/ysf");
 
+ysf.OnPickupStreamIn((pickupId, forPlayerId) => {
+    console.log(`Pickup: ${pickupId} for ${samp.GetPlayerName(forPlayerId, 24)} has streamed`);
+});
+
 /**
  * Custom Modules
  */
