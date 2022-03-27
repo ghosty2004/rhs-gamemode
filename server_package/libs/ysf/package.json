@@ -1,5 +1,5 @@
 {
-    "name": "streamer",
+    "name": "ysf",
     "version": "1.0.0",
     "description": "NodeJS library for SA:MP YSF | Compatible for samp-node plugin",
     "main": "build/index.js",

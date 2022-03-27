@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("@discordjs/builders");
 const { CommandInteraction } = require("discord.js");
 
 const { NOT_ENOUGH_ADMIN } = require("../../errors");
-const { SetMaxPlayers } = require("../../YSF");
+const { SetMaxPlayers } = require("../../../libs/ysf");
 
 const Function = require("../../functions");
 

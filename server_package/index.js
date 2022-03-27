@@ -22,6 +22,7 @@ const package_json = require("../package.json");
  */
 const samp = require("./libs/samp")
 const streamer = require("./libs/streamer");
+const ysf = require("./libs/ysf");
 
 /**
  * Custom Modules
@@ -46,7 +47,6 @@ const Server = require("./modules/server");
 const SpawnZone = require("./modules/spawnzone");
 const Teleport = require("./modules/teleport");
 const Web = require("./modules/web");
-const YSF = require("./modules/YSF");
 
 /**
  * Maps
@@ -4248,7 +4248,7 @@ CMD.on("setaccess", async (player, params) => {
         Player.Info[target.playerid].RconType = setValue;
         target.SendClientMessage(data.colors.YELLOW, `Admin {FF0000}${player.GetPlayerName(24)} {FFFF00}has seted your RCON access to: {FF0000}${params[1].toUpperCase()}{FFFF00}!`);
         player.SendClientMessage(data.colors.YELLOW, `You have successfully seted {FF0000}${target.GetPlayerName(24)}{FFFF00}'s RCON type to: {FF0000}${params[1].toUpperCase()}{FFFF00}!`);
-        YSF.SetPlayerAdmin(target, Player.Info[target.playerid].RconType != 0);
+        ysf.SetPlayerAdmin(target.playerid, Player.Info[target.playerid].RconType != 0);
         SendACMD(player, "SetAccess");
     }
 });
@@ -4274,7 +4274,7 @@ CMD.on("setmaxplayers", (player, params) => {
     if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     if(!isNumber(params[0])) return SendUsage(player, "/SetMaxPlayers [Max Players]");
     params[0] = parseInt(params[0]);
-    YSF.SetMaxPlayers(params[0]);
+    ysf.SetMaxPlayers(params[0]);
     player.SendClientMessage(data.colors.YELLOW, `Max players was successfully modified to {FF0000}${params[0]}{FFFF00}.`);
 });
 
@@ -6038,7 +6038,7 @@ function LoadPlayerStats(player, showDialog = true) {
         Player.Info[player.playerid].AdminActivity.ClearChats = result[0].admin_clearchats;
         Player.Info[player.playerid].AdminActivity.Since = result[0].admin_since;
         Player.Info[player.playerid].RconType = result[0].rcontype;
-        YSF.SetPlayerAdmin(player, Player.Info[player.playerid].RconType != 0);
+        ysf.SetPlayerAdmin(player.playerid, Player.Info[player.playerid].RconType != 0);
         Player.Info[player.playerid].VIP = result[0].VIP;
         Player.Info[player.playerid].VIP_Expire = result[0].VIP_Expire;
         Player.Info[player.playerid].Clan = result[0].clan;
@@ -6155,16 +6155,16 @@ samp.OnGameModeInit(() => {
     console.log("================================================".white);
     console.log("\n");
 
-    YSF.AddServerRule("* gamemode by", package_json.author);
-    YSF.AddServerRule("* server uptime", "00:00:00");
+    ysf.AddServerRule("* gamemode by", package_json.author);
+    ysf.AddServerRule("* server uptime", "00:00:00");
 
     setInterval(() => {
         let OnlineTime = Function.timestampToHMS(Server.Info.StartTime);
-        YSF.SetServerRule("* server uptime", `${OnlineTime.hours}:${OnlineTime.minutes}:${OnlineTime.seconds}`);
+        ysf.SetServerRule("* server uptime", `${OnlineTime.hours}:${OnlineTime.minutes}:${OnlineTime.seconds}`);
     }, 1000); 
 
     data.settings.ALLOWED_NICKNAME_CHARACTERS.forEach((character) => {
-        YSF.AllowNickNameCharacter(character, true);
+        ysf.AllowNickNameCharacter(character, true);
     });
 
     Maps.Load(); /* Load Server Maps */

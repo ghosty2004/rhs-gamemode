@@ -1,3 +1,5 @@
+import { E_SCM_EVENT_TYPE } from "./YsfEnums";
+
 export const OnPlayerEnterGangZone = (func: (playerId: number, zoneId: number) => void): void => {
     samp.on("OnPlayerEnterGangZone", ((playerId, zoneId) => func(playerId, zoneId)));
 }
@@ -38,7 +40,7 @@ export const OnPlayerClientGameInit = (func: (playerId: number, useCjWalk: numbe
     samp.on("OnPlayerClientGameInit", ((playerId, useCjWalk, limitGlobalChat, globalChatRadius, nameTagDistance, disableEnterExits, nameTagLos, manualVehEngineAndLights, spawnsAvailable, showNameTags, showPlayerMarkers, onFootRate, inCarRate, weaponRate, lagCompMode, vehicleFriendlyFire) => func(playerId, useCjWalk, limitGlobalChat, globalChatRadius, nameTagDistance, disableEnterExits, nameTagLos, manualVehEngineAndLights, spawnsAvailable, showNameTags, showPlayerMarkers, onFootRate, inCarRate, weaponRate, lagCompMode, vehicleFriendlyFire)));
 }
 
-export const OnOutcomeScmEvent = (func: (playerId: number, issuerId: number, eventId: number, vehicleId: number, arg1: number, arg2: number) => void): void => {
+export const OnOutcomeScmEvent = (func: (playerId: number, issuerId: number, eventId: E_SCM_EVENT_TYPE, vehicleId: number, arg1: number, arg2: number) => void): void => {
     samp.on("OnOutcomeScmEvent", ((playerId, issuerId, eventId, vehicleId, arg1, arg2) => func(playerId, issuerId, eventId, vehicleId, arg1, arg2)));
 }
 

@@ -1,5 +1,7 @@
 // => Execute
 
+import { E_PLAYER_CONNECT_MODE } from "./YsfEnums";
+
 export const execute = (command: string, saveoutput = 0, index = 0): void => {
     samp.callNative("execute", "sii", command, saveoutput, index);
 }
@@ -70,7 +72,7 @@ export const GetFilterScriptName = (id: number): Array<any> => {
 
 // => Server rule modifications
 
-export const AddServerRule = (name: string, value: string, flags = 0): void => {
+export const AddServerRule = (name: string, value: string, flags = 6): void => {
     samp.callNative("AddServerRule", "ssi", name, value, flags);
 }
 
@@ -206,7 +208,7 @@ export const IsValidNickName = (name: string): number => {
 }
 
 export const AllowNickNameCharacter = (character: string, allow: boolean): void => {
-    samp.callNative("AllowNickNameCharacter", "ss", character, allow);
+    samp.callNative("AllowNickNameCharacter", "ci", character, allow);
 }
 
 export const IsNickNameCharacterAllowed = (character: string): number => {
@@ -566,11 +568,11 @@ export const UpdatePlayerSyncData = (playerId: number, type = -1, setState = fal
 /** @deprecated */
 export const SendPlayerClientGameInit = (): void => {  }
 
-export const SetPlayerConnectMode = (playerId: number, mode: number): void => {
+export const SetPlayerConnectMode = (playerId: number, mode: E_PLAYER_CONNECT_MODE): void => {
     samp.callNative("SendPlayerClientGameInit", "ii", playerId, mode);
 }
 
-export const GetPlayerConnectMode = (playerId: number): number => {
+export const GetPlayerConnectMode = (playerId: number): E_PLAYER_CONNECT_MODE => {
     return samp.callNative("GetPlayerConnectMode", "i", playerId);
 }
 
