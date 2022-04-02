@@ -1,6 +1,6 @@
-import { Message, Interaction } from "discord.js";
+import { Message } from "discord.js";
 import { EventEmitter } from "events";
-import { SampPlayer } from "../../samp-node-lib";
+import { SampPlayer } from "../../libs/samp";
 
 declare interface Command {
     on<U>(

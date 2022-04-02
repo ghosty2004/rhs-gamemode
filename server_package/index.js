@@ -20,7 +20,7 @@ const package_json = require("../package.json");
 /**
  * Samp Node Lib
  */
-const samp = require("./libs/samp")
+const samp = require("./libs/samp");
 const streamer = require("./libs/streamer");
 const ysf = require("./libs/ysf");
 
@@ -344,7 +344,7 @@ CMD.on("anim", (player, params) => {
     if(params[0] == "list") {
         let info = "";
         info += "{BBFF00}The following {00BBF6}Anims {BBFF00}can be used with the command {00BBF6}/Anim [Anim]{BBFF00}!\n";
-        info += `{00BBF6}Example: {BBFF00}/Anim ${data.animations.at(0).name}\n`; // cell, phone
+        info += `{00BBF6}Example: {BBFF00}/Anim ${data.animations.at(0).name}\n`;
         info += "\n";
 
         let count = 0;
@@ -6012,25 +6012,98 @@ function Call_NewName(player) {
     });
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ * @param {Boolean} showDialog 
+ */
 function LoadPlayerStats(player, showDialog = true) {
     con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], async function(err, result) {
         if(err || !result) return player.Kick();
-        Player.Info[player.playerid].AccID = result[0].ID;
+        Player.Info[player.playerid].AccID = result[0].ID; 
         if(await checkPlayerBanStatus(player)) return Function.kickPlayer(player);
-        Player.Info[player.playerid].LoggedIn = true;
-        Player.Info[player.playerid].Mail = result[0].mail;
-        Player.Info[player.playerid].Money = result[0].money;
-        Player.Info[player.playerid].Coins = result[0].coins;
-        Player.Info[player.playerid].Respect.Positive = result[0].respect_positive;
-        Player.Info[player.playerid].Respect.Negative = result[0].respect_negative;
-        Player.Info[player.playerid].OnlineTime.Hours = result[0].hours;
-        Player.Info[player.playerid].OnlineTime.Minutes = result[0].minutes;
-        Player.Info[player.playerid].OnlineTime.Seconds = result[0].seconds;
-        Player.Info[player.playerid].Admin = result[0].admin;
-        Player.Info[player.playerid].AdminActivity.Points = result[0].admin_points;
-        Player.Info[player.playerid].AdminActivity.Kicks = result[0].admin_kicks;
-        Player.Info[player.playerid].AdminActivity.Warns = result[0].admin_warns;
-        Player.Info[player.playerid].AdminActivity.Bans = result[0].admin_warns;
+
+        /* To be continued this... */
+        player.setVariables({
+            loggedIn: true,
+            mail: result[0].mail,
+            money: result[0].money,
+            coins: result[0].coins,
+            respectPositive: result[0].respect_positive,
+            respectNegative: result[0].respect_negative,
+            hours: result[0].hours,
+            minutes: result[0].minutes,
+            seconds: result[0].seconds,
+            admin: result[0].admin,
+            adminPoints: result[0].admin_points,
+            adminKicks: result[0].admin_kicks,
+            adminWarns: result[0].admin_warns,
+            adminBans: result[0].admin_bans,
+            adminReactionTests: result[0].admin_reactiontests,
+            adminMathTests: result[0].admin_mathtests,
+            adminJails: result[0].admin_jails,
+            adminMutes: result[0].admin_mutes,
+            adminClearChats: result[0].admin_clearchats,
+            adminSince: result[0].admin_since,
+            rconType: result[0].rcontype,
+            vip: result[0].VIP,
+            vipExpire: result[0].VIP_Expire,
+            clan: result[0].clan,
+            clanRank: result[0].clan_rank,
+            gang: result[0].gang,
+            gangRank: result[0].gang_rank,
+            gangKills: result[0].gang_kills,
+            gangDeaths: result[0].gang_deaths,
+            gangCaptures: result[0].gang_captures,
+            gangPoints: result[0].gang_points,
+            gangWarns: result[0].gang_warns,
+            gangHours: result[0].gang_hours,
+            gangMinutes: result[0].gang_minutes,
+            gangSeconds: result[0].gang_seconds,
+            gangMemberSince: result[0].gang_membersince,
+            kills: result[0].kills,
+            headShots: result[0].headshots,
+            killingSpree: result[0].killingspree,
+            bestKillingSpree: result[0].bestkillingspree,
+            deaths: result[0].deaths,
+            driftPoints: result[0].driftpoints,
+            stuntPoints: result[0].stuntpoints,
+            racePoints: result[0].racepoints,
+            monthHours: result[0].month_hours,
+            monthMinutes: result[0].month_minutes,
+            monthSeconds: result[0].month_seconds,
+            monthKills: result[0].month_kills,
+            monthHeadShots: result[0].month_headshots,
+            monthKillingSpree: result[0].month_killingspree,
+            monthBestKillingSpree: result[0].month_bestkillingspree,
+            monthDeaths: result[0].month_deaths,
+            monthDriftPoints: result[0].month_driftpoints,
+            monthStuntPoints: result[0].month_stuntpoints,
+            monthRacePoints: result[0].month_racepoints,
+            description1: result[0].description1,
+            description2: result[0].description2,
+            description3: result[0].description3,
+            lastOn: result[0].laston,
+            jailed: result[0].jailed,
+            caged: result[0].caged,
+            kicks: result[0].kicks,
+            discord: result[0].discord,
+            holdSettings: result[0].hold_settings
+        });
+
+        Player.Info[player.playerid].LoggedIn = true; 
+        Player.Info[player.playerid].Mail = result[0].mail;  
+        Player.Info[player.playerid].Money = result[0].money; 
+        Player.Info[player.playerid].Coins = result[0].coins; 
+        Player.Info[player.playerid].Respect.Positive = result[0].respect_positive; 
+        Player.Info[player.playerid].Respect.Negative = result[0].respect_negative; 
+        Player.Info[player.playerid].OnlineTime.Hours = result[0].hours; 
+        Player.Info[player.playerid].OnlineTime.Minutes = result[0].minutes; 
+        Player.Info[player.playerid].OnlineTime.Seconds = result[0].seconds; 
+        Player.Info[player.playerid].Admin = result[0].admin; 
+        Player.Info[player.playerid].AdminActivity.Points = result[0].admin_points; 
+        Player.Info[player.playerid].AdminActivity.Kicks = result[0].admin_kicks; 
+        Player.Info[player.playerid].AdminActivity.Warns = result[0].admin_warns; 
+        Player.Info[player.playerid].AdminActivity.Bans = result[0].admin_warns; 
         Player.Info[player.playerid].AdminActivity.ReactionTests = result[0].admin_reactiontests;
         Player.Info[player.playerid].AdminActivity.MathTests = result[0].admin_mathtests;
         Player.Info[player.playerid].AdminActivity.Jails = result[0].admin_jails;
@@ -6039,7 +6112,7 @@ function LoadPlayerStats(player, showDialog = true) {
         Player.Info[player.playerid].AdminActivity.Since = result[0].admin_since;
         Player.Info[player.playerid].RconType = result[0].rcontype;
         ysf.SetPlayerAdmin(player.playerid, Player.Info[player.playerid].RconType != 0);
-        Player.Info[player.playerid].VIP = result[0].VIP;
+        Player.Info[player.playerid].VIP = result[0].VIP; 
         Player.Info[player.playerid].VIP_Expire = result[0].VIP_Expire;
         Player.Info[player.playerid].Clan = result[0].clan;
         Player.Info[player.playerid].Clan_Rank = result[0].clan_rank;
