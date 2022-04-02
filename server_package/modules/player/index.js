@@ -67,7 +67,6 @@ module.exports = {
                 StuntPoints: 0,
                 RacePoints: 0,
             },
-            AdminPoints: 0,
             Month: {
                 OnlineTime: {
                     Hours: 0,

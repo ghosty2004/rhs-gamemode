@@ -64,7 +64,6 @@ export declare const Info: {
         StuntPoints: number,
         RacePoints: number,
     },
-    AdminPoints: number,
     Month: {
         OnlineTime: {
             Hours: number,

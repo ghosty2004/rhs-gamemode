@@ -9,6 +9,8 @@ import {EventEmitter} from "events";
 
 const dialogEvent = new EventEmitter();
 
+dialogEvent.setMaxListeners(0);
+
 export const ShowPlayerSmartDialog = (playerid: number, style: number, caption: string, info: string, button1: string, button2: string, callback: SMART_DIALOG_CALLBACK) => {
     return SmartDialogFunctions.ShowPlayerSmartDialog(playerid, style, caption, info, button1, button2, callback);
 };
@@ -38,8 +40,8 @@ export class SmartDialogFunctions {
             removeAllListeners();
         }
 
-        dialogEvent.on("onResponse", onResponse);
-        dialogEvent.on("onDisconnect", onDisconnect);
+        dialogEvent.once("onResponse", onResponse);
+        dialogEvent.once("onDisconnect", onDisconnect);
 
         function removeAllListeners() {
             dialogEvent.removeListener("onResponse", onResponse);

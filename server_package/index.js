@@ -967,9 +967,11 @@ CMD.on("hold", (player) => {
                                         info += "{BBFF00}Neck\n";
                                         info += "{BBFF00}Jaw";
                                         player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.LIST, "{BBFF00}Choose on which side of the body the object will apparen", info, "Select", "Back", (response) => {
-                                            if(!response.button) return CMD.emit("hold", player);  
-                                            player.SetPlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing, Player.Info[player.playerid].HoldsData.CreatingId, listitem+1, 0, 0, 0, 0, 0, 0, 1, 1, 1);
-                                            player.EditAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
+                                            try {
+                                                if(!response.button) return CMD.emit("hold", player);  
+                                                player.SetPlayerAttachedObject(Player.Info[player.playerid].HoldsData.Editing, Player.Info[player.playerid].HoldsData.CreatingId, response.listItem+1, 0, 0, 0, 0, 0, 0, 1, 1, 1);
+                                                player.EditAttachedObject(Player.Info[player.playerid].HoldsData.Editing);
+                                            } catch(e) {console.log(e.stack)}
                                         });
                                     });
                                     break;
@@ -1152,12 +1154,12 @@ CMD.on("top", (player) => {
                 break;
             }
             case 2: {
-                con.query("SELECT name, adminpoints FROM users WHERE admin >= 1 ORDER BY adminpoints DESC LIMIT 10", function(err, result) {
+                con.query("SELECT name, admin_points FROM users WHERE admin >= 1 ORDER BY admin_points DESC LIMIT 10", function(err, result) {
                     let info = "{FFFFFF}Our best Admins are here!\n";
                     if(!err && result) {
                         info += "\n";
                         for(let i = 0; i < result.length; i++) {
-                            info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].adminpoints} {BBFF00}Activity Points\n`;
+                            info += `{FF0000}${i+1}. {BBFF00}${result[i].name}: {00BBF6}${result[i].admin_points} {BBFF00}Activity Points\n`;
                         }
                     }
                     info += "\n";
@@ -1359,7 +1361,7 @@ CMD.on("buyvip", (player) => {
                 UpdateRankLabelFor(player);
                 samp.SendClientMessageToAll(data.colors.LIGHT_YELLOW, `INFO:{00BBF6} ${player.GetPlayerName(24)}(${player.playerid}){BBFF00} a cumparat{FF0000} VIP Rosu{BBFF00} Gratis, Pentru a cumpara VIP, scrie /BuyVIP!`);
                 purchaseInfo += "{00FF00}Ai cumparat cu succes {FF0000}VIP Red{00FF00} Gratis!\n";
-                purchaseInfo += "{00FF00}Scrie {00BBF6}/vCmds {00FF00}pentru a vedea {FF0000}Comenzile de VIP{00FF00}!";
+                purchaseInfo += "{0FF00}Scrie {00BBF6}/vCmds {00FF00}pentru a vedea {FF0000}Comenzile de VIP{00FF00}!";
                 break;
             }
             case 1: {
@@ -5225,8 +5227,8 @@ function getPlayerStatsNote(player, offline_check=false) {
     if((offline_check ? player.hours : Function.totalGameTime(player, "default").hours) >= 100) note += 1;
     if((offline_check ? player.respect_positive : Player.Info[player.playerid].Respect.Positive) >= 50) note += 1;
     if((offline_check ? player.coins : Player.Info[player.playerid].Coins) >= 25000) note += 1;
-    if(Business.Info.some(s => s.owner == offline_check ? player.ID : Player.Info[player.playerid].AccID)) note += 1;
-    if(House.Info.some(s => s.owner == offline_check ? player.ID : Player.Info[player.playerid].AccID)) note += 1;
+    if(Business.Info.some(s => s.owner == (offline_check ? player.ID : Player.Info[player.playerid].AccID))) note += 1;
+    if(House.Info.some(s => s.owner == (offline_check ? player.ID : Player.Info[player.playerid].AccID))) note += 1;
     return note;
 }
 
@@ -6135,7 +6137,6 @@ function LoadPlayerStats(player, showDialog = true) {
         Player.Info[player.playerid].Driving_Data.DriftPoints = result[0].driftpoints;
         Player.Info[player.playerid].Driving_Data.StuntPoints = result[0].stuntpoints;
         Player.Info[player.playerid].Driving_Data.RacePoints = result[0].racepoints;
-        Player.Info[player.playerid].AdminPoints = result[0].adminpoints;
         Player.Info[player.playerid].Month.OnlineTime.Hours = result[0].month_hours;
         Player.Info[player.playerid].Month.OnlineTime.Minutes = result[0].month_minutes;
         Player.Info[player.playerid].Month.OnlineTime.Seconds = result[0].month_seconds;

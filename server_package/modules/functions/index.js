@@ -288,7 +288,7 @@ module.exports = {
         con.query("UPDATE users SET mail = ?, money = ?, coins = ?, respect_positive = ?, respect_negative = ?, hours = ?, minutes = ?, seconds = ?, admin = ?, admin_points = ?, admin_kicks = ?, admin_warns = ?,\
         admin_bans = ?, admin_reactiontests = ?, admin_mathtests = ?, admin_jails = ?, admin_mutes = ?, admin_clearchats = ?, admin_since = ?, VIP = ?, VIP_Expire = ?, clan = ?, clan_rank = ?, gang = ?, gang_rank = ?,\
         gang_kills = ?, gang_deaths = ?, gang_captures = ?, gang_points = ?, gang_warns = ?, gang_hours = ?, gang_minutes = ?, gang_seconds = ?, gang_membersince = ?, kills = ?, headshots = ?, killingspree = ?,\
-        bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, adminpoints = ?, month_hours = ?, month_minutes = ?, month_seconds = ?, month_kills = ?, month_headshots = ?, month_killingspree = ?,\
+        bestkillingspree = ?, deaths = ?, driftpoints = ?, stuntpoints = ?, racepoints = ?, month_hours = ?, month_minutes = ?, month_seconds = ?, month_kills = ?, month_headshots = ?, month_killingspree = ?,\
         month_bestkillingspree = ?, month_deaths = ?, month_driftpoints = ?, month_stuntpoints = ?, month_racepoints = ?, description1 = ?, description2 = ?, description3 = ?, laston = ?, jailed = ?, caged = ?, kicks = ?,\
         discord = ?, hold_settings = ? WHERE ID = ?", [
             Player.Info[player.playerid].Mail, Player.Info[player.playerid].Money, Player.Info[player.playerid].Coins, Player.Info[player.playerid].Respect.Positive, Player.Info[player.playerid].Respect.Negative, 
@@ -299,12 +299,14 @@ module.exports = {
             Player.Info[player.playerid].Gang_Data.Kills, Player.Info[player.playerid].Gang_Data.Deaths, Player.Info[player.playerid].Gang_Data.Captures, Player.Info[player.playerid].Gang_Data.Points, Player.Info[player.playerid].Gang_Data.Warns, 
             OnlineTimeGang.hours, OnlineTimeGang.minutes, OnlineTimeGang.seconds, Player.Info[player.playerid].Gang_Data.MemberSince, Player.Info[player.playerid].Kills_Data.Kills, Player.Info[player.playerid].Kills_Data.HeadShots, 
             Player.Info[player.playerid].Kills_Data.KillingSpree, Player.Info[player.playerid].Kills_Data.BestKillingSpree, Player.Info[player.playerid].Kills_Data.Deaths, Player.Info[player.playerid].Driving_Data.DriftPoints, 
-            Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, Player.Info[player.playerid].AdminPoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds,
+            Player.Info[player.playerid].Driving_Data.StuntPoints, Player.Info[player.playerid].Driving_Data.RacePoints, OnlineTimeMonth.hours, OnlineTimeMonth.minutes, OnlineTimeMonth.seconds,
             Player.Info[player.playerid].Month.Kills_Data.Kills, Player.Info[player.playerid].Month.Kills_Data.HeadShots, Player.Info[player.playerid].Month.Kills_Data.KillingSpree, Player.Info[player.playerid].Month.Kills_Data.BestKillingSpree, 
             Player.Info[player.playerid].Month.Kills_Data.Deaths, Player.Info[player.playerid].Month.Driving_Data.DriftPoints, Player.Info[player.playerid].Month.Driving_Data.StuntPoints, Player.Info[player.playerid].Month.Driving_Data.RacePoints, 
             Player.Info[player.playerid].Description[1], Player.Info[player.playerid].Description[2], Player.Info[player.playerid].Description[3], this.getDateForLastOn(), Player.Info[player.playerid].Jailed, Player.Info[player.playerid].Caged, 
             Player.Info[player.playerid].Kicks, Player.Info[player.playerid].Discord, Player.Info[player.playerid].HoldsData.Settings, Player.Info[player.playerid].AccID
-        ]);
+        ], (err) => {
+            if(err) console.log(err);
+        });
     },
     /**
      * @param {SampPlayer} player
