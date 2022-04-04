@@ -19,8 +19,7 @@ export class SmartDialogFunctions {
     static ShowPlayerSmartDialog(playerid: number, style: number, caption: string, info: string, button1: string, button2: string, callback: SMART_DIALOG_CALLBACK): void {
         ShowPlayerDialog(playerid, 0, style, caption, info, button1, button2);
  
-        function onResponse(responsePlayerId: number, responseDialogId: number, responseButton: number, responseListItem: number, responseInputText: string) {
-            if(responsePlayerId != playerid) return;
+        function onResponse(responseDialogId: number, responseButton: number, responseListItem: number, responseInputText: string) {
             if(responseDialogId != 0) return;
             callback({
                 button: responseButton,
@@ -35,13 +34,12 @@ export class SmartDialogFunctions {
             removeAllListeners();
         }
 
-        function onDisconnect(disconnectedPlayerId: number) {
-            if(disconnectedPlayerId != playerid) return;
+        function onDisconnect() {
             removeAllListeners();
         }
 
-        dialogEvent.once("onResponse", onResponse);
-        dialogEvent.once("onDisconnect", onDisconnect);
+        dialogEvent.once(`onResponse${playerid}`, onResponse);
+        dialogEvent.once(`onDisconnect${playerid}`, onDisconnect);
 
         function removeAllListeners() {
             dialogEvent.removeListener("onResponse", onResponse);
@@ -51,9 +49,9 @@ export class SmartDialogFunctions {
 }
 
 samp.on("OnDialogResponse", (playerid, dialogid, response, listitem, inputtext) => {
-    dialogEvent.emit("onResponse", playerid, dialogid, response, listitem, inputtext);
+    dialogEvent.emit(`onResponse${playerid}`, dialogid, response, listitem, inputtext);
 });
 
 samp.on("OnPlayerDisconnect", (playerid, reason) => {
-    dialogEvent.emit("onDisconnect", playerid);
+    dialogEvent.emit(`onDisconnect${playerid}`);
 });
