@@ -5920,7 +5920,7 @@ function replaceAll(string, search, replace) {
  * @param {samp.SampPlayer} player 
  */
 function PreparatePlayerLogin(player) {
-    con.query("SELECT * FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
+    con.query("SELECT name FROM users WHERE name = ?", [player.GetPlayerName(24)], function(err, result) {
         if(err) return player.Kick();
         if(result == 0) { /* Register */
             let info = "";
@@ -5930,6 +5930,7 @@ function PreparatePlayerLogin(player) {
             info += `{FFFF00}${Function.Lang(player, "Introdu o parola grea pe care doar tu sa o stii pentru a te autentifica! ({FF0000}intre 3-25 de caractere{FFFF00}):", "Enter a hard password before ({FF0000}Min. 3 - Max. 25 characters{FFFF00}):")}`;
             player.ShowPlayerSmartDialog(samp.DIALOG_STYLE.PASSWORD, Function.Lang(player, "Inregistreaza-ti numele!", "Register your name!"), info, "Register", Function.Lang(player, "Nume Nou", "New Name"), (response) => {
                 if(!response.button) return Call_NewName(player);
+                else if(response.inputText.length > 6) return response.repeatDialog();
                 else {
                     con.query("INSERT INTO users (name, password) VALUES(?, ?)", [player.GetPlayerName(24), md5(response.inputText)], function(err, result) {
                         if(err) return player.Kick();
