@@ -4344,11 +4344,9 @@ function checkGhostModes(player) {
         if(player.getVariable("ghostMode")) {
             ysf.HidePlayerForPlayer(i.playerid, player.playerid);
             i.SetPlayerMarkerForPlayer(player.playerid, 0xFFFFFF00);
-            console.log(`removing ${player.GetPlayerName(24)} to ${i.GetPlayerName(24)}`);
         } else {
             ysf.ShowPlayerForPlayer(i.playerid, player.playerid);
             i.SetPlayerMarkerForPlayer(player.playerid, player.GetPlayerColor());
-            console.log(`adding ${player.GetPlayerName(24)} to ${i.GetPlayerName(24)}`);
         }
     });
 }
