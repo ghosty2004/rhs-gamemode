@@ -25,7 +25,12 @@ const streamer = require("./libs/streamer");
 const ysf = require("./libs/ysf");
 
 /**
- * Custom Modules
+ * Custom Modules Without Export
+ */
+require("./modules/anticheat");
+
+/**
+ * Custom Modules With Export
  */
 const Business = require("./modules/business");
 const Checkpoint = require("./modules/checkpoint");
@@ -4320,14 +4325,6 @@ CMD.on("givepcar", (player, params) => {
     else SendUsage(player, "/GivePCar [ID/Name] [Vehicle ID]");
 });
 
-/**
- * Functions
- */
-function sendBuster(player, reason) {
-    player.SendClientMessage(data.colors.RED, `${data.settings.BUSTER_PREFIX}: Kicking player ${player.GetPlayerName(24)}(${player.playerid}). Reason: ${reason}`);
-    Function.kickPlayer(player);
-}
-
 function isPlayerInAnyHouseLift(player) {
     return House.Info.find((houseFind) => {
         return houseFind.lifts.find((liftFind) => {
@@ -4547,21 +4544,6 @@ function spawnPlayerInDM(player, first_time=false) {
             player.SpawnPlayer();
             break;
         }
-    }
-}
-
-/**
- * @param {samp.SampPlayer} player 
- */
-function CheckAntiCheat(player) {
-    if(Player.Info[player.playerid].Admin) return;
-    /* ======== */
-    /* Fly Hack */
-    /* ======== */
-    const AnimIndex = player.GetPlayerAnimationIndex();
-    const AnimName = samp.GetAnimationName(AnimIndex, 32, 32);
-    if(AnimName[0] == "PARACHUTE" && AnimName[1] == "FALL_SKYDIVE" && player.GetPlayerWeapon() != 46) {
-        SendMessageToAdmins(data.colors.RED, `${data.settings.BUSTER_PREFIX}: ${player.GetPlayerName(24)}(${player.playerid}) possible use Fly Hack!`);
     }
 }
 
@@ -4941,7 +4923,12 @@ function getGangRank(RankID) {
     return string;
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ * @param {samp.SampPlayer} target 
+ */
 function StartSpectate(player, target) {
+    player.setVariable("spectating", true);
     Player.Info[player.playerid].Spectating = target.playerid;
     player.TogglePlayerSpectating(true);
     player.SetPlayerVirtualWorld(target.GetPlayerVirtualWorld());
@@ -4951,13 +4938,20 @@ function StartSpectate(player, target) {
     CheckSpecTextDraw(player);
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ */
 function StopSpectate(player) {
+    player.setVariable("spectating", false);
     player.TogglePlayerSpectating(false);
     Player.Info[player.playerid].Spectating = -1;
     player.SpawnPlayer();
     CheckSpecTextDraw(player);
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ */
 function CheckSpecTextDraw(player) {
     if(Player.Info[player.playerid].Spectating != -1) {
         let target = samp.getPlayers().filter(f => f.playerid == Player.Info[player.playerid].Spectating)[0];
@@ -4971,6 +4965,12 @@ function CheckSpecTextDraw(player) {
     }
 }
 
+/**
+ * @param {samp.SampPlayer} player 
+ * @param {Number} model 
+ * @param {Number} color1 
+ * @param {Number} color2 
+ */
 function SpawnCar(player, model, color1=Function.getRandomInt(0, 255), color2=Function.getRandomInt(0, 255)) {
     if(player.IsPlayerInAnyVehicle()) return SendError(player, "Ai deja un vehicul!", "You are already in a vehicle!");
     if(Player.Info[player.playerid].SpawnedCar) {
@@ -6620,7 +6620,6 @@ samp.OnPlayerUpdate((player) => {
             }
         });
     }
-    CheckAntiCheat(player);
     return true;
 });
 

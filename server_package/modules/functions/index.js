@@ -6,6 +6,7 @@ const Gang = require("../gang");
 const colors = require("../../data/colors");
 const con = require("../mysql");
 const Player = require("../player");
+const settings = require("../../data/settings");
 
 module.exports = { 
     /**
@@ -358,5 +359,15 @@ module.exports = {
             case 3: string = "Founder"; break;
         }
         return string;
-    }
+    },
+    /**
+     * @param {SampPlayer} player 
+     * @param {String} reason 
+     */
+    sendBuster(player, reason) {
+        if(player.getVariable("awaitToBeKicked")) return;
+        player.setVariable("awaitToBeKicked", true);
+        SendClientMessageToAll(colors.RED, `${settings.BUSTER_PREFIX}: Kicking player '${player.GetPlayerName(24)}'. Reason: ${reason}`);
+        this.kickPlayer(player);
+    },
 }
