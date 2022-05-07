@@ -4133,7 +4133,7 @@ CMD.on("ghostmode", (player) => {
     if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
     const ghostMode = Boolean(player.getVariable("ghostMode"));
     player.setVariable("ghostMode", !ghostMode);
-    checkGhostModes(player);
+    checkGhostModesForAll(player);
     SendACMD(player, "GhostMode");
 });
 
@@ -4338,17 +4338,25 @@ CMD.on("givepcar", (player, params) => {
 
 /**
  * @param {samp.SampPlayer} player 
+ * @param {null|samp.SampPlayer} target
  */
-function checkGhostModes(player) {
-    samp.getPlayers().filter(f => f != player).forEach((i) => {
-        if(player.getVariable("ghostMode")) {
-            ysf.HidePlayerForPlayer(i.playerid, player.playerid);
-            i.SetPlayerMarkerForPlayer(player.playerid, 0xFFFFFF00);
+function checkGhostModesForPlayer(player, target = null) {
+    samp.getPlayers().filter(f => f != player && f == target || target == null).forEach((i) => {
+        if(i.getVariable("ghostMode")) {
+            ysf.HidePlayerForPlayer(player.playerid, i.playerid);
+            player.SetPlayerMarkerForPlayer(i.playerid, 0xFFFFFF00);
         } else {
-            ysf.ShowPlayerForPlayer(i.playerid, player.playerid);
-            i.SetPlayerMarkerForPlayer(player.playerid, player.GetPlayerColor());
+            ysf.ShowPlayerForPlayer(player.playerid, i.playerid);
+            player.SetPlayerMarkerForPlayer(i.playerid, i.GetPlayerColor());
         }
     });
+}
+
+/**
+ * @param {samp.SampPlayer} target 
+ */
+function checkGhostModesForAll(target) {
+    samp.getPlayers().forEach((i) => { checkGhostModesForPlayer(i, target); });
 }
 
 function isPlayerInAnyHouseLift(player) {
@@ -6590,6 +6598,7 @@ samp.OnPlayerConnect(async(player) => {
 
         player.PlayerPlaySound(1097, 0.0, 0.0, 0.0);
     }
+
     return true;
 });
 
@@ -6652,6 +6661,7 @@ samp.OnPlayerUpdate((player) => {
 
 samp.OnPlayerSpawn((player) => {
     if(!Player.Info[player.playerid].LoggedIn) return player.Kick();
+    checkGhostModesForPlayer(player);
     HideConnectTextDraw(player);
     ShowSpawnTextDraw(player);
     player.SetPlayerVirtualWorld(0);
