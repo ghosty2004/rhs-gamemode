@@ -52,7 +52,7 @@ const commands = [];
 bot.commands = new Discord.Collection();
 
 // => Settings
-const DEVELOPER_GUILD_ID = "873994029816242198"; 
+const DEVELOPER_GUILD_ID = 0; // 873994029816242198
 const Add_Slash_Commands_To_API = true;
 
 // => Load Some vars
@@ -156,7 +156,7 @@ bot.once("ready", () => {
     }, 10 * 1000);
 
     /* ============================================== */
-    /* Chcek if channels exists in discordChannelLogs */
+    /* Check if channels exists in discordChannelLogs */
     /* ============================================== */
     con.query("SELECT * FROM discordChannelLogs", function(err, result) {
         if(err) return;
