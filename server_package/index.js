@@ -24,14 +24,11 @@ const samp = require("./libs/samp");
 const streamer = require("./libs/streamer");
 const ysf = require("./libs/ysf");
 
-/**
- * Custom Modules Without Export
- */
-require("./modules/anticheat");
 
 /**
- * Custom Modules With Export
+ * Custom Modules
  */
+const AntiCheat = require("./modules/anticheat");
 const Business = require("./modules/business");
 const Checkpoint = require("./modules/checkpoint");
 const Circle = require("./modules/circle");
@@ -2511,7 +2508,7 @@ CMD.on("invisible", (player) => {
 
 CMD.on("visible", (player) => {
     if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
-}); 
+});
 
 CMD.on("vcar", (player) => {
     if(Player.Info[player.playerid].VIP < 2) return SendError(player, Errors.NOT_ENOUGH_VIP.RO, Errors.NOT_ENOUGH_VIP.ENG);
@@ -2543,6 +2540,7 @@ CMD.on("spec", (player, params) => {
     let target = getPlayer(params[0]);
     if(!target) return SendError(player, Errors.PLAYER_NOT_CONNECTED);
     if(target.GetPlayerState() == samp.PLAYER_STATE.SPECTATING) return SendError(player, "Player spectating someone else!");
+    if(!ysf.IsPlayerSpawned(target.playerid)) return SendError(player, "Player is not spawned!");
     player.GameTextForPlayer("~w~now~g~~h~ spectating~n~~w~type~r~~h~ /spec off~w~ to stop", 4000, 3);
     if(Player.Info[player.playerid].Admin) {
         SendMessageToAdmins(data.colors.BLUE, `Admin: {FFFF00}${player.GetPlayerName(24)} {0000FF}has started spectating player {FFFF00}#${target.playerid}`);
@@ -4130,6 +4128,15 @@ CMD.on("setall", (player, params) => {
  * Admins Commands
  * RCON
  */
+
+CMD.on("ghostmode", (player) => {
+    if(Player.Info[player.playerid].RconType < 2) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
+    const ghostMode = Boolean(player.getVariable("ghostMode"));
+    player.setVariable("ghostMode", !ghostMode);
+    checkGhostModes(player);
+    SendACMD(player, "GhostMode");
+});
+
 CMD.on("edithouse", (player) => {
     if(Player.Info[player.playerid].RconType < 3) return SendError(player, Errors.NOT_ENOUGH_ADMIN.RO, Errors.NOT_ENOUGH_ADMIN.ENG);
 });
@@ -4324,6 +4331,27 @@ CMD.on("givepcar", (player, params) => {
     }
     else SendUsage(player, "/GivePCar [ID/Name] [Vehicle ID]");
 });
+
+/**
+ * Functions
+ */
+
+/**
+ * @param {samp.SampPlayer} player 
+ */
+function checkGhostModes(player) {
+    samp.getPlayers().filter(f => f != player).forEach((i) => {
+        if(player.getVariable("ghostMode")) {
+            ysf.HidePlayerForPlayer(i.playerid, player.playerid);
+            i.SetPlayerMarkerForPlayer(player.playerid, 0xFFFFFF00);
+            console.log(`removing ${player.GetPlayerName(24)} to ${i.GetPlayerName(24)}`);
+        } else {
+            ysf.ShowPlayerForPlayer(i.playerid, player.playerid);
+            i.SetPlayerMarkerForPlayer(player.playerid, player.GetPlayerColor());
+            console.log(`adding ${player.GetPlayerName(24)} to ${i.GetPlayerName(24)}`);
+        }
+    });
+}
 
 function isPlayerInAnyHouseLift(player) {
     return House.Info.find((houseFind) => {
@@ -6620,6 +6648,7 @@ samp.OnPlayerUpdate((player) => {
             }
         });
     }
+    AntiCheat.onPlayerUpdate(player);
     return true;
 });
 
