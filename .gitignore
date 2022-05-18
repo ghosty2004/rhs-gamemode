@@ -2,8 +2,7 @@
 !node_modules/samp-node-lib
 !node_modules/youtube-audio-server
 
-server_package/data/mysql.js
-server_package/modules/mysql
+server_package/modules/mysql/index.js
 server_log.txt
 samp-node.log
 server.cfg
