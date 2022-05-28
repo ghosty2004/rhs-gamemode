@@ -32,7 +32,7 @@ CREATE TABLE `akas` (
   `ID` int NOT NULL,
   `names` varchar(100) NOT NULL,
   `ip` varchar(16) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -48,7 +48,7 @@ CREATE TABLE `bans` (
   `from_timestamp` int NOT NULL,
   `to_timestamp` int NOT NULL,
   `reason` varchar(30) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -64,7 +64,7 @@ CREATE TABLE `business` (
   `interiorType` varchar(30) NOT NULL,
   `cost` int NOT NULL,
   `win` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `business`
@@ -129,7 +129,7 @@ CREATE TABLE `dealership` (
   `type` varchar(15) NOT NULL,
   `model` int NOT NULL,
   `cost` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `dealership`
@@ -223,7 +223,7 @@ CREATE TABLE `discordChannelLogs` (
   `type` varbinary(20) NOT NULL,
   `guildId` varchar(20) NOT NULL,
   `channelId` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -246,7 +246,7 @@ CREATE TABLE `gangs` (
   `gate_objectid` int NOT NULL DEFAULT '980',
   `gate_position` json NOT NULL,
   `territory_position` json NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `gangs`
@@ -272,7 +272,7 @@ CREATE TABLE `gangscheckpoints` (
   `position` json NOT NULL,
   `position_to` json NOT NULL,
   `textlabel` varchar(30) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `gangscheckpoints`
@@ -298,7 +298,7 @@ CREATE TABLE `holds` (
   `offsetposition` json NOT NULL,
   `offsetrotation` json NOT NULL,
   `offsetscale` json NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -313,7 +313,7 @@ CREATE TABLE `houses` (
   `interiorType` varchar(30) NOT NULL,
   `cost` int NOT NULL,
   `lifts` json NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `houses`
@@ -358,7 +358,7 @@ CREATE TABLE `personalcars` (
   `position` json NOT NULL,
   `cartext` json NOT NULL,
   `from_admin` int NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
 
@@ -501,7 +501,7 @@ CREATE TABLE `users` (
   `gang_hours` int NOT NULL DEFAULT '0',
   `gang_minutes` int NOT NULL DEFAULT '0',
   `gang_seconds` int NOT NULL DEFAULT '0',
-  `gang_membersince` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'Unknown',
+  `gang_membersince` varchar(20) DEFAULT 'Unknown',
   `kills` int NOT NULL DEFAULT '0',
   `headshots` int NOT NULL DEFAULT '0',
   `killingspree` int NOT NULL DEFAULT '0',
@@ -524,7 +524,7 @@ CREATE TABLE `users` (
   `description1` varchar(100) NOT NULL DEFAULT '',
   `description2` varchar(100) NOT NULL DEFAULT '',
   `description3` varchar(100) NOT NULL DEFAULT '',
-  `laston` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'Unknown',
+  `laston` varchar(10) DEFAULT 'Unknown',
   `jailed` int NOT NULL DEFAULT '0',
   `caged` int NOT NULL DEFAULT '0',
   `kicks` int NOT NULL DEFAULT '0',
@@ -532,7 +532,7 @@ CREATE TABLE `users` (
   `hold_settings` int NOT NULL DEFAULT '0',
   `house` int NOT NULL DEFAULT '0',
   `business` int NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Indexes for dumped tables
