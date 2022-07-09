@@ -6544,7 +6544,7 @@ samp.OnPlayerExitVehicle((player, vehicleid) => {
 
 samp.OnPlayerGiveDamageActor((player, damaged_actorid, amount, weaponid, bodypart) => {
     if(damaged_actorid == data.settings.BUSTER_ACTOR) {
-        player.SendClientMessage(data.colors.RED, `${data.settings.BUSTER_PREFIX}: Stop shooting me idiot, will kick you!`);
+        player.SendClientMessage(data.colors.RED, `${data.settings.BUSTER_PREFIX}: Stop shooting me you idiot or I will kick you!`);
     }
     return true;
 });
