@@ -1126,7 +1126,8 @@ CMD.on("l", (player) => {
 });
 
 CMD.on("c4", (player) => {
-
+  player.GivePlayerWeapon(39, 5);
+  player.SendClientMessage(data.colors.GREEN, Function.Lang(player, "Ai primit 5 {00BBF6}C4{00FF00}!", "You recived 5{00BBF6}C4{00FF00}!"));
 });
 
 CMD.on("top", (player) => {
