@@ -267,7 +267,7 @@ CMD.on("car", (player, params) => {
 });
 
 CMD.on("v", (player, params) => { 
-
+    { CMD.emit("car", player); }
 });
 
 CMD.on("nrg", (player) => { SpawnCar(player, 522); });
@@ -862,13 +862,13 @@ CMD.on("fix", (player) => {
 
 });
 
-CMD.on("happy", (player) => {
-
+/*CMD.on("happy", (player) => {
+ player.SendClientMessageToAll(data.colors.GREEN, Function.Lang(player, "{00BBF6}Jucătorul "{player.GetPlayerName(24)} " este fericit!", "{00BBF6} The player "{player.GetPlayerName(24)}" is happy!"));
 });
 
 CMD.on("sad", (player) => {
-
-});
+    player.SendClientMessageToAll(data.colors.GREEN, Function.Lang(player, "{00BBF6}Jucătorul "{player.GetPlayerName(24)} " este trist =(", "{00BBF6} The player "{player.GetPlayerName(24)}" is sad =("));
+});*/
 
 CMD.on("tow", (player) => {
 
