@@ -4,8 +4,8 @@
 
 server_package/modules/mysql/index.js
 server_log.txt
-samp-node.log
 server.cfg
+samp.ban
 
 server_package/libs/samp/build
 server_package/libs/streamer/build
