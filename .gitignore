@@ -10,3 +10,4 @@ samp.ban
 server_package/libs/samp/build
 server_package/libs/streamer/build
 server_package/libs/ysf/build
+samp-node.log
