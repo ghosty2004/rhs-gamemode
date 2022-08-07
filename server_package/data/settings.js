@@ -10,7 +10,6 @@ module.exports = {
     RANDOM_SERVER_NAMES: [
         "Romania HarD Stunt - We are working...",
         "Romania HarD Stunt - Ghosty Edition",
-        "Romania HarD Stunt - Futu-ți engleza mă-tii Voller",
         "Romania HarD Stunt - Join Us!",
         "Romania HarD Stunt - The best stunt server"    
     ],
