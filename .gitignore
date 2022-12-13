@@ -2,7 +2,7 @@
 !node_modules/samp-node-lib
 !node_modules/youtube-audio-server
 
-server_package/modules/mysql/index.js
+.env
 server_log.txt
 server.cfg
 samp.ban

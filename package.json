@@ -4,7 +4,10 @@
   "description": "SA:MP RHS GameMode in NodeJS",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "setup-samp-lib": "cd server_package/libs/samp && npm install && npm run build",
+    "setup-streamer-lib": "cd server_package/libs/streamer && npm install && npm run build",
+    "setup-ysf-lib": "cd server_package/libs/ysf && npm install && npm run build",
+    "setup": "npm run setup-samp-lib && npm run setup-streamer-lib && npm run setup-ysf-lib"
   },
   "repository": {
     "type": "git",
@@ -17,6 +20,7 @@
   },
   "homepage": "https://github.com/Ghosty2004/rhs-gamemode#readme",
   "dependencies": {
+    "@discordjs/builders": "^1.4.0",
     "@discordjs/opus": "^0.5.3",
     "@discordjs/rest": "^0.1.0-canary.0",
     "@discordjs/voice": "^0.7.5",
@@ -24,6 +28,7 @@
     "colors": "^1.4.0",
     "discord-api-types": "^0.25.2",
     "discord.js": "^13.2.0",
+    "dotenv": "^16.0.3",
     "events": "^3.3.0",
     "express": "^4.17.2",
     "hastebin-gen": "^2.0.5",
@@ -32,7 +37,6 @@
     "mysql": "^2.18.1",
     "opusscript": "^0.0.8",
     "samp-node-lib": "^1.0.5",
-    "slash-command-builder": "^0.1.1",
     "youtube-audio-server": "^2.8.2",
     "youtube-search-without-api-key": "^1.0.6",
     "ytdl-core": "^4.9.1"

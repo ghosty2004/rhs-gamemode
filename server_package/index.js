@@ -6273,10 +6273,6 @@ samp.OnGameModeInit(() => {
         ysf.SetServerRule("* server uptime", `${OnlineTime.hours}:${OnlineTime.minutes}:${OnlineTime.seconds}`);
     }, 1000); 
 
-    data.settings.ALLOWED_NICKNAME_CHARACTERS.forEach((character) => {
-        ysf.AllowNickNameCharacter(character, true);
-    });
-
     Maps.Load(); /* Load Server Maps */
     TextDraws.server.Load(); /* Load Server TextDraws */
     Minigames.Load(); /* Load Server Minigames */

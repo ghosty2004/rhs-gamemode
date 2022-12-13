@@ -1,6 +1,15 @@
 # Romania HarD Stunt (SA:MP GameMode)
 - Language: **NodeJS**
 
+# Setup
+
+- Clone/download this repository
+- Type `npm install` in terminal
+- Type `npm run setup` in terminal
+- Create a copy of `.env.example` and rename to `.env`
+- Modify the mysql data from the `.env` what you created
+- Start the server and have fun :)
+
 # Images
 
 <details> 

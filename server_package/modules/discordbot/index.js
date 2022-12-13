@@ -60,9 +60,11 @@ con.on("finishedLoad", () => {
     con.query("SELECT ID, name FROM users ORDER BY month_hours DESC LIMIT 25", function(err, result) {
         if(err) return;
         for (const file of commandFiles) {
-            const command = require(`./commands/${file}`);
-            commands.push(command.data.toJSON());
-            bot.commands.set(command.data.name, command);
+            try {
+                const command = require(`./commands/${file}`);
+                commands.push(command.data.toJSON());
+                bot.commands.set(command.data.name, command);
+            } catch {}
         }
     });
 });
